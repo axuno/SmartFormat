@@ -199,7 +199,7 @@ namespace StringFormatEx.Plugins.Core
                 if (!cache.ContainsKey(cacheKey)) {
                     cache.Add(cacheKey, this.mCurrent.GetType());
                 }
-                return (Type)cache[cacheKey]; // TODO: Remove cast
+                return (Type)cache[cacheKey];
             }
         }
 
@@ -214,7 +214,7 @@ namespace StringFormatEx.Plugins.Core
                 if (!cache.ContainsKey(cacheKey)) {
                     cache.Add(cacheKey, mCurrent is int || mCurrent is long || mCurrent is short || mCurrent is float || mCurrent is double || mCurrent is decimal || (mCurrent != null && this.CurrentType.IsEnum));
                 }
-                return (bool)cache[cacheKey]; // TODO: Remove cast
+                return (bool)cache[cacheKey];
             }
         }
 
@@ -229,7 +229,7 @@ namespace StringFormatEx.Plugins.Core
                 if (!cache.ContainsKey(cacheKey)) {
                     cache.Add(cacheKey, mCurrent is float || mCurrent is double || mCurrent is decimal);
                 }
-                return (bool)cache[cacheKey]; // TODO: remove cast
+                return (bool)cache[cacheKey];
             }
         }
 
@@ -244,7 +244,7 @@ namespace StringFormatEx.Plugins.Core
                 if (!cache.ContainsKey(cacheKey)) {
                     cache.Add(cacheKey, mCurrent is System.DateTime);
                 }
-                return (bool)cache[cacheKey]; // TODO: remove cast
+                return (bool)cache[cacheKey];
             }
         }
 
@@ -259,7 +259,7 @@ namespace StringFormatEx.Plugins.Core
                 if (!cache.ContainsKey(cacheKey)) {
                     cache.Add(cacheKey, mCurrent is bool);
                 }
-                return (bool)cache[cacheKey]; // TODO: remove cast
+                return (bool)cache[cacheKey];
             }
         }
 
@@ -274,7 +274,7 @@ namespace StringFormatEx.Plugins.Core
                 if (!cache.ContainsKey(cacheKey)) {
                     cache.Add(cacheKey, mCurrent is string);
                 }
-                return (bool)cache[cacheKey]; // TODO: remove cast
+                return (bool)cache[cacheKey];
             }
         }
 
@@ -289,7 +289,7 @@ namespace StringFormatEx.Plugins.Core
                 if (!cache.ContainsKey(cacheKey)) {
                     cache.Add(cacheKey, mCurrent is TimeSpan);
                 }
-                return (bool)cache[cacheKey]; // TODO: remove cast
+                return (bool)cache[cacheKey];
             }
         }
 

@@ -324,6 +324,19 @@ namespace StringFormatEx.Tests
 
 
         [Test]
+        public void ComplexConditionFirstMatchingCase()
+        {
+            var p1 = new Person() { Birthday = DateTime.MinValue };
+
+            var formatString = "{Age:>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
+            var expectedOutput = "Senior Citizen";
+
+            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            Assert.AreEqual(expectedOutput, actualOutput);
+        }
+
+
+        [Test]
         public void ComplexConditionFallThroughCase()
         {
             var p1 = new Person() { Birthday = DateTime.Today };
