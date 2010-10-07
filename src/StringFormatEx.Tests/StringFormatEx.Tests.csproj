@@ -44,7 +44,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\StringFormatEx.csproj">
+    <ProjectReference Include="..\StringFormatEx\StringFormatEx.csproj">
       <Project>{83A94F48-8529-4A41-B5E1-1684827180DF}</Project>
       <Name>StringFormatEx</Name>
     </ProjectReference>
