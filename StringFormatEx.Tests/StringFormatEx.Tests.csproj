@@ -5,14 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{83A94F48-8529-4A41-B5E1-1684827180DF}</ProjectGuid>
+    <ProjectGuid>{5B6368BF-B7C3-440F-ABAA-52A48A837A46}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StringFormatEx</RootNamespace>
-    <AssemblyName>StringFormatEx</AssemblyName>
+    <RootNamespace>StringFormatEx.Tests</RootNamespace>
+    <AssemblyName>StringFormatEx.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,30 +31,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.5.7.10213, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ErrorAction.cs" />
-    <Compile Include="ExtendedStringFormatter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Extensions\ExtendedStringFormatterExtensions.cs" />
-    <Compile Include="Plugins\Core\ExtendFormatEventArgs.cs" />
-    <Compile Include="Plugins\Core\ExtendSourceEventArgs.cs" />
-    <Compile Include="Plugins\Core\IStringFormatterPlugin.cs" />
-    <Compile Include="Plugins\Core\ParsingServices.cs" />
-    <Compile Include="Plugins\_DefaultFormatPlugin.cs" />
-    <Compile Include="Plugins\_DefaultSourcePlugin.cs" />
+    <Compile Include="CodeProjectExampleTests.cs" />
+    <Compile Include="TestData\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Plugins\ArrayPlugin.cs" />
-    <Compile Include="Plugins\ConditionalPlugin.cs" />
-    <Compile Include="Plugins\Core\CustomFormatInfo.cs" />
-    <Compile Include="Plugins\Core\CustomFormatPriority.cs" />
-    <Compile Include="Plugins\Core\CustomFormatPriorityAttribute.cs" />
-    <Compile Include="Plugins\Core\ICustomSourceInfo.cs" />
-    <Compile Include="PlaceholderInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\StringFormatEx.csproj">
+      <Project>{83A94F48-8529-4A41-B5E1-1684827180DF}</Project>
+      <Name>StringFormatEx</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

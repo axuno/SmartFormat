@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("StringFormatEx")]
+[assembly: AssemblyTitle("StringFormatEx.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("StringFormatEx")]
-[assembly: AssemblyCopyright("CDDL")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("StringFormatEx.Tests")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("53c9e05e-8546-41e1-b47f-428d4ef84ad4")]
+[assembly: Guid("8eec7e3d-9465-49b8-a2a7-36bee44b12b1")]
 
 // Version information for an assembly consists of the following four values:
 //

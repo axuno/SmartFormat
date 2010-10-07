@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringFormatEx", "StringFormatEx.csproj", "{83A94F48-8529-4A41-B5E1-1684827180DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringFormatEx.Tests", "StringFormatEx.Tests\StringFormatEx.Tests.csproj", "{5B6368BF-B7C3-440F-ABAA-52A48A837A46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{83A94F48-8529-4A41-B5E1-1684827180DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83A94F48-8529-4A41-B5E1-1684827180DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83A94F48-8529-4A41-B5E1-1684827180DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B6368BF-B7C3-440F-ABAA-52A48A837A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B6368BF-B7C3-440F-ABAA-52A48A837A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B6368BF-B7C3-440F-ABAA-52A48A837A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B6368BF-B7C3-440F-ABAA-52A48A837A46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
