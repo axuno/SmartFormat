@@ -37,12 +37,11 @@ namespace StringFormatEx.Plugins
             ICustomSourceInfo info = e.SourceInfo;
             int itemIndex;
             if (info.Current is IList && int.TryParse(info.Selector, out itemIndex) && itemIndex < ((IList)info.Current).Count) {
-                info.Current = ((IList)info.Current)[itemIndex];
+                info.Current = ((IList)info.Current);//[itemIndex];
             }
         }
 
 
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
         private int CollectionIndex = -1;
 
 

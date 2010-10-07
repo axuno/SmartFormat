@@ -34,7 +34,7 @@ namespace StringFormatEx.Tests
             var p = MakeQuentin();
 
             var formatString = "{0} is {1} years old and has {2:N2} friends.";
-            var expectedOutput = "Quentin is 29 years old and has 4 friends.";
+            var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
 
             var actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p.Name, p.Age, p.Friends.Count);
             Assert.AreEqual(expectedOutput, actualOutput);
@@ -47,7 +47,7 @@ namespace StringFormatEx.Tests
             var p = MakeQuentin();
 
             var formatString = "{Name} is {Age} years old and has {Friends.Count:N2} friends.";
-            var expectedOutput = "Quentin is 29 years old and has 4 friends.";
+            var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
 
             var actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p);
             Assert.AreEqual(expectedOutput, actualOutput);
@@ -75,7 +75,7 @@ namespace StringFormatEx.Tests
                                           new DateTime(3000, 1, 1),
                                       };
 
-            var formatString = "All dates: {0:MM/dd/yyyy| and }.";
+            var formatString = "All dates: {0:M/d/yyyy| and }.";
             var expectedOutput = "All dates: 12/31/1999 and 10/10/2010 and 1/1/3000.";
 
             var actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, data);

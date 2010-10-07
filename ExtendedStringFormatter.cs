@@ -156,15 +156,18 @@ namespace StringFormatEx
 
                 //  Let's search for the "CustomFormatPriorityAttribute" to see if we should add this handler at a higher priority in the handler list:
                 CustomFormatPriorities handlerPriority = CustomFormatPriorities.Normal;
+
                 //  default priority
                 foreach (CustomFormatPriorityAttribute pa in value.Method.GetCustomAttributes(typeof(CustomFormatPriorityAttribute), true)) {
                     handlerPriority = pa.Priority;
                     //  There should never be more than 1 PriorityAttribute
                 }
+
                 //  Make sure there is a list for this priority:
                 if (!_customSourceHandlers.ContainsKey(handlerPriority)) {
                     _customSourceHandlers.Add(handlerPriority, new List<EventHandler<ExtendSourceEventArgs>>());
                 }
+
                 //  Add the new handler to the list:
                 _customSourceHandlers[handlerPriority].Add(value);
             }

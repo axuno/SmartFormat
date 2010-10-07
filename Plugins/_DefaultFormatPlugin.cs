@@ -49,7 +49,7 @@ namespace StringFormatEx.Plugins
             }
 
             //  Now try to format the object, using its own built-in formatting if possible:
-            if (info.Current.GetType() is IFormattable) {
+            if (info.Current is IFormattable) {
                 info.Write(((IFormattable)info.Current).ToString(info.Format, info.Provider));
             }
             else {
