@@ -67,31 +67,95 @@ namespace StringFormatEx
         /// </summary>
         /// <param name="format"></param>
         /// <param name="args"></param>
-        public string FormatEx(string format, params object[] args) 
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
+            object arg7, object arg8, object arg9, object arg10, object arg11, object arg12, params object[] args)
         {
-            StringWriter output = new StringWriter(new StringBuilder((format.Length * 2)));
-            //  Guessing a length can help performance a little.
-            FormatExInternal(new CustomFormatInfo(this, output, format, args));
-            return output.ToString();
-        }
-    
+            int argCount = 12 + (args != null ? args.Length : 0);
+            var newArgs = new object[argCount];
+            newArgs[0] = arg1;
+            newArgs[1] = arg2;
+            newArgs[2] = arg3;
+            newArgs[3] = arg4;
+            newArgs[4] = arg5;
+            newArgs[5] = arg6;
+            newArgs[6] = arg7;
+            newArgs[7] = arg8;
+            newArgs[8] = arg9;
+            newArgs[9] = arg10;
+            newArgs[10] = arg11;
+            newArgs[11] = arg12;
+            if (args != null) {
+                args.CopyTo(newArgs, 12);
+            }
 
-        /// <summary>
-        /// Performs the CustomFormat and outputs to a Stream.
-        /// </summary>
-        public void FormatEx(Stream output, string format, params object[] args) 
-        {
-            FormatExInternal(new CustomFormatInfo(this, new StreamWriter(output), format, args));
+            return new FluentFormatResult(this, format, newArgs);
         }
-    
 
-        /// <summary>
-        /// Performs the CustomFormat and outputs to a TextWriter.
-        /// </summary>
-        /// <param name="output">Common types of TextWriters are StringWriter and StreamWriter.</param>
-        public void FormatEx(TextWriter output, string format, params object[] args) 
+
+        public FluentFormatResult FormatEx(string format, object arg1)
         {
-            FormatExInternal(new CustomFormatInfo(this, output, format, args));
+            return FormatEx(format, arg1, null, null, null, null, null, null, null, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2)
+        {
+            return FormatEx(format, arg1, arg2, null, null, null, null, null, null, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3)
+        {
+            return FormatEx(format, arg1, arg2, arg3, null, null, null, null, null, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, null, null, null, null, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, null, null, null, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, null, null, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
+            object arg7)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, null, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
+            object arg7, object arg8)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, null, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
+            object arg7, object arg8, object arg9)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, null, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
+            object arg7, object arg8, object arg9, object arg10)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, null, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
+            object arg7, object arg8, object arg9, object arg10, object arg11)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, null, null);
+        }
+
+        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
+            object arg7, object arg8, object arg9, object arg10, object arg11, object arg12)
+        {
+            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, null);
         }
 
         #endregion
@@ -308,7 +372,7 @@ namespace StringFormatEx
             string invalidFormat = format.Substring(placeholder.formatStart, placeholder.formatLength);
             string errorMessage = ex.Message;
 
-            if (ex.GetType() is FormatException) {
+            if (ex is FormatException) {
                 errorMessage = FormatEx("\"{0}\" is not a valid format specifier for {1}", invalidFormat,
                                             info.CurrentType);
             }
