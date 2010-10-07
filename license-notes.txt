@@ -1,0 +1,12 @@
+I am not a lawyer, therefore my representations herein may be incorrect.  
+I accept no responsibility for any inaccuracies here or for any inaccuracies or errors in this library.
+
+StringFormatEx is licensed under the Common Development and Distribution License (CDDL).  
+It is licensed this way because it is a derivative work of, using source code from, the
+Custom Formatting in .NET found at http://www.codeproject.com/KB/string/Custom_Formatting.aspx
+
+To the best of my understanding one is only required to publish source for files in the original
+CDDL licensed project that have been modified or any new files that contain code copied from files
+in the original CDDL licensed project.
+
+Pesonally, I would like the code to be as free to use as anyone needs it to be.
