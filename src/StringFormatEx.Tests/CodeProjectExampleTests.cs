@@ -374,8 +374,8 @@ namespace StringFormatEx.Tests
             var formatString = "{0:{} = {Index}|, }";
             var expectedOutput = "A = 0, B = 1, C = 2";
 
-            //string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, new object[] {data});
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, data);
+            //string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, data);
+            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, (object)data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 

@@ -46,7 +46,7 @@ namespace StringFormatEx
             return formatter;
         }
 
-        private static IStringFormatterPlugin[] GetDefaultPlugins()
+        public static IStringFormatterPlugin[] GetDefaultPlugins()
         {
             return new IStringFormatterPlugin[] {
                                                     new Plugins._DefaultSourcePlugin(),
@@ -67,96 +67,52 @@ namespace StringFormatEx
         /// </summary>
         /// <param name="format"></param>
         /// <param name="args"></param>
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10, object arg11, object arg12, params object[] args)
+        public string FormatEx(IFormatProvider formatProvider, string format, params object[] args)
         {
-            int argCount = 12 + (args != null ? args.Length : 0);
-            var newArgs = new object[argCount];
-            newArgs[0] = arg1;
-            newArgs[1] = arg2;
-            newArgs[2] = arg3;
-            newArgs[3] = arg4;
-            newArgs[4] = arg5;
-            newArgs[5] = arg6;
-            newArgs[6] = arg7;
-            newArgs[7] = arg8;
-            newArgs[8] = arg9;
-            newArgs[9] = arg10;
-            newArgs[10] = arg11;
-            newArgs[11] = arg12;
-            if (args != null) {
-                args.CopyTo(newArgs, 12);
-            }
+             StringWriter output = new StringWriter(new StringBuilder((format.Length * 2)));
+            //  Guessing a length can help performance a little.
+            this.FormatExInternal(new CustomFormatInfo(this, output, formatProvider, format, args));
+            return output.ToString();
+        }
 
-            return new FluentFormatResult(this, format, newArgs);
+        public string FormatEx(string format, params object[] args)
+        {
+            return FormatEx((IFormatProvider)null, format, args);
         }
 
 
-        public FluentFormatResult FormatEx(string format, object arg1)
+        public void FormatEx(Stream output, IFormatProvider formatProvider, string format, params object[] args)
         {
-            return FormatEx(format, arg1, null, null, null, null, null, null, null, null, null, null, null, null);
+           FormatExInternal(new CustomFormatInfo(this, new StreamWriter(output), formatProvider, format, args));
+        }
+        
+        public void FormatEx(Stream output, string format, params object[] args)
+        {
+            FormatEx(output, null, format, args);
         }
 
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2)
+
+        public void FormatEx(TextWriter output, IFormatProvider formatProvider, string format, params object[] args)
         {
-            return FormatEx(format, arg1, arg2, null, null, null, null, null, null, null, null, null, null, null);
+           FormatExInternal(new CustomFormatInfo(this, output, formatProvider, format, args));
+        }
+        
+        public void FormatEx(TextWriter output, string format, params object[] args)
+        {
+            FormatEx(output, null, format, args);
         }
 
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3)
+
+        public void FormatEx(StringBuilder output, IFormatProvider formatProvider, string format, params object[] args)
         {
-            return FormatEx(format, arg1, arg2, arg3, null, null, null, null, null, null, null, null, null, null);
+           FormatExInternal(new CustomFormatInfo(this, new StringWriter(output), formatProvider, format, args));
+        }
+        
+        public void FormatEx(StringBuilder output, string format, params object[] args)
+        {
+            FormatEx(output, null, format, args);
         }
 
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, null, null, null, null, null, null, null, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, null, null, null, null, null, null, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, null, null, null, null, null, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, null, null, null, null, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, null, null, null, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, null, null, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, null, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10, object arg11)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, null, null);
-        }
-
-        public FluentFormatResult FormatEx(string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10, object arg11, object arg12)
-        {
-            return FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, null);
-        }
 
         #endregion
 

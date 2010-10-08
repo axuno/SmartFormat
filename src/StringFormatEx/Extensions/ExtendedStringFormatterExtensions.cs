@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Text;
+using StringFormatEx.Plugins.Core;
 
 
 
@@ -7,76 +9,50 @@ namespace StringFormatEx.Extensions
 {
     public static class ExtendedStringFormatterExtensions
     {
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10, object arg11, object arg12, params object[] args)
+        public static string FormatEx(this string format, IFormatProvider formatProvider, params object[] args)
         {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, args);
+             StringWriter output = new StringWriter(new StringBuilder((format.Length * 2)));
+            //  Guessing a length can help performance a little.
+            ExtendedStringFormatter.Default.FormatExInternal(new CustomFormatInfo(ExtendedStringFormatter.Default, output, formatProvider, format, args));
+            return output.ToString();
         }
 
-        public static string FormatEx(this string format, object arg1)
+        public static string FormatEx(this string format, params object[] args)
         {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, null, null, null, null, null, null, null, null, null, null, null, null);
+            return FormatEx(format, (IFormatProvider)null, format, args);
         }
 
-        public static string FormatEx(this string format, object arg1, object arg2)
+
+        public static void FormatEx(this string format, Stream output, IFormatProvider formatProvider, params object[] args)
         {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, null, null, null, null, null, null, null, null, null, null, null);
+           ExtendedStringFormatter.Default.FormatExInternal(new CustomFormatInfo(ExtendedStringFormatter.Default, new StreamWriter(output), formatProvider, format, args));
+        }
+        
+        public static void FormatEx(this string format, Stream output, params object[] args)
+        {
+            FormatEx(format, output, null, format, args);
         }
 
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3)
+
+        public static void FormatEx(this string format, TextWriter output, IFormatProvider formatProvider, params object[] args)
         {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, null, null, null, null, null, null, null, null, null, null);
+           ExtendedStringFormatter.Default.FormatExInternal(new CustomFormatInfo(ExtendedStringFormatter.Default, output, formatProvider, format, args));
+        }
+        
+        public static void FormatEx(this string format, TextWriter output, params object[] args)
+        {
+            FormatEx(format, output, null, format, args);
         }
 
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4)
-        {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, null, null, null, null, null, null, null, null, null);
-        }
 
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5)
+        public static void FormatEx(this string format, StringBuilder output, IFormatProvider formatProvider, params object[] args)
         {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, null, null, null, null, null, null, null, null);
+           ExtendedStringFormatter.Default.FormatExInternal(new CustomFormatInfo(ExtendedStringFormatter.Default, new StringWriter(output), formatProvider, format, args));
         }
-
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
+        
+        public static void FormatEx(this string format, StringBuilder output, params object[] args)
         {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, null, null, null, null, null, null, null);
-        }
-
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7)
-        {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, null, null, null, null, null, null);
-        }
-
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8)
-        {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, null, null, null, null, null);
-        }
-
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9)
-        {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, null, null, null, null);
-        }
-
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10)
-        {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, null, null, null);
-        }
-
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10, object arg11)
-        {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, null, null);
-        }
-
-        public static string FormatEx(this string format, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, 
-            object arg7, object arg8, object arg9, object arg10, object arg11, object arg12)
-        {
-            return ExtendedStringFormatter.Default.FormatEx(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, null);
+            FormatEx(format, output, null, format, args);
         }
 
     }
