@@ -13,7 +13,7 @@ namespace StringFormatEx
 
         #region Default static instance
 
-        private static ExtendedStringFormatter _default = GetDefault();
+        private static ExtendedStringFormatter _default = CreateDefault();
 
         public static ExtendedStringFormatter Default
         {
@@ -26,33 +26,34 @@ namespace StringFormatEx
 
         #region Factory Methods
 
-        public static ExtendedStringFormatter GetDefault()
+        public static ExtendedStringFormatter CreateDefault()
         {
             var formatter = new ExtendedStringFormatter();
             formatter.InvalidSelectorAction = ErrorAction.OutputErrorInResult;
             formatter.InvalidFormatAction = ErrorAction.OutputErrorInResult;
-            formatter.AddPlugins(GetDefaultPlugins());
+            formatter.AddPlugins(CreateDefaultPlugins());
 
             return formatter;
         }
 
-        public static ExtendedStringFormatter GetDefaultThatThrowsOnErrors()
+        public static ExtendedStringFormatter CreateDefaultThatThrowsOnErrors()
         {
             var formatter = new ExtendedStringFormatter();
             formatter.InvalidSelectorAction = ErrorAction.ThrowError;
             formatter.InvalidFormatAction = ErrorAction.ThrowError;
-            formatter.AddPlugins(GetDefaultPlugins());
+            formatter.AddPlugins(CreateDefaultPlugins());
 
             return formatter;
         }
 
-        public static IStringFormatterPlugin[] GetDefaultPlugins()
+        public static IStringFormatterPlugin[] CreateDefaultPlugins()
         {
             return new IStringFormatterPlugin[] {
                                                     new Plugins._DefaultSourcePlugin(),
                                                     new Plugins._DefaultFormatPlugin(),
                                                     new Plugins.ConditionalPlugin(),
-                                                    new Plugins.ArrayPlugin()
+                                                    new Plugins.ArrayPlugin(),
+                                                    new Plugins.TimestringPlugin()
                                                 };
         }
 
