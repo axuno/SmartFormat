@@ -71,7 +71,7 @@ namespace StringFormatEx.Plugins.Core
         internal static string[] escapeText = new string[] { "\r\n", "\t", "{", "}", "\\" };
     
         /// <summary>
-        /// A string containing Selector split characters.
+        /// A string containing Selectors split characters.
         /// Any of these characters chain together properties.
         /// For example, {Person.Address.City}.
         /// 

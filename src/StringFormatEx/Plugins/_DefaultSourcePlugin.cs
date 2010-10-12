@@ -28,8 +28,8 @@ namespace StringFormatEx.Plugins
         /// 
         /// 
         /// If this is the first selector and the selector is an integer, then it returns the (global) indexed argument (just like String.Format).
-        /// If the Current item is a Dictionary that contains the Selector, it returns the dictionary item.
-        /// Otherwise, Reflection will be used to determine if the Selector is a Property, Field, or Method of the Current item.
+        /// If the Current item is a Dictionary that contains the Selectors, it returns the dictionary item.
+        /// Otherwise, Reflection will be used to determine if the Selectors is a Selectors, Field, or ParseFormat of the Current item.
         /// </summary>
         [CustomFormatPriority(CustomFormatPriorities.Low)]
         private static void _GetDefaultSource(object source, ExtendSourceEventArgs e) 
@@ -37,7 +37,7 @@ namespace StringFormatEx.Plugins
             ICustomSourceInfo info = e.SourceInfo;
 
             //  If it wasn't handled, let's evaluate the source on our own:
-            //  We will see if it's an argument index, dictionary key, or a property/field/method.
+            //  We will see if it's an argument index, dictionary key, or a property/startIndex/method.
             //  Maybe source is the global index of our arguments? 
             int argIndex;
             if (info.SelectorIndex == 0 && int.TryParse(info.Selector, out argIndex)) {
@@ -58,13 +58,13 @@ namespace StringFormatEx.Plugins
 
 
             // REFLECTION:
-            // Let's see if the argSelector is a Property/Field/Method:
+            // Let's see if the argSelector is a Selectors/Field/ParseFormat:
             var sourceType = info.Current.GetType();
             MemberInfo[] members = sourceType.GetMember(info.Selector);
             foreach (MemberInfo member in members) {
                 switch (member.MemberType) {
                     case MemberTypes.Field:
-                        //  Selector is a Field; retrieve the value:
+                        //  Selectors is a Field; retrieve the value:
                         FieldInfo field = member as FieldInfo;
                         info.Current = field.GetValue(info.Current);
                         return;
@@ -72,7 +72,7 @@ namespace StringFormatEx.Plugins
                     case MemberTypes.Method:
                         MethodInfo method;
                         if (member.MemberType == MemberTypes.Property) {
-                            //  Selector is a Property
+                            //  Selectors is a Selectors
                             PropertyInfo prop = member as PropertyInfo;
                             //  Make sure the property is not WriteOnly:
                             if (prop.CanRead) {
@@ -83,12 +83,12 @@ namespace StringFormatEx.Plugins
                             }
                         }
                         else {
-                            //  Selector is a Method
+                            //  Selectors is a ParseFormat
                             method = member as MethodInfo;
                         }
 
                         //  Check that this method is valid -- it needs to be a Function (return a value) and has to be parameterless:
-                        //  We are only looking for a parameterless Property/Method:
+                        //  We are only looking for a parameterless Selectors/ParseFormat:
                         if ((method.GetParameters().Length > 0)) {
                             continue;
                         }
@@ -98,7 +98,7 @@ namespace StringFormatEx.Plugins
                             continue;
                         }
 
-                        //  Retrieve the Property/Method value:
+                        //  Retrieve the Selectors/ParseFormat value:
                         info.Current = method.Invoke(info.Current, new object[0]);
                         return;
                 }

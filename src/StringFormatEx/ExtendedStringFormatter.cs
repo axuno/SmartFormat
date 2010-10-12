@@ -282,7 +282,7 @@ namespace StringFormatEx
         #region OnInvalidSelector
 
         /// <summary>
-        /// Determines what to do when an Invalid Selector is found.
+        /// Determines what to do when an Invalid Selectors is found.
         /// 
         /// Returns True if we should just continue; False if we should skip this item.
         /// </summary>
@@ -293,7 +293,7 @@ namespace StringFormatEx
             string message;
             switch (InvalidSelectorAction) {
                 case ErrorAction.ThrowError:
-                    //  Let's give a detailed description of the error:
+                    //  Let's give a detailed description of the issue:
                     message = FormatEx(
                             ("Invalid Format String.\\n" +
                              ("Could not evaluate \"{0}\": \"{1}\" is not a member of {2}.\\n" +
@@ -302,7 +302,7 @@ namespace StringFormatEx
                     throw new ArgumentException(message, invalidSelector);
                 case ErrorAction.OutputErrorInResult:
                     //  Let's put the placeholder back,
-                    //  along with the error.
+                    //  along with the issue.
                     //  Example: {Person.Name.ABC}  becomes  {Person.Name.ABC:(Error: "ABC" is not a member of String)}
                     message = ("{" + (FormatEx("{0}:(Error: \"{1}\" is not a member of {2})", invalidSelector,
                                                     info.Selector, info.CurrentType) + "}"));
@@ -321,7 +321,7 @@ namespace StringFormatEx
         #region OnInvalidFormat
 
         /// <summary>
-        /// Determines what to do when an Invalid Selector is found.
+        /// Determines what to do when an Invalid Selectors is found.
         /// </summary>
         private void OnInvalidFormat(string format, CustomFormatInfo info, PlaceholderInfo placeholder, Exception ex)
         {
@@ -337,7 +337,7 @@ namespace StringFormatEx
             string message;
             switch (InvalidFormatAction) {
                 case ErrorAction.ThrowError:
-                    //  Let's give a detailed description of the error:
+                    //  Let's give a detailed description of the issue:
                     message = FormatEx(
                             ("Invalid Format String.\\n" +
                              ("Could not evaluate {{0}} because {1}.\\n" +
@@ -346,7 +346,7 @@ namespace StringFormatEx
                     throw new ArgumentException(message, invalidFormat, ex);
                 case ErrorAction.OutputErrorInResult:
                     //  Let's put the placeholder back,
-                    //  along with the error.
+                    //  along with the issue.
                     //  Example: {Person.Birthday:x}  becomes  {Person.Birthday:(Error: "x" is an invalid format specifier)}
                     message = ("{" + (FormatEx("{0}:(Error: {1})", selector, errorMessage) + "}"));
                     info.WriteError(message, placeholder);
@@ -413,7 +413,7 @@ namespace StringFormatEx
                 //  Handle errors:
                 if (!info.Handled) {
                     //  If the ExtendCustomSource event wasn't handled,
-                    //  then the Selector could not be evaluated.
+                    //  then the Selectors could not be evaluated.
                     if (!OnInvalidSelector(format, info, placeholder)) {
                         continue;
                     }

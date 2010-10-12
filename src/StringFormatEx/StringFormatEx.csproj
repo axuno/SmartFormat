@@ -35,15 +35,28 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Extensions.cs" />
+    <Compile Include="Core\Output\IOutput.cs" />
+    <Compile Include="Core\Output\StringOutput.cs" />
+    <Compile Include="Core\FormatException.cs" />
+    <Compile Include="Core\Plugins\IFormatterPlugin.cs" />
+    <Compile Include="Core\Plugins\ISourcePlugin.cs" />
+    <Compile Include="Core\Smart.cs" />
+    <Compile Include="Core\SmartFormat.cs" />
     <Compile Include="ErrorAction.cs" />
     <Compile Include="ExtendedStringFormatter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Extensions\ExtendedStringFormatterExtensions.cs" />
+    <Compile Include="Core\Parsing\LiteralText.cs" />
+    <Compile Include="Core\Parsing\Format.cs" />
+    <Compile Include="Core\Parsing\FormatItem.cs" />
+    <Compile Include="Core\Parsing\Parser.cs" />
     <Compile Include="Plugins\Core\ExtendFormatEventArgs.cs" />
     <Compile Include="Plugins\Core\ExtendSourceEventArgs.cs" />
     <Compile Include="Plugins\Core\IStringFormatterPlugin.cs" />
     <Compile Include="Plugins\Core\ParsingServices.cs" />
+    <Compile Include="Core\Parsing\Placeholder.cs" />
     <Compile Include="Plugins\TimestringPlugin.cs" />
     <Compile Include="Plugins\_DefaultFormatPlugin.cs" />
     <Compile Include="Plugins\_DefaultSourcePlugin.cs" />
@@ -56,7 +69,9 @@
     <Compile Include="Plugins\Core\ICustomSourceInfo.cs" />
     <Compile Include="PlaceholderInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Core\Parsing\Parser.cd" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

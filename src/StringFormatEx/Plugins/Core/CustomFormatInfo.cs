@@ -56,7 +56,7 @@ namespace StringFormatEx.Plugins.Core
         /// <summary>
         /// This method should only be used internally.
         /// 
-        /// Updates the Selector for use in the ExtendCustomSource event.
+        /// Updates the Selectors for use in the ExtendCustomSource event.
         /// </summary>
         internal void SetSelector(string newSelector, int newSelectorIndex)
         {

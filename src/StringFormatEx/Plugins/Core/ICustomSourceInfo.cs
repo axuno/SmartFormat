@@ -6,8 +6,8 @@ using System.ComponentModel;
 namespace StringFormatEx.Plugins.Core
 {
     /// <summary>
-    /// Contains all the data necessary to evaluate the Item Selector.
-    /// Provides the Current item, as well as the Selector.
+    /// Contains all the data necessary to evaluate the Item Selectors.
+    /// Provides the Current item, as well as the Selectors.
     /// 
     /// In the example "{0.Date.Year:N4}", there will be 3 iterations: Nothing + "0";  arg(0) + "Date";  arg(0).Date + "Year".
     /// </summary>
@@ -24,7 +24,7 @@ namespace StringFormatEx.Plugins.Core
     
         /// <summary>
 	    /// The index of the selector in the placeholder.
-	    /// For example, {0.Address.State.ToUpper}, if Selector = State, then SelectorIndex = 2
+	    /// For example, {0.Address.State.ToUpper}, if Selectors = State, then SelectorIndex = 2
 	    /// </summary>
         int SelectorIndex { get; }
 	
@@ -33,12 +33,12 @@ namespace StringFormatEx.Plugins.Core
         /// <summary>
 	    /// Returns the Current object.
 	    /// 
-	    /// Use Selector to evaluate the current object, and set the result here.
+	    /// Use Selectors to evaluate the current object, and set the result here.
 	    /// 
 	    /// In the example "{0.Date.Year:N4}", there will be 3 iterations:
-	    /// Current is Nothing, Selector = "0";
-	    /// Current is Arguments(0), Selector = "Date";
-	    /// Current is Arguments(0).Date, Selector = "Year".
+	    /// Current is Nothing, Selectors = "0";
+	    /// Current is Arguments(0), Selectors = "Date";
+	    /// Current is Arguments(0).Date, Selectors = "Year".
 	    /// The result is Current = Arguments(0).Date.Year.
 	    /// </summary>
 	    object Current { get; set; }
