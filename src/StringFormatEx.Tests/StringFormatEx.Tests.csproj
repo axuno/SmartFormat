@@ -42,6 +42,7 @@
     <Compile Include="Common\ExceptionCollection.cs" />
     <Compile Include="Common\IEnumerableExtensions.cs" />
     <Compile Include="ParserTests.cs" />
+    <Compile Include="SmartFormatTests.cs" />
     <Compile Include="TestData\Address.cs" />
     <Compile Include="TestData\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

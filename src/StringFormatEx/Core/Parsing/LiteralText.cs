@@ -5,7 +5,7 @@ using System.Text;
 
 namespace StringFormatEx.Core.Parsing
 {
-    public class LiteralText : FormatItem
+    public sealed class LiteralText : FormatItem
     {
         public LiteralText(Format parent, int startIndex) : base(parent, startIndex)
         { }

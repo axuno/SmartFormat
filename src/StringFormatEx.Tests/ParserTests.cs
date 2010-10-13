@@ -74,7 +74,7 @@ namespace StringFormatEx.Tests
         public void Test_Splicing()
         {
             var parser = new Parser();
-            parser.AddWatchedChar('|');
+            parser.WatchedChars += '|';
             var format = " a|aa {bbb.ccc: dd|d {eee} ff|f } gg|g ";
             var Format = parser.ParseFormat(format);
             Format = ((Placeholder)Format.Items[1]).Format;

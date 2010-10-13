@@ -50,8 +50,12 @@ namespace StringFormatEx.Core
 
         public string Format(string format, params object[] args)
         {
-            var output = new StringOutput();
-            FormatInto(output, format, args);
+            var output = new StringOutput(format.Length + args.Length * 8);
+            
+            var formatParsed = Parser.ParseFormat(format);
+            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+            Format(output, formatParsed, args, current);
+
             return output.ToString();
         }
 
@@ -59,8 +63,18 @@ namespace StringFormatEx.Core
         {
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-
             Format(output, formatParsed, args, current);
+        }
+
+        public string FormatCache(ref Format cache, string format, params object[] args)
+        {
+            var output = new StringOutput(format.Length + args.Length * 8);
+
+            if (cache == null) cache = this.Parser.ParseFormat(format);
+            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+            Format(output, cache, args, current);
+
+            return output.ToString();
         }
 
         #endregion

@@ -8,28 +8,17 @@ namespace StringFormatEx.Core.Parsing
 {
     public class Parser
     {
-        #region: Extra Selector Chars :
+        #region: Special Chars :
 
-        private string extraSelectorChars = "";
         /// <summary>
         /// Allows you to extend the allowable selector characters,
         /// to support additional selector syntaxes.
         /// </summary>
-        /// <param name="chars"></param>
-        public void AddExtraSelectorChars(string chars)
-        {
-            extraSelectorChars += chars;
-        }
-        
-        #endregion
+        public string SelectorChars = "";
 
-        #region: Watched Chars :
-
-        private string watchedChars = "";
-        public void AddWatchedChar(char c)
-        {
-            this.watchedChars += c;
-        }
+        public string SelectorSplitters = "";
+                
+        public string WatchedChars = "";
 
         #endregion
 
@@ -93,14 +82,14 @@ namespace StringFormatEx.Core.Parsing
                         current.parent.endIndex = i + 1;
                         current = current.parent.parent;
                     }
-                    else if (watchedChars.Contains(c))
+                    else if (WatchedChars.Contains(c))
                     {
                         current.AddWatchedCharacter(c, i);
                     }
                 }
                 else
                 {
-                    if (c == '.')
+                    if (SelectorSplitters.Contains(c))
                     {
                         // Add the selector:
                         if (i != lastI)
@@ -135,11 +124,8 @@ namespace StringFormatEx.Core.Parsing
                     {
                         // Let's make sure the selector characters are valid:
                         // Make sure it's alphanumeric:
-                        if (('a' <= c && c <= 'z')
-                         || ('A' <= c && c <= 'Z')
-                         || ('0' <= c && c <= '9')
-                         || ('_' == c)
-                         || (extraSelectorChars.Contains(c)))
+                        if (('0' <= c && c <= '9')
+                         || (SelectorChars.Contains(c)))
                         { }
                         else
                         {
@@ -147,7 +133,6 @@ namespace StringFormatEx.Core.Parsing
                             FormatError(format, i, "Invalid character in the selector", result);
                             return result;
                         }
-                    
                     }
                 }
             }

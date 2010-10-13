@@ -5,7 +5,7 @@ using System.Text;
 
 namespace StringFormatEx.Core.Parsing
 {
-    public class Format : FormatItem
+    public sealed class Format : FormatItem
     {
 
         #region: Constructors :
@@ -55,14 +55,6 @@ namespace StringFormatEx.Core.Parsing
         }
 
         #endregion
-
-        public string Text
-        {
-            get
-            {
-                return baseString.Substring(startIndex, endIndex - startIndex);
-            }
-        }
 
         #region: Substring :
 
@@ -122,22 +114,24 @@ namespace StringFormatEx.Core.Parsing
         {
             foreach (var item in f.Items)
             {
-                if (item is LiteralText)
+                var literalItem = item as LiteralText;
+                if (literalItem != null)
                 {
-                    var l = item as LiteralText;
-                    result.Append(l.baseString, l.startIndex, l.endIndex - l.startIndex);
+                    result.Append(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
+                    continue;
                 }
-                if (item is Placeholder)
+                var placeholderItem = item as Placeholder;
+                if (placeholderItem != null)
                 {
-                    var p = item as Placeholder;
                     result.Append("{");
-                    result.Append(string.Join(".", p.Selectors.ToArray()));
-                    if (p.Format != null)
+                    result.Append(string.Join(".", placeholderItem.Selectors.ToArray()));
+                    if (placeholderItem.Format != null)
                     {
                         result.Append(":");
-                        Reconstruct(p.Format, result);
+                        Reconstruct(placeholderItem.Format, result);
                     }
                     result.Append("}");
+                    continue;
                 }
             }
         }

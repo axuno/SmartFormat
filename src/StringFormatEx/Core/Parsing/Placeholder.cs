@@ -5,7 +5,7 @@ using System.Text;
 
 namespace StringFormatEx.Core.Parsing
 {
-    public class Placeholder : FormatItem
+    public sealed class Placeholder : FormatItem
     {
         public Placeholder(Format parent, int startIndex) : base(parent, startIndex)
         {

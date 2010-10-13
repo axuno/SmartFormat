@@ -38,10 +38,11 @@ namespace StringFormatEx.Core.Plugins
             }
 
             //  Now try to format the object, using its own built-in formatting if possible:
-            if (current is IFormattable)
+            var formattable = current as IFormattable;
+            if (formattable != null)
             {
                 var formatText = format == null ? null : format.ToString();
-                output.Write(((IFormattable)current).ToString(formatText, formatter.Provider));
+                output.Write(formattable.ToString(formatText, formatter.Provider));
             }
             else
             {

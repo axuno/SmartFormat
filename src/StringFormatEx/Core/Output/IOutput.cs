@@ -10,8 +10,6 @@ namespace StringFormatEx.Core.Output
     {
         void Write(string text);
         void Write(string text, int startIndex, int length);
-        //void Write(Format format);
-        //void Write(Format format, int startIndex, int length);
         void Write(FormatItem item);
     }
 }
