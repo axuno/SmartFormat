@@ -2,14 +2,26 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using StringFormatEx.Core;
+using StringFormatEx.Core.Output;
+using StringFormatEx.Core.Parsing;
+using StringFormatEx.Core.Plugins;
 using StringFormatEx.Plugins.Core;
 
 
 
 namespace StringFormatEx.Plugins
 {
-	public class TimestringPlugin : IStringFormatterPlugin
+	public class TimestringPlugin : IStringFormatterPlugin, IFormatterPlugin
     {
+        public void EvaluateFormat(SmartFormat formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        {
+
+        }
+
+
+
+
    	    private static readonly FormattingOptions _defaultFormattingOptions = CreateDefaultFormattingOptions();
    	    private readonly FormattingOptions _formattingOptions;
 
@@ -380,6 +392,6 @@ namespace StringFormatEx.Plugins
                                         });
 		}
 
-    
+
     }
 }

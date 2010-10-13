@@ -2,14 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using StringFormatEx.Core;
+using StringFormatEx.Core.Output;
+using StringFormatEx.Core.Parsing;
+using StringFormatEx.Core.Plugins;
 using StringFormatEx.Plugins.Core;
 
 
 
 namespace StringFormatEx.Plugins
 {
-    public class ConditionalPlugin : IStringFormatterPlugin
+    public class ConditionalPlugin : IStringFormatterPlugin, IFormatterPlugin
     {
+        public void EvaluateFormat(SmartFormat formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        {
+
+        }
 
         public IEnumerable<EventHandler<ExtendSourceEventArgs>> GetSourceExtensions()
         {

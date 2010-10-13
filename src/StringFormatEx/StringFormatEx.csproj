@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{83A94F48-8529-4A41-B5E1-1684827180DF}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -33,12 +33,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Extensions.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
     <Compile Include="Core\Output\StringOutput.cs" />
     <Compile Include="Core\FormatException.cs" />
+    <Compile Include="Core\Plugins\DefaultFormatter.cs" />
+    <Compile Include="Core\Plugins\DefaultSource.cs" />
     <Compile Include="Core\Plugins\IFormatterPlugin.cs" />
     <Compile Include="Core\Plugins\ISourcePlugin.cs" />
     <Compile Include="Core\Smart.cs" />
@@ -57,6 +64,7 @@
     <Compile Include="Plugins\Core\IStringFormatterPlugin.cs" />
     <Compile Include="Plugins\Core\ParsingServices.cs" />
     <Compile Include="Core\Parsing\Placeholder.cs" />
+    <Compile Include="Plugins\ReflectionPlugin.cs" />
     <Compile Include="Plugins\TimestringPlugin.cs" />
     <Compile Include="Plugins\_DefaultFormatPlugin.cs" />
     <Compile Include="Plugins\_DefaultSourcePlugin.cs" />

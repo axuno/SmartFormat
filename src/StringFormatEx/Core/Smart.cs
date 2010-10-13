@@ -62,13 +62,15 @@ namespace StringFormatEx.Core
             // Register all default plugins here:
             var result = new SmartFormat();
             result.AddSourcePlugins(
-                //new ArrayPlugin(),
-                //new ReflectionPlugin()
+                new ArrayPlugin(),
+                new ReflectionPlugin(),
+                new Plugins.DefaultSource()
                 );
             result.AddFormatterPlugins(
-                //new ConditionalPlugin(),
-                //new ArrayPlugin(),
-                //new TimestringPlugin()
+                new ArrayPlugin(),
+                new ConditionalPlugin(),
+                new TimestringPlugin(),
+                new Plugins.DefaultFormatter()
                 );
 
             return result;

@@ -7,8 +7,15 @@ namespace StringFormatEx.Core.Plugins
 {
     public interface ISourcePlugin
     {
-        void EvaluateSelector(object arg, string selector, ref bool handled, ref object result);
+        /// <summary>
+        /// Takes the current object and evaluates the selector.
+        /// </summary>
+        /// <param name="formatter"></param>
+        /// <param name="args"></param>
+        /// <param name="current"></param>
+        /// <param name="selector"></param>
+        /// <param name="handled"></param>
+        /// <param name="result"></param>
+        void EvaluateSelector(SmartFormat formatter, object[] args, object current, string selector, ref bool handled, ref object result);
     }
-    public delegate void EvaluateSelectorDelegate(object arg, string selector, ref bool handled, ref object result);
-
 }

@@ -9,7 +9,15 @@ namespace StringFormatEx.Core.Plugins
 {
     public interface IFormatterPlugin
     {
-        void Format(object arg, Format format, ref bool handled, IOutput output);
+        /// <summary>
+        /// Takes the current object and writes it to the output, using the specified format.
+        /// </summary>
+        /// <param name="formatter"></param>
+        /// <param name="args"></param>
+        /// <param name="current"></param>
+        /// <param name="format"></param>
+        /// <param name="handled"></param>
+        /// <param name="output"></param>
+        void EvaluateFormat(SmartFormat formatter, object[] args, object current, Format format, ref bool handled, IOutput output);
     }
-    public delegate void FormatDelegate(object arg, Format format, ref bool handled, IOutput output);
 }

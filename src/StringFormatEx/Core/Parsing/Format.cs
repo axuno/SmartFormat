@@ -125,7 +125,7 @@ namespace StringFormatEx.Core.Parsing
                 if (item is LiteralText)
                 {
                     var l = item as LiteralText;
-                    result.Append(l.Text);
+                    result.Append(l.baseString, l.startIndex, l.endIndex - l.startIndex);
                 }
                 if (item is Placeholder)
                 {

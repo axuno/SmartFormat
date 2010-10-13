@@ -538,6 +538,11 @@ namespace StringFormatEx
                         openCount++;
                         placeholder.hasNested = true;
                     }
+                    else if (c == Plugins.Core.ParsingServices.escapeCharacter)
+                    {
+                        //  The next character is escaped
+                        startIndex++;
+                    }
                     else {
                         //  It's just part of the Format
                     }

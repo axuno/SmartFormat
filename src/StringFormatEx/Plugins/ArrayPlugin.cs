@@ -2,14 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using StringFormatEx.Core;
+using StringFormatEx.Core.Output;
+using StringFormatEx.Core.Parsing;
+using StringFormatEx.Core.Plugins;
 using StringFormatEx.Plugins.Core;
 
 
 
 namespace StringFormatEx.Plugins
 {
-    public class ArrayPlugin : IStringFormatterPlugin
+    public class ArrayPlugin : IStringFormatterPlugin, ISourcePlugin, IFormatterPlugin
     {
+        public void EvaluateSelector(SmartFormat formatter, object[] args, object current, string selector, ref bool handled, ref object result)
+        {
+
+        }
+
+        public void EvaluateFormat(SmartFormat formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        {
+
+        }
 
         public IEnumerable<EventHandler<ExtendSourceEventArgs>> GetSourceExtensions()
         {

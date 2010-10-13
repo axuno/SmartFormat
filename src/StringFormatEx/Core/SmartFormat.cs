@@ -42,6 +42,7 @@ namespace StringFormatEx.Core
         #region: Properties :
 
         public Parser Parser { get; private set; }
+        public IFormatProvider Provider { get; set; }
 
         #endregion
 
@@ -49,49 +50,43 @@ namespace StringFormatEx.Core
 
         public string Format(string format, params object[] args)
         {
-            var formatParsed = Parser.ParseFormat(format);
             var output = new StringOutput();
-
-            Format(output, formatParsed, args);
-
+            FormatInto(output, format, args);
             return output.ToString();
         }
 
         public void FormatInto(IOutput output, string format, params object[] args)
         {
             var formatParsed = Parser.ParseFormat(format);
+            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 
-            Format(output, formatParsed, args);
+            Format(output, formatParsed, args, current);
         }
 
         #endregion
 
         #region: Format :
 
-        public void Format(IOutput output, Format format, params object[] args)
+        public void Format(IOutput output, Format format, object[] args, object current)
         {
-            object current = args;
-            if (args != null && args.Length > 0)
-                current = args[0];
-
             foreach (var item in format.Items)
             {
                 if (item is LiteralText)
                 {
                     output.Write(item);
                     continue;
-                }
+                } // Otherwise, the item is a placeholder.
 
-                bool handled;
                 var placeholder = (Placeholder)item;
                 object context = current;
 
+                bool handled;
                 // Evaluate the selectors:
                 foreach (var selector in placeholder.Selectors)
                 {
                     handled = false;
                     var result = context;
-                    InvokeSourcePlugins(context, selector, ref handled, ref result);
+                    InvokeSourcePlugins(args, context, selector, ref handled, ref result);
                     if (!handled)
                     {
                         // The selector wasn't handled.  It's probably not a property.
@@ -101,7 +96,7 @@ namespace StringFormatEx.Core
                 }
 
                 handled = false;
-                InvokeFormatterPlugins(context, placeholder.Format, ref handled, output);
+                InvokeFormatterPlugins(args, context, placeholder.Format, ref handled, output);
                 if (!handled)
                 {
                     // The formatter wasn't handled.  This is unusual.
@@ -112,19 +107,19 @@ namespace StringFormatEx.Core
 
         }
 
-        public void InvokeSourcePlugins(object arg, string selector, ref bool handled, ref object result)
+        private void InvokeSourcePlugins(object[] args, object current, string selector, ref bool handled, ref object result)
         {
             foreach (var sourcePlugin in this.sourcePlugins)
             {
-                sourcePlugin.EvaluateSelector(arg, selector, ref handled, ref result);
+                sourcePlugin.EvaluateSelector(this, args, current, selector, ref handled, ref result);
                 if (handled) break;
             }
         }
-        public void InvokeFormatterPlugins(object arg, Format format, ref bool handled, IOutput output)
+        private void InvokeFormatterPlugins(object[] args, object current, Format format, ref bool handled, IOutput output)
         {
             foreach (var formatterPlugin in this.formatterPlugins)
             {
-                formatterPlugin.Format(arg, format, ref handled, output);
+                formatterPlugin.EvaluateFormat(this, args, current, format, ref handled, output);
                 if (handled) break;
             }
         }

@@ -170,7 +170,15 @@ namespace Common
         public ExceptionCollection() { }
         public ExceptionCollection(Exception exception) : base(exception) { }
         public ExceptionCollection(IEnumerable<Exception> exceptions) : base(exceptions) { }
-
+        public static ExceptionCollection Combine(params ExceptionCollection[] combineAllExceptions)
+        {
+            var combined = new ExceptionCollection();
+            foreach (var exceptionCollection in combineAllExceptions)
+            {
+                combined.AddRange(exceptionCollection);
+            }
+            return combined;
+        }
 
         /// <summary>
         /// Adds a new Exception to the ExceptionCollection.

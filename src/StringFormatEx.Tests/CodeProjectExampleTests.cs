@@ -379,6 +379,17 @@ namespace StringFormatEx.Tests
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
+        [Test]
+        public void Escaping()
+        {
+            var args = new object[] { "Zero", "One", "Two", "Three" };
+
+            var format = "{0} {{0}} {{{0}}}";
+            var expected = "Zero {0} {Zero}";
+
+            var actual = ExtendedStringFormatter.Default.FormatEx(format, args);
+            Assert.AreEqual(expected, actual);
+        }
 
 
     }
