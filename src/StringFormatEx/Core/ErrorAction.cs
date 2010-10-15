@@ -1,4 +1,4 @@
-﻿namespace StringFormatEx
+﻿namespace SmartFormat.Core
 {
     public enum ErrorAction
     {

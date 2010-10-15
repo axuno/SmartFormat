@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace StringFormatEx.Core.Parsing
+namespace SmartFormat.Core.Parsing
 {
+    /// <summary>
+    /// Represents a substring of text.
+    /// </summary>
     public abstract class FormatItem
     {
-        public FormatItem(FormatItem parent, int startIndex) : this(parent.baseString, startIndex)
-        { }
-
-        public FormatItem(string baseString) : this(baseString, 0, baseString.Length)
-        { }
-        public FormatItem(string baseString, int startIndex) : this(baseString, startIndex, baseString.Length)
+        public FormatItem(FormatItem parent, int startIndex) : this(parent.baseString, startIndex, parent.baseString.Length)
         { }
         public FormatItem(string baseString, int startIndex, int endIndex)
         {
             this.baseString = baseString;
             this.startIndex = startIndex;
             this.endIndex = endIndex;
+        }
+
+        /// <summary>
+        /// Retrieves the substring that this item represents.
+        /// </summary>
+        public string Text
+        {
+            get
+            {
+                return this.baseString.Substring(startIndex, endIndex - startIndex);
+            }
         }
 
 

@@ -2,24 +2,92 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using StringFormatEx.Core.Parsing;
+using SmartFormat.Core.Parsing;
 
-namespace StringFormatEx.Core.Parsing
+namespace SmartFormat.Core.Parsing
 {
     public class Parser
     {
+        #region: Constructor :
+
+        public Parser()
+        {
+            #if DEBUG
+            ErrorAction = ErrorAction.ThrowError;
+            #else
+            ErrorAction = ErrorAction.OutputErrorInResult;
+            #endif
+        }
+
+        #endregion
+
         #region: Special Chars :
+        
+        // The following fields are points of extensibility
 
         /// <summary>
-        /// Allows you to extend the allowable selector characters,
-        /// to support additional selector syntaxes.
+        /// If false, only digits are allowed as selectors.
+        /// If true, selectors can be alpha-numeric.
+        /// This allows optimized alpha-character detection.
+        /// Specify any additional selector chars in AllowedSelectorChars.
         /// </summary>
-        public string SelectorChars = "";
+        private bool AlphanumericSelectors = false;
+        /// <summary>
+        /// A list of allowable selector characters,
+        /// to support additional selector syntaxes such as math.
+        /// Digits are always included, and letters can be included 
+        /// with AlphanumericSelectors.
+        /// </summary>
+        private string AllowedSelectorChars = "";
 
-        public string SelectorSplitters = "";
+        /// <summary>
+        /// A list of characters that come between selectors.
+        /// This can be "." for dot-notation, "[]" for arrays,
+        /// or even math symbols.
+        /// By default, there are no operators.
+        /// </summary>
+        private string Operators = "";
+
+
+        /// <summary>
+        /// Adds a-z and A-Z to the list of allowed selector chars.
+        /// </summary>
+        public void AddAlphanumericSelectors()
+        {
+            AlphanumericSelectors = true;
+        }
+        /// <summary>
+        /// Adds specific characters to the allowed selector chars.
+        /// </summary>
+        /// <param name="chars"></param>
+        public void AddAdditionalSelectorChars(string chars)
+        {
+            foreach (var c in chars)
+            {
+                if (!AllowedSelectorChars.Contains(c))
+                {
+                    AllowedSelectorChars += c;
+                }
+            }
+
+        }
+        /// <summary>
+        /// Adds specific characters to the allowed operator chars.
+        /// An operator is a character that is in the selector string
+        /// that splits the selectors.
+        /// </summary>
+        /// <param name="chars"></param>
+        public void AddOperators(string chars)
+        {
+            foreach (var c in chars)
+            {
+                if (!Operators.Contains(c))
+                {
+                    Operators += c;
+                }
+            }
+        }
                 
-        public string WatchedChars = "";
-
         #endregion
 
         #region: Parsing :
@@ -31,6 +99,8 @@ namespace StringFormatEx.Core.Parsing
             Placeholder currentPlaceholder = null;
 
             int lastI = 0;
+            int operatorIndex = 0;
+            int selectorIndex = 0;
             for (int i = 0, length = format.Length; i < length; i++)
             {
                 var c = format[i];
@@ -55,6 +125,8 @@ namespace StringFormatEx.Core.Parsing
                         currentPlaceholder = new Placeholder(current, i);
                         current.Items.Add(currentPlaceholder);
                         current.HasNested = true;
+                        operatorIndex = i+1;
+                        selectorIndex = 0;
                     }
                     else if (c == '}')
                     {
@@ -71,36 +143,41 @@ namespace StringFormatEx.Core.Parsing
                             continue;
                         }
 
-                        // Make sure that this is a nested placeholder:
+                        // Make sure that this is a nested placeholder before we un-nest it:
                         if (current.parent == null)
                         {
-                            FormatError(format, i, "Format string is missing a closing bracket", result);
-                            return result;
+                            ParserError(format, i, "Format string is missing a closing bracket", result);
+                            // Don't end the Format:
+                            continue;
                         }
-                        // End of the placeholder:
+                        // End of the placeholder's Format:
                         current.endIndex = i;
                         current.parent.endIndex = i + 1;
                         current = current.parent.parent;
                     }
-                    else if (WatchedChars.Contains(c))
-                    {
-                        current.AddWatchedCharacter(c, i);
-                    }
                 }
                 else
                 {
-                    if (SelectorSplitters.Contains(c))
+                    // Placeholder is NOT null, so that means we're parsing the selectors:
+                    if (Operators.Contains(c))
                     {
                         // Add the selector:
                         if (i != lastI)
-                            currentPlaceholder.Selectors.Add(format.Substring(lastI, i - lastI));
+                        {   
+                            currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
+                            selectorIndex++;
+                            operatorIndex = i;
+                        }
+
                         lastI = i + 1;
                     }
                     else if (c == ':')
                     {
                         // Add the selector:
                         if (i != lastI)
-                            currentPlaceholder.Selectors.Add(format.Substring(lastI, i - lastI));
+                            currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
+                        else if (operatorIndex != i) // There are trailing operators.  For now, this is an error.
+                            ParserError(format, operatorIndex, "There are trailing operators in the selector", result);
                         lastI = i + 1;
 
                         // Start the format:
@@ -112,7 +189,9 @@ namespace StringFormatEx.Core.Parsing
                     {
                         // Add the selector:
                         if (i != lastI)
-                            currentPlaceholder.Selectors.Add(format.Substring(lastI, i - lastI));
+                            currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
+                        else if (operatorIndex != i) // There are trailing operators.  For now, this is an error.
+                            ParserError(format, operatorIndex, "There are trailing operators in the selector", result);
                         lastI = i + 1;
 
                         // End the placeholder with no format:
@@ -125,13 +204,13 @@ namespace StringFormatEx.Core.Parsing
                         // Let's make sure the selector characters are valid:
                         // Make sure it's alphanumeric:
                         if (('0' <= c && c <= '9')
-                         || (SelectorChars.Contains(c)))
+                         || (AlphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'))
+                         || (AllowedSelectorChars.Contains(c)))
                         { }
                         else
                         {
                             // Invalid character in the selector.
-                            FormatError(format, i, "Invalid character in the selector", result);
-                            return result;
+                            ParserError(format, i, "Invalid character in the selector", result);
                         }
                     }
                 }
@@ -144,7 +223,13 @@ namespace StringFormatEx.Core.Parsing
             // Check that the format is finished:
             if (current.parent != null)
             {
-                FormatError(format, format.Length, "Format string is missing a closing bracket", result);
+                ParserError(format, format.Length, "Format string is missing a closing bracket", result);
+                current.endIndex = format.Length;
+                while (current.parent != null)
+                {
+                    current = current.parent.parent;
+                    current.endIndex = format.Length;
+                }
             }
 
             return result;
@@ -154,9 +239,25 @@ namespace StringFormatEx.Core.Parsing
 
         #region: Errors :
 
-        public void FormatError(string format, int index, string issue, Format formatSoFar)
+        public ErrorAction ErrorAction { get; set; }
+
+        /// <summary>
+        /// Determines what to do, based on the ErrorAction.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="index"></param>
+        /// <param name="issue"></param>
+        /// <param name="formatSoFar"></param>
+        public void ParserError(string format, int index, string issue, Format formatSoFar)
         {
-            throw new FormatException(format, index, issue, formatSoFar);
+            switch (this.ErrorAction)
+            {
+                case ErrorAction.ThrowError:
+                    throw new FormatException(format, index, issue, formatSoFar);
+                case ErrorAction.OutputErrorInResult:
+                case ErrorAction.Ignore:
+                    return;
+            }
         }
 
         #endregion

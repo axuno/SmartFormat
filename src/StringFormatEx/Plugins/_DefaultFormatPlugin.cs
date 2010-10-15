@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using StringFormatEx.Plugins.Core;
-
-
 
 namespace StringFormatEx.Plugins
 {

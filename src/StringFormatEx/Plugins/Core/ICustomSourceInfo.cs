@@ -9,7 +9,7 @@ namespace StringFormatEx.Plugins.Core
     /// Contains all the data necessary to evaluate the Item Selectors.
     /// Provides the Current item, as well as the Selectors.
     /// 
-    /// In the example "{0.Date.Year:N4}", there will be 3 iterations: Nothing + "0";  arg(0) + "Date";  arg(0).Date + "Year".
+    /// In the example "{0.Date.Year:N4}", there will be 3 iterations: Nothing + "0";  currentNumberr(0) + "Date";  currentNumberr(0).Date + "Year".
     /// </summary>
     public interface ICustomSourceInfo
     {

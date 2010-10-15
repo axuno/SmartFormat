@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 
 
-namespace StringFormatEx.Tests
+namespace SmartFormat.Tests
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Person

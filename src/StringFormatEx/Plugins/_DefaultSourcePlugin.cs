@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using StringFormatEx.Plugins.Core;
 
 
 
@@ -37,7 +36,7 @@ namespace StringFormatEx.Plugins
             ICustomSourceInfo info = e.SourceInfo;
 
             //  If it wasn't handled, let's evaluate the source on our own:
-            //  We will see if it's an argument index, dictionary key, or a property/startIndex/method.
+            //  We will see if it's an argument index, dictionary key, or a property/index/method.
             //  Maybe source is the global index of our arguments? 
             int argIndex;
             if (info.SelectorIndex == 0 && int.TryParse(info.Selector, out argIndex)) {

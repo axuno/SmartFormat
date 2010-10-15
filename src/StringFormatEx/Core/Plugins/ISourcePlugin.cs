@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SmartFormat.Core.Parsing;
 
-namespace StringFormatEx.Core.Plugins
+namespace SmartFormat.Core.Plugins
 {
     public interface ISourcePlugin
     {
@@ -16,6 +17,6 @@ namespace StringFormatEx.Core.Plugins
         /// <param name="selector"></param>
         /// <param name="handled"></param>
         /// <param name="result"></param>
-        void EvaluateSelector(SmartFormat formatter, object[] args, object current, string selector, ref bool handled, ref object result);
+        void EvaluateSelector(SmartFormatter formatter, object[] args, object current, Selector selector, ref bool handled, ref object result);
     }
 }

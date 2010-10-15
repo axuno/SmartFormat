@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using Common;
 using NUnit.Framework;
-using StringFormatEx.Core;
-using StringFormatEx.Core.Plugins;
+using SmartFormat.Core;
+using SmartFormat.Core.Plugins;
 using System.Diagnostics;
-using StringFormatEx.Core.Parsing;
+using SmartFormat.Core.Parsing;
 
-namespace StringFormatEx.Tests
+namespace SmartFormat.Tests
 {
     [TestFixture]
     public class SmartFormatTests
@@ -48,6 +48,11 @@ namespace StringFormatEx.Tests
                      Expected = "Thu, May 5, 5555",
                      Actual = new StringBuilder()
                 },
+                new{ Title = "Test 6 - Reflection",
+                     Format = "{5.Month}",
+                     Expected = "5",
+                     Actual = new StringBuilder()
+                },
             };
 
             // Create some testing arguments:
@@ -68,7 +73,7 @@ namespace StringFormatEx.Tests
         public void PerformanceTest_ComparedTo_StringFormat()
         {
             // Create the most basic formatter:
-            var Smart = new SmartFormat();
+            var Smart = new SmartFormatter();
             Smart.AddFormatterPlugins(new DefaultFormatter());
             Smart.AddSourcePlugins(new DefaultSource());
 
@@ -105,12 +110,12 @@ namespace StringFormatEx.Tests
                 // Do a quick warm-up and output check:
                 var stringActual = String.Format(test.format, args);
                 var smartActual = Smart.Format(test.format, args);
-                var cachedActual = Smart.FormatCache(ref cached, test.format, args);
-                var oldActual = ExtendedStringFormatter.Default.FormatEx(test.format, args);
+                var cachedActual = Smart.FormatWithCache(ref cached, test.format, args);
+                //var oldActual = ExtendedStringFormatter.Default.FormatEx(test.format, args);
                 Assert.AreEqual(test.expected, stringActual);
                 Assert.AreEqual(test.expected, smartActual);
                 Assert.AreEqual(test.expected, cachedActual);
-                Assert.AreEqual(test.expected, oldActual);
+                //Assert.AreEqual(test.expected, oldActual);
 
                 const int iterations = 1000000;
 
@@ -139,18 +144,18 @@ namespace StringFormatEx.Tests
                 cachedTimer.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    discard = Smart.FormatCache(ref cached, test.format, args);
+                    discard = Smart.FormatWithCache(ref cached, test.format, args);
                 }
                 cachedTimer.Stop();
 
-                // Performance for old Smart.Format:
-                var oldTimer = new Stopwatch();
-                oldTimer.Start();
-                for (int i = 0; i < iterations; i++)
-                {
-                    discard = ExtendedStringFormatter.Default.FormatEx(test.format, args);
-                }
-                oldTimer.Stop();
+                //// Performance for old Smart.Format:
+                //var oldTimer = new Stopwatch();
+                //oldTimer.Start();
+                //for (int i = 0; i < iterations; i++)
+                //{
+                //    discard = ExtendedStringFormatter.Default.FormatEx(test.format, args);
+                //}
+                //oldTimer.Stop();
 
 
                 // Compare the results:
@@ -158,11 +163,12 @@ namespace StringFormatEx.Tests
                 Console.WriteLine("String.Format results: {0:N2} s taken ({1:N1} ns per iteration)", stringTimer.Elapsed.TotalSeconds, stringTimer.Elapsed.TotalMilliseconds * 1000 / iterations);
                 Console.WriteLine("Smart.Format results: {0:N2} s taken ({1:N1} ns per iteration)", smartTimer.Elapsed.TotalSeconds, smartTimer.Elapsed.TotalMilliseconds * 1000 / iterations);
                 Console.WriteLine("Cached Smart.Format results: {0:N2} s taken ({1:N1} ns per iteration)", cachedTimer.Elapsed.TotalSeconds, cachedTimer.Elapsed.TotalMilliseconds * 1000 / iterations);
-                Console.WriteLine("Old Format results: {0:N2} s taken ({1:N1} ns per iteration)", oldTimer.Elapsed.TotalSeconds, oldTimer.Elapsed.TotalMilliseconds * 1000 / iterations);
+                //Console.WriteLine("Old Format results: {0:N2} s taken ({1:N1} ns per iteration)", oldTimer.Elapsed.TotalSeconds, oldTimer.Elapsed.TotalMilliseconds * 1000 / iterations);
                 var ratioStringSmart = smartTimer.Elapsed.TotalMilliseconds / stringTimer.Elapsed.TotalMilliseconds;
                 var ratioStringCached = cachedTimer.Elapsed.TotalMilliseconds / stringTimer.Elapsed.TotalMilliseconds;
-                var ratioStringOld = oldTimer.Elapsed.TotalMilliseconds / stringTimer.Elapsed.TotalMilliseconds;
-                Console.WriteLine("Ratio of String:Smart is 1:{0:N2}, String:Cached is 1:{1:N2}, String:Old is 1:{2:N2}", ratioStringSmart, ratioStringCached, ratioStringOld);
+                Console.WriteLine("Ratio of String:Smart is 1:{0:N2}, String:Cached is 1:{1:N2}", ratioStringSmart, ratioStringCached);
+                //var ratioStringOld = oldTimer.Elapsed.TotalMilliseconds / stringTimer.Elapsed.TotalMilliseconds;
+                //Console.WriteLine(", String:Old is 1:{0:N2}", ratioStringOld);
                 Console.WriteLine();
             }
         }

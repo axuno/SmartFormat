@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using StringFormatEx.Core.Plugins;
-using StringFormatEx.Core.Parsing;
-using StringFormatEx.Core.Output;
+using SmartFormat.Core.Plugins;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Output;
 
-namespace StringFormatEx.Core
+namespace SmartFormat.Core
 {
     /// <summary>
     /// This class contains the Format method that constructs 
     /// the composite string by invoking each plugin.
     /// </summary>
-    public class SmartFormat
+    public class SmartFormatter
     {
         #region: Constructor :
 
-        public SmartFormat()
+        public SmartFormatter()
         {
             this.Parser = new Parser();
         }
@@ -66,7 +66,7 @@ namespace StringFormatEx.Core
             Format(output, formatParsed, args, current);
         }
 
-        public string FormatCache(ref Format cache, string format, params object[] args)
+        public string FormatWithCache(ref Format cache, string format, params object[] args)
         {
             var output = new StringOutput(format.Length + args.Length * 8);
 
@@ -77,6 +77,13 @@ namespace StringFormatEx.Core
             return output.ToString();
         }
 
+        public void FormatWithCacheInto(ref Format cache, IOutput output, string format, params object[] args)
+        {
+            if (cache == null) cache = this.Parser.ParseFormat(format);
+            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+            Format(output, cache, args, current);
+        }
+
         #endregion
 
         #region: Format :
@@ -85,9 +92,10 @@ namespace StringFormatEx.Core
         {
             foreach (var item in format.Items)
             {
-                if (item is LiteralText)
+                var literalItem = item as LiteralText;
+                if (literalItem != null)
                 {
-                    output.Write(item);
+                    output.Write(literalItem);
                     continue;
                 } // Otherwise, the item is a placeholder.
 
@@ -104,24 +112,28 @@ namespace StringFormatEx.Core
                     if (!handled)
                     {
                         // The selector wasn't handled.  It's probably not a property.
-                        FormatError(item, "Could not evaluate the selector: " + selector);
+                        FormatError(selector, "Could not evaluate the selector: " + selector.Text, selector.startIndex);
                     }
                     context = result;
                 }
 
                 handled = false;
-                InvokeFormatterPlugins(args, context, placeholder.Format, ref handled, output);
-                if (!handled)
+                try
                 {
-                    // The formatter wasn't handled.  This is unusual.
-                    FormatError(item, "Could not format this item");
+                    InvokeFormatterPlugins(args, context, placeholder.Format, ref handled, output);
+                }
+                catch (Exception ex)
+                {
+                    // An error occurred while formatting.
+                    var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
+                    FormatError(item, ex, errorIndex);
                 }
 
             }
 
         }
 
-        private void InvokeSourcePlugins(object[] args, object current, string selector, ref bool handled, ref object result)
+        private void InvokeSourcePlugins(object[] args, object current, Selector selector, ref bool handled, ref object result)
         {
             foreach (var sourcePlugin in this.sourcePlugins)
             {
@@ -138,9 +150,13 @@ namespace StringFormatEx.Core
             }
         }
 
-        private void FormatError(FormatItem errorItem, string issue)
+        private void FormatError(FormatItem errorItem, string issue, int startIndex)
         {
-            throw new FormatException(errorItem.baseString, errorItem.startIndex, issue);
+            throw new FormatException(errorItem, issue, startIndex);
+        }
+        private void FormatError(FormatItem errorItem, Exception innerException, int startIndex)
+        {
+            throw new FormatException(errorItem, innerException, startIndex);
         }
 
         #endregion

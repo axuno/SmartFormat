@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using StringFormatEx.Core.Output;
-using StringFormatEx.Plugins;
+using SmartFormat.Core.Output;
+using SmartFormat.Plugins;
+using SmartFormat.Core;
+using SmartFormat.Core.Plugins;
 
-namespace StringFormatEx.Core
+namespace SmartFormat
 {
     /// <summary>
-    /// This class holds a Default instance of the SmartFormat.
+    /// This class holds a Default instance of the SmartFormatter.
     /// The default instance has all plugins registered.
     /// </summary>
     public static class Smart
@@ -41,8 +43,8 @@ namespace StringFormatEx.Core
 
         #region: Default formatter :
 
-        private static SmartFormat _default;
-        public static SmartFormat Default
+        private static SmartFormatter _default;
+        public static SmartFormatter Default
         {
             get
             {
@@ -57,20 +59,20 @@ namespace StringFormatEx.Core
             }
         }
 
-        public static SmartFormat CreateDefaultSmartFormat()
+        public static SmartFormatter CreateDefaultSmartFormat()
         {
             // Register all default plugins here:
-            var result = new SmartFormat();
+            var result = new SmartFormatter();
             result.AddSourcePlugins(
-                new ArrayPlugin(),
-                new ReflectionPlugin(),
-                new Plugins.DefaultSource()
+                //new ArrayPlugin(),
+                new ReflectionPlugin(result),
+                new DefaultSource()
                 );
             result.AddFormatterPlugins(
-                new ArrayPlugin(),
+                //new ArrayPlugin(),
                 new ConditionalPlugin(),
                 new TimestringPlugin(),
-                new Plugins.DefaultFormatter()
+                new DefaultFormatter()
                 );
 
             return result;

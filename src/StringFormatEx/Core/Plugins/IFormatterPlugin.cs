@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using StringFormatEx.Core.Parsing;
-using StringFormatEx.Core.Output;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Output;
 
-namespace StringFormatEx.Core.Plugins
+namespace SmartFormat.Core.Plugins
 {
     public interface IFormatterPlugin
     {
@@ -18,6 +18,6 @@ namespace StringFormatEx.Core.Plugins
         /// <param name="format"></param>
         /// <param name="handled"></param>
         /// <param name="output"></param>
-        void EvaluateFormat(SmartFormat formatter, object[] args, object current, Format format, ref bool handled, IOutput output);
+        void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output);
     }
 }

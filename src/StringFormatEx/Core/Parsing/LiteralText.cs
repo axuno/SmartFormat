@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace StringFormatEx.Core.Parsing
+namespace SmartFormat.Core.Parsing
 {
     public sealed class LiteralText : FormatItem
     {
@@ -12,12 +12,9 @@ namespace StringFormatEx.Core.Parsing
         public LiteralText(Format parent) : base(parent, parent.startIndex)
         { }
 
-        public string Text
+        public override string ToString()
         {
-            get
-            {
-                return this.baseString.Substring(startIndex, endIndex - startIndex);
-            }
+            return this.baseString.Substring(startIndex, endIndex - startIndex);
         }
     }
 }

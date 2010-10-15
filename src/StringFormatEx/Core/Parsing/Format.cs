@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace StringFormatEx.Core.Parsing
+namespace SmartFormat.Core.Parsing
 {
     public sealed class Format : FormatItem
     {
 
         #region: Constructors :
 
-        public Format(string baseString) : base(baseString)
+        public Format(string baseString) : base(baseString, 0, baseString.Length)
         {
+            this.parent = null;
             Items = new List<FormatItem>();
         }
         public Format(Placeholder parent, int startIndex) : base(parent, startIndex)
@@ -26,32 +27,35 @@ namespace StringFormatEx.Core.Parsing
         public List<FormatItem> Items { get; private set; }
         public bool HasNested { get; set; }
 
-        #region: Watched Characters :
-
+        #region: IndexOf :
         /// <summary>
-        /// Allows our parsing engine to find special un-nested characters.
+        /// Searches the literal text for the search string.
+        /// Does not search in nested placeholders.
         /// </summary>
-        private readonly Dictionary<char, List<int>> watchedChars = new Dictionary<char, List<int>>();
-        /// <summary>
-        /// Adds the watched character to the list.
-        /// </summary>
-        public void AddWatchedCharacter(char c, int index)
+        /// <param name="search"></param>
+        public int IndexOf(string search)
         {
-            List<int> indexes;
-            if (!watchedChars.TryGetValue(c, out indexes))
-            {
-                indexes = new List<int>();
-                watchedChars.Add(c, indexes);
-            }
-            indexes.Add(index);
+            return IndexOf(search, this.startIndex);
         }
         /// <summary>
-        /// Retrieves a list of all occurrances of un-nested watched characters,
-        /// as defined by our parsing engine.
+        /// Searches the literal text for the search string.
+        /// Does not search in nested placeholders.
         /// </summary>
-        public List<int> GetWatchedCharacters(char c)
+        /// <param name="search"></param>
+        /// <param name="startIndex"></param>
+        public int IndexOf(string search, int startIndex)
         {
-            return watchedChars[c];
+            foreach (var item in this.Items)
+            {
+                if (item.endIndex < startIndex) continue;
+                var literalItem = item as LiteralText;
+                if (literalItem == null) continue;
+
+                if (startIndex < literalItem.startIndex) startIndex = literalItem.startIndex;
+                var literalIndex = literalItem.baseString.IndexOf(search, startIndex, literalItem.endIndex - startIndex);
+                if (literalIndex != -1) return literalIndex;
+            }
+            return -1;
         }
 
         #endregion
@@ -104,39 +108,67 @@ namespace StringFormatEx.Core.Parsing
 
         #region: ToString :
 
-        public override string ToString()
+        /// <summary>
+        /// Retrieves the literal text contained in this format.
+        /// Excludes escaped chars, and does not include the text
+        /// of placeholders
+        /// </summary>
+        /// <returns></returns>
+        public string GetText()
         {
             var sb = new StringBuilder();
-            Reconstruct(this, sb);
-            return sb.ToString();
-        }
-        private static void Reconstruct(Format f, StringBuilder result)
-        {
-            foreach (var item in f.Items)
+            foreach (var item in this.Items)
             {
                 var literalItem = item as LiteralText;
                 if (literalItem != null)
                 {
-                    result.Append(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
-                    continue;
-                }
-                var placeholderItem = item as Placeholder;
-                if (placeholderItem != null)
-                {
-                    result.Append("{");
-                    result.Append(string.Join(".", placeholderItem.Selectors.ToArray()));
-                    if (placeholderItem.Format != null)
-                    {
-                        result.Append(":");
-                        Reconstruct(placeholderItem.Format, result);
-                    }
-                    result.Append("}");
-                    continue;
+                    sb.Append(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
                 }
             }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Reconstructs the format string, but doesn't include escaped chars
+        /// and tries to reconstruct placeholders.
+        /// </summary>
+        public override string ToString()
+        {
+            var result = new StringBuilder(endIndex - startIndex);
+            foreach (var item in Items)
+            {
+                result.Append(item.ToString());
+            }
+            return result.ToString();
         }
 
         #endregion
 
+        public Format[] Split(string search)
+        {
+            return Split(search, -1);
+        }
+
+        public Format[] Split(string search, int maxCount)
+        {
+            var results = new List<Format>();
+            var startIndex = this.startIndex;
+            while (startIndex != -1)
+            {
+                var nextIndex = this.IndexOf(search, startIndex);
+                if (nextIndex == -1 || maxCount == 0)
+                {
+                    results.Add(this.Substring(startIndex));
+                    break;
+                }
+                else
+                {
+                    results.Add(this.Substring(startIndex, nextIndex));
+                }
+                startIndex = nextIndex + search.Length;
+                maxCount--;
+            }
+            return results.ToArray();
+        }
     }
 }

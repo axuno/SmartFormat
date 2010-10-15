@@ -6,36 +6,20 @@ using StringFormatEx.Core;
 using StringFormatEx.Core.Output;
 using StringFormatEx.Core.Parsing;
 using StringFormatEx.Core.Plugins;
-using StringFormatEx.Plugins.Core;
-
-
 
 namespace StringFormatEx.Plugins
 {
-    public class ArrayPlugin : IStringFormatterPlugin, ISourcePlugin, IFormatterPlugin
+    public class ArrayPlugin : ISourcePlugin, IFormatterPlugin
     {
-        public void EvaluateSelector(SmartFormat formatter, object[] args, object current, string selector, ref bool handled, ref object result)
+        public void EvaluateSelector(SmartFormatter formatter, object[] args, object current, Selector selector, ref bool handled, ref object result)
         {
 
         }
 
-        public void EvaluateFormat(SmartFormat formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
         {
 
         }
-
-        public IEnumerable<EventHandler<ExtendSourceEventArgs>> GetSourceExtensions()
-        {
-            return new EventHandler<ExtendSourceEventArgs>[] 
-                { this.GetArraySource, this.GetArrayIndex };
-        }
-
-        public IEnumerable<EventHandler<ExtendFormatEventArgs>> GetFormatExtensions()
-        {
-            return new EventHandler<ExtendFormatEventArgs>[] 
-                { this.DoArrayFormatting };
-        }
-
 
         /// <summary>
         /// This allows an integer to be used as a selector to index an array (or list).

@@ -4,10 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using SmartFormat.Core;
 
 
 
-namespace StringFormatEx.Tests
+namespace SmartFormat.Tests
 {
     [TestFixture]
     public class CodeProjectExampleTests
@@ -47,7 +48,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0} is {1} years old and has {2:N2} friends.";
             var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p.FirstName, p.Age, p.Friends.Length);
+            string actualOutput = Smart.Format(formatString, p.FirstName, p.Age, p.Friends.Length);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -60,7 +61,7 @@ namespace StringFormatEx.Tests
             var formatString = "{FirstName} is {Age} years old and has {Friends.Length:N2} friends.";
             var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p);
+            string actualOutput = Smart.Format(formatString, p);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -72,7 +73,7 @@ namespace StringFormatEx.Tests
             var formatString = "There {0:is|are} {0} item{0:|s} remaining...";
             var expectedOutput = "There are 5 items remaining...";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 5);
+            string actualOutput = Smart.Format(formatString, 5);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -89,7 +90,7 @@ namespace StringFormatEx.Tests
             var formatString = "All dates: {0:M/d/yyyy| and }.";
             var expectedOutput = "All dates: 12/31/1999 and 10/10/2010 and 1/1/3000.";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, data);
+            string actualOutput = Smart.Format(formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -103,7 +104,7 @@ namespace StringFormatEx.Tests
             var formatString = "Person0: {0.FirstName}, Person1: {1.FirstName}";
             var expectedOutput = "Person0: Quentin, Person1: Melinda";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1, p2);
+            string actualOutput = Smart.Format(formatString, p1, p2);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -116,7 +117,7 @@ namespace StringFormatEx.Tests
             var formatString = "{Address.City}, {Address.State} {Address.Zip}";
             var expectedOutput = "Minneapolis, Minnesota 55401";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -129,7 +130,7 @@ namespace StringFormatEx.Tests
             var formatString = "{Address:{City}, {State} {Zip}}";
             var expectedOutput = "Minneapolis, Minnesota 55401";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -142,7 +143,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:({Width} x {Height})| and }";
             var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, sizes);
+            string actualOutput = Smart.Format(formatString, sizes);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -155,7 +156,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0.Address:{City}, {State} {Zip}}";
             var expectedOutput = "Minneapolis, Minnesota 55401";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -169,7 +170,7 @@ namespace StringFormatEx.Tests
             var formatString = "{FirstName} {0.FirstName} {1.FirstName}";
             var expectedOutput = "Quentin Quentin Melinda";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1, p2);
+            string actualOutput = Smart.Format(formatString, p1, p2);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -182,7 +183,7 @@ namespace StringFormatEx.Tests
             var formatString = "{Friends.Length:There {:is|are} {} friend{:|s}.}";
             var expectedOutput = "There are 4 friends.";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -195,7 +196,7 @@ namespace StringFormatEx.Tests
             var formatString = "{Address:{City}, {State}, {0.Age} {0.FullName}}";
             var expectedOutput = "Minneapolis, Minnesota, 29 Quentin Starin";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -206,7 +207,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0} {0:item|items}";
             var expectedOutput = "0 items";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 0);
+            string actualOutput = Smart.Format(formatString, 0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -217,7 +218,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0} {0:item|items}";
             var expectedOutput = "1 item";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 1);
+            string actualOutput = Smart.Format(formatString, 1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -228,7 +229,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0} {0:item|items}";
             var expectedOutput = "3 items";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 3);
+            string actualOutput = Smart.Format(formatString, 3);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -239,7 +240,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:no item|one item|many items}";
             var expectedOutput = "no item";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 0);
+            string actualOutput = Smart.Format(formatString, 0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -250,7 +251,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:no item|one item|many items}";
             var expectedOutput = "one item";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 1);
+            string actualOutput = Smart.Format(formatString, 1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -261,7 +262,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:no item|one item|many items}";
             var expectedOutput = "many items";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 3);
+            string actualOutput = Smart.Format(formatString, 3);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -272,7 +273,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:negative items|no item|one item|many items}";
             var expectedOutput = "no item";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 0);
+            string actualOutput = Smart.Format(formatString, 0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -283,7 +284,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:negative items|no item|one item|many items}";
             var expectedOutput = "one item";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 1);
+            string actualOutput = Smart.Format(formatString, 1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -294,7 +295,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:negative items|no item|one item|many items}";
             var expectedOutput = "many items";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, 3);
+            string actualOutput = Smart.Format(formatString, 3);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -305,7 +306,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:negative items|no item|one item|many items}";
             var expectedOutput = "negative items";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, -2);
+            string actualOutput = Smart.Format(formatString, -2);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -318,7 +319,7 @@ namespace StringFormatEx.Tests
             var formatString = "{Age:>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
             var expectedOutput = "Young Adult";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -331,7 +332,7 @@ namespace StringFormatEx.Tests
             var formatString = "{Age:>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
             var expectedOutput = "Senior Citizen";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -344,7 +345,7 @@ namespace StringFormatEx.Tests
             var formatString = "{Age:>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
             var expectedOutput = "Baby";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, p1);
+            string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -361,7 +362,7 @@ namespace StringFormatEx.Tests
             var formatString = "{0:M/d/yyyy|, |, and }.";
             var expectedOutput = "12/31/1999, 10/10/2010, and 1/1/3000.";
 
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, data);
+            string actualOutput = Smart.Format(formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -374,8 +375,8 @@ namespace StringFormatEx.Tests
             var formatString = "{0:{} = {Index}|, }";
             var expectedOutput = "A = 0, B = 1, C = 2";
 
-            //string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, data);
-            string actualOutput = ExtendedStringFormatter.Default.FormatEx(formatString, (object)data);
+            //string actualOutput = Smart.Format(formatString, data);
+            string actualOutput = Smart.Format(formatString, (object)data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -387,7 +388,7 @@ namespace StringFormatEx.Tests
             var format = "{0} {{0}} {{{0}}}";
             var expected = "Zero {0} {Zero}";
 
-            var actual = ExtendedStringFormatter.Default.FormatEx(format, args);
+            var actual = Smart.Format(format, args);
             Assert.AreEqual(expected, actual);
         }
 

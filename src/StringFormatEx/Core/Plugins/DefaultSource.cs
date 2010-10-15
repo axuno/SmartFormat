@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SmartFormat.Core.Parsing;
 
-namespace StringFormatEx.Core.Plugins
+namespace SmartFormat.Core.Plugins
 {
     public class DefaultSource : ISourcePlugin
     {
         /// <summary>
-        /// Performs the default index-based selector
+        /// Performs the default index-based selector, same as String.Format.
         /// </summary>
-        public void EvaluateSelector(SmartFormat formatter, object[] args, object current, string selector, ref bool handled, ref object result)
+        public void EvaluateSelector(SmartFormatter formatter, object[] args, object current, Selector selector, ref bool handled, ref object result)
         {
             // Make sure the selector is a valid in-range index:
             int argIndex;
-            if (int.TryParse(selector, out argIndex) && argIndex < args.Length)
+            if (int.TryParse(selector.Text, out argIndex) && argIndex < args.Length)
             {
                 result = args[argIndex];
                 handled = true;

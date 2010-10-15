@@ -2,27 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using StringFormatEx.Core;
-using StringFormatEx.Core.Output;
-using StringFormatEx.Core.Parsing;
-using StringFormatEx.Core.Plugins;
-using StringFormatEx.Plugins.Core;
+using SmartFormat.Core;
+using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Plugins;
+using SmartFormat.Plugins;
 
 
 
-namespace StringFormatEx.Plugins
+namespace SmartFormat.Plugins
 {
-	public class TimestringPlugin : IStringFormatterPlugin, IFormatterPlugin
+	public class TimestringPlugin : IFormatterPlugin
     {
-        public void EvaluateFormat(SmartFormat formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
-        {
 
-        }
-
-
-
-
-   	    private static readonly FormattingOptions _defaultFormattingOptions = CreateDefaultFormattingOptions();
+        private static readonly FormattingOptions _defaultFormattingOptions = CreateDefaultFormattingOptions();
    	    private readonly FormattingOptions _formattingOptions;
 
 
@@ -111,26 +104,13 @@ namespace StringFormatEx.Plugins
         #endregion
 
 
-        public IEnumerable<EventHandler<ExtendSourceEventArgs>> GetSourceExtensions()
+        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
         {
-            return new EventHandler<ExtendSourceEventArgs>[] { };
-        }
-
-        public IEnumerable<EventHandler<ExtendFormatEventArgs>> GetFormatExtensions()
-        {
-            return new EventHandler<ExtendFormatEventArgs>[] 
-                { this.DoTimeStringFormat };
-        }
-
-
-		private void DoTimeStringFormat(object sender, ExtendFormatEventArgs e)
-		{
-		    CustomFormatInfo info = e.FormatInfo;
-
-			if (info.CurrentIsTimeSpan) {
-				info.Write(TimestringPlugin.ToTimeString((TimeSpan)info.Current, info.Format, _formattingOptions));
-			} else if (info.CurrentIsDate && info.FormatStartsWith("timestring")) {
-				info.Write(TimestringPlugin.ToTimeString(DateTime.Now.Subtract((DateTime)info.Current), info.Format.Substring(10), _formattingOptions));
+            var formatText = format != null ? format.Text : "";
+			if (current is TimeSpan) {
+				output.Write(TimestringPlugin.ToTimeString((TimeSpan)current, formatText, _formattingOptions));
+			} else if (current is DateTime && formatText.StartsWith("timestring")) {
+				output.Write(TimestringPlugin.ToTimeString(DateTime.Now.Subtract((DateTime)current), formatText.Substring(10), _formattingOptions));
 			}
 		}
 

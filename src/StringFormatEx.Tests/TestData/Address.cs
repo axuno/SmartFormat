@@ -5,7 +5,7 @@ using System.Reflection;
 
 
 
-namespace StringFormatEx.Tests
+namespace SmartFormat.Tests
 {
     /// <summary>
     /// Generic class that can be used for United States addresses

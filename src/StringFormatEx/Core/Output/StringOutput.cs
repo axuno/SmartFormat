@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using StringFormatEx.Core.Parsing;
+using SmartFormat.Core.Parsing;
 
-namespace StringFormatEx.Core.Output
+namespace SmartFormat.Core.Output
 {
     public class StringOutput : IOutput
     {
@@ -32,7 +32,7 @@ namespace StringFormatEx.Core.Output
         {
             output.Append(text, startIndex, length);
         }
-        public void Write(FormatItem item)
+        public void Write(LiteralText item)
         {
             output.Append(item.baseString, item.startIndex, item.endIndex - item.startIndex);
         }

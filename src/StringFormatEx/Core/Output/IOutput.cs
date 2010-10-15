@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using StringFormatEx.Core.Parsing;
+using SmartFormat.Core.Parsing;
 
-namespace StringFormatEx.Core.Output
+namespace SmartFormat.Core.Output
 {
     public interface IOutput
     {
         void Write(string text);
         void Write(string text, int startIndex, int length);
-        void Write(FormatItem item);
+        void Write(LiteralText item);
     }
 }

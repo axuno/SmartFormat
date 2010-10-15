@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using StringFormatEx.Core.Parsing;
+using SmartFormat.Core.Parsing;
 using Common;
 
-namespace StringFormatEx.Tests
+namespace SmartFormat.Tests
 {
     [TestFixture]
     public class ParserTests
@@ -74,28 +74,32 @@ namespace StringFormatEx.Tests
         public void Test_Splicing()
         {
             var parser = new Parser();
-            parser.WatchedChars += '|';
-            var format = " a|aa {bbb.ccc: dd|d {eee} ff|f } gg|g ";
+            parser.AddAlphanumericSelectors();
+            parser.AddOperators(".+");
+            var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
+            var expected = new[] { " a", "aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg", "g " };
+
             var Format = parser.ParseFormat(format);
-            Format = ((Placeholder)Format.Items[1]).Format;
-
-            var allSplits = Format.GetWatchedCharacters('|');
-
             var allSplices = new List<Format>();
-            for (int i = -1; i < allSplits.Count; i++)
+            var startIndex = Format.startIndex;
+            while (true)
             {
-                Format splice;
-                if (i == -1) {
-                    splice = Format.Substring(Format.startIndex, allSplits[0]);
-                } else if (i == allSplits.Count - 1) {
-                    splice = Format.Substring(allSplits[i] + 1, Format.endIndex);
-                } else {
-                    splice = Format.Substring(allSplits[i] + 1, allSplits[i+1]);
+                var nextIndex = Format.IndexOf("|", startIndex);
+                if (nextIndex == -1)
+                {
+                    allSplices.Add(Format.Substring(startIndex));
+                    break;
                 }
-                allSplices.Add(splice);
+                else
+                {
+                    var splice = Format.Substring(startIndex, nextIndex);
+                    allSplices.Add(splice);
+                }
+                startIndex = nextIndex + 1;
             }
 
-            allSplices.ForEach(Console.WriteLine);
+            var actual = allSplices.Select(s => s.Text).ToArray();
+            Assert.AreEqual(expected, actual);
 
         }
     }
