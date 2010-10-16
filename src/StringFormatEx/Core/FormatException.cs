@@ -11,7 +11,7 @@ namespace SmartFormat.Core
         public FormatException(FormatItem errorItem, Exception formatException, int index)
             : base(string.Format("Error evaluating format string: {0} at {1}\n{2}\n{3}", formatException.Message, index, errorItem.baseString, new String('-', index) + "^"), formatException)
         {
-            this.Format = FormatSoFar.baseString;
+            this.Format = errorItem.baseString;
             this.FormatSoFar = null;
             this.ErrorItem = errorItem;
             this.Issue = formatException.Message;
@@ -20,7 +20,7 @@ namespace SmartFormat.Core
         public FormatException(FormatItem errorItem, string issue, int index)
             : base(string.Format("Error evaluating format string: {0} at {1}\n{2}\n{3}", issue, index, errorItem.baseString, new String('-', index) + "^"))
         {
-            this.Format = FormatSoFar.baseString;
+            this.Format = errorItem.baseString;
             this.FormatSoFar = null;
             this.ErrorItem = errorItem;
             this.Issue = issue;
@@ -31,9 +31,10 @@ namespace SmartFormat.Core
             : base(string.Format("Error parsing format string: {0} at {1}\n{2}\n{3}", issue, index, format, new String('-', index) + "^"))
         {
             this.Format = format;
+            this.FormatSoFar = formatSoFar;
+            this.ErrorItem = null;
             this.Index = index;
             this.Issue = issue;
-            this.FormatSoFar = formatSoFar;
         }
 
         public string Format { get; private set; }

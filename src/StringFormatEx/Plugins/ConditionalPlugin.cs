@@ -27,117 +27,154 @@ namespace SmartFormat.Plugins
 //            CustomFormatInfo info = e.FormatInfo;
 
             // See if the format string contains un-nested "|":
-            Format[] parameters = format.Split("|", 4);
-            if (parameters.Length == 1) {
-                return; // There are no splits.
-            }
+            var parameters = new List<int>();
+            parameters.Add(format.startIndex - 1);
+            parameters.AddRange(format.FindAll("|"));
+            if (parameters.Count == 1) return; // There are no parameters found..
 
 
-            int paramCount = parameters.Length;
-            int paramIndex = 0; // Determines which parameter to use in the result
+            int paramCount = parameters.Count;
+            int paramIndex; // Determines which parameter to use for output
+            Format selectedParameter;
 
             var currentIsNumber = 
                 current is byte || current is short || current is int || current is long
                 || current is float || current is double || current is decimal;
-            var currentNumber = currentIsNumber ? (decimal)current : 0;
+            var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
 
-            // See if there are any (optional) conditions:
-            bool conditionResult = false;
-            if (currentIsNumber && TryEvaluateCondition(ref parameters[0], currentNumber, ref conditionResult)) {
-                // parameters(0) contained a "conditional statement"
-                // If the conditional statement was False, then
-                // we will move on to the next parameters
-                while (!conditionResult) {
-                    if (paramIndex == parameters.Length - 1) {
+
+            // First, we'll see if we are using "complex conditions":
+            if (currentIsNumber) {
+
+                // Only do "complex conditions" if the first item is a complex condition.
+                var hasComplexConditions = false;
+                bool conditionWasTrue;
+                int start = parameters[0] + 1;
+                int end = parameters[1];
+                paramIndex = 0;
+                while (TryEvaluateCondition(format, ref start, end, currentNumber, out conditionWasTrue))
+                {
+                    hasComplexConditions = true;
+                    // If the conditional statement was true, then we can break.
+                    if (conditionWasTrue) {
+                        break;
+                    } else if (paramIndex == parameters.Count) {
+                        // We've run out of conditional statements.
                         break;
                     }
-
                     paramIndex += 1;
+                    start = parameters[paramIndex] + 1;
+                    end = (paramIndex < parameters.Count - 1) ? parameters[paramIndex + 1] : format.endIndex;
+                }
 
-                    if (!TryEvaluateCondition(ref parameters[paramIndex], currentNumber, ref conditionResult)) {
-                        // (couldn't evaluate the conditional statement, which means it's an "else" statement
-                        break;
-                    }
+                if (hasComplexConditions) {
+                    // Let's output the result of the complex condition
+                    handled = true;
+                    if (paramIndex >= parameters.Count) return; // Nothing to output
+                    selectedParameter = format.Substring(start, end);
+                    formatter.Format(output, selectedParameter, args, current);
+                }
+            }
+
+
+            // Determine the Current item's Type:
+            if (currentIsNumber) {
+                // Number: Neg|Zero|One|Many  or  Zero|One|Many/Neg  or  One|Many/Neg/Zero
+                var arg = currentNumber;
+                if (arg < 0m) {
+                    paramIndex = 0;
+                } 
+                else if (arg == 0m) {
+                    paramIndex = 1;
+                } 
+                else if (arg <= 1m) {
+                    paramIndex = 2;
+                } 
+                else {
+                    paramIndex = 3;
+                }
+                    
+                paramIndex = paramCount - paramIndex;
+                if (paramIndex < 0) {
+                    paramIndex = paramCount - 1;
                 }
             } 
-            else {
-                // Determine the Current item's Type:
-                if (currentIsNumber) {
-                    // Number: Neg|Zero|One|Many  or  Zero|One|Many/Neg  or  One|Many/Neg/Zero
-                    var arg = currentNumber;
-                    if (arg < 0m) {
-                        paramIndex = 0;
-                    } 
-                    else if (arg == 0m) {
-                        paramIndex = 1;
-                    } 
-                    else if (arg <= 1m) {
-                        paramIndex = 2;
-                    } 
-                    else {
-                        paramIndex = 3;
-                    }
-                    
-                    paramIndex = paramCount - paramIndex;
-                    if (paramIndex < 0) {
-                        paramIndex = paramCount - 1;
-                    }
+            else if (current is bool) {
+                // Bool: True|False
+                bool arg = (bool)current;
+                if (arg)
+                {
+                    paramIndex = 0;
+                }
+                else
+                {
+                    paramIndex = 1;
+                }
+            } 
+            else if (current is DateTime) {
+                // Date: Past|Present|Future   or   Past/Present|Future
+                System.DateTime arg = (DateTime)current;
+                if (paramCount == 3 && arg.Date == DateTime.Today) 
+                {
+                    paramIndex = 1;
+                }
+                else if (arg < DateTime.Now)
+                {
+                    paramIndex = 0;
+                }
+                else
+                {
+                    paramIndex = paramCount - 1;
+                }
+            } 
+            else if (current is TimeSpan) {
+                // TimeSpan: Negative|Zero|Positive  or  Negative/Zero|Positive
+                TimeSpan arg = (TimeSpan)current;
+                if (paramCount == 3 && arg == TimeSpan.Zero)
+                {
+                    paramIndex = 1;
                 } 
-                else if (current is bool) {
-                    // Bool: True|False
-                    bool arg = (bool)current;
-                    if (!arg) {
-                        paramIndex = 1;
-                    }
+                else if (arg.CompareTo(TimeSpan.Zero) == -1) 
+                {
+                    paramIndex = 0;
                 } 
-                else if (current is DateTime) {
-                    // Date: Past|Present|Future   or   Past/Present|Future
-                    System.DateTime arg = (DateTime)current;
-                    if (paramCount == 3 && arg.Date == DateTime.Today) {
-                        paramIndex = 1;
-                    } 
-                    else if (arg > DateTime.Now) {
-                        paramIndex = paramCount - 1;
-                    }
+                else 
+                {
+                    paramIndex = paramCount - 1;
+                }
+            } 
+            else if (current is string) {
+                // String: Value|NullOrEmpty
+                var arg = (string)current;
+                if (!string.IsNullOrEmpty(arg))
+                {
+                    paramIndex = 0;
+                }
+                else
+                {
+                    paramIndex = 1;
+                }
+            } else {
+                // Object: Something|Nothing
+                object arg = current;
+                if (arg != null)
+                {
+                    paramIndex = 0;
                 } 
-                else if (current is TimeSpan) {
-                    // TimeSpan: Negative|Zero|Positive  or  Negative/Zero|Positive
-                    TimeSpan arg = (TimeSpan)current;
-                    if (paramCount == 3 && arg == TimeSpan.Zero) {
-                        paramIndex = 1;
-                    } 
-                    else if (arg.CompareTo(TimeSpan.Zero) == 1) {
-                        paramIndex = paramCount - 1;
-                    }
-                } 
-                else if (current is string) {
-                    // String: Value|NullOrEmpty
-                    var arg = (string)current;
-                    if (string.IsNullOrEmpty(arg)) {
-                        paramIndex = 1;
-                    }
-                } else {
-                    // Object: Something|Nothing
-                    object arg = current;
-                    if (arg == null) {
-                        paramIndex = 1;
-                    }
+                else 
+                {
+                    paramIndex = 1;
                 }
             }
 
-
             // Now, output the selected parameter:
-            var selectedParameter = parameters[paramIndex];
-            if (format.HasNested)
-            {
-                // The format has nested items, so let's evaluate those now:
-                formatter.Format(output, selectedParameter, args, current);
-            } else {
-                // The format doesn't have nested items so let's just write the selected parameter:
-                // Since the format doesn't have nested items, it must be a LiteralText:
-                var literal = parameters[paramIndex].Items[0] as LiteralText;
-                output.Write(literal);
-            }
+            int startIndex = (paramIndex < parameters.Count) ? parameters[paramIndex] + 1 : format.endIndex;
+            int endIndex = (paramIndex < parameters.Count - 1) ? parameters[paramIndex + 1] : format.endIndex;
+            selectedParameter = format.Substring(startIndex, endIndex);
+            
+            // Output the selectedParameter:
+            formatter.Format(output, selectedParameter, args, current);
+            handled = true;
         }
 
 
@@ -151,13 +188,17 @@ namespace SmartFormat.Plugins
         /// Examples:
         /// &gt;=21&amp;&lt;30&amp;!=25/=40?
         /// </summary>
-        private static bool TryEvaluateCondition(ref Format conditions, decimal value, ref bool conditionResult)
+        private static bool TryEvaluateCondition(Format format, ref int start, int end, decimal value, out bool conditionResult)
         {
+        //private static bool TryEvaluateCondition(ref Format conditions, decimal value, ref bool conditionResult)
+        //{
+            conditionResult = false;
             //                                           and/or   comparator     value
             // Let's evaluate the conditions into a boolean value:
-            Match m = static_TryEvaluateCondition_conditionFormat.Match(conditions.Text);
+            Match m = static_TryEvaluateCondition_conditionFormat.Match(format.baseString, start, end - start);
             if (!m.Success) {
-                return false; // Unsuccessful
+                // Could not parse the "complex condition"
+                return false; 
             }
 
 
@@ -202,9 +243,9 @@ namespace SmartFormat.Plugins
                 }
             }
 
-            conditions = conditions.Substring(m.Index + m.Length);
-            return true;
             // Successful
+            start = m.Index + m.Length;
+            return true;
         }
 
     }

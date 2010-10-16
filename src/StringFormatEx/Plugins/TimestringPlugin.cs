@@ -8,125 +8,246 @@ using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Plugins;
 using SmartFormat.Plugins;
 
-
-
 namespace SmartFormat.Plugins
 {
 	public class TimestringPlugin : IFormatterPlugin
     {
 
-        private static readonly FormattingOptions _defaultFormattingOptions = CreateDefaultFormattingOptions();
-   	    private readonly FormattingOptions _formattingOptions;
+        #region IFormatterPlugin
 
-
-        public TimestringPlugin() 
-            : this(CreateDefaultFormattingOptions())
-        {}
-
-        public TimestringPlugin(FormattingOptions formattingOptions)
+        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
         {
-            _formattingOptions = formattingOptions;
+            if (format != null && format.HasNested) return;
+
+            var formatText = format != null ? format.Text : "";
+            if (current is TimeSpan)
+            {
+                var formattingOptions = TimestringFormatter.FormattingOptions.Parse(this.FormattingOptions, formatText);
+                output.Write(TimestringFormatter.ToTimeString((TimeSpan)current, formattingOptions));
+            }
+            else if (current is DateTime && formatText.StartsWith("timestring"))
+            {
+                formatText = formatText.Substring(10);
+                var formattingOptions = TimestringFormatter.FormattingOptions.Parse(this.FormattingOptions, formatText);
+                output.Write(TimestringFormatter.ToTimeString(DateTime.Now.Subtract((DateTime)current), formattingOptions));
+            }
         }
 
-
-
-        #region AccuracyOptions
-
-        public enum AccuracyOptions
-		{
-			Milliseconds,
-			Seconds,
-			Minutes,
-			Hours,
-			Days,
-			Weeks
-		}
-
         #endregion
 
+        #region Constructors
 
-        #region TruncationOptions
-
-        public enum TruncationOptions
-		{
-			/// <summary>
-			/// Automatically removes any values that are zero.
-			/// Example: "10.23:00:59.000" = "10 days 23 hours 59 minutes"
-			/// </summary>
-			Auto,
-			/// <summary>
-			/// Only keeps the highest non-zero value.
-			/// Example: "10.23:00:59.000" = "10 days"
-			/// </summary>
-			Shortest,
-			/// <summary>
-			/// Starts with the highest non-zero value and displays all lesser values.
-			/// Example: "0.0:10:59.000" = "10 minutes 59 seconds 0 milliseconds"
-			/// </summary>
-			Fill,
-			/// <summary>
-			/// Displays all values within range.
-			/// Example: "0.0:10:59.000" = "0 days 0 hours 10 minutes 59 seconds 0 milliseconds"
-			/// </summary>
-			Full
-		}
+        public TimestringPlugin()
+        {
+            FormattingOptions = TimestringFormatter.DefaultFormattingOptions;
+        }
 
         #endregion
-
 
         #region FormattingOptions 
 
-        public class FormattingOptions
+        public SmartFormat.Plugins.TimestringFormatter.FormattingOptions FormattingOptions { get; set; }
+
+        #endregion
+
+    }
+
+    public static class TimestringFormatter 
+    {
+        #region DefaultFormattingOptions
+
+        public static FormattingOptions DefaultFormattingOptions { get; set; }
+        static TimestringFormatter()
+        {
+            DefaultFormattingOptions = CreateDefaultFormattingOptions();
+        }
+        public static FormattingOptions CreateDefaultFormattingOptions()
+        {
+            return new FormattingOptions()
+            {
+                SmallestUnitToDisplay = AccuracyOptions.Seconds,
+                LargestUnitToDisplay = AccuracyOptions.Days,
+                TruncationOption = TruncationOptions.Auto,
+                Abbreviate = false,
+                IfZeroIncludeLessThan = true
+            };
+        }
+
+        #endregion
+
+        #region FormattingOptions 
+
+        public struct FormattingOptions
         {
             public AccuracyOptions SmallestUnitToDisplay { get; set; }
             public AccuracyOptions LargestUnitToDisplay { get; set; }
             public TruncationOptions TruncationOption { get; set; }
             public bool Abbreviate { get; set; }
             public bool IfZeroIncludeLessThan { get; set; }
-        }
+            private static Regex parser = new Regex(@"\b(w|d|h|m|s|ms|auto|short|fill|full|abbr|noabbr|less|noless)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            public static FormattingOptions Parse(FormattingOptions defaultFormattingOptions, string formatOptionsString)
+            {
+                formatOptionsString = formatOptionsString.ToLower();
 
-        #endregion
+                TruncationOptions TruncationOption = defaultFormattingOptions.TruncationOption;
+                bool Abbreviate = defaultFormattingOptions.Abbreviate;
+                bool IfZeroIncludeLessThan = defaultFormattingOptions.IfZeroIncludeLessThan;
 
+                AccuracyOptions LargestToDisplay = AccuracyOptions.Milliseconds - 1;
+                AccuracyOptions SmallestToDisplay = AccuracyOptions.Weeks + 1;
 
-        #region DefaultFormattingOptions
+                AccuracyOptions? newRange = null;
+                foreach (Match m in parser.Matches(formatOptionsString))
+                {
+                    switch (m.Value)
+                    {
+                        case "w":
+                            newRange = AccuracyOptions.Weeks;
+                            break;
+                        case "d":
+                            newRange = AccuracyOptions.Days;
+                            break;
+                        case "h":
+                            newRange = AccuracyOptions.Hours;
+                            break;
+                        case "m":
+                            newRange = AccuracyOptions.Minutes;
+                            break;
+                        case "s":
+                            newRange = AccuracyOptions.Seconds;
+                            break;
+                        case "ms":
+                            newRange = AccuracyOptions.Milliseconds;
 
-        public static FormattingOptions CreateDefaultFormattingOptions()
-        {
-            return new FormattingOptions() {
-                                               SmallestUnitToDisplay = AccuracyOptions.Seconds,
-                                               LargestUnitToDisplay = AccuracyOptions.Days,
-                                               TruncationOption = TruncationOptions.Auto,
-                                               Abbreviate = false,
-                                               IfZeroIncludeLessThan = true
-                                           };
-        }
+                            break;
+                        case "auto":
+                            TruncationOption = TruncationOptions.Auto;
+                            break;
+                        case "short":
+                            TruncationOption = TruncationOptions.Shortest;
+                            break;
+                        case "fill":
+                            TruncationOption = TruncationOptions.Fill;
+                            break;
+                        case "full":
+                            TruncationOption = TruncationOptions.Full;
 
-        #endregion
+                            break;
+                        case "abbr":
+                            Abbreviate = true;
+                            break;
+                        case "noabbr":
+                            Abbreviate = false;
 
+                            break;
+                        case "less":
+                            IfZeroIncludeLessThan = true;
+                            break;
+                        case "noless":
+                            IfZeroIncludeLessThan = false;
+                            break;
+                    }
 
-        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
-        {
-            var formatText = format != null ? format.Text : "";
-			if (current is TimeSpan) {
-				output.Write(TimestringPlugin.ToTimeString((TimeSpan)current, formatText, _formattingOptions));
-			} else if (current is DateTime && formatText.StartsWith("timestring")) {
-				output.Write(TimestringPlugin.ToTimeString(DateTime.Now.Subtract((DateTime)current), formatText.Substring(10), _formattingOptions));
-			}
-		}
+                    if (newRange.HasValue)
+                    {
+                        if (SmallestToDisplay > newRange.Value)
+                        {
+                            SmallestToDisplay = newRange.Value;
+                        }
+                        if (LargestToDisplay < newRange.Value)
+                        {
+                            LargestToDisplay = newRange.Value;
+                        }
+                    }
+                }
 
+                if (!newRange.HasValue)
+                {
+                    //let's do defaults:
+                    SmallestToDisplay = defaultFormattingOptions.SmallestUnitToDisplay;
+                    LargestToDisplay = defaultFormattingOptions.LargestUnitToDisplay;
+                }
 
-
-        public static string ToTimeString(TimeSpan FromTime)
-        {
-            return ToTimeString(FromTime, _defaultFormattingOptions);
-        }
-
-        public static string ToTimeString(TimeSpan FromTime, string formatOptions)
-        {
-            return ToTimeString(FromTime, formatOptions, _defaultFormattingOptions);
+                return new FormattingOptions()
+                {
+                    SmallestUnitToDisplay = SmallestToDisplay,
+                    LargestUnitToDisplay = LargestToDisplay,
+                    TruncationOption = TruncationOption,
+                    Abbreviate = Abbreviate,
+                    IfZeroIncludeLessThan = IfZeroIncludeLessThan
+                };
+            }
         }
         
+        public enum AccuracyOptions
+        {
+            Milliseconds,
+            Seconds,
+            Minutes,
+            Hours,
+            Days,
+            Weeks
+        }
 
+        public enum TruncationOptions
+        {
+            /// <summary>
+            /// Automatically removes any values that are zero.
+            /// Example: "10.23:00:59.000" = "10 days 23 hours 59 minutes"
+            /// </summary>
+            Auto,
+            /// <summary>
+            /// Only keeps the highest non-zero value.
+            /// Example: "10.23:00:59.000" = "10 days"
+            /// </summary>
+            Shortest,
+            /// <summary>
+            /// Starts with the highest non-zero value and displays all lesser values.
+            /// Example: "0.0:10:59.000" = "10 minutes 59 seconds 0 milliseconds"
+            /// </summary>
+            Fill,
+            /// <summary>
+            /// Displays all values within range.
+            /// Example: "0.0:10:59.000" = "0 days 0 hours 10 minutes 59 seconds 0 milliseconds"
+            /// </summary>
+            Full
+        }
+
+        #endregion
+
+        #region ToTimeString
+
+        /// <summary>
+        /// Converts the Timespan into a string, using the format options as a shortcut.
+        /// Example:
+        /// ts = ToTimeString(Now.TimeOfDay, "[(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr]")
+        /// </summary>
+        /// <param name="FromTime"></param>
+        /// <param name="formattingOptions">A list of flags options.
+        /// Syntax:
+        /// [(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr] [less|noless]
+        /// </param>
+        /// <remarks> The format options are case insensitive. </remarks>
+        public static string ToTimeString(TimeSpan FromTime)
+        {
+            return ToTimeString(FromTime, DefaultFormattingOptions);
+        }
+
+        /// <summary>
+        /// Converts the Timespan into a string, using the format options as a shortcut.
+        /// Example:
+        /// ts = ToTimeString(Now.TimeOfDay, "[(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr]")
+        /// </summary>
+        /// <param name="FromTime"></param>
+        /// <param name="formattingOptions">A list of flags options.
+        /// Syntax:
+        /// [(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr] [less|noless]
+        /// </param>
+        /// <remarks> The format options are case insensitive. </remarks>
+        public static string ToTimeString(TimeSpan FromTime, string formattingOptions)
+        {
+            return ToTimeString(FromTime, FormattingOptions.Parse(DefaultFormattingOptions, formattingOptions));
+        }
         /// <summary>
 		/// Turns a TimeSpan into a human-readable text.  
 		/// For example: "31.23:59:00.555" = "31 days 23 hours 59 minutes 0 seconds 555 milliseconds"
@@ -267,111 +388,8 @@ namespace SmartFormat.Plugins
 			}
 
 			return ret.Trim();
-		}
+        }
 
-
-        
-        static Regex static_TimeString_r = new Regex("\\b(w|d|h|m|s|ms|auto|short|fill|full|abbr|noabbr|less|noless)\\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        
-        /// <summary>
-		/// Converts the Timespan into a string, using the format options as a shortcut.
-		/// Example:
-		/// ts$ = TimeString(Now.TimeOfDay, "[(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr]")
-		/// </summary>
-		/// <param name="FromTime"></param>
-		/// <param name="formatOptions">A list of flags options.
-		/// Syntax:
-		/// [(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr] [less|noless]
-		/// </param>
-		/// <remarks> The format options are case insensitive. </remarks>
-		public static string ToTimeString(TimeSpan FromTime, string formatOptions, FormattingOptions defaultFormattingOptions)
-		{
-			formatOptions = formatOptions.ToLower();
-
-			TruncationOptions TruncationOption = defaultFormattingOptions.TruncationOption;
-			bool Abbreviate = defaultFormattingOptions.Abbreviate;
-		    bool IfZeroIncludeLessThan = defaultFormattingOptions.IfZeroIncludeLessThan;
-
-			AccuracyOptions LargestToDisplay = AccuracyOptions.Milliseconds - 1;
-			AccuracyOptions SmallestToDisplay = AccuracyOptions.Weeks + 1;
-
-			AccuracyOptions? newRange = null;
-			foreach (Match m in static_TimeString_r.Matches(formatOptions)) {
-				switch (m.Value) {
-					case "w":
-						newRange = AccuracyOptions.Weeks;
-						break;
-					case "d":
-						newRange = AccuracyOptions.Days;
-						break;
-					case "h":
-						newRange = AccuracyOptions.Hours;
-						break;
-					case "m":
-						newRange = AccuracyOptions.Minutes;
-						break;
-					case "s":
-						newRange = AccuracyOptions.Seconds;
-						break;
-					case "ms":
-						newRange = AccuracyOptions.Milliseconds;
-
-						break;
-					case "auto":
-						TruncationOption = TruncationOptions.Auto;
-						break;
-					case "short":
-						TruncationOption = TruncationOptions.Shortest;
-						break;
-					case "fill":
-						TruncationOption = TruncationOptions.Fill;
-						break;
-					case "full":
-						TruncationOption = TruncationOptions.Full;
-
-						break;
-					case "abbr":
-						Abbreviate = true;
-						break;
-					case "noabbr":
-						Abbreviate = false;
-
-						break;
-					case "less":
-						IfZeroIncludeLessThan = true;
-						break;
-					case "noless":
-						IfZeroIncludeLessThan = false;
-						break;
-				}
-
-				if (newRange.HasValue) {
-                    if (SmallestToDisplay > newRange.Value) {
-                        SmallestToDisplay = newRange.Value;
-                    }
-                    if (LargestToDisplay < newRange.Value) {
-                        LargestToDisplay = newRange.Value;
-                    }
-				}
-			}
-
-			if (!newRange.HasValue) {
-				//let's do defaults:
-				SmallestToDisplay = defaultFormattingOptions.SmallestUnitToDisplay;
-				LargestToDisplay = defaultFormattingOptions.LargestUnitToDisplay;
-			}
-
-            return ToTimeString(FromTime, 
-                new FormattingOptions() {
-                                            SmallestUnitToDisplay = SmallestToDisplay, 
-                                            LargestUnitToDisplay = LargestToDisplay, 
-                                            TruncationOption = TruncationOption, 
-                                            Abbreviate = Abbreviate, 
-                                            IfZeroIncludeLessThan = IfZeroIncludeLessThan
-                                        });
-		}
-
-
+        #endregion
     }
 }

@@ -42,7 +42,7 @@ namespace SmartFormat.Core.Parsing
         /// Does not search in nested placeholders.
         /// </summary>
         /// <param name="search"></param>
-        /// <param name="startIndex"></param>
+        /// <param name="index"></param>
         public int IndexOf(string search, int startIndex)
         {
             foreach (var item in this.Items)
@@ -72,9 +72,15 @@ namespace SmartFormat.Core.Parsing
         {
             // Validate the arguments:
             if (startIndex < this.startIndex || startIndex > this.endIndex) // || endIndex > this.endIndex)
-                throw new ArgumentOutOfRangeException("startIndex");
+                throw new ArgumentOutOfRangeException("index");
             if (endIndex > this.endIndex)
                 throw new ArgumentOutOfRangeException("endIndex");
+
+            // If startIndex and endIndex already match this item, we're done:
+            if (startIndex == this.startIndex && endIndex == this.endIndex)
+            {
+                return this;
+            }
 
             var substring = new Format(this.baseString) { startIndex = startIndex, endIndex = endIndex };
             foreach (var item in this.Items)
@@ -170,5 +176,20 @@ namespace SmartFormat.Core.Parsing
             }
             return results.ToArray();
         }
+
+        public int[] FindAll(string search)
+        {
+            var results = new List<int>();
+            var index = this.startIndex;
+            while (true)
+            {
+                index = this.IndexOf(search, index);
+                if (index == -1) break;
+                results.Add(index);
+                index += search.Length;
+            }
+            return results.ToArray();
+        }
+
     }
 }
