@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringFormatEx", "StringFormatEx\StringFormatEx.csproj", "{83A94F48-8529-4A41-B5E1-1684827180DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat", "SmartFormat\SmartFormat.csproj", "{83A94F48-8529-4A41-B5E1-1684827180DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringFormatEx.Tests", "StringFormatEx.Tests\StringFormatEx.Tests.csproj", "{5B6368BF-B7C3-440F-ABAA-52A48A837A46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Tests", "SmartFormat.Tests\SmartFormat.Tests.csproj", "{5B6368BF-B7C3-440F-ABAA-52A48A837A46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
