@@ -13,69 +13,72 @@ namespace SmartFormat.Plugins
     public class ConditionalPlugin : IFormatterPlugin
     {
 
-        private static Regex static_TryEvaluateCondition_conditionFormat 
-            = new Regex("^(?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \\?", 
-                RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static Regex static_TryEvaluateCondition_conditionFormat
+            = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
+            //   Description:      and/or    comparator     value
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 
         public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
         {
             if (format == null) return;
-//        }
-//        private static void FormatConditional(object sender, ExtendFormatEventArgs e)
-//        {
-//            CustomFormatInfo info = e.FormatInfo;
 
             // See if the format string contains un-nested "|":
-            var parameters = new List<int>();
-            parameters.Add(format.startIndex - 1);
-            parameters.AddRange(format.FindAll("|"));
-            if (parameters.Count == 1) return; // There are no parameters found..
+            var parameters = format.Split("|");
+            if (parameters.Count == 1) return; // There are no parameters found.
 
-
-            int paramCount = parameters.Count;
-            int paramIndex; // Determines which parameter to use for output
-            Format selectedParameter;
-
+            // See if the value is a number:
             var currentIsNumber = 
                 current is byte || current is short || current is int || current is long
                 || current is float || current is double || current is decimal;
             var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
 
 
+            int paramIndex; // Determines which parameter to use for output
+
             // First, we'll see if we are using "complex conditions":
             if (currentIsNumber) {
-
-                // Only do "complex conditions" if the first item is a complex condition.
-                var hasComplexConditions = false;
-                bool conditionWasTrue;
-                int start = parameters[0] + 1;
-                int end = parameters[1];
-                paramIndex = 0;
-                while (TryEvaluateCondition(format, ref start, end, currentNumber, out conditionWasTrue))
+                paramIndex = -1;
+                while (true)
                 {
-                    hasComplexConditions = true;
-                    // If the conditional statement was true, then we can break.
-                    if (conditionWasTrue) {
-                        break;
-                    } else if (paramIndex == parameters.Count) {
-                        // We've run out of conditional statements.
-                        break;
+                    paramIndex++;
+                    if (paramIndex == parameters.Count)
+                    {
+                        // We reached the end of our parameters,
+                        // so we output nothing
+                        handled = true;
+                        return;
                     }
-                    paramIndex += 1;
-                    start = parameters[paramIndex] + 1;
-                    end = (paramIndex < parameters.Count - 1) ? parameters[paramIndex + 1] : format.endIndex;
-                }
+                    bool conditionWasTrue;
+                    Format outputItem;
+                    if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out conditionWasTrue, out outputItem))
+                    {
+                        // This parameter doesn't have a
+                        // complex condition (making it a "else" condition)
 
-                if (hasComplexConditions) {
-                    // Let's output the result of the complex condition
-                    handled = true;
-                    if (paramIndex >= parameters.Count) return; // Nothing to output
-                    selectedParameter = format.Substring(start, end);
-                    formatter.Format(output, selectedParameter, args, current);
+                        // Only do "complex conditions" if the first item IS a "complex condition".
+                        if (paramIndex == 0)
+                        {
+                            break;
+                        }
+                        // Otherwise, output the "else" section:
+                        conditionWasTrue = true;
+                    }
+
+                    // If the conditional statement was true, then we can break.
+                    if (conditionWasTrue)
+                    {
+                        formatter.Format(output, outputItem, args, current);
+                        handled = true;
+                        return;
+                    } 
                 }
+                // We don't have any "complex conditions", 
+                // so let's do the normal conditional formatting:
             }
 
+
+            var paramCount = parameters.Count;
 
             // Determine the Current item's Type:
             if (currentIsNumber) {
@@ -168,10 +171,8 @@ namespace SmartFormat.Plugins
             }
 
             // Now, output the selected parameter:
-            int startIndex = (paramIndex < parameters.Count) ? parameters[paramIndex] + 1 : format.endIndex;
-            int endIndex = (paramIndex < parameters.Count - 1) ? parameters[paramIndex + 1] : format.endIndex;
-            selectedParameter = format.Substring(startIndex, endIndex);
-            
+            var selectedParameter = parameters[paramIndex];
+
             // Output the selectedParameter:
             formatter.Format(output, selectedParameter, args, current);
             handled = true;
@@ -188,16 +189,14 @@ namespace SmartFormat.Plugins
         /// Examples:
         /// &gt;=21&amp;&lt;30&amp;!=25/=40?
         /// </summary>
-        private static bool TryEvaluateCondition(Format format, ref int start, int end, decimal value, out bool conditionResult)
+        private static bool TryEvaluateCondition(Format parameter, decimal value, out bool conditionResult, out Format outputItem)
         {
-        //private static bool TryEvaluateCondition(ref Format conditions, decimal value, ref bool conditionResult)
-        //{
             conditionResult = false;
-            //                                           and/or   comparator     value
             // Let's evaluate the conditions into a boolean value:
-            Match m = static_TryEvaluateCondition_conditionFormat.Match(format.baseString, start, end - start);
+            Match m = static_TryEvaluateCondition_conditionFormat.Match(parameter.baseString, parameter.startIndex, parameter.endIndex - parameter.startIndex);
             if (!m.Success) {
                 // Could not parse the "complex condition"
+                outputItem = parameter;
                 return false; 
             }
 
@@ -244,7 +243,9 @@ namespace SmartFormat.Plugins
             }
 
             // Successful
-            start = m.Index + m.Length;
+            // Output the substring that doesn't contain the "complex condition"
+            var newStartIndex = m.Index + m.Length;
+            outputItem = parameter.Substring(newStartIndex);
             return true;
         }
 

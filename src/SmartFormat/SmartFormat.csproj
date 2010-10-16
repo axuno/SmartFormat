@@ -61,7 +61,7 @@
     <Compile Include="Plugins\ReflectionPlugin.cs" />
     <Compile Include="Plugins\TimestringPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Plugins\ArrayPlugin.cs" />
+    <Compile Include="Plugins\ArrayPlugin.cs" />
     <Compile Include="Plugins\ConditionalPlugin.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -15,6 +15,15 @@ namespace SmartFormat
     /// </summary>
     public static class Smart
     {
+        #region: Smart.Format :
+
+        public static string Format(string format, params object[] args)
+        {
+            return Default.Format(format, args);
+        }
+
+        #endregion
+
         #region: Overloads - Just to match the signature of String.Format :
 
         public static string Format(string format, object arg0, object arg1, object arg2)
@@ -28,15 +37,6 @@ namespace SmartFormat
         public static string Format(string format, object arg0)
         {
             return Format(format, new object[] { arg0 });
-        }
-
-        #endregion
-
-        #region: Smart.Format :
-
-        public static string Format(string format, params object[] args)
-        {
-            return Default.Format(format, args);
         }
 
         #endregion
@@ -64,12 +64,12 @@ namespace SmartFormat
             // Register all default plugins here:
             var result = new SmartFormatter();
             result.AddSourcePlugins(
-                //new ArrayPlugin(),
+                new ArrayPlugin(result),
                 new ReflectionPlugin(result),
                 new DefaultSource()
                 );
             result.AddFormatterPlugins(
-                //new ArrayPlugin(),
+                new ArrayPlugin(result),
                 new ConditionalPlugin(),
                 new TimestringPlugin(),
                 new DefaultFormatter()

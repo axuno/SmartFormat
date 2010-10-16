@@ -27,38 +27,7 @@ namespace SmartFormat.Core.Parsing
         public List<FormatItem> Items { get; private set; }
         public bool HasNested { get; set; }
 
-        #region: IndexOf :
-        /// <summary>
-        /// Searches the literal text for the search string.
-        /// Does not search in nested placeholders.
-        /// </summary>
-        /// <param name="search"></param>
-        public int IndexOf(string search)
-        {
-            return IndexOf(search, this.startIndex);
-        }
-        /// <summary>
-        /// Searches the literal text for the search string.
-        /// Does not search in nested placeholders.
-        /// </summary>
-        /// <param name="search"></param>
-        /// <param name="index"></param>
-        public int IndexOf(string search, int startIndex)
-        {
-            foreach (var item in this.Items)
-            {
-                if (item.endIndex < startIndex) continue;
-                var literalItem = item as LiteralText;
-                if (literalItem == null) continue;
-
-                if (startIndex < literalItem.startIndex) startIndex = literalItem.startIndex;
-                var literalIndex = literalItem.baseString.IndexOf(search, startIndex, literalItem.endIndex - startIndex);
-                if (literalIndex != -1) return literalIndex;
-            }
-            return -1;
-        }
-
-        #endregion
+        #region Special Optimized Functions
 
         #region: Substring :
 
@@ -112,6 +81,182 @@ namespace SmartFormat.Core.Parsing
 
         #endregion
 
+        #region: IndexOf :
+        /// <summary>
+        /// Searches the literal text for the search string.
+        /// Does not search in nested placeholders.
+        /// </summary>
+        /// <param name="search"></param>
+        public int IndexOf(string search)
+        {
+            return IndexOf(search, this.startIndex);
+        }
+        /// <summary>
+        /// Searches the literal text for the search string.
+        /// Does not search in nested placeholders.
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="index"></param>
+        public int IndexOf(string search, int startIndex)
+        {
+            foreach (var item in this.Items)
+            {
+                if (item.endIndex < startIndex) continue;
+                var literalItem = item as LiteralText;
+                if (literalItem == null) continue;
+
+                if (startIndex < literalItem.startIndex) startIndex = literalItem.startIndex;
+                var literalIndex = literalItem.baseString.IndexOf(search, startIndex, literalItem.endIndex - startIndex);
+                if (literalIndex != -1) return literalIndex;
+            }
+            return -1;
+        }
+
+        #endregion
+
+        public IList<Format> Split(string search)
+        {
+            return Split(search, -1);
+        }
+
+        public IList<Format> Split(string search, int maxCount)
+        {
+            var splits = this.FindAll(search, maxCount);
+            return new SplitList(this, splits);
+        }
+
+        public IList<int> FindAll(string search)
+        {
+            return FindAll(search, -1);
+        }
+
+        public IList<int> FindAll(string search, int maxCount)
+        {
+            var results = new List<int>();
+            var index = this.startIndex;
+            while (maxCount != 0)
+            {
+                index = this.IndexOf(search, index);
+                if (index == -1) break;
+                results.Add(index);
+                index += search.Length;
+                maxCount--;
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Contains the results of a Split operation.
+        /// This allows deferred splitting of items.
+        /// </summary>
+        private class SplitList : IList<Format>
+        {
+            #region Constructor
+            private readonly Format format;
+            private readonly IList<int> splits;
+            public SplitList(Format format, IList<int> splits)
+            {
+                this.format = format;
+                this.splits = splits;
+            }
+
+            #endregion
+
+            #region IList
+
+            public Format this[int index]
+            {
+                get
+                {
+                    if (index == 0)
+                    {
+                        return format.Substring(format.startIndex, splits[0]);
+                    }
+                    else if (index == splits.Count)
+                    {
+                        return format.Substring(splits[index - 1], format.endIndex);
+                    }
+                    return format.Substring(splits[index - 1], splits[index]);
+                }
+                set
+                {
+                    throw new NotSupportedException();
+                }
+            }
+
+            public void CopyTo(Format[] array, int arrayIndex)
+            {
+                var length = splits.Count + 1;
+                for (int i = 0; i < length; i++)
+                {
+                    array[arrayIndex + i] = this[i];
+                }
+            }
+
+            public int Count
+            {
+                get { return splits.Count + 1; }
+            }
+
+            public bool IsReadOnly
+            {
+                get { return true; }
+            }
+
+            #endregion
+
+            #region NotSupported IList Interface
+
+            public int IndexOf(Format item)
+            {
+                throw new NotSupportedException();
+            }
+
+            public void Insert(int index, Format item)
+            {
+                throw new NotSupportedException();
+            }
+
+            public void RemoveAt(int index)
+            {
+                throw new NotSupportedException();
+            }
+
+            public void Add(Format item)
+            {
+                throw new NotSupportedException();
+            }
+
+            public void Clear()
+            {
+                throw new NotSupportedException();
+            }
+
+            public bool Contains(Format item)
+            {
+                throw new NotSupportedException();
+            }
+
+            public bool Remove(Format item)
+            {
+                throw new NotSupportedException();
+            }
+
+            public IEnumerator<Format> GetEnumerator()
+            {
+                throw new NotSupportedException();
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                throw new NotSupportedException();
+            }
+
+            #endregion
+        }
+
+        #endregion
+
         #region: ToString :
 
         /// <summary>
@@ -150,46 +295,6 @@ namespace SmartFormat.Core.Parsing
 
         #endregion
 
-        public Format[] Split(string search)
-        {
-            return Split(search, -1);
-        }
-
-        public Format[] Split(string search, int maxCount)
-        {
-            var results = new List<Format>();
-            var startIndex = this.startIndex;
-            while (startIndex != -1)
-            {
-                var nextIndex = this.IndexOf(search, startIndex);
-                if (nextIndex == -1 || maxCount == 0)
-                {
-                    results.Add(this.Substring(startIndex));
-                    break;
-                }
-                else
-                {
-                    results.Add(this.Substring(startIndex, nextIndex));
-                }
-                startIndex = nextIndex + search.Length;
-                maxCount--;
-            }
-            return results.ToArray();
-        }
-
-        public int[] FindAll(string search)
-        {
-            var results = new List<int>();
-            var index = this.startIndex;
-            while (true)
-            {
-                index = this.IndexOf(search, index);
-                if (index == -1) break;
-                results.Add(index);
-                index += search.Length;
-            }
-            return results.ToArray();
-        }
-
+    
     }
 }
