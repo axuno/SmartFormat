@@ -10,10 +10,10 @@ using SmartFormat.Plugins;
 
 namespace SmartFormat.Plugins
 {
-	public class TimestringPlugin : IFormatterPlugin
+	public class TimestringPlugin : IFormatter
     {
 
-        #region IFormatterPlugin
+        #region IFormatter
 
         public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
         {
@@ -351,14 +351,18 @@ namespace SmartFormat.Plugins
 
 				//Determine whether to display this value
 				bool DisplayThisValue = false;
+                bool breakFor = false;
 				switch (formattingOptions.TruncationOption) {
 					case TruncationOptions.Auto:
 						if (Value > 0)
 							DisplayThisValue = true;
 						break;
 					case TruncationOptions.Shortest:
-						if (TextStarted)
-							break; // TODO: might not be correct. Was : Exit For
+                        if (TextStarted)
+                        {
+                            breakFor = true;
+                            break;
+                        }
 
 						if (Value > 0)
 							DisplayThisValue = true;
@@ -371,6 +375,7 @@ namespace SmartFormat.Plugins
 						DisplayThisValue = true;
 						break;
 				}
+                if (breakFor) break;
 
 				//we need to display SOMETHING (even if it's zero)
 				if (i == formattingOptions.SmallestUnitToDisplay & TextStarted == false) {

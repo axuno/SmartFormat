@@ -25,16 +25,38 @@ namespace SmartFormat.Core
 
         #region: Plugin Registration :
 
-        private readonly List<ISourcePlugin> sourcePlugins = new List<ISourcePlugin>();
-        public void AddSourcePlugins(params ISourcePlugin[] sourcePlugins)
+        private readonly List<ISource> sourcePlugins = new List<ISource>();
+        private readonly List<IFormatter> formatterPlugins = new List<IFormatter>();
+        /// <summary>
+        /// Adds each plugins to this formatter.
+        /// Each plugin must implement ISource, IFormatter, or both.
+        /// 
+        /// An exception will be thrown if the plugin doesn't implement those interfaces.
+        /// </summary>
+        /// <param name="plugins"></param>
+        public void AddPlugins(params object[] plugins)
         {
-            this.sourcePlugins.AddRange(sourcePlugins);
-        }
-        
-        private readonly List<IFormatterPlugin> formatterPlugins = new List<IFormatterPlugin>();
-        public void AddFormatterPlugins(params IFormatterPlugin[] formatterPlugins)
-        {
-            this.formatterPlugins.AddRange(formatterPlugins);
+            foreach (var plugin in plugins)
+            {
+                // We need to filter each plugin to the correct list:
+                var source = plugin as ISource;
+                var formatter = plugin as IFormatter;
+
+                // If this object ISN'T a plugin, throw an exception:
+                if (source == null && formatter == null)
+                    throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", plugin.GetType().FullName), "plugins");
+
+                if (source != null)
+                    sourcePlugins.Add(source);
+                if (formatter != null)
+                    formatterPlugins.Add(formatter);
+            }
+
+            // Search each plugin for the "PluginPriority" 
+            // attribute, and sort the lists accordingly.
+
+            sourcePlugins.Sort(PluginPriorityAttribute.SourceComparer());
+            formatterPlugins.Sort(PluginPriorityAttribute.FormatterComparer());
         }
 
         #endregion

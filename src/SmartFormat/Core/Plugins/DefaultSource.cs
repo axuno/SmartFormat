@@ -6,7 +6,8 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Plugins
 {
-    public class DefaultSource : ISourcePlugin
+    [PluginPriority(PluginPriority.Low)]
+    public class DefaultSource : ISource
     {
         /// <summary>
         /// Performs the default index-based selector, same as String.Format.

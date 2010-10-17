@@ -7,7 +7,7 @@ using SmartFormat.Core.Output;
 
 namespace SmartFormat.Core.Plugins
 {
-    public interface IFormatterPlugin
+    public interface IFormatter
     {
         /// <summary>
         /// Takes the current object and writes it to the output, using the specified format.

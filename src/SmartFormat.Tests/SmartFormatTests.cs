@@ -69,13 +69,15 @@ namespace SmartFormat.Tests
             ExceptionCollection.Combine(runtimeErrors, resultErrors).ThrowIfNotEmpty();
         }
 
-        [Test]
+        [Test, Explicit("This performance test takes like 45 seconds")]
         public void PerformanceTest_ComparedTo_StringFormat()
         {
             // Create the most basic formatter:
             var Smart = new SmartFormatter();
-            Smart.AddFormatterPlugins(new DefaultFormatter());
-            Smart.AddSourcePlugins(new DefaultSource());
+            Smart.AddPlugins(
+                new DefaultFormatter(), 
+                new DefaultSource()
+            );
 
             // Setup the test criteria:
             var tests = new[]{

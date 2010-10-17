@@ -7,7 +7,8 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Plugins
 {
-    public class DefaultFormatter : IFormatterPlugin
+    [PluginPriority(PluginPriority.Low)]
+    public class DefaultFormatter : IFormatter
     {
         /// <summary>
         /// Do the default formatting, same as "String.Format".

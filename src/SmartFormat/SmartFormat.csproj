@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Plugins\PluginPriority.cs" />
+    <Compile Include="Core\Plugins\PluginPriorityAttribute.cs" />
     <Compile Include="SmartExtensions.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
     <Compile Include="Core\Output\StringOutput.cs" />

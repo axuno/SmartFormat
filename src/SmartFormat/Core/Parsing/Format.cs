@@ -122,7 +122,7 @@ namespace SmartFormat.Core.Parsing
         public IList<Format> Split(string search, int maxCount)
         {
             var splits = this.FindAll(search, maxCount);
-            return new SplitList(this, splits);
+            return new SplitList(this, splits, search.Length);
         }
 
         public IList<int> FindAll(string search)
@@ -152,12 +152,15 @@ namespace SmartFormat.Core.Parsing
         private class SplitList : IList<Format>
         {
             #region Constructor
+
             private readonly Format format;
             private readonly IList<int> splits;
-            public SplitList(Format format, IList<int> splits)
+            private readonly int searchLength;
+            public SplitList(Format format, IList<int> splits, int searchLength)
             {
                 this.format = format;
                 this.splits = splits;
+                this.searchLength = searchLength;
             }
 
             #endregion
@@ -168,15 +171,28 @@ namespace SmartFormat.Core.Parsing
             {
                 get
                 {
-                    if (index == 0)
+                    if (index > splits.Count) throw new ArgumentOutOfRangeException("index");
+
+                    if (splits.Count == 0)
                     {
+                        // No splits, so return the whole format
+                        return format;
+                    }
+                    else if (index == 0)
+                    {
+                        // Return the format before the first split:
                         return format.Substring(format.startIndex, splits[0]);
                     }
                     else if (index == splits.Count)
                     {
-                        return format.Substring(splits[index - 1], format.endIndex);
+                        // Return the format after the last split:
+                        return format.Substring(splits[index - 1] + searchLength, format.endIndex);
                     }
-                    return format.Substring(splits[index - 1], splits[index]);
+                    else
+                    {
+                        // Return the format between the splits:
+                        return format.Substring(splits[index - 1] + searchLength, splits[index]);
+                    }
                 }
                 set
                 {

@@ -6,7 +6,7 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Plugins
 {
-    public interface ISourcePlugin
+    public interface ISource
     {
         /// <summary>
         /// Takes the current object and evaluates the selector.

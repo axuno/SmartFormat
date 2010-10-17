@@ -63,15 +63,13 @@ namespace SmartFormat
         {
             // Register all default plugins here:
             var result = new SmartFormatter();
-            result.AddSourcePlugins(
-                new ArrayPlugin(result),
-                new ReflectionPlugin(result),
-                new DefaultSource()
-                );
-            result.AddFormatterPlugins(
+            result.AddPlugins(
+                // Add all plugins:
                 new ArrayPlugin(result),
                 new ConditionalPlugin(),
+                new ReflectionPlugin(result),
                 new TimestringPlugin(),
+                new DefaultSource(),
                 new DefaultFormatter()
                 );
 

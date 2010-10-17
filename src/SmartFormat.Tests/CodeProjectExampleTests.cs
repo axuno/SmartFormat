@@ -87,7 +87,7 @@ namespace SmartFormat.Tests
                                           new DateTime(3000, 1, 1),
                                       };
 
-            var formatString = "All dates: {0:M/d/yyyy| and }.";
+            var formatString = "All dates: {0:{:M/d/yyyy}| and }.";
             var expectedOutput = "All dates: 12/31/1999 and 10/10/2010 and 1/1/3000.";
 
             string actualOutput = Smart.Format(formatString, data);
@@ -359,7 +359,7 @@ namespace SmartFormat.Tests
                                           new DateTime(3000, 1, 1),
                                       };
 
-            var formatString = "{0:M/d/yyyy|, |, and }.";
+            var formatString = "{0:{:M/d/yyyy}|, |, and }.";
             var expectedOutput = "12/31/1999, 10/10/2010, and 1/1/3000.";
 
             string actualOutput = Smart.Format(formatString, data);

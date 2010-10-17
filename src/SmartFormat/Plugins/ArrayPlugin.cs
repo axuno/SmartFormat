@@ -10,7 +10,8 @@ using SmartFormat.Core.Plugins;
 
 namespace SmartFormat.Plugins
 {
-    public class ArrayPlugin : ISourcePlugin, IFormatterPlugin
+    [PluginPriority(PluginPriority.Highest)]
+    public class ArrayPlugin : IFormatter, ISource 
     {
 
         public ArrayPlugin(SmartFormatter formatter)
@@ -29,9 +30,13 @@ namespace SmartFormat.Plugins
         {
             int itemIndex;
             var currentList = current as IList;
-            if (current != null && int.TryParse(selector.Text, out itemIndex) && itemIndex < currentList.Count)
+            if (selector.SelectorIndex > 0 && currentList != null && int.TryParse(selector.Text, out itemIndex) && itemIndex < currentList.Count)
             {
-                current = currentList[itemIndex];
+                // The current is a List, and the selector is a number;
+                // let's return the List item:
+                // Example: {People.2.Name}
+                //           ^List  ^itemIndex
+                result = currentList[itemIndex];
                 handled = true;
             }
         //}
@@ -48,7 +53,7 @@ namespace SmartFormat.Plugins
             {
                 if (selector.SelectorIndex == 0)
                 {
-                    current = CollectionIndex;
+                    result = CollectionIndex;
                     handled = true;
                     return;
                 }
@@ -59,7 +64,8 @@ namespace SmartFormat.Plugins
                     // This might occur if we have 2 lists that we are trying to sync.
                     if (0 <= CollectionIndex & CollectionIndex < currentList.Count)
                     {
-                        current = currentList[CollectionIndex];
+                        result = currentList[CollectionIndex];
+                        handled = true;
                     }
                     else
                     {
@@ -69,7 +75,8 @@ namespace SmartFormat.Plugins
                 else
                 {
                     // We want the Index to be inserted:
-                    current = CollectionIndex;
+                    result = CollectionIndex;
+                    handled = true;
                 }
             }
         }
@@ -108,9 +115,26 @@ namespace SmartFormat.Plugins
         {
             // This method needs the Highest priority so that it comes before the ConditionalPlugin
 
+            // Check if this Format has the correct syntax:
+            // (It must have a nested placeholder, and must have >= 2 parameters
+            if (format == null || !format.HasNested) return;
+            // Split our parameters:
+            var parameters = format.Split("|", 3);
+            if (parameters.Count == 1) return;
+
+
             // This plugin requires at least IEnumerable
             var enumerable = current as IEnumerable;
             if (enumerable == null) return;
+            // Ignore Strings, because they're IEnumerable.
+            // This issue might actually need a solution 
+            // for other objects that are IEnumerable.
+            if (current is string) return;
+
+
+
+
+
 
             // Let's retrieve all items from the enumerable:
             IList items = current as IList;
@@ -124,14 +148,18 @@ namespace SmartFormat.Plugins
                 items = allItems.ToArray();
             }
 
-
-            var parameters = format.Split("|", 3);
-            var itemFormat = parameters[0];
-            string spacer = (parameters.Count >= 2) ? parameters[1].Text : "";
-            string lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : null;
-
+            Format itemFormat = null;
+            string spacer = null;
+            string lastSpacer = null;
+            if (format != null)
+            {
+                itemFormat = parameters[0];
+                spacer = (parameters.Count >= 2) ? parameters[1].Text : "";
+                lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : null;
+            }
 
             int oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
+
             CollectionIndex = -1;
             foreach (object item in items) {
                 CollectionIndex += 1; // Keep track of the index
@@ -148,18 +176,15 @@ namespace SmartFormat.Plugins
                     }
                 }
 
-                if (format.HasNested)
-                {
-                    // Output this nested item:
-                    formatter.Format(output, itemFormat, args, item);
-                } else {
-                    // Use the itemFormat as a format specifier:
-                    throw new NotImplementedException();
-                }
+                // Output the nested format for this item:
+                if (itemFormat == null) continue;
+                formatter.Format(output, itemFormat, args, item);
 
             }
 
             CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex
+
+            handled = true;
         }
 
     }

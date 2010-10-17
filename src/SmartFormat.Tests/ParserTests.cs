@@ -15,6 +15,9 @@ namespace SmartFormat.Tests
         public void TestParser()
         {
             var parser = new Parser();
+            parser.AddAlphanumericSelectors();
+            parser.AddAdditionalSelectorChars("_");
+            parser.AddOperators(".");
 
             var formats = new[]{
                 " aaa {bbb.ccc: ddd {eee} fff } ggg ",

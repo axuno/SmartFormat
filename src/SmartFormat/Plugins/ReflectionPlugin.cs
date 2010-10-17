@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace SmartFormat.Plugins
 {
-    public class ReflectionPlugin : ISourcePlugin
+    public class ReflectionPlugin : ISource
     {
         public ReflectionPlugin(SmartFormatter formatter)
         {

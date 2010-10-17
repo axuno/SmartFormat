@@ -10,7 +10,8 @@ using SmartFormat.Core.Plugins;
 
 namespace SmartFormat.Plugins
 {
-    public class ConditionalPlugin : IFormatterPlugin
+    [PluginPriority(PluginPriority.High)]
+    public class ConditionalPlugin : IFormatter
     {
 
         private static Regex static_TryEvaluateCondition_conditionFormat
@@ -96,8 +97,8 @@ namespace SmartFormat.Plugins
                 else {
                     paramIndex = 3;
                 }
-                    
-                paramIndex = paramCount - paramIndex;
+
+                paramIndex = paramIndex - 4 + paramCount;
                 if (paramIndex < 0) {
                     paramIndex = paramCount - 1;
                 }
