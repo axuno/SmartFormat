@@ -14,7 +14,7 @@ namespace SmartFormat.Plugins
     public class ConditionalPlugin : IFormatter
     {
 
-        private static Regex static_TryEvaluateCondition_conditionFormat
+        private static readonly Regex complexConditionPattern
             = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
             //   Description:      and/or    comparator     value
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -32,6 +32,11 @@ namespace SmartFormat.Plugins
             var currentIsNumber = 
                 current is byte || current is short || current is int || current is long
                 || current is float || current is double || current is decimal;
+            // An Enum is a number too:
+            if (currentIsNumber == false && current != null && current.GetType().IsEnum)
+            {
+                currentIsNumber = true;
+            }
             var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
 
 
@@ -194,7 +199,7 @@ namespace SmartFormat.Plugins
         {
             conditionResult = false;
             // Let's evaluate the conditions into a boolean value:
-            Match m = static_TryEvaluateCondition_conditionFormat.Match(parameter.baseString, parameter.startIndex, parameter.endIndex - parameter.startIndex);
+            Match m = complexConditionPattern.Match(parameter.baseString, parameter.startIndex, parameter.endIndex - parameter.startIndex);
             if (!m.Success) {
                 // Could not parse the "complex condition"
                 outputItem = parameter;

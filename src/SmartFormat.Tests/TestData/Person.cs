@@ -13,9 +13,10 @@ namespace SmartFormat.Tests
 	    {
             this.Friends = new List<Person>();
 	    }
-	    public Person(string newName, System.DateTime newBirthday, string newAddress, params Person[] newFriends)
+	    public Person(string newName, Sex sex, DateTime newBirthday, string newAddress, params Person[] newFriends)
 	    {
 		    this.FullName = newName;
+	        this.Sex = sex;
 		    this.Birthday = newBirthday;
 		    if (!string.IsNullOrEmpty(newAddress))
 			    this.Address = Address.Parse(newAddress);
@@ -25,7 +26,6 @@ namespace SmartFormat.Tests
 	    public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MiddleName { get; set; }
-
 	    public string FullName {
 		    get {
 			    if (string.IsNullOrEmpty(this.MiddleName)) {
@@ -50,30 +50,40 @@ namespace SmartFormat.Tests
 	    }
         
         public DateTime Birthday { get; set; }
+        public int Age
+        {
+            get
+            {
+                if (Birthday.Month < DateTime.Now.Month || (Birthday.Month == DateTime.Now.Month && Birthday.Day <= DateTime.Now.Day))
+                {
+                    return DateTime.Now.Year - Birthday.Year;
+                }
+                else
+                {
+                    return DateTime.Now.Year - 1 - Birthday.Year;
+                }
+            }
+        }
         public Address Address { get; set; }
 
         public List<Person> Friends { get; set; }
-
-
 	    public int NumberOfFriends {
 		    get { return this.Friends.Count; }
 	    }
 
-
-	    public int Age {
-		    get {
-			    if (Birthday.Month < DateTime.Now.Month || (Birthday.Month == DateTime.Now.Month && Birthday.Day <= DateTime.Now.Day)) {
-				    return DateTime.Now.Year - Birthday.Year;
-			    } else {
-				    return DateTime.Now.Year - 1 - Birthday.Year;
-			    }
-		    }
-	    }
 	    public override string ToString()
 	    {
 		    return LastName + ", " + FirstName;
 	    }
 
         public Person Spouse { get; set; }
+
+        public Sex Sex { get; set; }
+    }
+
+    public enum Sex
+    {
+        Female = 0,
+        Male = 1
     }
 }
