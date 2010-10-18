@@ -19,7 +19,7 @@ namespace SmartFormat.Tests
                                     FullName = "Quentin Starin",
                                     Birthday = new DateTime(1981, 02, 15),
                                     Address = new Address("101 1st Ave", "Minneapolis", States.Minnesota, "55401"),
-                                    Friends = new Person[] {
+                                    Friends = new List<Person> {
                                                                 new Person() { FullName = "John Smith", Birthday = new DateTime(1978, 1, 1) },
                                                                 new Person() { FullName = "Bob Johnson", Birthday = new DateTime(1957, 1, 1) },
                                                                 new Person() { FullName = "Mary Meyer", Birthday = new DateTime(1990, 1, 1) },
@@ -48,7 +48,7 @@ namespace SmartFormat.Tests
             var formatString = "{0} is {1} years old and has {2:N2} friends.";
             var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
 
-            string actualOutput = Smart.Format(formatString, p.FirstName, p.Age, p.Friends.Length);
+            string actualOutput = Smart.Format(formatString, p.FirstName, p.Age, p.Friends.Count);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 

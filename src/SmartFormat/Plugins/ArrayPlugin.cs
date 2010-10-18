@@ -120,7 +120,7 @@ namespace SmartFormat.Plugins
             if (format == null || !format.HasNested) return;
             // Split our parameters:
             var parameters = format.Split("|", 3);
-            if (parameters.Count == 1) return;
+            //if (parameters.Count == 1) return;
 
 
             // This plugin requires at least IEnumerable
@@ -177,7 +177,6 @@ namespace SmartFormat.Plugins
                 }
 
                 // Output the nested format for this item:
-                if (itemFormat == null) continue;
                 formatter.Format(output, itemFormat, args, item);
 
             }

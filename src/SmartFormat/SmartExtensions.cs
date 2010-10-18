@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SmartFormat.Core;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
@@ -36,7 +37,7 @@ namespace SmartFormat
             var sourceList = sources as IList<T> ?? sources.ToList();
             var output = new StringOutput((format.Length + separator.Length) * sourceList.Count);
             var formatter = Smart.Default;
-            Format cache = null; ;
+            FormatCache cache = null;
             for (int i = 0; i < sourceList.Count; i++)
             {
                 if (i > 0) output.Write(separator);

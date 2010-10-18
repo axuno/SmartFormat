@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
 
-namespace Common
+namespace SmartFormat.Tests.Common
 {
     // Note: I just found out that .NET 4 has an exception called "AggregateException" that sounds very similar to this ExceptionCollection.
 
@@ -56,6 +55,22 @@ namespace Common
         public void AddRange(IEnumerable<TException> exceptions)
         {
             this.innerExceptions.AddRange(exceptions);
+        }
+
+        /// <summary>
+        /// Executes an action, and if an exception is thrown, adds it to the collection.
+        /// </summary>
+        /// <param name="action"></param>
+        public void Try(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (TException ex)
+            {
+                this.Add(ex);
+            }            
         }
 
         #endregion

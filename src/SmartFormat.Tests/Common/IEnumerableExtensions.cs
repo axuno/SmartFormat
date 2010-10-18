@@ -14,5 +14,14 @@ namespace SmartFormat.Tests.Common
                 action(source);
             }
         }
+        public static void ForEach<T>(this IEnumerable<T> sources, Action<T, int> action)
+        {
+            var i = 0;
+            foreach (var source in sources)
+            {
+                action(source, i);
+                i++;
+            }
+        }
     }
 }

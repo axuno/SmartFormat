@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using SmartFormat.Core.Parsing;
-using Common;
+using SmartFormat.Tests.Common;
 
 namespace SmartFormat.Tests
 {

@@ -88,22 +88,22 @@ namespace SmartFormat.Core
             Format(output, formatParsed, args, current);
         }
 
-        public string FormatWithCache(ref Format cache, string format, params object[] args)
+        public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
         {
             var output = new StringOutput(format.Length + args.Length * 8);
 
-            if (cache == null) cache = this.Parser.ParseFormat(format);
+            if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, cache, args, current);
+            Format(output, cache.Format, args, current);
 
             return output.ToString();
         }
 
-        public void FormatWithCacheInto(ref Format cache, IOutput output, string format, params object[] args)
+        public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
         {
-            if (cache == null) cache = this.Parser.ParseFormat(format);
+            if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, cache, args, current);
+            Format(output, cache.Format, args, current);
         }
 
         #endregion
