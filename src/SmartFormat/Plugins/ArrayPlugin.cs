@@ -82,7 +82,7 @@ namespace SmartFormat.Plugins
         }
 
 
-
+        [ThreadStatic]
         private int CollectionIndex = -1;
         /// <summary>
         /// If the source value is an array (or supports ICollection), 
@@ -117,9 +117,9 @@ namespace SmartFormat.Plugins
 
             // Check if this Format has the correct syntax:
             // (It must have a nested placeholder, and must have >= 2 parameters
-            if (format == null || !format.HasNested) return;
+            //if (format == null || !format.HasNested) return;
             // Split our parameters:
-            var parameters = format.Split("|", 3);
+            //var parameters = format.Split("|", 3);
             //if (parameters.Count == 1) return;
 
 
@@ -148,14 +148,40 @@ namespace SmartFormat.Plugins
                 items = allItems.ToArray();
             }
 
+            // Create an item formatter:
             Format itemFormat = null;
             string spacer = null;
             string lastSpacer = null;
             if (format != null)
             {
+                var parameters = format.Split("|", 3);
                 itemFormat = parameters[0];
                 spacer = (parameters.Count >= 2) ? parameters[1].Text : "";
                 lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : null;
+            }
+            if (itemFormat == null)
+            {
+                // The format is not nested,
+                // so we will treat it as an itemFormat:
+                // Create an empty placeholder:
+                var newItemFormat = new Format("");
+                newItemFormat.HasNested = true;
+                var placeholder = new Placeholder(newItemFormat, 0);
+                placeholder.Format = null;
+                newItemFormat.Items.Add(placeholder);
+                itemFormat = newItemFormat;
+            }
+            else if (!itemFormat.HasNested)
+            {
+                var newItemFormat = new Format(itemFormat.baseString);
+                newItemFormat.startIndex = itemFormat.startIndex;
+                newItemFormat.endIndex = itemFormat.endIndex;
+                newItemFormat.HasNested = true;
+                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex);
+                newPlaceholder.Format = itemFormat;
+                newPlaceholder.endIndex = itemFormat.endIndex;
+                newItemFormat.Items.Add(newPlaceholder);
+                itemFormat = newItemFormat;
             }
 
             int oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
@@ -178,7 +204,6 @@ namespace SmartFormat.Plugins
 
                 // Output the nested format for this item:
                 formatter.Format(output, itemFormat, args, item);
-
             }
 
             CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex

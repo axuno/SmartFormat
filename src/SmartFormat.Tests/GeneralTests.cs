@@ -36,44 +36,6 @@ namespace SmartFormat.Tests
         }
 
         [Test]
-        public void Test_Escaping()
-        {
-            var parser = new Parser();
-
-            var tests = new[]{
-                new { Title = "Test Opening Braces",
-                      Format = "{{0}} - {{{0}}}",
-                      Expected = "{0} - {Zero}",
-                      Actual = new StringBuilder(),
-                },
-                new { Title = "Test Closing Braces",
-                      Format = "{1:N0} }} - {1:N0}0}} - {1:N0}}0} - {1:N0}}}",
-                      Expected = "1 } - 10} - N0}1 - N1}",
-                      Actual = new StringBuilder(),
-                },
-            };
-            var args = new object[] { "Zero", 1, 2.22M, new DateTime(2003, 3, 3), "Four".ToCharArray(), new TimeSpan(0, 5, 0, 5, 0) };
-
-
-            foreach (var test in tests)
-            {
-                var parsed = parser.ParseFormat(test.Format);
-                Console.WriteLine(parsed.ToString());
-            }
-
-
-            // Process all items:
-            var errors = tests.TryAll(t => t.Actual.Append( string.Format( t.Format, args )));
-            
-            // Check all results:
-            var moreErrors = tests.TryAll(t => Assert.AreEqual(t.Expected, t.Actual.ToString()));
-
-            errors.AddRange(moreErrors);
-            errors.ThrowIfNotEmpty();
-
-        }
-
-        [Test]
         public void Test_Splicing()
         {
             var parser = new Parser();

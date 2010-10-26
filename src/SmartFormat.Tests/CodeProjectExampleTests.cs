@@ -58,7 +58,7 @@ namespace SmartFormat.Tests
         {
             var p = MakeQuentin();
 
-            var formatString = "{FirstName} is {Age} years old and has {Friends.Length:N2} friends.";
+            var formatString = "{FirstName} is {Age} years old and has {Friends.Count:N2} friends.";
             var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
 
             string actualOutput = Smart.Format(formatString, p);
@@ -180,7 +180,7 @@ namespace SmartFormat.Tests
         {
             var p1 = MakeQuentin();
 
-            var formatString = "{Friends.Length:There {:is|are} {} friend{:|s}.}";
+            var formatString = "{Friends.Count:There {:is|are} {} friend{:|s}.}";
             var expectedOutput = "There are 4 friends.";
 
             string actualOutput = Smart.Format(formatString, p1);
@@ -381,7 +381,7 @@ namespace SmartFormat.Tests
         }
 
         [Test]
-        public void Escaping()
+        public void EscapingDoubleBraces()
         {
             var args = new object[] { "Zero", "One", "Two", "Three" };
 
@@ -392,6 +392,23 @@ namespace SmartFormat.Tests
             Assert.AreEqual(expected, actual);
         }
 
+        [Test]
+        public void EscapingSlashBraces()
+        {
+            var Smart = new SmartFormatter();
+            Smart.Parser.UseAlternativeEscapeChar('\\');
+            Smart.AddPlugins(
+                new Core.Plugins.DefaultFormatter(), 
+                new Core.Plugins.DefaultSource());
+
+            var args = new object[] { "Zero", "One", "Two", 3 };
+
+            var format = @"{0} \{0\} \{{0}\} {3:00\}} {3:00}\}";
+            var expected = "Zero {0} {Zero} 03} 03}";
+
+            var actual = Smart.Format(format, args);
+            Assert.AreEqual(expected, actual);
+        }
 
     }
 }

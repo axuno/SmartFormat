@@ -8,6 +8,7 @@ namespace SmartFormat.Core.Parsing
 {
     public class Parser
     {
+
         #region: Constructor :
 
         public Parser()
@@ -48,9 +49,20 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         private string Operators = "";
 
+        /// <summary>
+        /// If false, double-curly braces are escaped.
+        /// If true, the AlternativeEscapeChar is used for escaping braces.
+        /// </summary>
+        private bool AlternativeEscaping = false;
 
         /// <summary>
-        /// Adds a-z and A-Z to the list of allowed selector chars.
+        /// If AlternativeEscaping is true, then this character is
+        /// used to escape curly braces.
+        /// </summary>
+        private char AlternativeEscapeChar = '\\';
+
+        /// <summary>
+        /// Includes a-z and A-Z in the list of allowed selector chars.
         /// </summary>
         public void AddAlphanumericSelectors()
         {
@@ -87,6 +99,27 @@ namespace SmartFormat.Core.Parsing
                 }
             }
         }
+
+        /// <summary>
+        /// Sets the AlternativeEscaping option to True 
+        /// so that braces will only be escaped after the
+        /// specified character.
+        /// </summary>
+        /// <param name="alternativeEscapeChar"></param>
+        public void UseAlternativeEscapeChar(char alternativeEscapeChar)
+        {
+            this.AlternativeEscapeChar = alternativeEscapeChar;
+            this.AlternativeEscaping = true;
+        }
+        /// <summary>
+        /// Uses {{ and }} for escaping braces for compatibility with String.Format.  
+        /// However, this does not work very well with nested placeholders,
+        /// so it is recommended to use an alternative escape char.
+        /// </summary>
+        public void UseBraceEscaping()
+        {
+            this.AlternativeEscaping = false;
+        }
                 
         #endregion
 
@@ -114,11 +147,14 @@ namespace SmartFormat.Core.Parsing
                         lastI = i + 1;
 
                         // See if this brace should be escaped:
-                        var nextI = i + 1;
-                        if (nextI < length && format[nextI] == '{')
+                        if (!this.AlternativeEscaping)
                         {
-                            i++;
-                            continue;
+                            var nextI = lastI;
+                            if (nextI < length && format[nextI] == '{')
+                            {
+                                i++;
+                                continue;
+                            }
                         }
 
                         // New placeholder:
@@ -136,11 +172,14 @@ namespace SmartFormat.Core.Parsing
                         lastI = i + 1;
 
                         // See if this brace should be escaped:
-                        var nextI = i + 1;
-                        if (nextI < length && format[nextI] == '}')
+                        if (!this.AlternativeEscaping)
                         {
-                            i++;
-                            continue;
+                            var nextI = lastI;
+                            if (nextI < length && format[nextI] == '}')
+                            {
+                                i++;
+                                continue;
+                            }
                         }
 
                         // Make sure that this is a nested placeholder before we un-nest it:
@@ -154,6 +193,21 @@ namespace SmartFormat.Core.Parsing
                         current.endIndex = i;
                         current.parent.endIndex = i + 1;
                         current = current.parent.parent;
+                    }
+                    else if (this.AlternativeEscaping && c == this.AlternativeEscapeChar)
+                    {
+                        // See if the next char is a brace that should be escaped:
+                        var nextI = i + 1;
+                        if (nextI < length && (format[nextI] == '{' || format[nextI] == '}'))
+                        {
+                            // Finish the last text item:
+                            if (i != lastI)
+                                current.Items.Add(new LiteralText(current, lastI) { endIndex = i });
+                            lastI = i + 1;
+
+                            i++;
+                            continue;
+                        }
                     }
                 }
                 else
@@ -263,7 +317,4 @@ namespace SmartFormat.Core.Parsing
         #endregion
 
     }
-
-
-
 }

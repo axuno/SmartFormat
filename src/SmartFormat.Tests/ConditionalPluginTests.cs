@@ -45,12 +45,12 @@ namespace SmartFormat.Tests
             var formats = new[] {
                 "{6.Friends.0:{FirstName} is a {Sex:man|woman}.}",
                 "{6.Friends.1:{FirstName} is a {Sex:man|woman}.}",
-                "{9.DayOfWeek:Sunday|Monday|Some other day} / {10.DayOfWeek:Sunday|Monday|Some other day}",
+                "{9.DayOfWeek:Sunday|Monday|Some other day} / {10.DayOfWeek:Sunday|Monday|Some other day} / {11.DayOfWeek:Sunday|Monday|Some other day}",
             };
             var expected = new[] {
                 "Jim is a man.",
                 "Pam is a woman.",
-                "Some other day / Sunday",
+                "Sunday / Monday / Some other day",
             };
 
             var args = GetArgs();

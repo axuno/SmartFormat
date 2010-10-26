@@ -16,22 +16,46 @@ namespace SmartFormat.Tests
                 "ABCDE".ToCharArray(),
                 "One|Two|Three|Four|Five".Split('|'),
                 GetPerson().Friends,
-                "1/1/2000|10/10/2010|5/5/5555".Split('|').Select(s=>DateTime.ParseExact(s,"M/d/yyyy",null))
+                "1/1/2000|10/10/2010|5/5/5555".Split('|').Select(s=>DateTime.ParseExact(s,"M/d/yyyy",null)),
+                new []{1,2,3,4,5},
             };
             return args;
         }
         [Test]
-        public void BasicTest()
+        public void FormatTest()
         {
             var formats = new string[] {
-                "{0}",
+                "{4}",
+                "{4:}",
+                "{4:00}",
+                "{4:|,}",
+                "{4:|, |, and }",
+                "{4:N2|, |, and }",
+            };
+            var expected = new string[] {
+                "12345",
+                "12345",
+                "0102030405",
+                "1,2,3,4,5",
+                "1, 2, 3, 4, and 5",
+                "1.00, 2.00, 3.00, 4.00, and 5.00",
+            };
+
+            var args = GetArgs();
+            Smart.Default.Test(formats, args, expected);
+
+        }
+
+        [Test]
+        public void NestedFormatTest()
+        {
+            var formats = new string[] {
                 "{0:{}-}",
                 "{0:{}|-}",
                 "{0:{}|-|+}",
                 "{0:({})|, |, and }",
             };
             var expected = new string[] {
-                "System.Char[]",
                 "A-B-C-D-E-",
                 "A-B-C-D-E",
                 "A-B-C-D+E",
@@ -42,7 +66,7 @@ namespace SmartFormat.Tests
             Smart.Default.Test(formats, args, expected);
         }
         [Test]
-        public void NestedTest()
+        public void NestedArraysTest()
         {
             var formats = new string[] {
                 "{2:{:{FirstName}}|, }",

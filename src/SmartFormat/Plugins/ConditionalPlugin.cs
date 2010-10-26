@@ -127,7 +127,7 @@ namespace SmartFormat.Plugins
                 {
                     paramIndex = 1;
                 }
-                else if (arg < DateTime.Now)
+                else if (arg <= DateTime.Now)
                 {
                     paramIndex = 0;
                 }
@@ -143,7 +143,7 @@ namespace SmartFormat.Plugins
                 {
                     paramIndex = 1;
                 } 
-                else if (arg.CompareTo(TimeSpan.Zero) == -1) 
+                else if (arg.CompareTo(TimeSpan.Zero) <= 0) 
                 {
                     paramIndex = 0;
                 } 
