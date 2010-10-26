@@ -24,12 +24,14 @@ namespace SmartFormat.Plugins
             {
                 var formattingOptions = TimestringFormatter.FormattingOptions.Parse(this.FormattingOptions, formatText);
                 output.Write(TimestringFormatter.ToTimeString((TimeSpan)current, formattingOptions));
+                handled = true;
             }
             else if (current is DateTime && formatText.StartsWith("timestring"))
             {
                 formatText = formatText.Substring(10);
                 var formattingOptions = TimestringFormatter.FormattingOptions.Parse(this.FormattingOptions, formatText);
                 output.Write(TimestringFormatter.ToTimeString(DateTime.Now.Subtract((DateTime)current), formattingOptions));
+                handled = true;
             }
         }
 
@@ -84,7 +86,7 @@ namespace SmartFormat.Plugins
             public TruncationOptions TruncationOption { get; set; }
             public bool Abbreviate { get; set; }
             public bool IfZeroIncludeLessThan { get; set; }
-            private static Regex parser = new Regex(@"\b(w|d|h|m|s|ms|auto|short|fill|full|abbr|noabbr|less|noless)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            private static Regex parser = new Regex(@"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             public static FormattingOptions Parse(FormattingOptions defaultFormattingOptions, string formatOptionsString)
             {
                 formatOptionsString = formatOptionsString.ToLower();
@@ -101,22 +103,22 @@ namespace SmartFormat.Plugins
                 {
                     switch (m.Value)
                     {
-                        case "w":
+                        case "w": case "week": case "weeks":
                             newRange = AccuracyOptions.Weeks;
                             break;
-                        case "d":
+                        case "d": case "day": case "days":
                             newRange = AccuracyOptions.Days;
                             break;
-                        case "h":
+                        case "h": case "hour": case "hours":
                             newRange = AccuracyOptions.Hours;
                             break;
-                        case "m":
+                        case "m": case "minute": case "minutes":
                             newRange = AccuracyOptions.Minutes;
                             break;
-                        case "s":
+                        case "s": case "second": case "seconds":
                             newRange = AccuracyOptions.Seconds;
                             break;
-                        case "ms":
+                        case "ms": case "millisecond": case "milliseconds":
                             newRange = AccuracyOptions.Milliseconds;
 
                             break;
