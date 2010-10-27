@@ -12,12 +12,11 @@ namespace SmartFormat.Core.Plugins
         /// <summary>
         /// Takes the current object and writes it to the output, using the specified format.
         /// </summary>
-        /// <param name="formatter"></param>
-        /// <param name="args"></param>
         /// <param name="current"></param>
         /// <param name="format"></param>
         /// <param name="handled"></param>
         /// <param name="output"></param>
-        void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output);
+        /// <param name="formatDetails"></param>
+        void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails);
     }
 }

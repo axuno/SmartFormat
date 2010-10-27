@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SmartFormat.Core;
+﻿using SmartFormat.Core;
 using SmartFormat.Core.Plugins;
 using SmartFormat.Core.Parsing;
 using System.Reflection;
@@ -19,7 +15,7 @@ namespace SmartFormat.Plugins
             formatter.Parser.AddOperators(".");
         }
 
-        public void EvaluateSelector(SmartFormatter formatter, object[] args, object current, Selector selector, ref bool handled, ref object result)
+        public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
         {
             if (current == null)
             {
@@ -36,7 +32,7 @@ namespace SmartFormat.Plugins
                 {
                     case MemberTypes.Field:
                         //  Selector is a Field; retrieve the value:
-                        var field = member as FieldInfo;
+                        var field = (FieldInfo) member;
                         result = field.GetValue(current);
                         handled = true;
                         return;
@@ -46,7 +42,7 @@ namespace SmartFormat.Plugins
                         if (member.MemberType == MemberTypes.Property)
                         {
                             //  Selector is a Property
-                            PropertyInfo prop = member as PropertyInfo;
+                            var prop = (PropertyInfo) member;
                             //  Make sure the property is not WriteOnly:
                             if (prop.CanRead)
                             {
@@ -60,7 +56,7 @@ namespace SmartFormat.Plugins
                         else
                         {
                             //  Selector is a method
-                            method = member as MethodInfo;
+                            method = (MethodInfo) member;
                         }
 
                         //  Check that this method is valid -- it needs to return a value and has to be parameterless:

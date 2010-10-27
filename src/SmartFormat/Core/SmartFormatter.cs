@@ -112,6 +112,12 @@ namespace SmartFormat.Core
 
         public void Format(IOutput output, Format format, object[] args, object current)
         {
+            var formatDetails = new FormatDetails() {
+                Formatter = this,
+                OriginalArgs = args,
+                Placeholder = null,
+            };
+
             foreach (var item in format.Items)
             {
                 var literalItem = item as LiteralText;
@@ -123,6 +129,7 @@ namespace SmartFormat.Core
 
                 var placeholder = (Placeholder)item;
                 object context = current;
+                formatDetails.Placeholder = placeholder;
 
                 bool handled;
                 // Evaluate the selectors:
@@ -130,7 +137,7 @@ namespace SmartFormat.Core
                 {
                     handled = false;
                     var result = context;
-                    InvokeSourcePlugins(args, context, selector, ref handled, ref result);
+                    InvokeSourcePlugins(context, selector, ref handled, ref result, formatDetails);
                     if (!handled)
                     {
                         // The selector wasn't handled.  It's probably not a property.
@@ -142,7 +149,7 @@ namespace SmartFormat.Core
                 handled = false;
                 try
                 {
-                    InvokeFormatterPlugins(args, context, placeholder.Format, ref handled, output);
+                    InvokeFormatterPlugins(context, placeholder.Format, ref handled, output, formatDetails);
                 }
                 catch (Exception ex)
                 {
@@ -155,19 +162,19 @@ namespace SmartFormat.Core
 
         }
 
-        private void InvokeSourcePlugins(object[] args, object current, Selector selector, ref bool handled, ref object result)
+        private void InvokeSourcePlugins(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
         {
             foreach (var sourcePlugin in this.sourcePlugins)
             {
-                sourcePlugin.EvaluateSelector(this, args, current, selector, ref handled, ref result);
+                sourcePlugin.EvaluateSelector(current, selector, ref handled, ref result, formatDetails);
                 if (handled) break;
             }
         }
-        private void InvokeFormatterPlugins(object[] args, object current, Format format, ref bool handled, IOutput output)
+        private void InvokeFormatterPlugins(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
             foreach (var formatterPlugin in this.formatterPlugins)
             {
-                formatterPlugin.EvaluateFormat(this, args, current, format, ref handled, output);
+                formatterPlugin.EvaluateFormat(current, format, ref handled, output, formatDetails);
                 if (handled) break;
             }
         }

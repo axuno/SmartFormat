@@ -399,7 +399,7 @@ namespace SmartFormat.Tests
             Smart.Parser.UseAlternativeEscapeChar('\\');
             Smart.AddPlugins(
                 new Core.Plugins.DefaultFormatter(), 
-                new Core.Plugins.DefaultSource());
+                new Core.Plugins.DefaultSource(Smart));
 
             var args = new object[] { "Zero", "One", "Two", 3 };
 

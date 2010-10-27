@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
-using SmartFormat.Core;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Plugins;
-using SmartFormat.Plugins;
 
 namespace SmartFormat.Plugins
 {
@@ -15,7 +11,7 @@ namespace SmartFormat.Plugins
 
         #region IFormatter
 
-        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
             if (format != null && format.HasNested) return;
 
@@ -48,7 +44,7 @@ namespace SmartFormat.Plugins
 
         #region FormattingOptions 
 
-        public SmartFormat.Plugins.TimestringFormatter.FormattingOptions FormattingOptions { get; set; }
+        public TimestringFormatter.FormattingOptions FormattingOptions { get; set; }
 
         #endregion
 
@@ -81,12 +77,18 @@ namespace SmartFormat.Plugins
 
         public struct FormattingOptions
         {
+            /// <summary>The lowest value that gets calculated.  For example, if set to Minutes, then seconds (and milliseconds) will never get shown.</summary>
             public AccuracyOptions SmallestUnitToDisplay { get; set; }
+            /// <summary>Example: If largest = Hours, then "3d 12h ..." = "84h ..."</summary>
             public AccuracyOptions LargestUnitToDisplay { get; set; }
+            /// <summary>Determines how much info is returned</summary>
             public TruncationOptions TruncationOption { get; set; }
+            /// <summary>Example: "1d 2h 3m 4s 5ms" or "1 day 2 hours 3 minutes 4 seconds 5 milliseconds"</summary>
             public bool Abbreviate { get; set; }
+            /// <summary>Example: If largest = Hours and FromTime = 1 minute, then returns "less than 1 hour", otherwise returns "0 hours"</summary>
             public bool IfZeroIncludeLessThan { get; set; }
-            private static Regex parser = new Regex(@"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            private static readonly Regex parser = new Regex(@"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             public static FormattingOptions Parse(FormattingOptions defaultFormattingOptions, string formatOptionsString)
             {
                 formatOptionsString = formatOptionsString.ToLower();
@@ -220,15 +222,9 @@ namespace SmartFormat.Plugins
         #region ToTimeString
 
         /// <summary>
-        /// Converts the Timespan into a string, using the format options as a shortcut.
-        /// Example:
-        /// ts = ToTimeString(Now.TimeOfDay, "[(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr]")
+        /// Converts the Timespan into a string, using the default format options.
         /// </summary>
         /// <param name="FromTime"></param>
-        /// <param name="formattingOptions">A list of flags options.
-        /// Syntax:
-        /// [(smallest)w|d|h|m|s|ms] [(largest)w|d|h|m|s|ms] [auto|short|fill|full] [abbr|noabbr] [less|noless]
-        /// </param>
         /// <remarks> The format options are case insensitive. </remarks>
         public static string ToTimeString(TimeSpan FromTime)
         {
@@ -255,11 +251,7 @@ namespace SmartFormat.Plugins
 		/// For example: "31.23:59:00.555" = "31 days 23 hours 59 minutes 0 seconds 555 milliseconds"
 		/// </summary>
 		/// <param name="FromTime"></param>
-		/// <param name="smallestToDisplay">The lowest value that gets calculated.  For example, if set to Minutes, then seconds (and milliseconds) will never get shown.</param>
-		/// <param name="TruncationOption">Determines how much info is returned</param>
-		/// <param name="Abbreviate">Example: "1d 2h 3m 4s 5ms" or "1 day 2 hours 3 minutes 4 seconds 5 milliseconds"</param>
-		/// <param name="largestToDisplay">Example: If largest = Hours, then "3d 12h ..." = "84h ..."</param>
-		/// <param name="IfZeroIncludeLessThan">Example: If largest = Hours and FromTime = 1 minute, then returns "less than 1 hour"</param>
+		/// <param name="formattingOptions"></param>
 		public static string ToTimeString(TimeSpan FromTime, FormattingOptions formattingOptions)
 		{
 			string ret = "";

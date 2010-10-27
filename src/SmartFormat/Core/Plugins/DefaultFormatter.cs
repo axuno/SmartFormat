@@ -13,16 +13,16 @@ namespace SmartFormat.Core.Plugins
         /// <summary>
         /// Do the default formatting, same as "String.Format".
         /// </summary>
-        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
-            // No matter what, this function handles the method.
+            // This function always handles the method:
             handled = true;
 
             // If the format has nested placeholders, we process those first 
             // instead of formatting the item:
             if (format != null && format.HasNested)
             {
-                formatter.Format(output, format, args, current);
+                formatDetails.Formatter.Format(output, format, formatDetails.OriginalArgs, current);
                 return;
             }
 
@@ -34,33 +34,56 @@ namespace SmartFormat.Core.Plugins
 
 
             //  (The following code was adapted from the built-in String.Format code)
-            
+
             //  We will try using IFormatProvider, IFormattable, and if all else fails, ToString.
-
-            // Try IFormatProvider:
-            if (formatter.Provider != null)
+            var formatter = formatDetails.Formatter;
+            string result = null;
+            ICustomFormatter cFormatter;
+            IFormattable formattable;
+            // Use the provider to see if a CustomFormatter is available:
+            if (formatter.Provider != null && (cFormatter = formatter.Provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
             {
-                //  Use the provider to see if a CustomFormatter is available:
-                ICustomFormatter cformatter = formatter.Provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter;
-                if (cformatter != null)
-                {
-                    var formatText = format == null ? null : format.GetText();
-                    output.Write(cformatter.Format(formatText, current, formatter.Provider));
-                    return;
-                }
+                var formatText = format == null ? null : format.GetText();
+                result = cFormatter.Format(formatText, current, formatter.Provider);
             }
-
             // IFormattable:
-            var formattable = current as IFormattable;
-            if (formattable != null)
+            else if ((formattable = current as IFormattable) != null)
             {
                 var formatText = format == null ? null : format.ToString();
-                output.Write(formattable.ToString(formatText, formatter.Provider));
+                result = formattable.ToString(formatText, formatter.Provider);
             }
             // ToString:
             else
             {
-                output.Write(current.ToString());
+                result = current.ToString();
+            }
+
+
+            // Now that we have the result, let's output it (and consider alignment):
+            
+            
+            // See if there's a pre-alignment to consider:
+            if (formatDetails.Placeholder.Alignment > 0)
+            {
+                var spaces = formatDetails.Placeholder.Alignment - result.Length;
+                if (spaces > 0)
+                {
+                    output.Write(new String(' ', spaces));
+                }
+            }
+
+            // Output the result:
+            output.Write(result);
+
+
+            // See if there's a post-alignment to consider:
+            if (formatDetails.Placeholder.Alignment < 0)
+            {
+                var spaces = -formatDetails.Placeholder.Alignment - result.Length;
+                if (spaces > 0)
+                {
+                    output.Write(new String(' ', spaces));
+                }
             }
         }
     }

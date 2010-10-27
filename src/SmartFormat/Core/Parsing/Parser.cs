@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SmartFormat.Core.Parsing;
+﻿using System.Linq;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -112,6 +108,7 @@ namespace SmartFormat.Core.Parsing
             this.AlternativeEscaping = true;
         }
         /// <summary>
+        /// [Default] 
         /// Uses {{ and }} for escaping braces for compatibility with String.Format.  
         /// However, this does not work very well with nested placeholders,
         /// so it is recommended to use an alternative escape char.

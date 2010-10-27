@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using SmartFormat.Core;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
@@ -26,31 +24,26 @@ namespace SmartFormat.Plugins
         /// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
         /// The ".2" selector is used to reference Dates(2).
         /// </summary>
-        public void EvaluateSelector(SmartFormatter formatter, object[] args, object current, Selector selector, ref bool handled, ref object result)
+        public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
         {
+            // See if we're trying to access a specific index:
             int itemIndex;
             var currentList = current as IList;
             if (selector.SelectorIndex > 0 && currentList != null && int.TryParse(selector.Text, out itemIndex) && itemIndex < currentList.Count)
             {
                 // The current is a List, and the selector is a number;
                 // let's return the List item:
-                // Example: {People.2.Name}
+                // Example: {People[2].Name}
                 //           ^List  ^itemIndex
                 result = currentList[itemIndex];
                 handled = true;
             }
-        //}
 
-        ///// <summary>
-        ///// Allows you to use "{Index}" as a valid selector.
-        ///// </summary>
-        //public void EvaluateSelector2()
-        //{
-            // This event has the Lowest priority, which means that it only fires if reflection fails.
 
             // We want to see if there is an "Index" property that was supplied.
             if (selector.Text.Equals("index", StringComparison.OrdinalIgnoreCase))
             {
+                // Looking for "{Index}"
                 if (selector.SelectorIndex == 0)
                 {
                     result = CollectionIndex;
@@ -58,24 +51,10 @@ namespace SmartFormat.Plugins
                     return;
                 }
 
-                //var currentList = current as IList;
-                if (currentList != null)
+                // Looking for 2 lists to sync: "{List1: {List2[Index]} }"
+                if (currentList != null && 0 <= CollectionIndex && CollectionIndex < currentList.Count)
                 {
-                    // This might occur if we have 2 lists that we are trying to sync.
-                    if (0 <= CollectionIndex & CollectionIndex < currentList.Count)
-                    {
-                        result = currentList[CollectionIndex];
-                        handled = true;
-                    }
-                    else
-                    {
-                        // Not a valid index!!!  Cannot synchronize these lists.
-                    }
-                }
-                else
-                {
-                    // We want the Index to be inserted:
-                    result = CollectionIndex;
+                    result = currentList[CollectionIndex];
                     handled = true;
                 }
             }
@@ -111,7 +90,7 @@ namespace SmartFormat.Plugins
         /// In this example, format = "{Width}x{Height}".  Notice the nested brackets.
         /// 
         /// </summary>
-        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
             // This method needs the Highest priority so that it comes before the ConditionalPlugin
 
@@ -203,7 +182,7 @@ namespace SmartFormat.Plugins
                 }
 
                 // Output the nested format for this item:
-                formatter.Format(output, itemFormat, args, item);
+                formatDetails.Formatter.Format(output, itemFormat, formatDetails.OriginalArgs, item);
             }
 
             CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex

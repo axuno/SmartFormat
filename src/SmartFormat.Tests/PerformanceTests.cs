@@ -55,7 +55,7 @@ namespace SmartFormat.Tests
             FormatCache cache = null;
             FormatCache cache2 = null;
             var NoPlugins = new SmartFormatter();
-            NoPlugins.AddPlugins(new DefaultFormatter(), new DefaultSource());
+            NoPlugins.AddPlugins(new DefaultFormatter(), new DefaultSource(NoPlugins));
 
             var formatters = new[] {
                 new {

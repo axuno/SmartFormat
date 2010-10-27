@@ -14,23 +14,29 @@ namespace SmartFormat.Core.Parsing
         }
 
         public readonly Format parent;
-        public List<Selector> Selectors {get; private set;}
+        public List<Selector> Selectors { get; private set; }
         public Format Format { get; set; }
+        public int Alignment { get; set; }
 
         public override string ToString()
         {
             var result = new StringBuilder(endIndex - startIndex);
-            result.Append("{");
+            result.Append('{');
             foreach (var s in Selectors)
             {
                 result.Append(s.baseString, s.operatorStart, s.endIndex - s.operatorStart);
             }
+            if (Alignment != 0)
+            {
+                result.Append(',');
+                result.Append(Alignment);
+            }
             if (Format != null)
             {
-                result.Append(":");
+                result.Append(':');
                 result.Append(Format.ToString());
             }
-            result.Append("}");
+            result.Append('}');
             return result.ToString();
         }
     }

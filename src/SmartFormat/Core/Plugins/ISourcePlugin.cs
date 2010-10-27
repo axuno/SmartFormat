@@ -11,12 +11,11 @@ namespace SmartFormat.Core.Plugins
         /// <summary>
         /// Takes the current object and evaluates the selector.
         /// </summary>
-        /// <param name="formatter"></param>
-        /// <param name="args"></param>
         /// <param name="current"></param>
         /// <param name="selector"></param>
         /// <param name="handled"></param>
         /// <param name="result"></param>
-        void EvaluateSelector(SmartFormatter formatter, object[] args, object current, Selector selector, ref bool handled, ref object result);
+        /// <param name="formatDetails"></param>
+        void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails);
     }
 }

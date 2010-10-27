@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using SmartFormat.Core;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Plugins;
@@ -20,7 +17,7 @@ namespace SmartFormat.Plugins
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 
-        public void EvaluateFormat(SmartFormatter formatter, object[] args, object current, Format format, ref bool handled, IOutput output)
+        public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
             if (format == null) return;
 
@@ -74,7 +71,7 @@ namespace SmartFormat.Plugins
                     // If the conditional statement was true, then we can break.
                     if (conditionWasTrue)
                     {
-                        formatter.Format(output, outputItem, args, current);
+                        formatDetails.Formatter.Format(output, outputItem, formatDetails.OriginalArgs, current);
                         handled = true;
                         return;
                     } 
@@ -180,7 +177,7 @@ namespace SmartFormat.Plugins
             var selectedParameter = parameters[paramIndex];
 
             // Output the selectedParameter:
-            formatter.Format(output, selectedParameter, args, current);
+            formatDetails.Formatter.Format(output, selectedParameter, formatDetails.OriginalArgs, current);
             handled = true;
         }
 

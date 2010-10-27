@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\FormatCache.cs" />
+    <Compile Include="Core\Plugins\FormatDetails.cs" />
     <Compile Include="Core\Plugins\PluginPriority.cs" />
     <Compile Include="Core\Plugins\PluginPriorityAttribute.cs" />
     <Compile Include="SmartExtensions.cs" />
