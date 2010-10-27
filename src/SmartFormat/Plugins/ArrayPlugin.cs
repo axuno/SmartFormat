@@ -182,7 +182,7 @@ namespace SmartFormat.Plugins
                 }
 
                 // Output the nested format for this item:
-                formatDetails.Formatter.Format(output, itemFormat, formatDetails.OriginalArgs, item);
+                formatDetails.Formatter.Format(output, itemFormat, formatDetails.OriginalArgs, item, formatDetails.FormatCache);
             }
 
             CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex

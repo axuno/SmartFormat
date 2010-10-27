@@ -22,10 +22,36 @@ namespace SmartFormat
 
         #region: String :
 
+        // I can't really decide on the correct naming convention for these extensions,
+        // so for now I'm just including Format, SmartFormat, and FormatSmart:
+
         public static string Format(this string format, params object[] args)
         {
             return Smart.Format(format, args);
         }
+
+        public static string SmartFormat(this string format, params object[] args)
+        {
+            return Smart.Format(format, args);
+        }
+
+        public static string SmartFormat(this string format, ref FormatCache cache, params object[] args)
+        {
+            return Smart.Default.FormatWithCache(ref cache, format, args);
+        }
+
+        public static string FormatSmart(this string format, params object[] args)
+        {
+            return Smart.Format(format, args);
+        }
+
+        public static string FormatSmart(this string format, ref FormatCache cache, params object[] args)
+        {
+            // With cache:
+            return Smart.Default.FormatWithCache(ref cache, format, args);
+        }
+
+
 
         #endregion
 

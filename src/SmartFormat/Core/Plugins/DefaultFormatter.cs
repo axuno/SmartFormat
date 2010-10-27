@@ -22,7 +22,7 @@ namespace SmartFormat.Core.Plugins
             // instead of formatting the item:
             if (format != null && format.HasNested)
             {
-                formatDetails.Formatter.Format(output, format, formatDetails.OriginalArgs, current);
+                formatDetails.Formatter.Format(output, format, formatDetails.OriginalArgs, current, formatDetails.FormatCache);
                 return;
             }
 

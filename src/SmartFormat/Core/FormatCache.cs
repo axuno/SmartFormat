@@ -15,7 +15,16 @@ namespace SmartFormat.Core
         public FormatCache(Format format)
         {
             this.Format = format;
+            this.CachedObjects = new Dictionary<string, object>();
         }
+        /// <summary>
+        /// Caches the parsed format.
+        /// </summary>
         public Format Format { get; private set; }
+        /// <summary>
+        /// Storage for any misc objects.
+        /// This can be used by plugins that want to cache data.
+        /// </summary>
+        public Dictionary<string, object> CachedObjects { get; private set; }
     }
 }

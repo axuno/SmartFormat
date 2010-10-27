@@ -21,6 +21,12 @@ namespace SmartFormat.Core
             this.Parser = new Parser();
         }
 
+        public SmartFormatter(params object[] plugins)
+        {
+            this.Parser = new Parser();
+            this.AddPlugins(plugins);
+        }
+
         #endregion
 
         #region: Plugin Registration :
@@ -76,7 +82,7 @@ namespace SmartFormat.Core
             
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, formatParsed, args, current);
+            Format(output, formatParsed, args, current, null);
 
             return output.ToString();
         }
@@ -85,7 +91,7 @@ namespace SmartFormat.Core
         {
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, formatParsed, args, current);
+            Format(output, formatParsed, args, current, null);
         }
 
         public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
@@ -94,7 +100,7 @@ namespace SmartFormat.Core
 
             if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, cache.Format, args, current);
+            Format(output, cache.Format, args, current, cache);
 
             return output.ToString();
         }
@@ -103,20 +109,16 @@ namespace SmartFormat.Core
         {
             if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, cache.Format, args, current);
+            Format(output, cache.Format, args, current, cache);
         }
 
         #endregion
 
         #region: Format :
 
-        public void Format(IOutput output, Format format, object[] args, object current)
+        public void Format(IOutput output, Format format, object[] args, object current, FormatCache formatCache)
         {
-            var formatDetails = new FormatDetails() {
-                Formatter = this,
-                OriginalArgs = args,
-                Placeholder = null,
-            };
+            var formatDetails = new FormatDetails(this, args, formatCache);
 
             foreach (var item in format.Items)
             {

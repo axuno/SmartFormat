@@ -71,7 +71,7 @@ namespace SmartFormat.Plugins
                     // If the conditional statement was true, then we can break.
                     if (conditionWasTrue)
                     {
-                        formatDetails.Formatter.Format(output, outputItem, formatDetails.OriginalArgs, current);
+                        formatDetails.Formatter.Format(output, outputItem, formatDetails.OriginalArgs, current, formatDetails.FormatCache);
                         handled = true;
                         return;
                     } 
@@ -177,7 +177,7 @@ namespace SmartFormat.Plugins
             var selectedParameter = parameters[paramIndex];
 
             // Output the selectedParameter:
-            formatDetails.Formatter.Format(output, selectedParameter, formatDetails.OriginalArgs, current);
+            formatDetails.Formatter.Format(output, selectedParameter, formatDetails.OriginalArgs, current, formatDetails.FormatCache);
             handled = true;
         }
 
