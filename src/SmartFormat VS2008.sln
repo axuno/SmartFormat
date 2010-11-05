@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat", "SmartFormat\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Tests", "SmartFormat.Tests\SmartFormat.Tests.csproj", "{5B6368BF-B7C3-440F-ABAA-52A48A837A46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Demo", "SmartFormat.Demo\SmartFormat.Demo.csproj", "{54A06E44-EA03-4138-BCD6-C2D47527AA02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
