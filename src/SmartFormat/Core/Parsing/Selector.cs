@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
-    public sealed class Selector : FormatItem
+    public class Selector : FormatItem
     {
         public Selector(string baseString, int startIndex, int endIndex, int operatorStart, int selectorIndex)
             : base(baseString, startIndex, endIndex)

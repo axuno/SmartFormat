@@ -22,7 +22,7 @@ namespace SmartFormat.Core.Plugins
             // instead of formatting the item:
             if (format != null && format.HasNested)
             {
-                formatDetails.Formatter.Format(output, format, formatDetails.OriginalArgs, current, formatDetails.FormatCache);
+                formatDetails.Formatter.Format(output, format, current, formatDetails);
                 return;
             }
 
@@ -68,12 +68,12 @@ namespace SmartFormat.Core.Plugins
                 var spaces = formatDetails.Placeholder.Alignment - result.Length;
                 if (spaces > 0)
                 {
-                    output.Write(new String(' ', spaces));
+                    output.Write(new String(' ', spaces), formatDetails);
                 }
             }
 
             // Output the result:
-            output.Write(result);
+            output.Write(result, formatDetails);
 
 
             // See if there's a post-alignment to consider:
@@ -82,7 +82,7 @@ namespace SmartFormat.Core.Plugins
                 var spaces = -formatDetails.Placeholder.Alignment - result.Length;
                 if (spaces > 0)
                 {
-                    output.Write(new String(' ', spaces));
+                    output.Write(new String(' ', spaces), formatDetails);
                 }
             }
         }

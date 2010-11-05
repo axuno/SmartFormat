@@ -15,6 +15,10 @@ namespace SmartFormat.Core.Parsing
             ErrorAction = ErrorAction.OutputErrorInResult;
             #endif
         }
+        public Parser(ErrorAction errorAction)
+        {
+            ErrorAction = errorAction;
+        }
 
         #endregion
 
@@ -128,6 +132,10 @@ namespace SmartFormat.Core.Parsing
             var current = result;
             Placeholder currentPlaceholder = null;
 
+            // Store parsing errors until the end:
+            var parsingErrors = new ParsingErrors(result);
+
+            int nestedDepth = 0;
             int lastI = 0;
             int operatorIndex = 0;
             int selectorIndex = 0;
@@ -155,7 +163,8 @@ namespace SmartFormat.Core.Parsing
                         }
 
                         // New placeholder:
-                        currentPlaceholder = new Placeholder(current, i);
+                        nestedDepth++;
+                        currentPlaceholder = new Placeholder(current, i, nestedDepth);
                         current.Items.Add(currentPlaceholder);
                         current.HasNested = true;
                         operatorIndex = i+1;
@@ -182,11 +191,11 @@ namespace SmartFormat.Core.Parsing
                         // Make sure that this is a nested placeholder before we un-nest it:
                         if (current.parent == null)
                         {
-                            ParserError(format, i, "Format string is missing a closing bracket", result);
-                            // Don't end the Format:
+                            parsingErrors.AddIssue(current, "Format string has too many closing braces", i, i + 1);
                             continue;
                         }
                         // End of the placeholder's Format:
+                        nestedDepth--;
                         current.endIndex = i;
                         current.parent.endIndex = i + 1;
                         current = current.parent.parent;
@@ -227,8 +236,13 @@ namespace SmartFormat.Core.Parsing
                         // Add the selector:
                         if (i != lastI)
                             currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
-                        else if (operatorIndex != i) // There are trailing operators.  For now, this is an error.
-                            ParserError(format, operatorIndex, "There are trailing operators in the selector", result);
+                        else if (operatorIndex != i)
+                        {
+                            // There are trailing operators.  For now, this is an error.
+                            parsingErrors.AddIssue(current, "There are trailing operators in the selector", operatorIndex, i);
+                            //var issue = "There are trailing operators in the selector";
+                            //ParserError(format, operatorIndex, issue, result);
+                        }
                         lastI = i + 1;
 
                         // Start the format:
@@ -241,13 +255,18 @@ namespace SmartFormat.Core.Parsing
                         // Add the selector:
                         if (i != lastI)
                             currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
-                        else if (operatorIndex != i) // There are trailing operators.  For now, this is an error.
-                            ParserError(format, operatorIndex, "There are trailing operators in the selector", result);
+                        else if (operatorIndex != i)
+                        {
+                            // There are trailing operators.  For now, this is an error.
+                            parsingErrors.AddIssue(current, "There are trailing operators in the selector", operatorIndex, i);
+                            //ParserError(format, operatorIndex, "There are trailing operators in the selector", result);
+                        }
                         lastI = i + 1;
 
                         // End the placeholder with no format:
+                        nestedDepth--;
                         currentPlaceholder.endIndex = i + 1;
-                        current = (Format)currentPlaceholder.parent;
+                        current = currentPlaceholder.parent;
                         currentPlaceholder = null;
                     }
                     else 
@@ -261,7 +280,8 @@ namespace SmartFormat.Core.Parsing
                         else
                         {
                             // Invalid character in the selector.
-                            ParserError(format, i, "Invalid character in the selector", result);
+                            parsingErrors.AddIssue(current, "Invalid character in the selector", i, i + 1);
+                            //ParserError(format, i, "Invalid character in the selector", result);
                         }
                     }
                 }
@@ -272,9 +292,10 @@ namespace SmartFormat.Core.Parsing
                 current.Items.Add(new LiteralText(current, lastI) { endIndex = format.Length });
 
             // Check that the format is finished:
-            if (current.parent != null)
+            if (current.parent != null || currentPlaceholder != null)
             {
-                ParserError(format, format.Length, "Format string is missing a closing bracket", result);
+                //ParserError(format, format.Length, "Format string is missing a closing brace", result);
+                parsingErrors.AddIssue(current, "Format string is missing a closing brace", format.Length, format.Length);
                 current.endIndex = format.Length;
                 while (current.parent != null)
                 {
@@ -282,6 +303,9 @@ namespace SmartFormat.Core.Parsing
                     current.endIndex = format.Length;
                 }
             }
+
+            // Check if there were any parsing errors:
+            if (parsingErrors.HasIssues && ErrorAction == Core.ErrorAction.ThrowError) throw parsingErrors;
 
             return result;
         }
@@ -292,24 +316,25 @@ namespace SmartFormat.Core.Parsing
 
         public ErrorAction ErrorAction { get; set; }
 
-        /// <summary>
-        /// Determines what to do, based on the ErrorAction.
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="index"></param>
-        /// <param name="issue"></param>
-        /// <param name="formatSoFar"></param>
-        public void ParserError(string format, int index, string issue, Format formatSoFar)
-        {
-            switch (this.ErrorAction)
-            {
-                case ErrorAction.ThrowError:
-                    throw new FormatException(format, index, issue, formatSoFar);
-                case ErrorAction.OutputErrorInResult:
-                case ErrorAction.Ignore:
-                    return;
-            }
-        }
+        ///// <summary>
+        ///// Determines what to do, based on the ErrorAction.
+        ///// </summary>
+        ///// <param name="format"></param>
+        ///// <param name="index"></param>
+        ///// <param name="issue"></param>
+        ///// <param name="formatSoFar"></param>
+        //public void ParserError(string format, int index, string issue, Format formatSoFar)
+        //{
+        //    switch (this.ErrorAction)
+        //    {
+        //        case ErrorAction.ThrowError:
+        //            throw new FormatException(format, index, issue, formatSoFar);
+        //        case ErrorAction.OutputErrorInResult:
+        //            // We don't really have a way to output the error in the result.
+        //        case ErrorAction.Ignore:
+        //            return;
+        //    }
+        //}
 
         #endregion
 

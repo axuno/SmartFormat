@@ -27,6 +27,13 @@ namespace SmartFormat.Core
             this.AddPlugins(plugins);
         }
 
+        public SmartFormatter(ErrorAction errorAction, params object[] plugins)
+        {
+            this.Parser = new Parser(errorAction);
+            this.AddPlugins(plugins);
+            this.ErrorAction = errorAction;
+        }
+
         #endregion
 
         #region: Plugin Registration :
@@ -69,9 +76,10 @@ namespace SmartFormat.Core
 
         #region: Properties :
 
-        public Parser Parser { get; private set; }
+        public Parser Parser { get; set; }
         public IFormatProvider Provider { get; set; }
-
+        public ErrorAction ErrorAction { get; set; }
+        
         #endregion
 
         #region: Format Overloads :
@@ -82,7 +90,8 @@ namespace SmartFormat.Core
             
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, formatParsed, args, current, null);
+            var formatDetails = new FormatDetails(this, args, null);
+            Format(output, formatParsed, current, formatDetails);
 
             return output.ToString();
         }
@@ -91,7 +100,8 @@ namespace SmartFormat.Core
         {
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, formatParsed, args, current, null);
+            var formatDetails = new FormatDetails(this, args, null);
+            Format(output, formatParsed, current, formatDetails);
         }
 
         public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
@@ -100,7 +110,8 @@ namespace SmartFormat.Core
 
             if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, cache.Format, args, current, cache);
+            var formatDetails = new FormatDetails(this, args, cache);
+            Format(output, cache.Format, current, formatDetails);
 
             return output.ToString();
         }
@@ -109,23 +120,24 @@ namespace SmartFormat.Core
         {
             if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            Format(output, cache.Format, args, current, cache);
+            var formatDetails = new FormatDetails(this, args, cache);
+            Format(output, cache.Format, current, formatDetails);
         }
 
         #endregion
 
         #region: Format :
 
-        public void Format(IOutput output, Format format, object[] args, object current, FormatCache formatCache)
+        public void Format(IOutput output, Format format, object current, FormatDetails formatDetails)
         {
-            var formatDetails = new FormatDetails(this, args, formatCache);
-
+            Placeholder originalPlaceholder = formatDetails.Placeholder;
             foreach (var item in format.Items)
             {
                 var literalItem = item as LiteralText;
                 if (literalItem != null)
                 {
-                    output.Write(literalItem);
+                    formatDetails.Placeholder = originalPlaceholder;
+                    output.Write(literalItem, formatDetails);
                     continue;
                 } // Otherwise, the item is a placeholder.
 
@@ -143,7 +155,8 @@ namespace SmartFormat.Core
                     if (!handled)
                     {
                         // The selector wasn't handled.  It's probably not a property.
-                        FormatError(selector, "Could not evaluate the selector: " + selector.Text, selector.startIndex);
+                        FormatError(selector, "Could not evaluate the selector: " + selector.Text, selector.startIndex, output, formatDetails);
+                        continue;
                     }
                     context = result;
                 }
@@ -157,7 +170,8 @@ namespace SmartFormat.Core
                 {
                     // An error occurred while formatting.
                     var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
-                    FormatError(item, ex, errorIndex);
+                    FormatError(item, ex, errorIndex, output, formatDetails);
+                    continue;
                 }
 
             }
@@ -181,13 +195,35 @@ namespace SmartFormat.Core
             }
         }
 
-        private void FormatError(FormatItem errorItem, string issue, int startIndex)
+        private void FormatError(FormatItem errorItem, string issue, int startIndex, IOutput output, FormatDetails formatDetails)
         {
-            throw new FormatException(errorItem, issue, startIndex);
+            switch (this.ErrorAction)
+            {
+                case ErrorAction.Ignore:
+                    return;
+                case ErrorAction.ThrowError:
+                    throw new FormatException(errorItem, issue, startIndex);
+                case ErrorAction.OutputErrorInResult:
+                    formatDetails.FormatError = new FormatException(errorItem, issue, startIndex);
+                    output.Write(issue, formatDetails);
+                    formatDetails.FormatError = null;
+                    break;
+            }
         }
-        private void FormatError(FormatItem errorItem, Exception innerException, int startIndex)
+        private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, IOutput output, FormatDetails formatDetails)
         {
-            throw new FormatException(errorItem, innerException, startIndex);
+            switch (this.ErrorAction)
+            {
+                case ErrorAction.Ignore:
+                    return;
+                case ErrorAction.ThrowError:
+                    throw new FormatException(errorItem, innerException, startIndex);
+                case ErrorAction.OutputErrorInResult:
+                    formatDetails.FormatError = new FormatException(errorItem, innerException, startIndex);
+                    output.Write(innerException.Message, formatDetails);
+                    formatDetails.FormatError = null;
+                    break;
+            }
         }
 
         #endregion

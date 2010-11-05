@@ -5,18 +5,20 @@ using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
-    public sealed class Placeholder : FormatItem
+    public class Placeholder : FormatItem
     {
-        public Placeholder(Format parent, int startIndex) : base(parent, startIndex)
+        public Placeholder(Format parent, int startIndex, int nestedDepth) : base(parent, startIndex)
         {
             this.parent = parent;
             this.Selectors = new List<Selector>();
+            this.NestedDepth = nestedDepth;
         }
 
         public readonly Format parent;
         public List<Selector> Selectors { get; private set; }
         public Format Format { get; set; }
         public int Alignment { get; set; }
+        public int NestedDepth { get; set; }
 
         public override string ToString()
         {

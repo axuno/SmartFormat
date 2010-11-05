@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
-    public sealed class Format : FormatItem
+    public class Format : FormatItem
     {
 
         #region: Constructors :

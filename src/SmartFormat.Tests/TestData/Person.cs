@@ -48,7 +48,14 @@ namespace SmartFormat.Tests
 			    }
 		    }
 	    }
-        
+        public string Name
+        {
+            get
+            {
+                return this.FirstName + " " + this.LastName;
+            }
+        }
+
         public DateTime Birthday { get; set; }
         public int Age
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Plugins;
 
 namespace SmartFormat.Core.Output
 {
@@ -22,17 +23,20 @@ namespace SmartFormat.Core.Output
             this.output = output;
         }
 
-        
-        
+
         public void Write(string text)
         {
             output.Append(text);
         }
-        public void Write(string text, int startIndex, int length)
+        public void Write(string text, FormatDetails formatDetails)
+        {
+            output.Append(text);
+        }
+        public void Write(string text, int startIndex, int length, FormatDetails formatDetails)
         {
             output.Append(text, startIndex, length);
         }
-        public void Write(LiteralText item)
+        public void Write(LiteralText item, FormatDetails formatDetails)
         {
             output.Append(item.baseString, item.startIndex, item.endIndex - item.startIndex);
         }

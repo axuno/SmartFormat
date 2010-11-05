@@ -82,12 +82,12 @@ namespace SmartFormat.Plugins
         /// 
         /// 
         /// Advanced:
-        /// Composite Formatting is allowed in the format by using nested brackets.
+        /// Composite Formatting is allowed in the format by using nested braces.
         /// If a nested item is detected, Composite formatting will be used.
         ///
         /// Example:
         /// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
-        /// In this example, format = "{Width}x{Height}".  Notice the nested brackets.
+        /// In this example, format = "{Width}x{Height}".  Notice the nested braces.
         /// 
         /// </summary>
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
@@ -145,7 +145,7 @@ namespace SmartFormat.Plugins
                 // Create an empty placeholder:
                 var newItemFormat = new Format("");
                 newItemFormat.HasNested = true;
-                var placeholder = new Placeholder(newItemFormat, 0);
+                var placeholder = new Placeholder(newItemFormat, 0, formatDetails.Placeholder.NestedDepth);
                 placeholder.Format = null;
                 newItemFormat.Items.Add(placeholder);
                 itemFormat = newItemFormat;
@@ -156,7 +156,7 @@ namespace SmartFormat.Plugins
                 newItemFormat.startIndex = itemFormat.startIndex;
                 newItemFormat.endIndex = itemFormat.endIndex;
                 newItemFormat.HasNested = true;
-                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex);
+                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, formatDetails.Placeholder.NestedDepth);
                 newPlaceholder.Format = itemFormat;
                 newPlaceholder.endIndex = itemFormat.endIndex;
                 newItemFormat.Items.Add(newPlaceholder);
@@ -170,19 +170,19 @@ namespace SmartFormat.Plugins
                 CollectionIndex += 1; // Keep track of the index
 
                 // If it isn't the first item, then write the spacer:
-                if (CollectionIndex != 0) {
+                if (spacer != null && CollectionIndex != 0) {
                     // Write either the spacer or lastSpacer:
                     if (lastSpacer == null || CollectionIndex < items.Count - 1) {
-                        output.Write(spacer);
+                        output.Write(spacer, formatDetails);
                     }
                     else 
                     {
-                        output.Write(lastSpacer);
+                        output.Write(lastSpacer, formatDetails);
                     }
                 }
 
                 // Output the nested format for this item:
-                formatDetails.Formatter.Format(output, itemFormat, formatDetails.OriginalArgs, item, formatDetails.FormatCache);
+                formatDetails.Formatter.Format(output, itemFormat, item, formatDetails);
             }
 
             CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex

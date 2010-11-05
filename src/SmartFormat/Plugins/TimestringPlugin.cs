@@ -19,14 +19,14 @@ namespace SmartFormat.Plugins
             if (current is TimeSpan)
             {
                 var formattingOptions = TimestringFormatter.FormattingOptions.Parse(this.FormattingOptions, formatText);
-                output.Write(TimestringFormatter.ToTimeString((TimeSpan)current, formattingOptions));
+                output.Write(TimestringFormatter.ToTimeString((TimeSpan)current, formattingOptions), formatDetails);
                 handled = true;
             }
             else if (current is DateTime && formatText.StartsWith("timestring"))
             {
                 formatText = formatText.Substring(10);
                 var formattingOptions = TimestringFormatter.FormattingOptions.Parse(this.FormattingOptions, formatText);
-                output.Write(TimestringFormatter.ToTimeString(DateTime.Now.Subtract((DateTime)current), formattingOptions));
+                output.Write(TimestringFormatter.ToTimeString(DateTime.Now.Subtract((DateTime)current), formattingOptions), formatDetails);
                 handled = true;
             }
         }

@@ -1,4 +1,5 @@
-﻿using SmartFormat.Core.Parsing;
+﻿using System;
+using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Plugins
 {
@@ -26,12 +27,19 @@ namespace SmartFormat.Core.Plugins
         public object[] OriginalArgs { get; internal set; }
         /// <summary>
         /// The placeholder that contains the item being formatted.
+        /// Can be null.
         /// </summary>
         public Placeholder Placeholder { get; internal set; }
         /// <summary>
-        /// This object can be used to cache resources between calls.
+        /// This object can be used to cache resources between formatting calls.
         /// It will be null unless FormatWithCache is called.
         /// </summary>
         public FormatCache FormatCache { get; internal set; }
+
+        /// <summary>
+        /// If ErrorAction is set to OutputErrorsInResult, this contains the exception
+        /// that was caused by either a parsing error or a formatting error.
+        /// </summary>
+        public FormatException FormatError { get; set; }
     }
 }

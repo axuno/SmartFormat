@@ -5,7 +5,7 @@ namespace SmartFormat.Tests
 {
     public abstract class BaseTest
     {
-        public Person GetPerson()
+        public static Person GetPerson()
         {
             var michael = new Person("Michael Scott", Sex.Male, new DateTime(1970, 3, 3), "333 Third St, Scranton, PA 18447");
             var jim = new Person("Jim Halpert", Sex.Male, new DateTime(1979, 1, 1), "111 First St, Scranton, PA 18447");

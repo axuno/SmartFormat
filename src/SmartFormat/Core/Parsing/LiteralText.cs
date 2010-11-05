@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
-    public sealed class LiteralText : FormatItem
+    public class LiteralText : FormatItem
     {
         public LiteralText(Format parent, int startIndex) : base(parent, startIndex)
         { }
