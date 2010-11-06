@@ -9,7 +9,7 @@ using SmartFormat.Tests.Common;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ParserTests
+    public class ParserTests : BaseTest
     {
         [Test]
         public void TestParser()
@@ -33,6 +33,32 @@ namespace SmartFormat.Tests
             // match the original ones:
 
             results.TryAll(r => Assert.AreEqual(r.format, r.parsed.ToString())).ThrowIfNotEmpty();
+        }
+
+        [Test]
+        //[ExpectedException(typeof(ParsingErrors))]
+        public void Parser_Throws_Exception()
+        {
+            var args = new object[] {GetPerson()};
+            var formats = new[] {
+                //"{",
+                //"}",
+                //"{{{",
+                //"}}}",
+                //" {.} ",
+                //" {..} ",
+                //" {0.} ",
+                " {.0,} ",
+            };
+            var allErrors = new ExceptionCollection<ParsingErrors>();
+            foreach (var format in formats)
+            {
+                allErrors.Try(()=>Smart.Default.Test(format, args, "Error"));
+            }
+
+            // Make sure that EVERY item had an error:
+            Assert.AreEqual(formats.Length, allErrors.Count, "Not all items had exceptions!");
+            
         }
 
         [Test]
@@ -67,5 +93,6 @@ namespace SmartFormat.Tests
             Assert.AreEqual(expected, actual);
 
         }
+
     }
 }

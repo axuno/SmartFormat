@@ -20,21 +20,27 @@ namespace SmartFormat.Core.Plugins
         /// </summary>
         public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
         {
-            // Make sure the selector is a valid in-range index:
             int selectorValue;
             if (int.TryParse(selector.Text, out selectorValue))
             {
-                if (selector.Operator == ",")
+                // Argument Index:
+                // Just like String.Format, the arg index must be in-range, 
+                // should be the first item, and shouldn't have any operator:
+                if (selector.SelectorIndex == 0
+                    && selectorValue < formatDetails.OriginalArgs.Length
+                    && selector.Operator == "")
+                {
+                    // This selector is an argument index.
+                    result = formatDetails.OriginalArgs[selectorValue];
+                    handled = true;
+                }
+                // Alignment:
+                // An alignment item should be preceeded by a comma
+                else if (selector.Operator == ",")
                 {
                     // This selector is actually an Alignment modifier.
                     result = current; // (don't change the current item)
                     formatDetails.Placeholder.Alignment = selectorValue; // Set the alignment
-                    handled = true;
-                }
-                else if (selectorValue < formatDetails.OriginalArgs.Length)
-                {
-                    // This selector is an argument index.
-                    result = formatDetails.OriginalArgs[selectorValue];
                     handled = true;
                 }
             }

@@ -25,36 +25,43 @@ namespace SmartFormat.Core.Parsing
             Issues.Add(new ParsingIssue(issue, startIndex, endIndex - startIndex));
         }
 
-        public override string  Message
+        public override string Message
         {
 	        get 
 	        {
-	            var arrows = "";
-	            var lastArrow = 0;
-	            foreach (var issue in Issues)
-	            {
-	                arrows += new string('-', issue.Index - lastArrow);
-                    if (issue.Length > 0)
-                    {
-                        arrows += new string('^', Math.Max(issue.Length, 1));
-                        lastArrow = issue.Index + issue.Length;
-                    }
-                    else
-                    {
-                        arrows += '^';
-                        lastArrow = issue.Index + 1;
-                    }
-	            }
-
-
-	            return string.Format("The format string has {0} issue{1}:\n{2}\nIn: \"{3}\"\nAt:  {4} ",
+	            return string.Format("The format string has {0} issue{1}: {2}",
 	                                 Issues.Count,
 	                                 Issues.Count == 1 ? "" : "s",
-	                                 string.Join(", ", Issues.Select(i => i.Issue).ToArray()),
-                                     result.baseString,
-                                     arrows
+	                                 string.Join(", ", Issues.Select(i => i.Issue).ToArray())
                                      );
 	        }
+        }
+
+        public override string ToString()
+        {
+            var arrows = "";
+            var lastArrow = 0;
+            foreach (var issue in Issues)
+            {
+                arrows += new string('-', issue.Index - lastArrow);
+                if (issue.Length > 0)
+                {
+                    arrows += new string('^', Math.Max(issue.Length, 1));
+                    lastArrow = issue.Index + issue.Length;
+                }
+                else
+                {
+                    arrows += '^';
+                    lastArrow = issue.Index + 1;
+                }
+            }
+            return string.Format("The format string has {0} issue{1}:\n{2}\nIn: \"{3}\"\nAt:  {4} ",
+                                 Issues.Count,
+                                 Issues.Count == 1 ? "" : "s",
+                                 string.Join(", ", Issues.Select(i => i.Issue).ToArray()),
+                                 result.baseString,
+                                 arrows
+                                 );
         }
         public class ParsingIssue
         {

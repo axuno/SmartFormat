@@ -24,7 +24,7 @@ namespace SmartFormat.Tests
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: \"{0}\" => \"{1}\"", format, actual);
+                Console.WriteLine("Error: \"{0}\" => \"{1}\" - {2}", format, actual, ex.Message.Replace('\n', ' '));
                 throw;
             }
         }

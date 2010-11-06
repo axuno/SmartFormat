@@ -9,7 +9,7 @@ namespace SmartFormat.Core
     public class FormatException : Exception
     {
         public FormatException(FormatItem errorItem, Exception formatException, int index)
-            : base(string.Format("Error evaluating format string: {0} at {1}\n{2}\n{3}", formatException.Message, index, errorItem.baseString, new String('-', index) + "^"), formatException)
+            //: base(string.Format("Error evaluating format string: {0} at {1}\n{2}\n{3}", formatException.Message, index, errorItem.baseString, new String('-', index) + "^"), formatException)
         {
             this.Format = errorItem.baseString;
             this.FormatSoFar = null;
@@ -18,7 +18,7 @@ namespace SmartFormat.Core
             this.Index = index;
         }
         public FormatException(FormatItem errorItem, string issue, int index)
-            : base(string.Format("Error evaluating format string: {0} at {1}\n{2}\n{3}", issue, index, errorItem.baseString, new String('-', index) + "^"))
+            //: base(string.Format("Error evaluating format string: {0} at {1}\n{2}\n{3}", issue, index, errorItem.baseString, new String('-', index) + "^"))
         {
             this.Format = errorItem.baseString;
             this.FormatSoFar = null;
@@ -28,7 +28,7 @@ namespace SmartFormat.Core
         }
 
         public FormatException(string format, int index, string issue, Format formatSoFar)
-            : base(string.Format("Error parsing format string: {0} at {1}\n{2}\n{3}", issue, index, format, new String('-', index) + "^"))
+            //: base(string.Format("Error parsing format string: {0} at {1}\n{2}\n{3}", issue, index, format, new String('-', index) + "^"))
         {
             this.Format = format;
             this.FormatSoFar = formatSoFar;
@@ -42,5 +42,23 @@ namespace SmartFormat.Core
         public FormatItem ErrorItem { get; private set; }
         public string Issue { get; private set; }
         public int Index { get; private set; }
+
+        public override string Message
+        {
+            get
+            {
+                return string.Format("Error parsing format string: {0} at {1}",
+                                     Issue,
+                                     Index);
+            }
+        }
+        public override string ToString()
+        {
+            return string.Format("Error parsing format string: {0} at {1}\n{2}\n{3}",
+                                 Issue,
+                                 Index,
+                                 Format,
+                                 new String('-', Index) + "^");
+        }
     }
 }
