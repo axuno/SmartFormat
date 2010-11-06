@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -25,7 +24,7 @@ namespace SmartFormat.Core.Parsing
             Issues.Add(new ParsingIssue(issue, startIndex, endIndex - startIndex));
         }
 
-        public override string Message
+        public string MessageShort
         {
 	        get 
 	        {
@@ -37,31 +36,34 @@ namespace SmartFormat.Core.Parsing
 	        }
         }
 
-        public override string ToString()
+        public override string Message
         {
-            var arrows = "";
-            var lastArrow = 0;
-            foreach (var issue in Issues)
+            get
             {
-                arrows += new string('-', issue.Index - lastArrow);
-                if (issue.Length > 0)
+                var arrows = "";
+                var lastArrow = 0;
+                foreach (var issue in Issues)
                 {
-                    arrows += new string('^', Math.Max(issue.Length, 1));
-                    lastArrow = issue.Index + issue.Length;
+                    arrows += new string('-', issue.Index - lastArrow);
+                    if (issue.Length > 0)
+                    {
+                        arrows += new string('^', Math.Max(issue.Length, 1));
+                        lastArrow = issue.Index + issue.Length;
+                    }
+                    else
+                    {
+                        arrows += '^';
+                        lastArrow = issue.Index + 1;
+                    }
                 }
-                else
-                {
-                    arrows += '^';
-                    lastArrow = issue.Index + 1;
-                }
+                return string.Format("The format string has {0} issue{1}:\n{2}\nIn: \"{3}\"\nAt:  {4} ",
+                                     Issues.Count,
+                                     Issues.Count == 1 ? "" : "s",
+                                     string.Join(", ", Issues.Select(i => i.Issue).ToArray()),
+                                     result.baseString,
+                                     arrows
+                                     );
             }
-            return string.Format("The format string has {0} issue{1}:\n{2}\nIn: \"{3}\"\nAt:  {4} ",
-                                 Issues.Count,
-                                 Issues.Count == 1 ? "" : "s",
-                                 string.Join(", ", Issues.Select(i => i.Issue).ToArray()),
-                                 result.baseString,
-                                 arrows
-                                 );
         }
         public class ParsingIssue
         {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using SmartFormat.Core.Plugins;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Output;
