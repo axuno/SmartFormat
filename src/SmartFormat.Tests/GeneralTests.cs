@@ -42,13 +42,17 @@ namespace SmartFormat.Tests
             var args = new object[] {GetPerson()};
             var formats = new[] {
                 "{",
+                "{0",
                 "}",
+                "0}",
                 "{{{",
                 "}}}",
-                " {.} ",
-                " {..} ",
-                " {0.} ",
-                " {0..0} ",
+                "{.}",
+                "{.:}",
+                "{..}",
+                "{..:}",
+                "{0.}",
+                "{0.:}",
             };
             var allErrors = new ExceptionCollection<ParsingErrors>();
             foreach (var format in formats)
