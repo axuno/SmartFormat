@@ -9,7 +9,7 @@ using SmartFormat.Tests.Common;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ParserTests : BaseTest
+    public class ParserTests
     {
         [Test]
         public void TestParser()
@@ -39,7 +39,7 @@ namespace SmartFormat.Tests
         //[ExpectedException(typeof(ParsingErrors))]
         public void Parser_Throws_Exception()
         {
-            var args = new object[] {GetPerson()};
+            var args = new object[] { TestFactory.GetPerson() };
             var formats = new[] {
                 "{",
                 "{0",

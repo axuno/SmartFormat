@@ -8,14 +8,14 @@ using SmartFormat.Tests.Common;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ArrayPluginTests : BaseTest
+    public class ArrayPluginTests
     {
         public object[] GetArgs()
         {
             var args = new object[] {
                 "ABCDE".ToCharArray(),
                 "One|Two|Three|Four|Five".Split('|'),
-                GetPerson().Friends,
+                TestFactory.GetPerson().Friends,
                 "1/1/2000|10/10/2010|5/5/5555".Split('|').Select(s=>DateTime.ParseExact(s,"M/d/yyyy",null)),
                 new []{1,2,3,4,5},
             };

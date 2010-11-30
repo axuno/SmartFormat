@@ -3,7 +3,7 @@ using SmartFormat.Tests;
 
 namespace SmartFormat.Tests
 {
-    public abstract class BaseTest
+    public abstract class TestFactory
     {
         public static Person GetPerson()
         {

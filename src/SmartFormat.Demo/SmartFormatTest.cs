@@ -7,8 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SmartFormat.Core;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Demo.Sample_Plugins;
 using SmartFormat.Tests;
+using SmartFormat.Tests.Common;
 
 namespace SmartFormat.Demo
 {
@@ -37,7 +39,7 @@ namespace SmartFormat.Demo
             rtfOutput = new RTFOutput(nestedColors, Color.LightPink);
 
 
-            arg0 = BaseTest.GetPerson();
+            arg0 = TestFactory.GetPerson();
             arg1 = DateTime.Now;
 
             propertyGrid1.SelectedObject = new PropertyGridObject() {
@@ -47,7 +49,7 @@ namespace SmartFormat.Demo
 
 
             Smart.Default.ErrorAction = ErrorAction.OutputErrorInResult;
-            Smart.Default.Parser.ErrorAction = ErrorAction.OutputErrorInResult;
+            Smart.Default.Parser.ErrorAction = ErrorAction.ThrowError;
         }
         public class PropertyGridObject
         {
@@ -61,10 +63,43 @@ namespace SmartFormat.Demo
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
+
+            
+            groupBox1.ResetForeColor();
+            groupBox1.Text = "Format";
             var format = richTextBox1.Text;
 
             rtfOutput.Clear();
-            Smart.Default.FormatInto(rtfOutput, format, arg0, arg1);
+            // Save selection:
+            var s = richTextBox1.SelectionStart;
+            var l = richTextBox1.SelectionLength;
+            try
+            {
+                Smart.Default.FormatInto(rtfOutput, format, arg0, arg1);
+                
+                richTextBox1.SelectAll();
+                richTextBox1.SelectionBackColor = richTextBox1.BackColor;
+            }
+            catch (ParsingErrors ex)
+            {
+                var errorBG = Color.LightPink;
+                var errorFG = Color.DarkRed;
+                groupBox1.ForeColor = errorFG;
+
+                groupBox1.Text = string.Format("Format has {0} issue{1}: {2}", 
+                                               ex.Issues.Count,
+                                               (ex.Issues.Count == 1) ? "" : "s",
+                                               ex.Issues.Select(i=>i.Issue).JoinStrings(" ", " ", " (and {0} more)", 1)
+                                               );
+                // Highlight errors:
+                foreach (var issue in ex.Issues)
+                {
+                    richTextBox1.Select(issue.Index, issue.Length);
+                    richTextBox1.SelectionBackColor = errorBG;
+                }
+            }
+            richTextBox1.SelectionStart = s;
+            richTextBox1.SelectionLength = l;
 
             richTextBox2.Rtf = rtfOutput.ToString();
         }

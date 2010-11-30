@@ -7,13 +7,13 @@ using NUnit.Framework;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ConditionalPluginTests : BaseTest
+    public class ConditionalPluginTests
     {
         private object[] GetArgs()
         {
             return new object[] {
                 0,1,2,3,-1,-2, // {4},{5}
-                GetPerson(), // {6}
+                TestFactory.GetPerson(), // {6}
                 false,true, // {7},{8}
                 new DateTime(1111,1,1,1,1,1),DateTime.Now,new DateTime(5555,5,5,5,5,5), // {9},{10},{11}
                 new TimeSpan(-1,-1,-1,-1,-1), TimeSpan.Zero,new TimeSpan(5,5,5,5,5), // {12},{13},{14}

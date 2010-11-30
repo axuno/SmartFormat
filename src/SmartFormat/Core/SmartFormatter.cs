@@ -155,7 +155,8 @@ namespace SmartFormat.Core
                     {
                         // The selector wasn't handled.  It's probably not a property.
                         FormatError(selector, "Could not evaluate the selector: " + selector.Text, selector.startIndex, output, formatDetails);
-                        continue;
+                        context = null;
+                        break;
                     }
                     context = result;
                 }

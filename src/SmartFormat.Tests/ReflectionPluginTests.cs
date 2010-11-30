@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ReflectionPluginTests : BaseTest
+    public class ReflectionPluginTests
     {
         public object[] GetArgs()
         {
@@ -16,7 +16,7 @@ namespace SmartFormat.Tests
                 111,
                 new DateTime(2222,2,2,2,2,2),
                 new { Value = 3, Anon = true },
-                GetPerson(),
+                TestFactory.GetPerson(),
             };
         }
 
