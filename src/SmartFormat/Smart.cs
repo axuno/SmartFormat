@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SmartFormat.Core.Output;
 using SmartFormat.Plugins;
 using SmartFormat.Core;
 using SmartFormat.Core.Plugins;
@@ -24,7 +20,7 @@ namespace SmartFormat
 
         #endregion
 
-        #region: Overloads - Just to match the signature of String.Format :
+        #region: Overloads - Just to match the signature of String.Format, and allow support for languages that don't support "params" :
 
         public static string Format(string format, object arg0, object arg1, object arg2)
         {
@@ -54,7 +50,6 @@ namespace SmartFormat
             }
             set
             {
-                if (value == null) throw new ArgumentNullException();
                 _default = value;
             }
         }
