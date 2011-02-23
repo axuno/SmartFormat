@@ -17,7 +17,7 @@ namespace SmartFormat.Tests
         {
             var p = new Person() {
                                     FullName = "Quentin Starin",
-                                    Birthday = new DateTime(1981, 02, 15),
+                                    Birthday = DateTime.Today.AddYears(-30),
                                     Address = new Address("101 1st Ave", "Minneapolis", States.Minnesota, "55401"),
                                     Friends = new List<Person> {
                                                                 new Person() { FullName = "John Smith", Birthday = new DateTime(1978, 1, 1) },
@@ -46,7 +46,7 @@ namespace SmartFormat.Tests
             var p = MakeQuentin();
 
             var formatString = "{0} is {1} years old and has {2:N2} friends.";
-            var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
+            var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
             string actualOutput = Smart.Format(formatString, p.FirstName, p.Age, p.Friends.Count);
             Assert.AreEqual(expectedOutput, actualOutput);
@@ -59,7 +59,7 @@ namespace SmartFormat.Tests
             var p = MakeQuentin();
 
             var formatString = "{FirstName} is {Age} years old and has {Friends.Count:N2} friends.";
-            var expectedOutput = "Quentin is 29 years old and has 4.00 friends.";
+            var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
             string actualOutput = Smart.Format(formatString, p);
             Assert.AreEqual(expectedOutput, actualOutput);
@@ -194,7 +194,7 @@ namespace SmartFormat.Tests
             var p1 = MakeQuentin();
 
             var formatString = "{Address:{City}, {State}, {0.Age} {0.FullName}}";
-            var expectedOutput = "Minneapolis, Minnesota, 29 Quentin Starin";
+            var expectedOutput = "Minneapolis, Minnesota, 30 Quentin Starin";
 
             string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
@@ -317,7 +317,7 @@ namespace SmartFormat.Tests
             var p1 = MakeQuentin();
 
             var formatString = "{Age:>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
-            var expectedOutput = "Young Adult";
+            var expectedOutput = "Adult";
 
             string actualOutput = Smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
