@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{83A94F48-8529-4A41-B5E1-1684827180DF}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -45,6 +45,7 @@
     <Compile Include="Core\Plugins\FormatDetails.cs" />
     <Compile Include="Core\Plugins\PluginPriority.cs" />
     <Compile Include="Core\Plugins\PluginPriorityAttribute.cs" />
+    <Compile Include="Plugins\TimeFormatterPlugin.cs" />
     <Compile Include="SmartExtensions.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
     <Compile Include="Core\Output\StringOutput.cs" />
@@ -64,7 +65,6 @@
     <Compile Include="Core\Parsing\Parser.cs" />
     <Compile Include="Core\Parsing\Placeholder.cs" />
     <Compile Include="Plugins\ReflectionPlugin.cs" />
-    <Compile Include="Plugins\TimestringPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plugins\ArrayPlugin.cs" />
     <Compile Include="Plugins\ConditionalPlugin.cs" />

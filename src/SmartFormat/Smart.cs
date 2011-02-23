@@ -63,7 +63,7 @@ namespace SmartFormat
                 new ArrayPlugin(result),
                 new ConditionalPlugin(),
                 new ReflectionPlugin(result),
-                new TimestringPlugin(),
+                new TimeFormatterPlugin(),
                 new DefaultSource(result),
                 new DefaultFormatter()
                 );
