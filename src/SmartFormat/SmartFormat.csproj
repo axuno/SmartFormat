@@ -45,6 +45,7 @@
     <Compile Include="Core\Plugins\FormatDetails.cs" />
     <Compile Include="Core\Plugins\PluginPriority.cs" />
     <Compile Include="Core\Plugins\PluginPriorityAttribute.cs" />
+    <Compile Include="Plugins\LocalizationForPluralsPlugin.cs" />
     <Compile Include="Plugins\TimeFormatterPlugin.cs" />
     <Compile Include="SmartExtensions.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
