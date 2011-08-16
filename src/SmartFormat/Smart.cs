@@ -61,7 +61,7 @@ namespace SmartFormat
             result.AddPlugins(
                 // Add all plugins:
                 new ArrayPlugin(result),
-                new LocalizationForPluralsPlugin(),
+                new PluralLocalizationPlugin(),
                 new ConditionalPlugin(),
                 new ReflectionPlugin(result),
                 new TimeFormatterPlugin(),

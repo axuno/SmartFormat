@@ -44,6 +44,7 @@
     <Compile Include="Common\EnumerableExtensions.cs" />
     <Compile Include="Common\ExceptionCollection.cs" />
     <Compile Include="ConditionalPluginTests.cs" />
+    <Compile Include="PluralLocalizationPluginTests.cs" />
     <Compile Include="GeneralTests.cs" />
     <Compile Include="PerformanceTests.cs" />
     <Compile Include="ReflectionPluginTests.cs" />
