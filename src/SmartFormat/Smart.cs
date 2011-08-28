@@ -58,8 +58,8 @@ namespace SmartFormat
             var result = new SmartFormatter();
             result.AddExtensions(
                 // Add all extensions:
-                new ArrayExtension(result),
-                new PluralLocalizationExtension(),
+                new ListExtension(result),
+                new PluralLocalizationExtension("en"),
                 new ConditionalExtension(),
                 new ReflectionExtension(result),
                 new TimeFormatterExtension(),

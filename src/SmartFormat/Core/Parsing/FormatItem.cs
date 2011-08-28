@@ -5,9 +5,10 @@
     /// </summary>
     public abstract class FormatItem
     {
-        public FormatItem(FormatItem parent, int startIndex) : this(parent.baseString, startIndex, parent.baseString.Length)
+        protected FormatItem(FormatItem parent, int startIndex) : this(parent.baseString, startIndex, parent.baseString.Length)
         { }
-        public FormatItem(string baseString, int startIndex, int endIndex)
+
+        protected FormatItem(string baseString, int startIndex, int endIndex)
         {
             this.baseString = baseString;
             this.startIndex = startIndex;

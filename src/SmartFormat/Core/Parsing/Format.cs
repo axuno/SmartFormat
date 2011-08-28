@@ -22,11 +22,15 @@ namespace SmartFormat.Core.Parsing
 
         #endregion
 
+        #region: Fields and Properties :
+
         public readonly Placeholder parent;
         public List<FormatItem> Items { get; private set; }
         public bool HasNested { get; set; }
 
-        #region Special Optimized Functions
+        #endregion
+
+        #region: Special Optimized Functions :
 
         #region: Substring :
 
@@ -113,16 +117,7 @@ namespace SmartFormat.Core.Parsing
 
         #endregion
 
-        public IList<Format> Split(string search)
-        {
-            return Split(search, -1);
-        }
-
-        public IList<Format> Split(string search, int maxCount)
-        {
-            var splits = this.FindAll(search, maxCount);
-            return new SplitList(this, splits, search.Length);
-        }
+        #region: FindAll :
 
         public IList<int> FindAll(string search)
         {
@@ -142,6 +137,21 @@ namespace SmartFormat.Core.Parsing
                 maxCount--;
             }
             return results;
+        }
+        
+        #endregion
+
+        #region: Split :
+
+        public IList<Format> Split(string search)
+        {
+            return Split(search, -1);
+        }
+
+        public IList<Format> Split(string search, int maxCount)
+        {
+            var splits = this.FindAll(search, maxCount);
+            return new SplitList(this, splits, search.Length);
         }
 
         /// <summary>
@@ -272,6 +282,8 @@ namespace SmartFormat.Core.Parsing
 
         #endregion
 
+        #endregion
+
         #region: ToString :
 
         /// <summary>
@@ -309,7 +321,6 @@ namespace SmartFormat.Core.Parsing
         }
 
         #endregion
-
     
     }
 }
