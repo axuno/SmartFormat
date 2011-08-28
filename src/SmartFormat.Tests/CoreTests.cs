@@ -40,7 +40,7 @@ namespace SmartFormat.Tests
         public void Parser_Throws_Exception()
         {
             var args = new object[] { TestFactory.GetPerson() };
-            var formats = new[] {
+            var invalidFormats = new[] {
                 "{",
                 "{0",
                 "}",
@@ -55,13 +55,13 @@ namespace SmartFormat.Tests
                 "{0.:}",
             };
             var allErrors = new ExceptionCollection<ParsingErrors>();
-            foreach (var format in formats)
+            foreach (var format in invalidFormats)
             {
                 allErrors.Try(()=>Smart.Default.Test(format, args, "Error"));
             }
 
             // Make sure that EVERY item had an error:
-            Assert.AreEqual(formats.Length, allErrors.Count, "Not all items had exceptions!");
+            Assert.AreEqual(invalidFormats.Length, allErrors.Count, "Not all items had exceptions!");
             
         }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SmartFormat.Core.Extensions;
+﻿using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Output
