@@ -1,7 +1,6 @@
-﻿using System;
-using SmartFormat.Core.Parsing;
+﻿using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core.Plugins
+namespace SmartFormat.Core.Extensions
 {
     /// <summary>
     /// Contains extra information about the item currently being formatted.

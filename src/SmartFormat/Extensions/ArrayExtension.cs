@@ -2,17 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using SmartFormat.Core;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Plugins;
 
-namespace SmartFormat.Plugins
+namespace SmartFormat.Extensions
 {
-    [PluginPriority(PluginPriority.Highest)]
-    public class ArrayPlugin : IFormatter, ISource 
+    [ExtensionPriority(ExtensionPriority.Highest)]
+    public class ArrayExtension : IFormatter, ISource 
     {
 
-        public ArrayPlugin(SmartFormatter formatter)
+        public ArrayExtension(SmartFormatter formatter)
         {
             formatter.Parser.AddOperators("[]()");
         }
@@ -92,7 +92,7 @@ namespace SmartFormat.Plugins
         /// </summary>
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
-            // This method needs the Highest priority so that it comes before the ConditionalPlugin
+            // This method needs the Highest priority so that it comes before the ConditionalExtension
 
             // Check if this Format has the correct syntax:
             // (It must have a nested placeholder, and must have >= 2 parameters
@@ -102,7 +102,7 @@ namespace SmartFormat.Plugins
             //if (parameters.Count == 1) return;
 
 
-            // This plugin requires at least IEnumerable
+            // This extension requires at least IEnumerable
             var enumerable = current as IEnumerable;
             if (enumerable == null) return;
             // Ignore Strings, because they're IEnumerable.

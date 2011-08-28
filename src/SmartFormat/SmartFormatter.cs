@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SmartFormat.Core.Plugins;
-using SmartFormat.Core.Parsing;
+using SmartFormat.Core;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
+using FormatException = SmartFormat.Core.FormatException;
 
-namespace SmartFormat.Core
+namespace SmartFormat
 {
     /// <summary>
     /// This class contains the Format method that constructs 
-    /// the composite string by invoking each plugin.
+    /// the composite string by invoking each extension.
     /// </summary>
     public class SmartFormatter
     {
@@ -20,55 +22,55 @@ namespace SmartFormat.Core
             this.Parser = new Parser();
         }
 
-        public SmartFormatter(params object[] plugins)
+        public SmartFormatter(params object[] extensions)
         {
             this.Parser = new Parser();
-            this.AddPlugins(plugins);
+            this.AddExtensions(extensions);
         }
 
-        public SmartFormatter(ErrorAction errorAction, params object[] plugins)
+        public SmartFormatter(ErrorAction errorAction, params object[] extensions)
         {
             this.Parser = new Parser(errorAction);
-            this.AddPlugins(plugins);
+            this.AddExtensions(extensions);
             this.ErrorAction = errorAction;
         }
 
         #endregion
 
-        #region: Plugin Registration :
+        #region: Extension Registration :
 
-        private readonly List<ISource> sourcePlugins = new List<ISource>();
-        private readonly List<IFormatter> formatterPlugins = new List<IFormatter>();
+        private readonly List<ISource> sourceExtensions = new List<ISource>();
+        private readonly List<IFormatter> formatterExtensions = new List<IFormatter>();
         /// <summary>
-        /// Adds each plugins to this formatter.
-        /// Each plugin must implement ISource, IFormatter, or both.
+        /// Adds each extensions to this formatter.
+        /// Each extension must implement ISource, IFormatter, or both.
         /// 
-        /// An exception will be thrown if the plugin doesn't implement those interfaces.
+        /// An exception will be thrown if the extension doesn't implement those interfaces.
         /// </summary>
-        /// <param name="plugins"></param>
-        public void AddPlugins(params object[] plugins)
+        /// <param name="extensions"></param>
+        public void AddExtensions(params object[] extensions)
         {
-            foreach (var plugin in plugins)
+            foreach (var extension in extensions)
             {
-                // We need to filter each plugin to the correct list:
-                var source = plugin as ISource;
-                var formatter = plugin as IFormatter;
+                // We need to filter each extension to the correct list:
+                var source = extension as ISource;
+                var formatter = extension as IFormatter;
 
-                // If this object ISN'T a plugin, throw an exception:
+                // If this object ISN'T a extension, throw an exception:
                 if (source == null && formatter == null)
-                    throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", plugin.GetType().FullName), "plugins");
+                    throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", extension.GetType().FullName), "extensions");
 
                 if (source != null)
-                    sourcePlugins.Add(source);
+                    sourceExtensions.Add(source);
                 if (formatter != null)
-                    formatterPlugins.Add(formatter);
+                    formatterExtensions.Add(formatter);
             }
 
-            // Search each plugin for the "PluginPriority" 
+            // Search each extension for the "ExtensionPriority" 
             // attribute, and sort the lists accordingly.
 
-            sourcePlugins.Sort(PluginPriorityAttribute.SourceComparer());
-            formatterPlugins.Sort(PluginPriorityAttribute.FormatterComparer());
+            sourceExtensions.Sort(ExtensionPriorityAttribute.SourceComparer());
+            formatterExtensions.Sort(ExtensionPriorityAttribute.FormatterComparer());
         }
 
         #endregion
@@ -150,7 +152,7 @@ namespace SmartFormat.Core
                 {
                     handled = false;
                     var result = context;
-                    InvokeSourcePlugins(context, selector, ref handled, ref result, formatDetails);
+                    InvokeSourceExtensions(context, selector, ref handled, ref result, formatDetails);
                     if (!handled)
                     {
                         // The selector wasn't handled.  It's probably not a property.
@@ -164,7 +166,7 @@ namespace SmartFormat.Core
                 handled = false;
                 try
                 {
-                    InvokeFormatterPlugins(context, placeholder.Format, ref handled, output, formatDetails);
+                    InvokeFormatterExtensions(context, placeholder.Format, ref handled, output, formatDetails);
                 }
                 catch (Exception ex)
                 {
@@ -178,19 +180,19 @@ namespace SmartFormat.Core
 
         }
 
-        private void InvokeSourcePlugins(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
+        private void InvokeSourceExtensions(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
         {
-            foreach (var sourcePlugin in this.sourcePlugins)
+            foreach (var sourceExtension in this.sourceExtensions)
             {
-                sourcePlugin.EvaluateSelector(current, selector, ref handled, ref result, formatDetails);
+                sourceExtension.EvaluateSelector(current, selector, ref handled, ref result, formatDetails);
                 if (handled) break;
             }
         }
-        private void InvokeFormatterPlugins(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+        private void InvokeFormatterExtensions(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
-            foreach (var formatterPlugin in this.formatterPlugins)
+            foreach (var formatterExtension in this.formatterExtensions)
             {
-                formatterPlugin.EvaluateFormat(current, format, ref handled, output, formatDetails);
+                formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
                 if (handled) break;
             }
         }

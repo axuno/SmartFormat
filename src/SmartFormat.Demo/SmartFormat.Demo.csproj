@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{54A06E44-EA03-4138-BCD6-C2D47527AA02}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -54,7 +54,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sample Plugins\RTFOutput.cs" />
+    <Compile Include="Sample Extensions\RTFOutput.cs" />
     <Compile Include="ThirdParty\RTFLib\IRTFCell.cs" />
     <Compile Include="ThirdParty\RTFLib\IRtfProcessor.cs" />
     <Compile Include="ThirdParty\RTFLib\IRTFRow.cs" />

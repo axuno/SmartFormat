@@ -1,14 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using SmartFormat.Core;
 
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class PluralLocalizationPluginTests
+    public class PluralLocalizationExtensionTests
     {
+        private void TestResults(string cultureName, string format, Dictionary<decimal, string> expectedValuesAndResults)
+        {
+            var formatter = new SmartFormatter();
+            var cultureInfo = CultureInfo.GetCultureInfo(cultureName);
+
+            foreach (var test in expectedValuesAndResults)
+            {
+                var value = test.Key;
+                var expected = test.Value;
+                var actual = formatter.Format(format, value);
+
+                Assert.That(actual, Is.EqualTo(expected));
+            }
+        }
+
         private object[] GetArgs()
         {
             return new object[] {
@@ -43,8 +60,8 @@ namespace SmartFormat.Tests
         public void Test_Enum()
         {
             var formats = new[] {
-                "{6.Friends.0:{FirstName} is a {Sex:man|woman}.}",
-                "{6.Friends.1:{FirstName} is a {Sex:man|woman}.}",
+                "{6.Friends.0:{FirstName} is a {Gender:man|woman}.}",
+                "{6.Friends.1:{FirstName} is a {Gender:man|woman}.}",
                 "{9.DayOfWeek:Sunday|Monday|Some other day} / {11.DayOfWeek:Sunday|Monday|Some other day}",
             };
             var expected = new[] {

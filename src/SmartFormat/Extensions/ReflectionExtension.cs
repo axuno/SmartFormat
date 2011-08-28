@@ -1,13 +1,13 @@
 ﻿using SmartFormat.Core;
-using SmartFormat.Core.Plugins;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 using System.Reflection;
 
-namespace SmartFormat.Plugins
+namespace SmartFormat.Extensions
 {
-    public class ReflectionPlugin : ISource
+    public class ReflectionExtension : ISource
     {
-        public ReflectionPlugin(SmartFormatter formatter)
+        public ReflectionExtension(SmartFormatter formatter)
         {
             // Add some special info to the parser:
             formatter.Parser.AddAlphanumericSelectors(); // (A-Z + a-z)

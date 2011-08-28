@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Plugins;
 
-namespace SmartFormat.Plugins
+namespace SmartFormat.Extensions
 {
-    public class TimeFormatterPlugin : IFormatter
+    public class TimeFormatterExtension : IFormatter
     {
 
         #region IFormatter
@@ -38,7 +38,7 @@ namespace SmartFormat.Plugins
 
         #region Constructors
 
-        public TimeFormatterPlugin()
+        public TimeFormatterExtension()
         {
             this.DefaultFormatOptions = TimeFormatter.DefaultFormatOptions;
         }

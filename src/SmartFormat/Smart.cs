@@ -1,13 +1,13 @@
 ﻿using System;
-using SmartFormat.Plugins;
+using SmartFormat.Core.Extensions;
+using SmartFormat.Extensions;
 using SmartFormat.Core;
-using SmartFormat.Core.Plugins;
 
 namespace SmartFormat
 {
     /// <summary>
     /// This class holds a Default instance of the SmartFormatter.
-    /// The default instance has all plugins registered.
+    /// The default instance has all extensions registered.
     /// </summary>
     public static class Smart
     {
@@ -20,7 +20,7 @@ namespace SmartFormat
 
         #endregion
 
-        #region: Overloads - Just to match the signature of String.Format, and allow support for languages that don't support "params" :
+        #region: Overloads - Just to match the signature of String.Format, and allow support for programming languages that don't support "params" :
 
         public static string Format(string format, object arg0, object arg1, object arg2)
         {
@@ -56,15 +56,15 @@ namespace SmartFormat
 
         public static SmartFormatter CreateDefaultSmartFormat()
         {
-            // Register all default plugins here:
+            // Register all default extensions here:
             var result = new SmartFormatter();
-            result.AddPlugins(
-                // Add all plugins:
-                new ArrayPlugin(result),
-                new PluralLocalizationPlugin(),
-                new ConditionalPlugin(),
-                new ReflectionPlugin(result),
-                new TimeFormatterPlugin(),
+            result.AddExtensions(
+                // Add all extensions:
+                new ArrayExtension(result),
+                new PluralLocalizationExtension(),
+                new ConditionalExtension(),
+                new ReflectionExtension(result),
+                new TimeFormatterExtension(),
                 new DefaultSource(result),
                 new DefaultFormatter()
                 );

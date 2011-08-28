@@ -3,22 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Plugins;
 using FormatException = SmartFormat.Core.FormatException;
 
-namespace SmartFormat.Plugins
+namespace SmartFormat.Extensions
 {
-    [PluginPriority(PluginPriority.High)]
-    public class PluralLocalizationPlugin : IFormatter
+    [ExtensionPriority(ExtensionPriority.High)]
+    public class PluralLocalizationExtension : IFormatter
     {
         private readonly PluralFormatInfo defaultPluralFormatInfo;
-        public PluralLocalizationPlugin()
+        public PluralLocalizationExtension()
         {
             this.defaultPluralFormatInfo = new CommonLanguagesPluralFormatInfo();
         }
-        public PluralLocalizationPlugin(PluralFormatInfo defaultPluralFormatInfo)
+        public PluralLocalizationExtension(PluralFormatInfo defaultPluralFormatInfo)
         {
             this.defaultPluralFormatInfo = defaultPluralFormatInfo;
         }
@@ -27,13 +27,13 @@ namespace SmartFormat.Plugins
         {
             // See if the format string contains un-nested ":":
             var pluralWords = format.Split(":");
-            if (pluralWords.Count == 1) return; // This plugin requires a ":" in the format string.
+            if (pluralWords.Count == 1) return; // This extension requires a ":" in the format string.
 
             // See if the value is a number:
             var currentIsNumber =
                 current is byte || current is short || current is int || current is long
                 || current is float || current is double || current is decimal;
-            if (!currentIsNumber) return; // This plugin only formats numbers.
+            if (!currentIsNumber) return; // This extension only formats numbers.
 
             // Normalize the number to decimal:
             var value = Convert.ToDecimal(current);

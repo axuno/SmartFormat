@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core.Plugins
+namespace SmartFormat.Core.Extensions
 {
-    [PluginPriority(PluginPriority.Low)]
+    [ExtensionPriority(ExtensionPriority.Low)]
     public class DefaultFormatter : IFormatter
     {
         /// <summary>
-        /// Do the default formatting, same as "String.Format".
+        /// Do the default formatting, same logic as "String.Format".
         /// </summary>
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {

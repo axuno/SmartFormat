@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using SmartFormat.Core;
-
+using SmartFormat.Core.Extensions;
 
 
 namespace SmartFormat.Tests
@@ -397,9 +397,9 @@ namespace SmartFormat.Tests
         {
             var Smart = new SmartFormatter();
             Smart.Parser.UseAlternativeEscapeChar('\\');
-            Smart.AddPlugins(
-                new Core.Plugins.DefaultFormatter(), 
-                new Core.Plugins.DefaultSource(Smart));
+            Smart.AddExtensions(
+                new DefaultFormatter(), 
+                new DefaultSource(Smart));
 
             var args = new object[] { "Zero", "One", "Two", 3 };
 

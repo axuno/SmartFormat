@@ -1,11 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-
-
-namespace SmartFormat.Core.Plugins
+namespace SmartFormat.Core.Extensions
 {
-    public enum PluginPriority
+    public enum ExtensionPriority
     {
         // the greater the value, the higher the priority
         /// <summary>
@@ -25,14 +22,14 @@ namespace SmartFormat.Core.Plugins
         /// <summary>
         /// Low priority is used only for the core's default methods,
         /// and shouldn't be used otherwise.  
-        /// If you want a Source plugin to fire after the default methods, then use Lowest priority.
+        /// If you want a Source extension to fire after the default methods, then use Lowest priority.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         Low = 3,
 
         /// <summary>
-        /// This is the lowest priority.  It is only valid for Source plugins, not Formatter plugins.
-        /// A Source plugin with this priority only occurs after all other plugins fail.
+        /// This is the lowest priority.  It is only valid for Source extensions, not Formatter extensions.
+        /// A Source extension with this priority only occurs after all other extensions fail.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         Lowest = 99

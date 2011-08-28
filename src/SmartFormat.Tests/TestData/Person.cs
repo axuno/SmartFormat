@@ -13,10 +13,10 @@ namespace SmartFormat.Tests
 	    {
             this.Friends = new List<Person>();
 	    }
-	    public Person(string newName, Sex sex, DateTime newBirthday, string newAddress, params Person[] newFriends)
+	    public Person(string newName, Gender gender, DateTime newBirthday, string newAddress, params Person[] newFriends)
 	    {
 		    this.FullName = newName;
-	        this.Sex = sex;
+	        this.Gender = gender;
 		    this.Birthday = newBirthday;
 		    if (!string.IsNullOrEmpty(newAddress))
 			    this.Address = Address.Parse(newAddress);
@@ -85,10 +85,10 @@ namespace SmartFormat.Tests
 
         public Person Spouse { get; set; }
 
-        public Sex Sex { get; set; }
+        public Gender Gender { get; set; }
     }
 
-    public enum Sex
+    public enum Gender
     {
         Female = 0,
         Male = 1

@@ -4,11 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using RTF;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Plugins;
 
-namespace SmartFormat.Demo.Sample_Plugins
+namespace SmartFormat.Demo.Sample_Extensions
 {
     public class RTFOutput : IOutput
     {

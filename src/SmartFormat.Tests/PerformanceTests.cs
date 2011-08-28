@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using SmartFormat.Core;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Plugins;
 
 namespace SmartFormat.Tests
 {
@@ -17,7 +17,7 @@ namespace SmartFormat.Tests
         {
             // Create the most basic formatter:
             //var Smart = new SmartFormatter();
-            //Smart.AddPlugins(
+            //Smart.AddExtensions(
             //    new DefaultFormatter(), 
             //    new DefaultSource()
             //);
@@ -54,8 +54,8 @@ namespace SmartFormat.Tests
 
             FormatCache cache = null;
             FormatCache cache2 = null;
-            var NoPlugins = new SmartFormatter();
-            NoPlugins.AddPlugins(new DefaultFormatter(), new DefaultSource(NoPlugins));
+            var NoExtensions = new SmartFormatter();
+            NoExtensions.AddExtensions(new DefaultFormatter(), new DefaultSource(NoExtensions));
 
             var formatters = new[] {
                 new {
@@ -67,16 +67,16 @@ namespace SmartFormat.Tests
                     Function = new Func<string, object[], string>(Smart.Format),
                 },
                 new {
-                    Title = "NoPlugins.Format",
-                    Function = new Func<string, object[], string>(NoPlugins.Format),
+                    Title = "NoExtensions.Format",
+                    Function = new Func<string, object[], string>(NoExtensions.Format),
                 },
                 new {
                     Title = "Smart.FormatWithCache",
                     Function = new Func<string, object[], string>((format, args2) => Smart.Default.FormatWithCache(ref cache, format, args2)),
                 },
                 new {
-                    Title = "NoPlugins.FormatWithCache",
-                    Function = new Func<string, object[], string>((format, args2) => NoPlugins.FormatWithCache(ref cache2, format, args2)),
+                    Title = "NoExtensions.FormatWithCache",
+                    Function = new Func<string, object[], string>((format, args2) => NoExtensions.FormatWithCache(ref cache2, format, args2)),
                 },
             };
 

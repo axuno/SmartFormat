@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Plugins;
 
 namespace SmartFormat.Core.Output
 {

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Plugins;
 
 
-namespace SmartFormat.Plugins
+namespace SmartFormat.Extensions
 {
-    [PluginPriority(PluginPriority.High)]
-    public class ConditionalPlugin : IFormatter
+    [ExtensionPriority(ExtensionPriority.High)]
+    public class ConditionalExtension : IFormatter
     {
 
         private static readonly Regex complexConditionPattern

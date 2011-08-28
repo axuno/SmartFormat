@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ConditionalPluginTests
+    public class ConditionalExtensionTests
     {
         private object[] GetArgs()
         {
@@ -43,8 +43,8 @@ namespace SmartFormat.Tests
         public void Test_Enum()
         {
             var formats = new[] {
-                "{6.Friends.0:{FirstName} is a {Sex:man|woman}.}",
-                "{6.Friends.1:{FirstName} is a {Sex:man|woman}.}",
+                "{6.Friends.0:{FirstName} is a {Gender:man|woman}.}",
+                "{6.Friends.1:{FirstName} is a {Gender:man|woman}.}",
                 "{9.DayOfWeek:Sunday|Monday|Some other day} / {11.DayOfWeek:Sunday|Monday|Some other day}",
             };
             var expected = new[] {
