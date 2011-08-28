@@ -12,10 +12,19 @@ namespace SmartFormat.Extensions
     public class PluralLocalizationExtension : IFormatter
     {
         private readonly PluralFormatInfo defaultPluralFormatInfo;
-        public PluralLocalizationExtension()
+        /// <summary>
+        /// Initializes the plugin with rules for many common languages.
+        /// If no CultureInfo is supplied to the formatter, the
+        /// default language rules will be used by default.
+        /// </summary>
+        public PluralLocalizationExtension(string defaultTwoLetterISOLanguageName)
         {
-            this.defaultPluralFormatInfo = new CommonLanguagesPluralFormatInfo();
+            this.defaultPluralFormatInfo = new CommonLanguagesPluralFormatInfo(defaultTwoLetterISOLanguageName);
         }
+        /// <summary>
+        /// Initializes the plugin with a custom default rule provider.
+        /// </summary>
+        /// <param name="defaultPluralFormatInfo"></param>
         public PluralLocalizationExtension(PluralFormatInfo defaultPluralFormatInfo)
         {
             this.defaultPluralFormatInfo = defaultPluralFormatInfo;
@@ -23,37 +32,44 @@ namespace SmartFormat.Extensions
 
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
-            // See if the format string contains un-nested ":":
-            var pluralWords = format.Split(":");
-            if (pluralWords.Count == 1) return; // This extension requires a ":" in the format string.
+            // Ignore formats that start with "?" (this can be used to bypass this extension)
+            if (format.baseString[format.startIndex] == '?')
+            {
+                return;
+            }
+
+            // Extract the plural words from the format string:
+            var pluralWords = format.Split("|");
+            // This extension requires at least two plural words:
+            if (pluralWords.Count == 1) return; 
 
             // See if the value is a number:
             var currentIsNumber =
                 current is byte || current is short || current is int || current is long
                 || current is float || current is double || current is decimal;
-            if (!currentIsNumber) return; // This extension only formats numbers.
+            // This extension only formats numbers:
+            if (!currentIsNumber) return; 
 
             // Normalize the number to decimal:
             var value = Convert.ToDecimal(current);
 
-            // Determine which PluralFormatInfo to use (depending on CurrentCulture, etc):
+            // Get the plural rule:
             var provider = formatDetails.Formatter.Provider;
-            var cultureInfo = provider as CultureInfo;
-            var pluralFormatInfo = GetPluralFormatInfo(provider);
+            var pluralRule = GetPluralRule(provider);
 
-            if (pluralFormatInfo == null)
+            if (pluralRule == null)
             {
                 // Not a supported language.
                 return;
             }
 
             var pluralCount = pluralWords.Count;
-            var pluralIndex = pluralFormatInfo.GetPluralIndex(cultureInfo, value, pluralCount);
+            var pluralIndex = pluralRule(value, pluralCount);
 
             if (pluralIndex < 0 || pluralWords.Count <= pluralIndex)
             {
-                // Index is out of range.
-                throw new FormatException(format, "Invalid plural index", pluralWords.Last().endIndex);
+                // The plural rule should always return a value in-range!
+                throw new FormatException(format, "Invalid plural rule result", pluralWords.Last().endIndex);
             }
 
             // Output the selected word (allowing for nested formats):
@@ -61,20 +77,36 @@ namespace SmartFormat.Extensions
             formatDetails.Formatter.Format(output, pluralForm, current, formatDetails);
             handled = true;
         }
-
-        private PluralFormatInfo GetPluralFormatInfo(IFormatProvider provider)
+                
+        private PluralFormatInfo.PluralRuleDelegate GetPluralRule(IFormatProvider provider)
         {
-            // We need to get a PluralFormatInfo to process this request.
+            // Let's retirm the correct Plural Rule to use:
             PluralFormatInfo pluralFormatInfo = null;
 
+            // See if a custom PluralFormatInfo is available from the FormatProvider:
             if (provider != null)
             {
-                // Try to get the PluralFormatInfo from the IFormatProvider:
-                // (this might return null)
-                pluralFormatInfo = (PluralFormatInfo)provider.GetFormat(typeof(PluralFormatInfo));
+                pluralFormatInfo = (PluralFormatInfo)provider.GetFormat(typeof (PluralFormatInfo));
             }
 
-            return pluralFormatInfo ?? defaultPluralFormatInfo;
+            // If no custom PluralFormatInfo, let's use our default:
+            if (pluralFormatInfo == null)
+            {
+                pluralFormatInfo = defaultPluralFormatInfo;
+            }
+
+            // Only continue if we have a PluralFormatInfo:
+            if (pluralFormatInfo == null)
+            {
+                return null;
+            }
+
+
+            // Get the culture, only if it was provided:
+            var cultureInfo = provider as CultureInfo;
+
+            // Retrieve the plural rule from the PluralFormatInfo:
+            return pluralFormatInfo.GetPluralRule(cultureInfo);
         }
 
     }
@@ -98,50 +130,37 @@ namespace SmartFormat.Extensions
         /// <param name="value">The value that is being referenced by the singular or plural words</param>
         /// <param name="pluralCount"></param>
         /// <returns></returns>
-        public delegate int GetPluralIndexDelegate(decimal value, int pluralCount);
+        public delegate int PluralRuleDelegate(decimal value, int pluralCount);
 
-        private readonly GetPluralIndexDelegate _getPluralIndex;
-        public PluralFormatInfo(GetPluralIndexDelegate _getPluralIndex)
+        private readonly PluralRuleDelegate pluralRule;
+        public PluralFormatInfo(PluralRuleDelegate pluralRule)
         {
-            this._getPluralIndex = _getPluralIndex;
+            this.pluralRule = pluralRule;
         }
 
-        public virtual int GetPluralIndex(CultureInfo cultureInfo, decimal value, int pluralCount)
+        public virtual PluralRuleDelegate GetPluralRule(CultureInfo culture)
         {
-            var language = (cultureInfo != null) ? cultureInfo.TwoLetterISOLanguageName : null;
-            switch (language)
-            {
-                    
-            }
-            return _getPluralIndex(value, pluralCount);
+            return pluralRule;
         }
     }
 
     public class CommonLanguagesPluralFormatInfo : PluralFormatInfo
     {
-        public CommonLanguagesPluralFormatInfo() : base(null)
+        private string defaultTwoLetterISOLanguageName;
+        public CommonLanguagesPluralFormatInfo(string defaultTwoLetterIsoLanguageName) : base(null)
         {
-        }
-
-        public override int GetPluralIndex(CultureInfo cultureInfo, decimal value, int pluralCount)
-        {
-            var languageRule = GetLanguageRule(cultureInfo);
-            if (languageRule == null)
-            {
-                return -1;
-            }
-            return languageRule(value, pluralCount);
+            this.defaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
         }
 
         #region: Common Language Rules :
 
-        public static GetPluralIndexDelegate GetLanguageRule(CultureInfo cultureInfo)
+        public override PluralRuleDelegate GetPluralRule(CultureInfo cultureInfo)
         {
-            var language = (cultureInfo != null) ? cultureInfo.TwoLetterISOLanguageName : null;
+            var twoLetterISOLanguageName = (cultureInfo != null) ? cultureInfo.TwoLetterISOLanguageName : defaultTwoLetterISOLanguageName;
 
             // The following language codes came from:
             // http://www.loc.gov/standards/iso639-2/php/code_list.php
-            switch (language)
+            switch (twoLetterISOLanguageName)
             {
                 case null:
                     return null;
