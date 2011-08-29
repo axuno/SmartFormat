@@ -78,7 +78,6 @@ namespace SmartFormat
         #region: Properties :
 
         public Parser Parser { get; set; }
-        public IFormatProvider Provider { get; set; }
         public ErrorAction ErrorAction { get; set; }
         
         #endregion
@@ -87,11 +86,16 @@ namespace SmartFormat
 
         public string Format(string format, params object[] args)
         {
+            return Format(null, format, args);
+        }
+
+        public string Format(IFormatProvider provider, string format, params object[] args)
+        {
             var output = new StringOutput(format.Length + args.Length * 8);
             
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, null);
+            var formatDetails = new FormatDetails(this, args, null, provider);
             Format(output, formatParsed, current, formatDetails);
 
             return output.ToString();
@@ -101,7 +105,7 @@ namespace SmartFormat
         {
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, null);
+            var formatDetails = new FormatDetails(this, args, null, null);
             Format(output, formatParsed, current, formatDetails);
         }
 
@@ -111,7 +115,7 @@ namespace SmartFormat
 
             if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, cache);
+            var formatDetails = new FormatDetails(this, args, cache, null);
             Format(output, cache.Format, current, formatDetails);
 
             return output.ToString();
@@ -121,7 +125,7 @@ namespace SmartFormat
         {
             if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, cache);
+            var formatDetails = new FormatDetails(this, args, cache, null);
             Format(output, cache.Format, current, formatDetails);
         }
 

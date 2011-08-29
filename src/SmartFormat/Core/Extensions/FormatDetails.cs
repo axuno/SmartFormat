@@ -1,4 +1,5 @@
-﻿using SmartFormat.Core.Parsing;
+﻿using System;
+using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Extensions
 {
@@ -8,11 +9,12 @@ namespace SmartFormat.Core.Extensions
     /// </summary>
     public class FormatDetails
     {
-        public FormatDetails(SmartFormatter formatter, object[] originalArgs, FormatCache formatCache)
+        public FormatDetails(SmartFormatter formatter, object[] originalArgs, FormatCache formatCache, IFormatProvider provider)
         {
             Formatter = formatter;
             OriginalArgs = originalArgs;
             FormatCache = formatCache;
+            Provider = provider;
         }
         /// <summary>
         /// The original formatter responsible for formatting this item.
@@ -35,6 +37,13 @@ namespace SmartFormat.Core.Extensions
         /// </summary>
         public FormatCache FormatCache { get; internal set; }
 
+        /// <summary>
+        /// The Format Provider that can be used to determine how to 
+        /// format items such as numbers, dates, and anything else that
+        /// might be culture-specific.
+        /// </summary>
+        public IFormatProvider Provider { get; internal set; }
+        
         /// <summary>
         /// If ErrorAction is set to OutputErrorsInResult, this contains the exception
         /// that was caused by either a parsing error or a formatting error.

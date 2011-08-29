@@ -54,7 +54,7 @@ namespace SmartFormat.Extensions
             var value = Convert.ToDecimal(current);
 
             // Get the plural rule:
-            var provider = formatDetails.Formatter.Provider;
+            var provider = formatDetails.Provider;
             var pluralRule = GetPluralRule(provider);
 
             if (pluralRule == null)

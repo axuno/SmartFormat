@@ -1,4 +1,5 @@
-﻿using SmartFormat.Core.Extensions;
+﻿using System;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Extensions;
 
 namespace SmartFormat
@@ -14,6 +15,11 @@ namespace SmartFormat
         public static string Format(string format, params object[] args)
         {
             return Default.Format(format, args);
+        }
+
+        public static string Format(IFormatProvider provider, string format, params object[] args)
+        {
+            return Default.Format(provider, format, args);
         }
 
         #endregion

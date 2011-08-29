@@ -19,7 +19,7 @@ namespace SmartFormat.Tests
             {
                 var value = test.Key;
                 var expected = test.Value;
-                var actual = Smart.Format(format, value);
+                var actual = Smart.Format(cultureInfo, format, value);
 
                 Assert.That(actual, Is.EqualTo(expected));
                 Debug.WriteLine(actual);
@@ -47,7 +47,7 @@ namespace SmartFormat.Tests
         public void Test_English()
         {
             TestAllResults(
-                CultureInfo.GetCultureInfo("en"),
+                CultureInfo.GetCultureInfo("en-US"),
                 "There {0:is|are} {0} {0:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},
@@ -64,7 +64,7 @@ namespace SmartFormat.Tests
         public void Test_Turkish()
         {
             TestAllResults(
-                CultureInfo.GetCultureInfo("tr"),
+                CultureInfo.GetCultureInfo("tr-TR"),
                 "{0} nesne kaldı.",
                 new ExpectedResults {
                     {   0, "0 nesne kaldı."},

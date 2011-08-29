@@ -38,16 +38,16 @@ namespace SmartFormat.Core.Extensions
             ICustomFormatter cFormatter;
             IFormattable formattable;
             // Use the provider to see if a CustomFormatter is available:
-            if (formatter.Provider != null && (cFormatter = formatter.Provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
+            if (formatDetails.Provider != null && (cFormatter = formatDetails.Provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
             {
                 var formatText = format == null ? null : format.GetText();
-                result = cFormatter.Format(formatText, current, formatter.Provider);
+                result = cFormatter.Format(formatText, current, formatDetails.Provider);
             }
             // IFormattable:
             else if ((formattable = current as IFormattable) != null)
             {
                 var formatText = format == null ? null : format.ToString();
-                result = formattable.ToString(formatText, formatter.Provider);
+                result = formattable.ToString(formatText, formatDetails.Provider);
             }
             // ToString:
             else
