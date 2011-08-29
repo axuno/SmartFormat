@@ -21,7 +21,7 @@ namespace SmartFormat.Extensions
         /// 
         /// This is better described using an example:
         /// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
-        /// The ".2" selector is used to reference Dates(2).
+        /// The ".2" selector is used to reference Dates[2].
         /// </summary>
         public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
         {
@@ -68,15 +68,15 @@ namespace SmartFormat.Extensions
         /// 
         /// 
         /// Syntax: 
-        /// format [| spacer [| last spacer ]]
+        /// #1: "format|spacer"
+        /// #2: "format|spacer|last spacer"
+        /// #3: "format|spacer|last spacer|two spacer"
         /// 
         /// The format will be used for each item in the collection, the spacer will be between all items, and the last spacer will replace the spacer for the last item only.
         /// 
         /// Example:
         /// CustomFormat("{Dates:D|; |; and }", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "January 1, 2000; December 31, 2999; and September 9, 9999"
         /// In this example, format = "D", spacer = "; ", and last spacer = "; and "
-        /// 
-        /// 
         /// 
         /// 
         /// 
@@ -91,15 +91,7 @@ namespace SmartFormat.Extensions
         /// </summary>
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
-            // This method needs the Highest priority so that it comes before the ConditionalExtension
-
-            // Check if this Format has the correct syntax:
-            // (It must have a nested placeholder, and must have >= 2 parameters
-            //if (format == null || !format.HasNested) return;
-            // Split our parameters:
-            //var parameters = format.Split("|", 3);
-            //if (parameters.Count == 1) return;
-
+            // This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
 
             // This extension requires at least IEnumerable
             var enumerable = current as IEnumerable;
@@ -108,10 +100,8 @@ namespace SmartFormat.Extensions
             // This issue might actually need a solution 
             // for other objects that are IEnumerable.
             if (current is string) return;
-
-
-
-
+            // If the object is IFormattable, ignore it
+            if (current is IFormattable) return;
 
 
             // Let's retrieve all items from the enumerable:
@@ -123,19 +113,21 @@ namespace SmartFormat.Extensions
                 {
                     allItems.Add(item);
                 }
-                items = allItems.ToArray();
+                items = allItems;
             }
 
             // Create an item formatter:
             Format itemFormat = null;
             string spacer = null;
             string lastSpacer = null;
+            string twoSpacer = null;
             if (format != null)
             {
-                var parameters = format.Split("|", 3);
+                var parameters = format.Split("|", 4);
                 itemFormat = parameters[0];
                 spacer = (parameters.Count >= 2) ? parameters[1].Text : "";
-                lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : null;
+                lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : spacer;
+                twoSpacer = (parameters.Count >= 4) ? parameters[3].Text : lastSpacer;
             }
             if (itemFormat == null)
             {
@@ -168,16 +160,21 @@ namespace SmartFormat.Extensions
             foreach (object item in items) {
                 CollectionIndex += 1; // Keep track of the index
 
-                // If it isn't the first item, then write the spacer:
-                if (spacer != null && CollectionIndex != 0) {
-                    // Write either the spacer or lastSpacer:
-                    if (lastSpacer == null || CollectionIndex < items.Count - 1) {
-                        output.Write(spacer, formatDetails);
-                    }
-                    else 
-                    {
-                        output.Write(lastSpacer, formatDetails);
-                    }
+                // Determine which spacer to write:
+                if (spacer == null || CollectionIndex == 0)
+                {
+                    // Don't write the spacer.
+                }
+                else if (CollectionIndex < items.Count - 1) {
+                    output.Write(spacer, formatDetails);
+                }
+                else if (CollectionIndex == 1)
+                {
+                    output.Write(twoSpacer, formatDetails);
+                }
+                else
+                {
+                    output.Write(lastSpacer, formatDetails);
                 }
 
                 // Output the nested format for this item:
