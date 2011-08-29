@@ -19,6 +19,11 @@ namespace SmartFormat.Extensions
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
             if (format == null) return;
+            // Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
+            if (format.baseString[format.startIndex] == ':')
+            {
+                format = format.Substring(1);
+            }
 
             // See if the format string contains un-nested "|":
             var parameters = format.Split("|");

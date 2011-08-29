@@ -39,8 +39,8 @@ namespace SmartFormat
 
         #region: Extension Registration :
 
-        private readonly List<ISource> sourceExtensions = new List<ISource>();
-        private readonly List<IFormatter> formatterExtensions = new List<IFormatter>();
+        private List<ISource> sourceExtensions = new List<ISource>();
+        private List<IFormatter> formatterExtensions = new List<IFormatter>();
         /// <summary>
         /// Adds each extensions to this formatter.
         /// Each extension must implement ISource, IFormatter, or both.
@@ -69,8 +69,8 @@ namespace SmartFormat
             // Search each extension for the "ExtensionPriority" 
             // attribute, and sort the lists accordingly.
 
-            sourceExtensions.Sort(ExtensionPriorityAttribute.SourceComparer());
-            formatterExtensions.Sort(ExtensionPriorityAttribute.FormatterComparer());
+            sourceExtensions.OrderBy(ex => ExtensionPriorityAttribute.GetExtensionPriority(ex)).ToList();
+            formatterExtensions.OrderBy(ex => ExtensionPriorityAttribute.GetExtensionPriority(ex)).ToList();
         }
 
         #endregion
@@ -131,6 +131,8 @@ namespace SmartFormat
 
         public void Format(IOutput output, Format format, object current, FormatDetails formatDetails)
         {
+            // Before we start, make sure we have at least one source extension and one formatter extension:
+            CheckForExtensions();
             Placeholder originalPlaceholder = formatDetails.Placeholder;
             foreach (var item in format.Items)
             {
@@ -155,14 +157,15 @@ namespace SmartFormat
                     InvokeSourceExtensions(context, selector, ref handled, ref result, formatDetails);
                     if (!handled)
                     {
-                        // The selector wasn't handled.  It's probably not a property.
-                        FormatError(selector, "Could not evaluate the selector: " + selector.Text, selector.startIndex, output, formatDetails);
+                        // The selector wasn't handled, which means it isn't valid
+                        FormatError(selector, string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector.startIndex, output, formatDetails);
                         context = null;
                         break;
                     }
                     context = result;
                 }
 
+                // Evaluate the format:
                 handled = false;
                 try
                 {
@@ -178,6 +181,18 @@ namespace SmartFormat
 
             }
 
+        }
+
+        private void CheckForExtensions()
+        {
+            if (this.sourceExtensions.Count == 0)
+            {
+                throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
+            }
+            if (this.formatterExtensions.Count == 0)
+            {
+                throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
+            }
         }
 
         private void InvokeSourceExtensions(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)

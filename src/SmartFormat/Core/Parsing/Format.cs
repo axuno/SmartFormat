@@ -37,16 +37,18 @@ namespace SmartFormat.Core.Parsing
         /// <summary>Returns a substring of the current Format.</summary>
         public Format Substring(int startIndex)
         {
-            return Substring(startIndex, this.endIndex);
+            return Substring(startIndex, this.endIndex - this.startIndex - startIndex);
         }
         /// <summary>Returns a substring of the current Format.</summary>
-        public Format Substring(int startIndex, int endIndex)
+        public Format Substring(int startIndex, int length)
         {
+            startIndex = this.startIndex + startIndex;
+            var endIndex = startIndex + length;
             // Validate the arguments:
             if (startIndex < this.startIndex || startIndex > this.endIndex) // || endIndex > this.endIndex)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException("startIndex");
             if (endIndex > this.endIndex)
-                throw new ArgumentOutOfRangeException("endIndex");
+                throw new ArgumentOutOfRangeException("length");
 
             // If startIndex and endIndex already match this item, we're done:
             if (startIndex == this.startIndex && endIndex == this.endIndex)
@@ -92,7 +94,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="search"></param>
         public int IndexOf(string search)
         {
-            return IndexOf(search, this.startIndex);
+            return IndexOf(search, 0);
         }
         /// <summary>
         /// Searches the literal text for the search string.
@@ -102,6 +104,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="index"></param>
         public int IndexOf(string search, int startIndex)
         {
+            startIndex = this.startIndex + startIndex;
             foreach (var item in this.Items)
             {
                 if (item.endIndex < startIndex) continue;
@@ -110,7 +113,7 @@ namespace SmartFormat.Core.Parsing
 
                 if (startIndex < literalItem.startIndex) startIndex = literalItem.startIndex;
                 var literalIndex = literalItem.baseString.IndexOf(search, startIndex, literalItem.endIndex - startIndex);
-                if (literalIndex != -1) return literalIndex;
+                if (literalIndex != -1) return literalIndex - this.startIndex;
             }
             return -1;
         }
@@ -127,7 +130,7 @@ namespace SmartFormat.Core.Parsing
         public IList<int> FindAll(string search, int maxCount)
         {
             var results = new List<int>();
-            var index = this.startIndex;
+            var index = 0; // this.startIndex;
             while (maxCount != 0)
             {
                 index = this.IndexOf(search, index);
@@ -190,17 +193,18 @@ namespace SmartFormat.Core.Parsing
                     else if (index == 0)
                     {
                         // Return the format before the first split:
-                        return format.Substring(format.startIndex, splits[0]);
+                        return format.Substring(0, splits[0]);
                     }
                     else if (index == splits.Count)
                     {
                         // Return the format after the last split:
-                        return format.Substring(splits[index - 1] + searchLength, format.endIndex);
+                        return format.Substring(splits[index - 1] + searchLength);
                     }
                     else
                     {
                         // Return the format between the splits:
-                        return format.Substring(splits[index - 1] + searchLength, splits[index]);
+                        var startIndex = splits[index - 1] + searchLength;
+                        return format.Substring(startIndex, splits[index] - startIndex);
                     }
                 }
                 set

@@ -33,7 +33,7 @@ namespace SmartFormat.Extensions
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
             // Ignore formats that start with "?" (this can be used to bypass this extension)
-            if (format.baseString[format.startIndex] == '?')
+            if (format == null || format.baseString[format.startIndex] == ':')
             {
                 return;
             }
@@ -69,7 +69,7 @@ namespace SmartFormat.Extensions
             if (pluralIndex < 0 || pluralWords.Count <= pluralIndex)
             {
                 // The plural rule should always return a value in-range!
-                throw new FormatException(format, "Invalid plural rule result", pluralWords.Last().endIndex);
+                throw new FormatException(format, "Invalid number of plural parameters", pluralWords.Last().endIndex);
             }
 
             // Output the selected word (allowing for nested formats):

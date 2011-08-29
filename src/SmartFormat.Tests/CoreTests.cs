@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -36,8 +37,7 @@ namespace SmartFormat.Tests
         }
 
         [Test]
-        //[ExpectedException(typeof(ParsingErrors))]
-        public void Parser_Throws_Exception()
+        public void Parser_Throws_Exceptions()
         {
             var args = new object[] { TestFactory.GetPerson() };
             var invalidFormats = new[] {
@@ -65,37 +65,103 @@ namespace SmartFormat.Tests
             
         }
 
-        [Test]
-        public void Test_Splicing()
+
+
+        private static Parser GetRegularParser()
         {
             var parser = new Parser();
             parser.AddAlphanumericSelectors();
-            parser.AddOperators(".+");
+            parser.AddOperators(".");
+            return parser;
+        }
+        
+        [Test]
+        public void Test_Format_Substring()
+        {
+            var parser = GetRegularParser();
             var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-            var expected = new[] { " a", "aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg", "g " };
 
             var Format = parser.ParseFormat(format);
-            var allSplices = new List<Format>();
-            var startIndex = Format.startIndex;
-            while (true)
-            {
-                var nextIndex = Format.IndexOf("|", startIndex);
-                if (nextIndex == -1)
-                {
-                    allSplices.Add(Format.Substring(startIndex));
-                    break;
-                }
-                else
-                {
-                    var splice = Format.Substring(startIndex, nextIndex);
-                    allSplices.Add(splice);
-                }
-                startIndex = nextIndex + 1;
-            }
 
-            var actual = allSplices.Select(s => s.Text).ToArray();
-            Assert.AreEqual(expected, actual);
+            // Extract the substrings of literal text:
+            Assert.That(Format.Substring( 1, 3).ToString(), Is.EqualTo("a|a"));
+            Assert.That(Format.Substring(41, 4).ToString(), Is.EqualTo("gg|g"));
 
+            // Extract a substring that overlaps into the placeholder:
+            Assert.That(Format.Substring(4, 3).ToString(), Is.EqualTo("a {bbb: ccc dd|d {:|||} {eee} ff|f }"));
+            Assert.That(Format.Substring(20, 23).ToString(), Is.EqualTo("{bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
+            
+            // Make sure a invalid values are caught:
+            Assert.That(() => Format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => Format.Substring(100), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => Format.Substring(10, 100), Throws.TypeOf<ArgumentOutOfRangeException>());
+
+
+            // Now, test nested format strings:
+            var placeholder = (Placeholder)Format.Items[1];
+            Format = placeholder.Format;
+            Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
+
+            Assert.That(Format.Substring(5, 4).ToString(), Is.EqualTo("dd|d"));
+            Assert.That(Format.Substring(8, 3).ToString(), Is.EqualTo("d {:|||}"));
+            Assert.That(Format.Substring(8, 10).ToString(), Is.EqualTo("d {:|||} {eee}"));
+            Assert.That(Format.Substring(8, 16).ToString(), Is.EqualTo("d {:|||} {eee} f"));
+
+            // Make sure invalid values are caught:
+            Assert.That(() => Format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => Format.Substring(30), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => Format.Substring(25, 5), Throws.TypeOf<ArgumentOutOfRangeException>());
+            
+        }
+
+        [Test]
+        public void Test_Format_IndexOf()
+        {
+            var parser = GetRegularParser();
+            var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
+            var Format = parser.ParseFormat(format);
+
+            Assert.That(Format.IndexOf("|"), Is.EqualTo(2));
+            Assert.That(Format.IndexOf("|", 3), Is.EqualTo(43));
+            Assert.That(Format.IndexOf("|", 44), Is.EqualTo(-1));
+            Assert.That(Format.IndexOf("#"), Is.EqualTo(-1));
+            Assert.That(Format.IndexOf("eee"), Is.EqualTo(-1));
+
+            // Test nested formats:
+            var placeholder = (Placeholder) Format.Items[1];
+            Format = placeholder.Format;
+            Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
+
+            Assert.That(Format.IndexOf("|"), Is.EqualTo(7));
+            Assert.That(Format.IndexOf("|", 8), Is.EqualTo(25));
+            Assert.That(Format.IndexOf("|", 26), Is.EqualTo(-1));
+            Assert.That(Format.IndexOf("#"), Is.EqualTo(-1));
+            Assert.That(Format.IndexOf("eee"), Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void Test_Format_Split()
+        {
+            var parser = GetRegularParser();
+            var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
+            var Format = parser.ParseFormat(format);
+            var splits = Format.Split("|");
+
+            Assert.That(splits.Count, Is.EqualTo(3));
+            Assert.That(splits[0].ToString(), Is.EqualTo(" a"));
+            Assert.That(splits[1].ToString(), Is.EqualTo("aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
+            Assert.That(splits[2].ToString(), Is.EqualTo("g "));
+
+            // Test nested formats:
+            var placeholder = (Placeholder) Format.Items[1];
+            Format = placeholder.Format;
+            Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
+            splits = Format.Split("|");
+
+            Assert.That(splits.Count, Is.EqualTo(3));
+            Assert.That(splits[0].ToString(), Is.EqualTo(" ccc dd"));
+            Assert.That(splits[1].ToString(), Is.EqualTo("d {:|||} {eee} ff"));
+            Assert.That(splits[2].ToString(), Is.EqualTo("f "));
         }
 
     }
