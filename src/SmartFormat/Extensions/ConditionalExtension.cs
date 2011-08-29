@@ -251,7 +251,7 @@ namespace SmartFormat.Extensions
 
             // Successful
             // Output the substring that doesn't contain the "complex condition"
-            var newStartIndex = m.Index + m.Length;
+            var newStartIndex = m.Index + m.Length - parameter.startIndex;
             outputItem = parameter.Substring(newStartIndex);
             return true;
         }
