@@ -6,16 +6,15 @@ using System.Text;
 using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Extensions;
-using TestCriteria = System.Collections.Generic.Dictionary<decimal, string>;
+using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
 
 namespace SmartFormat.Tests
 {
     [TestFixture]
     public class PluralLocalizationExtensionTests
     {
-        private void TestResults(string cultureName, string format, TestCriteria expectedValuesAndResults)
+        private void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
         {
-            var cultureInfo = (cultureName == null) ? null : CultureInfo.GetCultureInfo(cultureName);
             foreach (var test in expectedValuesAndResults)
             {
                 var value = test.Key;
@@ -30,34 +29,60 @@ namespace SmartFormat.Tests
         [Test]
         public void Test_Default()
         {
-            TestResults(
+            TestAllResults(
                 null,
                 "There {0:is|are} {0} {0:item|items} remaining",
-                new TestCriteria {
-                    {   1, "There is 1 item remaining"},
+                new ExpectedResults {
+                    {  -1, "There are -1 items remaining"},
                     {   0, "There are 0 items remaining"},
+                    {0.5m, "There are 0.5 items remaining"},
+                    {   1, "There is 1 item remaining"},
+                    {1.5m, "There are 1.5 items remaining"},
                     {   2, "There are 2 items remaining"},
                     {  11, "There are 11 items remaining"},
-                    {0.5m, "There are 0.5 items remaining"},
-                    {1.5m, "There are 1.5 items remaining"},
-                    {  -1, "There are -1 items remaining"},
                 });
         }
 
         [Test]
         public void Test_English()
         {
-            TestResults(
-                "en",
+            TestAllResults(
+                CultureInfo.GetCultureInfo("en"),
                 "There {0:is|are} {0} {0:item|items} remaining",
-                new TestCriteria {
-                    {   1, "There is 1 item remaining"},
+                new ExpectedResults {
+                    {  -1, "There are -1 items remaining"},
                     {   0, "There are 0 items remaining"},
+                    {0.5m, "There are 0.5 items remaining"},
+                    {   1, "There is 1 item remaining"},
+                    {1.5m, "There are 1.5 items remaining"},
                     {   2, "There are 2 items remaining"},
                     {  11, "There are 11 items remaining"},
-                    {0.5m, "There are 0.5 items remaining"},
-                    {1.5m, "There are 1.5 items remaining"},
-                    {  -1, "There are -1 items remaining"},
+                });
+        }
+
+        [Test]
+        public void Test_Turkish()
+        {
+            TestAllResults(
+                CultureInfo.GetCultureInfo("tr"),
+                "{0} nesne kaldı.",
+                new ExpectedResults {
+                    {   0, "0 nesne kaldı."},
+                    {   1, "1 nesne kaldı."},
+                    {   2, "2 nesne kaldı."},
+                });
+
+            TestAllResults(
+                CultureInfo.GetCultureInfo("tr"),
+                "Seçili {0:nesneyi|nesneleri} silmek istiyor musunuz?",
+                new ExpectedResults {
+                    {  -1, "Seçili nesneleri silmek istiyor musunuz?"},
+                    {   0, "Seçili nesneleri silmek istiyor musunuz?"},
+                    {0.5m, "Seçili nesneleri silmek istiyor musunuz?"},
+                    {   1, "Seçili nesneyi silmek istiyor musunuz?"},
+                    {1.5m, "Seçili nesneleri silmek istiyor musunuz?"},
+                    {   2, "Seçili nesneleri silmek istiyor musunuz?"},
+                    {  11, "Seçili nesneleri silmek istiyor musunuz?"},
                 });
         }
 
