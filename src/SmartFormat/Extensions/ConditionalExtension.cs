@@ -89,24 +89,13 @@ namespace SmartFormat.Extensions
 
             // Determine the Current item's Type:
             if (currentIsNumber) {
-                // Number: Neg|Zero|One|Many  or  Zero|One|Many/Neg  or  One|Many/Neg/Zero
-                var arg = currentNumber;
-                if (arg < 0m) {
-                    paramIndex = 0;
-                } 
-                else if (arg == 0m) {
-                    paramIndex = 1;
-                } 
-                else if (arg <= 1m) {
-                    paramIndex = 2;
-                } 
-                else {
-                    paramIndex = 3;
-                }
-
-                paramIndex = paramIndex - 4 + paramCount;
-                if (paramIndex < 0) {
+                if (currentNumber < 0)
+                {
                     paramIndex = paramCount - 1;
+                } 
+                else
+                {
+                    paramIndex = Math.Min((int)Math.Floor(currentNumber), paramCount - 1);
                 }
             } 
             else if (current is bool) {

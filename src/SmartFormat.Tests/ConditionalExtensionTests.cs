@@ -12,7 +12,8 @@ namespace SmartFormat.Tests
         private object[] GetArgs()
         {
             return new object[] {
-                0,1,2,3,-1,-2, // {4},{5}
+                0,1,2,3,
+                -1,-2, // {4},{5}
                 TestFactory.GetPerson(), // {6}
                 false,true, // {7},{8}
                 new DateTime(1111,1,1,1,1,1),DateTime.Now,new DateTime(5555,5,5,5,5,5), // {9},{10},{11}
@@ -25,15 +26,16 @@ namespace SmartFormat.Tests
         [Test]
         public void Test_Numbers()
         {
+            // Note: the "::" is necessary to bypass the PluralLocalizationExtension, and will be ignored in the output
             var formats = new[] {
-                "{0:One|Many} {1:One|Many} {2:One|Many} {3:One|Many} {4:One|Many} {5:One|Many}",
-                "{0:Zero|One|Many} {1:Zero|One|Many} {2:Zero|One|Many} {3:Zero|One|Many} {4:Zero|One|Many} {5:Zero|One|Many}",
-                "{0:Neg|Zero|One|Many} {1:Neg|Zero|One|Many} {2:Neg|Zero|One|Many} {3:Neg|Zero|One|Many} {4:Neg|Zero|One|Many} {5:Neg|Zero|One|Many}",
+                "{0::Zero|Other} {1::Zero|Other} {2::Zero|Other} {3::Zero|Other} {4::Zero|Other} {5::Zero|Other}",
+                "{0::Zero|One|Other} {1::Zero|One|Other} {2::Zero|One|Other} {3::Zero|One|Other} {4::Zero|One|Other} {5::Zero|One|Other}",
+                "{0::Zero|One|Two|Other} {1::Zero|One|Two|Other} {2::Zero|One|Two|Other} {3::Zero|One|Two|Other} {4::Zero|One|Two|Other} {5::Zero|One|Two|Other}",
             };
             var expected = new[] {
-                "Many One Many Many Many Many",
-                "Zero One Many Many Many Many",
-                "Zero One Many Many Neg Neg",
+                "Zero Other Other Other Other Other",
+                "Zero One Other Other Other Other",
+                "Zero One Two Other Other Other",
             };
 
             var args = GetArgs();
