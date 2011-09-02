@@ -45,6 +45,7 @@
     <Compile Include="Core\Extensions\ExtensionPriorityAttribute.cs" />
     <Compile Include="Extensions\PluralLocalizationFormatter.cs" />
     <Compile Include="Extensions\TimeFormatter.cs" />
+    <Compile Include="Utilities\FormatDelegate.cs" />
     <Compile Include="Utilities\TimeSpanUtility.cs" />
     <Compile Include="SmartExtensions.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
