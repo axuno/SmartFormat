@@ -2,6 +2,9 @@
 
 namespace SmartFormat.Core.Extensions
 {
+    /// <summary>
+    /// Evaluates a selector.
+    /// </summary>
     public interface ISource
     {
         /// <summary>

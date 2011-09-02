@@ -35,12 +35,6 @@ namespace SmartFormat.Demo.Sample_Extensions
             Write(text, 0, text.Length, formatDetails);
         }
 
-        public void Write(LiteralText item, FormatDetails formatDetails)
-        {
-            Write(item.baseString, item.startIndex, item.endIndex - item.startIndex, formatDetails);
-        }
-
-
         public void Write(string text, int startIndex, int length, FormatDetails formatDetails)
         {
             // Depending on the nested level, we will color this item differently:

@@ -3,6 +3,10 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core
 {
+    /// <summary>
+    /// An exception caused by either a parsing issue
+    /// or an unhandled error in attempting to output the format.
+    /// </summary>
     public class FormatException : Exception
     {
         public FormatException(FormatItem errorItem, Exception formatException, int index)
@@ -20,15 +24,6 @@ namespace SmartFormat.Core
             this.ErrorItem = errorItem;
             this.Issue = issue;
             this.Index = index;
-        }
-
-        public FormatException(string format, int index, string issue, Format formatSoFar)
-        {
-            this.Format = format;
-            this.FormatSoFar = formatSoFar;
-            this.ErrorItem = null;
-            this.Index = index;
-            this.Issue = issue;
         }
 
         public string Format { get; private set; }

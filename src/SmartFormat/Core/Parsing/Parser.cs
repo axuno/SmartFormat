@@ -2,6 +2,9 @@
 
 namespace SmartFormat.Core.Parsing
 {
+    /// <summary>
+    /// Parses a format string.
+    /// </summary>
     public class Parser
     {
 

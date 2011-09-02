@@ -4,6 +4,9 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Output
 {
+    /// <summary>
+    /// Wraps a TextWriter so that it can be used for output.
+    /// </summary>
     public class TextWriterOutput : IOutput
     {
         public TextWriterOutput(TextWriter output)
@@ -20,11 +23,6 @@ namespace SmartFormat.Core.Output
         public void Write(string text, int startIndex, int length, FormatDetails formatDetails)
         {
             Output.Write(text.Substring(startIndex, length));
-        }
-
-        public void Write(LiteralText item, FormatDetails formatDetails)
-        {
-            Output.Write(item.baseString.Substring(item.startIndex, item.endIndex - item.startIndex));
         }
     }
 }

@@ -1,5 +1,9 @@
 ﻿namespace SmartFormat.Core.Parsing
 {
+    /// <summary>
+    /// Represents the literal text that is found
+    /// in a parsed format string.
+    /// </summary>
     public class LiteralText : FormatItem
     {
         public LiteralText(Format parent, int startIndex) : base(parent, startIndex)

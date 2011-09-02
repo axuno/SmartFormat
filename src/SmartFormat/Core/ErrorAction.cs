@@ -1,5 +1,8 @@
 ﻿namespace SmartFormat.Core
 {
+    /// <summary>
+    /// Determines how format errors are handled.
+    /// </summary>
     public enum ErrorAction
     {
         /// <summary>Throws an exception.  This is only recommended for debugging, so that formatting errors can be easily found.</summary>

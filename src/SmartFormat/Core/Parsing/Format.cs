@@ -4,6 +4,12 @@ using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
+    /// <summary>
+    /// Represents a parsed format string.
+    /// Contains a list of <see cref="FormatItem"/>s, 
+    /// including <see cref="LiteralText"/>s 
+    /// and <see cref="Placeholder"/>s.
+    /// </summary>
     public class Format : FormatItem
     {
 

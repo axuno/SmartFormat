@@ -1,7 +1,8 @@
 ﻿namespace SmartFormat.Core.Parsing
 {
     /// <summary>
-    /// Represents a substring of text.
+    /// Base class that represents a substring 
+    /// of text from a parsed format string.
     /// </summary>
     public abstract class FormatItem
     {

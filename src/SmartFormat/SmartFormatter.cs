@@ -144,7 +144,7 @@ namespace SmartFormat
                 if (literalItem != null)
                 {
                     formatDetails.Placeholder = originalPlaceholder;
-                    output.Write(literalItem, formatDetails);
+                    output.Write(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex, formatDetails);
                     continue;
                 } // Otherwise, the item is a placeholder.
 

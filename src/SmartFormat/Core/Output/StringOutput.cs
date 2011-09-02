@@ -4,6 +4,10 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Output
 {
+    /// <summary>
+    /// Wraps a StringBuilder so it can be used for output.
+    /// This is used for the default output.
+    /// </summary>
     public class StringOutput : IOutput
     {
         private readonly StringBuilder output;
@@ -21,10 +25,6 @@ namespace SmartFormat.Core.Output
         }
 
 
-        public void Write(string text)
-        {
-            output.Append(text);
-        }
         public void Write(string text, FormatDetails formatDetails)
         {
             output.Append(text);
@@ -33,11 +33,6 @@ namespace SmartFormat.Core.Output
         {
             output.Append(text, startIndex, length);
         }
-        public void Write(LiteralText item, FormatDetails formatDetails)
-        {
-            output.Append(item.baseString, item.startIndex, item.endIndex - item.startIndex);
-        }
-
 
 
         /// <summary>

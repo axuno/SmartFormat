@@ -3,6 +3,11 @@ using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
+    /// <summary>
+    /// Represents the placeholder in a parsed format string,
+    /// including the <see cref="Selector"/>s 
+    /// and the item <see cref="Format"/>.
+    /// </summary>
     public class Placeholder : FormatItem
     {
         public Placeholder(Format parent, int startIndex, int nestedDepth) : base(parent, startIndex)
