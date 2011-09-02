@@ -43,8 +43,9 @@
     <Compile Include="Core\Extensions\FormatDetails.cs" />
     <Compile Include="Core\Extensions\ExtensionPriority.cs" />
     <Compile Include="Core\Extensions\ExtensionPriorityAttribute.cs" />
-    <Compile Include="Extensions\PluralLocalizationExtension.cs" />
-    <Compile Include="Extensions\TimeFormatterExtension.cs" />
+    <Compile Include="Extensions\PluralLocalizationFormatter.cs" />
+    <Compile Include="Extensions\TimeFormatter.cs" />
+    <Compile Include="Utilities\TimeSpanUtility.cs" />
     <Compile Include="SmartExtensions.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
     <Compile Include="Core\Output\StringOutput.cs" />
@@ -53,8 +54,8 @@
     <Compile Include="Core\Parsing\Selector.cs" />
     <Compile Include="Core\Extensions\DefaultFormatter.cs" />
     <Compile Include="Core\Extensions\DefaultSource.cs" />
-    <Compile Include="Core\Extensions\IFormatterPlugin.cs" />
-    <Compile Include="Core\Extensions\ISourcePlugin.cs" />
+    <Compile Include="Core\Extensions\IFormatter.cs" />
+    <Compile Include="Core\Extensions\ISource.cs" />
     <Compile Include="Smart.cs" />
     <Compile Include="Core\ErrorAction.cs" />
     <Compile Include="Core\Parsing\LiteralText.cs" />
@@ -62,10 +63,10 @@
     <Compile Include="Core\Parsing\FormatItem.cs" />
     <Compile Include="Core\Parsing\Parser.cs" />
     <Compile Include="Core\Parsing\Placeholder.cs" />
-    <Compile Include="Extensions\ReflectionExtension.cs" />
+    <Compile Include="Extensions\ReflectionSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Extensions\ListExtension.cs" />
-    <Compile Include="Extensions\ConditionalExtension.cs" />
+    <Compile Include="Extensions\ListFormatter.cs" />
+    <Compile Include="Extensions\ConditionalFormatter.cs" />
     <Compile Include="SmartFormatter.cs" />
   </ItemGroup>
   <ItemGroup />

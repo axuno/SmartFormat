@@ -7,7 +7,7 @@ using SmartFormat.Core.Parsing;
 namespace SmartFormat.Extensions
 {
     [ExtensionPriority(ExtensionPriority.High)]
-    public class ConditionalExtension : IFormatter
+    public class ConditionalFormatter : IFormatter
     {
 
         private static readonly Regex complexConditionPattern

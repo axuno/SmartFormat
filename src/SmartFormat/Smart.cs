@@ -64,11 +64,11 @@ namespace SmartFormat
             var result = new SmartFormatter();
             result.AddExtensions(
                 // Add all extensions:
-                new ListExtension(result),
-                new PluralLocalizationExtension("en"),
-                new ConditionalExtension(),
-                new ReflectionExtension(result),
-                new TimeFormatterExtension(),
+                new ListFormatter(result),
+                new PluralLocalizationFormatter("en"),
+                new ConditionalFormatter(),
+                new ReflectionSource(result),
+                new TimeFormatter("en"),
                 new DefaultSource(result),
                 new DefaultFormatter()
                 );

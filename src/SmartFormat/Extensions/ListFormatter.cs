@@ -8,10 +8,10 @@ using SmartFormat.Core.Parsing;
 namespace SmartFormat.Extensions
 {
     [ExtensionPriority(ExtensionPriority.Highest)]
-    public class ListExtension : IFormatter, ISource 
+    public class ListFormatter : IFormatter, ISource 
     {
 
-        public ListExtension(SmartFormatter formatter)
+        public ListFormatter(SmartFormatter formatter)
         {
             formatter.Parser.AddOperators("[]()");
         }

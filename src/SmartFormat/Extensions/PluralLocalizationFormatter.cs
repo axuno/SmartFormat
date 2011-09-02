@@ -9,7 +9,7 @@ using FormatException = SmartFormat.Core.FormatException;
 namespace SmartFormat.Extensions
 {
     [ExtensionPriority(ExtensionPriority.High)]
-    public class PluralLocalizationExtension : IFormatter
+    public class PluralLocalizationFormatter : IFormatter
     {
         private readonly PluralFormatInfo defaultPluralFormatInfo;
         /// <summary>
@@ -17,7 +17,7 @@ namespace SmartFormat.Extensions
         /// If no CultureInfo is supplied to the formatter, the
         /// default language rules will be used by default.
         /// </summary>
-        public PluralLocalizationExtension(string defaultTwoLetterISOLanguageName)
+        public PluralLocalizationFormatter(string defaultTwoLetterISOLanguageName)
         {
             this.defaultPluralFormatInfo = new CommonLanguagesPluralFormatInfo(defaultTwoLetterISOLanguageName);
         }
@@ -25,7 +25,7 @@ namespace SmartFormat.Extensions
         /// Initializes the plugin with a custom default rule provider.
         /// </summary>
         /// <param name="defaultPluralFormatInfo"></param>
-        public PluralLocalizationExtension(PluralFormatInfo defaultPluralFormatInfo)
+        public PluralLocalizationFormatter(PluralFormatInfo defaultPluralFormatInfo)
         {
             this.defaultPluralFormatInfo = defaultPluralFormatInfo;
         }
@@ -156,96 +156,100 @@ namespace SmartFormat.Extensions
 
         public override PluralRuleDelegate GetPluralRule(CultureInfo cultureInfo)
         {
-            var twoLetterISOLanguageName = (cultureInfo != null) ? cultureInfo.TwoLetterISOLanguageName : defaultTwoLetterISOLanguageName;
-
-            // The following language codes came from:
-            // http://www.loc.gov/standards/iso639-2/php/code_list.php
-            switch (twoLetterISOLanguageName)
+            if (cultureInfo != null)
             {
-                case null:
-                    return null;
-
-                // Germanic family
-                //     English, German, Dutch, Swedish, Danish, Norwegian, Faroese
-                // Romanic family
-                //     Spanish, Portuguese, Italian, Bulgarian
-                // Latin/Greek family
-                //     Greek
-                // Finno-Ugric family
-                //     Finnish, Estonian
-                // Semitic family
-                //     Hebrew
-                // Artificial
-                //     Esperanto 
-                // Finno-Ugric family
-                //     Hungarian
-                // Turkic/Altaic family
-                //     Turkish 
-                case "en": case "de": case "nl": case "sv": case "da": case "no": case "nn": case "nb": case "fo": 
-                case "es": case "pt": case "it": case "bg": 
-                case "el": 
-                case "fi": case "et":
-                case "he":
-                case "eo":
-                case "hu":
-                case "tr":
-                    return CommonLanguageRules.English_Special;
-
-                // Romanic family
-                //     Brazilian Portuguese, French 
-                case "fr":
-                    return CommonLanguageRules.French;
-
-                // Baltic family
-                //     Latvian 
-                case "lv":
-                    return CommonLanguageRules.Latvian;
-
-                // Celtic
-                //     Gaeilge (Irish) 
-                case "ga":
-                    return CommonLanguageRules.Irish;
-
-                // Romanic family
-                //     Romanian 
-                case "ro":
-                    return CommonLanguageRules.Romanian;
-
-                //Baltic family
-                //    Lithuanian 
-                case "lt":
-                    return CommonLanguageRules.Lithuanian;
-
-                // Slavic family
-                //     Russian, Ukrainian, Serbian, Croatian 
-                case "ru": case "uk": case "sr": case "hr":
-                    return CommonLanguageRules.Russian;
-
-                // Slavic family
-                //     Czech, Slovak 
-                case "cs": case "sk":
-                    return CommonLanguageRules.Czech;
-
-                // Slavic family
-                //     Polish 
-                case "pl":
-                    return CommonLanguageRules.Polish;
-
-                // Slavic family
-                //     Slovenian 
-                case "sl":
-                    return CommonLanguageRules.Slovenian;
-
-
-                default:
-                    return null;
+                return CommonLanguageRules.GetPluralRule(cultureInfo.TwoLetterISOLanguageName);
             }
+            return CommonLanguageRules.GetPluralRule(defaultTwoLetterISOLanguageName);
         }
 
         public static class CommonLanguageRules
         {
             // Much of this language information came from the following url:
             // http://www.gnu.org/s/hello/manual/gettext/Plural-forms.html
+            // The following language codes came from:
+            // http://www.loc.gov/standards/iso639-2/php/code_list.php
+        
+            public static PluralRuleDelegate GetPluralRule(string twoLetterISOLanguageName)
+            {
+                switch (twoLetterISOLanguageName)
+                {
+                    // Germanic family
+                    //     English, German, Dutch, Swedish, Danish, Norwegian, Faroese
+                    // Romanic family
+                    //     Spanish, Portuguese, Italian, Bulgarian
+                    // Latin/Greek family
+                    //     Greek
+                    // Finno-Ugric family
+                    //     Finnish, Estonian
+                    // Semitic family
+                    //     Hebrew
+                    // Artificial
+                    //     Esperanto 
+                    // Finno-Ugric family
+                    //     Hungarian
+                    // Turkic/Altaic family
+                    //     Turkish 
+                    case "en": case "de": case "nl": case "sv": case "da": case "no": case "nn": case "nb": case "fo": 
+                    case "es": case "pt": case "it": case "bg": 
+                    case "el": 
+                    case "fi": case "et":
+                    case "he":
+                    case "eo":
+                    case "hu":
+                    case "tr":
+                        return CommonLanguageRules.English_Special;
+
+                    // Romanic family
+                    //     Brazilian Portuguese, French 
+                    case "fr":
+                        return CommonLanguageRules.French;
+
+                    // Baltic family
+                    //     Latvian 
+                    case "lv":
+                        return CommonLanguageRules.Latvian;
+
+                    // Celtic
+                    //     Gaeilge (Irish) 
+                    case "ga":
+                        return CommonLanguageRules.Irish;
+
+                    // Romanic family
+                    //     Romanian 
+                    case "ro":
+                        return CommonLanguageRules.Romanian;
+
+                    //Baltic family
+                    //    Lithuanian 
+                    case "lt":
+                        return CommonLanguageRules.Lithuanian;
+
+                    // Slavic family
+                    //     Russian, Ukrainian, Serbian, Croatian 
+                    case "ru": case "uk": case "sr": case "hr":
+                        return CommonLanguageRules.Russian;
+
+                    // Slavic family
+                    //     Czech, Slovak 
+                    case "cs": case "sk":
+                        return CommonLanguageRules.Czech;
+
+                    // Slavic family
+                    //     Polish 
+                    case "pl":
+                        return CommonLanguageRules.Polish;
+
+                    // Slavic family
+                    //     Slovenian 
+                    case "sl":
+                        return CommonLanguageRules.Slovenian;
+
+
+                    default:
+                        return null;
+                }
+            }
 
             public static int English_Special(decimal value, int pluralCount)
             {

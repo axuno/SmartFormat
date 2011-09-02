@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace SmartFormat.Extensions
 {
-    public class ReflectionExtension : ISource
+    public class ReflectionSource : ISource
     {
-        public ReflectionExtension(SmartFormatter formatter)
+        public ReflectionSource(SmartFormatter formatter)
         {
             // Add some special info to the parser:
             formatter.Parser.AddAlphanumericSelectors(); // (A-Z + a-z)
