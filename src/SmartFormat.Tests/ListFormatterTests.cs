@@ -8,7 +8,7 @@ using SmartFormat.Tests.Common;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ArrayExtensionTests
+    public class ListFormatterTests
     {
         public object[] GetArgs()
         {

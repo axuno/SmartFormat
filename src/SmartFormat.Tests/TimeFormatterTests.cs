@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class TimestringExtensionTests
+    public class TimeFormatterTests
     {
         public object[] GetArgs()
         {

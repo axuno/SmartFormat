@@ -39,25 +39,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArrayExtensionTests.cs" />
+    <Compile Include="ListFormatterTests.cs" />
     <Compile Include="CodeProjectExampleTests.cs" />
     <Compile Include="Common\ArgumentValidator.cs" />
     <Compile Include="Common\EnumerableExtensions.cs" />
     <Compile Include="Common\ExceptionCollection.cs" />
-    <Compile Include="ConditionalExtensionTests.cs" />
+    <Compile Include="ConditionalFormatterTests.cs" />
     <Compile Include="CoreTests.cs" />
     <Compile Include="FormatDelegateTests.cs" />
     <Compile Include="PerformanceTests.cs" />
-    <Compile Include="PluralLocalizationExtensionTests.cs">
+    <Compile Include="PluralLocalizationFormatterTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ReflectionExtensionTests.cs" />
+    <Compile Include="ReflectionFormatterTests.cs" />
     <Compile Include="TestData\Address.cs" />
     <Compile Include="TestFactory.cs" />
     <Compile Include="TestData\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers.cs" />
-    <Compile Include="TimestringExtensionTests.cs" />
+    <Compile Include="TimeFormatterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SmartFormat\SmartFormat.csproj">

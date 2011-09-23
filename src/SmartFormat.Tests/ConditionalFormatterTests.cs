@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class ConditionalExtensionTests
+    public class ConditionalFormatterTests
     {
         private object[] GetArgs()
         {

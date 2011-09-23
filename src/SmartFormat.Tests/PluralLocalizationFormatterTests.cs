@@ -11,7 +11,7 @@ using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
 namespace SmartFormat.Tests
 {
     [TestFixture]
-    public class PluralLocalizationExtensionTests
+    public class PluralLocalizationFormatterTests
     {
         private void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
         {
