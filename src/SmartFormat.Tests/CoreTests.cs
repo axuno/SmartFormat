@@ -7,6 +7,8 @@ using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Tests.Common;
+using SmartFormat.Utilities;
+using FormatException = SmartFormat.Core.FormatException;
 
 namespace SmartFormat.Tests
 {
@@ -55,15 +57,43 @@ namespace SmartFormat.Tests
                 "{0.}",
                 "{0.:}",
             };
-            var allErrors = new ExceptionCollection<ParsingErrors>();
             foreach (var format in invalidFormats)
             {
-                allErrors.Try(()=>Smart.Default.Test(format, args, "Error"));
+                try
+                {
+                    Smart.Default.Test(format, args, "Error");
+                    // Make sure that EVERY item has an error:
+                    Assert.Fail("Parsing \"{0}\" should have failed but did not.", format);
+                }
+                catch (ParsingErrors ex)
+                {
+                }
             }
 
-            // Make sure that EVERY item had an error:
-            Assert.AreEqual(invalidFormats.Length, allErrors.Count, "Not all items had exceptions!");
-            
+        }
+
+        [Test]
+        public void Parser_Ignores_Exceptions()
+        {
+            var parser = new Parser(ErrorAction.Ignore);
+            var invalidFormats = new[] {
+                "{",
+                "{0",
+                "}",
+                "0}",
+                "{{{",
+                "}}}",
+                "{.}",
+                "{.:}",
+                "{..}",
+                "{..:}",
+                "{0.}",
+                "{0.:}",
+            };
+            foreach (var format in invalidFormats)
+            {
+                var discard = parser.ParseFormat(format);
+            }
         }
 
 
@@ -165,5 +195,45 @@ namespace SmartFormat.Tests
             Assert.That(splits[2].ToString(), Is.EqualTo("f "));
         }
 
+    }
+
+    [TestFixture]
+    public class FormatterTests
+    {
+        private object[] errorArgs = new object[]{ new FormatDelegate(format => { throw new Exception("ERROR!"); } ) };
+
+        [Test]
+        public void Formatter_Throws_Exceptions()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.ErrorAction = ErrorAction.ThrowError;
+
+            try
+            {
+                formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--");
+                Assert.Fail("Formatter should have thrown an exception, but did not.");
+            }
+            catch (FormatException ex)
+            {
+            }
+        }
+
+        [Test]
+        public void Formatter_Outputs_Exceptions()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.ErrorAction = ErrorAction.OutputErrorInResult;
+
+            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--ERROR!--ERROR!--");
+        }
+
+        [Test]
+        public void Formatter_Ignores_Exceptions()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.ErrorAction = ErrorAction.Ignore;
+
+            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "------");
+        }
     }
 }
