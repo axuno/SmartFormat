@@ -10,14 +10,6 @@ namespace SmartFormat.Core.Parsing
 
         #region: Constructor :
 
-        public Parser()
-        {
-            #if DEBUG
-            ErrorAction = ErrorAction.ThrowError;
-            #else
-            ErrorAction = ErrorAction.OutputErrorInResult;
-            #endif
-        }
         public Parser(ErrorAction errorAction)
         {
             ErrorAction = errorAction;

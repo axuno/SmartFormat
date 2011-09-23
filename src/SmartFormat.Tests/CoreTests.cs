@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using SmartFormat.Core;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Tests.Common;
 
@@ -15,7 +16,7 @@ namespace SmartFormat.Tests
         [Test]
         public void TestParser()
         {
-            var parser = new Parser();
+            var parser = new Parser(ErrorAction.ThrowError);
             parser.AddAlphanumericSelectors();
             parser.AddAdditionalSelectorChars("_");
             parser.AddOperators(".");
@@ -69,7 +70,7 @@ namespace SmartFormat.Tests
 
         private static Parser GetRegularParser()
         {
-            var parser = new Parser();
+            var parser = new Parser(ErrorAction.ThrowError);
             parser.AddAlphanumericSelectors();
             parser.AddOperators(".");
             return parser;

@@ -18,29 +18,28 @@ namespace SmartFormat
         #region: Constructor :
 
         public SmartFormatter()
+            #if DEBUG
+            : this(Core.ErrorAction.ThrowError)
+            #else
+            : this(ErrorAction.Ignore)
+            #endif
         {
-            this.Parser = new Parser();
         }
 
-        public SmartFormatter(params object[] extensions)
-        {
-            this.Parser = new Parser();
-            this.AddExtensions(extensions);
-        }
-
-        public SmartFormatter(ErrorAction errorAction, params object[] extensions)
+        public SmartFormatter(ErrorAction errorAction)
         {
             this.Parser = new Parser(errorAction);
-            this.AddExtensions(extensions);
             this.ErrorAction = errorAction;
+            this.SourceExtensions = new List<ISource>();
+            this.FormatterExtensions = new List<IFormatter>();
         }
 
         #endregion
 
         #region: Extension Registration :
 
-        private List<ISource> sourceExtensions = new List<ISource>();
-        private List<IFormatter> formatterExtensions = new List<IFormatter>();
+        public List<ISource> SourceExtensions { get; private set; }
+        public List<IFormatter> FormatterExtensions { get; private set; }
         /// <summary>
         /// Adds each extensions to this formatter.
         /// Each extension must implement ISource, IFormatter, or both.
@@ -61,9 +60,9 @@ namespace SmartFormat
                     throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", extension.GetType().FullName), "extensions");
 
                 if (source != null)
-                    sourceExtensions.Add(source);
+                    SourceExtensions.Add(source);
                 if (formatter != null)
-                    formatterExtensions.Add(formatter);
+                    FormatterExtensions.Add(formatter);
             }
         }
 
@@ -183,11 +182,11 @@ namespace SmartFormat
 
         private void CheckForExtensions()
         {
-            if (this.sourceExtensions.Count == 0)
+            if (this.SourceExtensions.Count == 0)
             {
                 throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
             }
-            if (this.formatterExtensions.Count == 0)
+            if (this.FormatterExtensions.Count == 0)
             {
                 throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
             }
@@ -195,7 +194,7 @@ namespace SmartFormat
 
         private void InvokeSourceExtensions(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
         {
-            foreach (var sourceExtension in this.sourceExtensions)
+            foreach (var sourceExtension in this.SourceExtensions)
             {
                 sourceExtension.EvaluateSelector(current, selector, ref handled, ref result, formatDetails);
                 if (handled) break;
@@ -203,7 +202,7 @@ namespace SmartFormat
         }
         private void InvokeFormatterExtensions(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
         {
-            foreach (var formatterExtension in this.formatterExtensions)
+            foreach (var formatterExtension in this.FormatterExtensions)
             {
                 formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
                 if (handled) break;
