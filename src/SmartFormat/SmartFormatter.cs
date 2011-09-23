@@ -68,9 +68,8 @@ namespace SmartFormat
 
             // Search each extension for the "ExtensionPriority" 
             // attribute, and sort the lists accordingly.
-
-            sourceExtensions.OrderBy(ex => ExtensionPriorityAttribute.GetExtensionPriority(ex)).ToList();
-            formatterExtensions.OrderBy(ex => ExtensionPriorityAttribute.GetExtensionPriority(ex)).ToList();
+            sourceExtensions = sourceExtensions.OrderBy(ex => ExtensionPriorityAttribute.GetExtensionPriority(ex)).ToList();
+            formatterExtensions = formatterExtensions.OrderBy(ex => ExtensionPriorityAttribute.GetExtensionPriority(ex)).ToList();
         }
 
         #endregion
