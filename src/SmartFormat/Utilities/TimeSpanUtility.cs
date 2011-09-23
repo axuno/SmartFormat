@@ -540,7 +540,7 @@ namespace SmartFormat.Utilities
             get
             {
                 return new TimeTextInfo(
-                    CommonLanguagesPluralFormatInfo.CommonLanguageRules.English,
+                    CommonLanguageRules.GetPluralRule("en"),
                     new[] { "{0} week", "{0} weeks" }, 
                     new[] { "{0} day", "{0} days" }, 
                     new[] { "{0} hour", "{0} hours" },
