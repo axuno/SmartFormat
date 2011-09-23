@@ -7,7 +7,6 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
-    [ExtensionPriority(ExtensionPriority.Highest)]
     public class ListFormatter : IFormatter, ISource 
     {
 

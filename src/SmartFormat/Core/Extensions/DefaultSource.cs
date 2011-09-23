@@ -2,7 +2,6 @@
 
 namespace SmartFormat.Core.Extensions
 {
-    [ExtensionPriority(ExtensionPriority.Low)]
     public class DefaultSource : ISource
     {
         public DefaultSource(SmartFormatter formatter)

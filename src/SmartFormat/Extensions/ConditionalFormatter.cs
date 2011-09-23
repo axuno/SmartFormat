@@ -6,7 +6,6 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
-    [ExtensionPriority(ExtensionPriority.High)]
     public class ConditionalFormatter : IFormatter
     {
 

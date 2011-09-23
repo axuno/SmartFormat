@@ -8,7 +8,6 @@ using FormatException = SmartFormat.Core.FormatException;
 
 namespace SmartFormat.Extensions
 {
-    [ExtensionPriority(ExtensionPriority.High)]
     public class PluralLocalizationFormatter : IFormatter
     {
         private readonly PluralFormatInfo defaultPluralFormatInfo;

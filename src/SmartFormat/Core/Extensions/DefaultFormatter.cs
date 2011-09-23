@@ -4,7 +4,6 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Extensions
 {
-    [ExtensionPriority(ExtensionPriority.Low)]
     public class DefaultFormatter : IFormatter
     {
         /// <summary>
