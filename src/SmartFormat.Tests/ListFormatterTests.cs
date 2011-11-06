@@ -21,19 +21,20 @@ namespace SmartFormat.Tests
             };
             return args;
         }
+        
         [Test]
         public void FormatTest()
         {
             var formats = new string[] {
                 "{4}",
-                "{4:}",
-                "{4:00}",
+                "{4:|}",
+                "{4:00|}",
                 "{4:|,}",
                 "{4:|, |, and }",
                 "{4:N2|, |, and }",
             };
             var expected = new string[] {
-                "12345",
+                "System.Int32[]",
                 "12345",
                 "0102030405",
                 "1,2,3,4,5",
@@ -45,12 +46,11 @@ namespace SmartFormat.Tests
             Smart.Default.Test(formats, args, expected);
 
         }
-
         [Test]
         public void NestedFormatTest()
         {
             var formats = new string[] {
-                "{0:{}-}",
+                "{0:{}-|}",
                 "{0:{}|-}",
                 "{0:{}|-|+}",
                 "{0:({})|, |, and }",
@@ -70,7 +70,7 @@ namespace SmartFormat.Tests
         {
             var formats = new string[] {
                 "{2:{:{FirstName}}|, }",
-                "{3:{:M/d/yyyy} }",
+                "{3:{:M/d/yyyy} |}",
                 "{2:{:{FirstName}'s friends: {Friends:{FirstName}|, } }|; }",
             };
             var expected = new string[] {

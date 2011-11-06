@@ -102,46 +102,25 @@ namespace SmartFormat.Extensions
             // If the object is IFormattable, ignore it
             if (current is IFormattable) return;
 
+            // This extension requires a | to specify the spacer:
+            if (format == null) return;
+            var parameters = format.Split("|", 4);
+            if (parameters.Count < 2) return;
+            
+            // Grab all formatting options:
+            // They must be in one of these formats:
+            // itemFormat|spacer
+            // itemFormat|spacer|lastSpacer
+            // itemFormat|spacer|lastSpacer|twoSpacer
+            var itemFormat = parameters[0];
+            var spacer = (parameters.Count >= 2) ? parameters[1].Text : "";
+            var lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : spacer;
+            var twoSpacer = (parameters.Count >= 4) ? parameters[3].Text : lastSpacer;
 
-            // Let's retrieve all items from the enumerable:
-            IList items = current as IList;
-            if (items == null)
-            {
-                var allItems = new List<object>();
-                foreach (var item in enumerable)
-                {
-                    allItems.Add(item);
-                }
-                items = allItems;
-            }
-
-            // Create an item formatter:
-            Format itemFormat = null;
-            string spacer = null;
-            string lastSpacer = null;
-            string twoSpacer = null;
-            if (format != null)
-            {
-                var parameters = format.Split("|", 4);
-                itemFormat = parameters[0];
-                spacer = (parameters.Count >= 2) ? parameters[1].Text : "";
-                lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : spacer;
-                twoSpacer = (parameters.Count >= 4) ? parameters[3].Text : lastSpacer;
-            }
-            if (itemFormat == null)
+            if (!itemFormat.HasNested)
             {
                 // The format is not nested,
                 // so we will treat it as an itemFormat:
-                // Create an empty placeholder:
-                var newItemFormat = new Format("");
-                newItemFormat.HasNested = true;
-                var placeholder = new Placeholder(newItemFormat, 0, formatDetails.Placeholder.NestedDepth);
-                placeholder.Format = null;
-                newItemFormat.Items.Add(placeholder);
-                itemFormat = newItemFormat;
-            }
-            else if (!itemFormat.HasNested)
-            {
                 var newItemFormat = new Format(itemFormat.baseString);
                 newItemFormat.startIndex = itemFormat.startIndex;
                 newItemFormat.endIndex = itemFormat.endIndex;
@@ -153,8 +132,19 @@ namespace SmartFormat.Extensions
                 itemFormat = newItemFormat;
             }
 
-            int oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
+            // Let's buffer all items from the enumerable (to ensure the Count without double-enumeration):
+            ICollection items = current as ICollection;
+            if (items == null)
+            {
+                var allItems = new List<object>();
+                foreach (var item in enumerable)
+                {
+                    allItems.Add(item);
+                }
+                items = allItems;
+            }
 
+            int oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
             CollectionIndex = -1;
             foreach (object item in items) {
                 CollectionIndex += 1; // Keep track of the index
