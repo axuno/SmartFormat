@@ -71,6 +71,7 @@ namespace SmartFormat
                 new ConditionalFormatter(),
                 new TimeFormatter("en"),
                 new ReflectionSource(result),
+                new DictionarySource(result),
                 // These default extensions reproduce the String.Format behavior:
                 new DefaultSource(result),
                 new DefaultFormatter()

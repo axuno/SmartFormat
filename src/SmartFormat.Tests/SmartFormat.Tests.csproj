@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DictionaryFormatterTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Extensions\ListFormatterTests.cs" />
     <Compile Include="CodeProjectExampleTests.cs" />
     <Compile Include="TestUtils\ArgumentValidator.cs" />
