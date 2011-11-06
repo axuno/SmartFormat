@@ -1,6 +1,7 @@
-﻿using SmartFormat.Core.Parsing;
+﻿using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core.Extensions
+namespace SmartFormat.Extensions
 {
     public class DefaultSource : ISource
     {

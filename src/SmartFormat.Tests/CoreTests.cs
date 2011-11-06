@@ -42,6 +42,10 @@ namespace SmartFormat.Tests
         [Test]
         public void Parser_Throws_Exceptions()
         {
+            // Let's set the "ErrorAction" to "Throw":
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Parser.ErrorAction = ErrorAction.ThrowError;
+
             var args = new object[] { TestFactory.GetPerson() };
             var invalidFormats = new[] {
                 "{",
@@ -61,7 +65,7 @@ namespace SmartFormat.Tests
             {
                 try
                 {
-                    Smart.Default.Test(format, args, "Error");
+                    formatter.Test(format, args, "Error");
                     // Make sure that EVERY item has an error:
                     Assert.Fail("Parsing \"{0}\" should have failed but did not.", format);
                 }

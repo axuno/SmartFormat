@@ -36,6 +36,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\FormatCache.cs" />
@@ -51,8 +53,8 @@
     <Compile Include="Core\FormatException.cs" />
     <Compile Include="Core\Output\TextWriterOutput.cs" />
     <Compile Include="Core\Parsing\Selector.cs" />
-    <Compile Include="Core\Extensions\DefaultFormatter.cs" />
-    <Compile Include="Core\Extensions\DefaultSource.cs" />
+    <Compile Include="Extensions\DefaultFormatter.cs" />
+    <Compile Include="Extensions\DefaultSource.cs" />
     <Compile Include="Core\Extensions\IFormatter.cs" />
     <Compile Include="Core\Extensions\ISource.cs" />
     <Compile Include="Smart.cs" />

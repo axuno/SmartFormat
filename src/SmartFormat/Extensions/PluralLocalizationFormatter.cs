@@ -670,7 +670,4 @@ namespace SmartFormat.Extensions
         }
     }
 
-
-
-
 }

@@ -6,6 +6,7 @@ using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests
 {

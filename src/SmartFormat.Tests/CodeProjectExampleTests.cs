@@ -6,6 +6,7 @@ using System.Text;
 using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Extensions;
 
 
 namespace SmartFormat.Tests

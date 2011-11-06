@@ -1,8 +1,9 @@
 ﻿using System;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core.Extensions
+namespace SmartFormat.Extensions
 {
     public class DefaultFormatter : IFormatter
     {
