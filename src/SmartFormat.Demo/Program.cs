@@ -15,7 +15,7 @@ namespace SmartFormat.Demo
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SmartFormatTest());
+            Application.Run(new SmartFormatDemo());
         }
     }
 }

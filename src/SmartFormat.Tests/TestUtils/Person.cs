@@ -86,6 +86,11 @@ namespace SmartFormat.Tests
         public Person Spouse { get; set; }
 
         public Gender Gender { get; set; }
+
+        public int Random()
+        {
+            return DateTime.Now.Second % 3;
+        }
     }
 
     public enum Gender

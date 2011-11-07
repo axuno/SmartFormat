@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SmartFormat.Demo</RootNamespace>
     <AssemblyName>SmartFormat.Demo</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -36,6 +36,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -43,10 +44,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -54,11 +56,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SmartFormatTest.cs">
+    <Compile Include="SmartFormatDemo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SmartFormatTest.Designer.cs">
-      <DependentUpon>SmartFormatTest.cs</DependentUpon>
+    <Compile Include="SmartFormatDemo.Designer.cs">
+      <DependentUpon>SmartFormatDemo.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,8 +84,9 @@
     <Compile Include="ThirdParty\RTFLib\RTFRow.cs" />
     <Compile Include="ThirdParty\RTFLib\RTFRowDefinition.cs" />
     <Compile Include="ThirdParty\RTFLib\RTFUtil.cs" />
-    <EmbeddedResource Include="SmartFormatTest.resx">
-      <DependentUpon>SmartFormatTest.cs</DependentUpon>
+    <EmbeddedResource Include="SmartFormatDemo.resx">
+      <DependentUpon>SmartFormatDemo.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -105,6 +108,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ThirdParty\RTFLib\Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SmartFormat.Tests\SmartFormat.Tests.csproj">
       <Project>{5B6368BF-B7C3-440F-ABAA-52A48A837A46}</Project>
       <Name>SmartFormat.Tests</Name>
@@ -113,9 +119,6 @@
       <Project>{83A94F48-8529-4A41-B5E1-1684827180DF}</Project>
       <Name>SmartFormat</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ThirdParty\RTFLib\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
