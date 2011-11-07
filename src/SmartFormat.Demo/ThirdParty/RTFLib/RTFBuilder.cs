@@ -71,13 +71,13 @@ namespace RTF
                 using (new RTFFormatWrap(this))
                 {
                     value = this.CheckChar(value);
-                    if (value.IndexOf(Environment.NewLine) >= 0)
+                    if (value.Contains("\n"))
                     {
-                        string[] lines = value.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-                        foreach (string line in lines)
+                        string[] lines = value.Split(new[] {"\r\n","\n"}, StringSplitOptions.None);
+                        for (int i = 0; i < lines.Length; i++)
                         {
-                            this._sb.Append(line);
-                            this._sb.Append("\\line ");
+                            if (i > 0) this._sb.Append("\\line ");
+                            this._sb.Append(lines[i]);
                         }
                     }
                     else
