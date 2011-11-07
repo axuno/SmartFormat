@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace SmartFormat.Core.Parsing
+﻿namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Parses a format string.
@@ -71,7 +69,7 @@ namespace SmartFormat.Core.Parsing
         {
             foreach (var c in chars)
             {
-                if (!AllowedSelectorChars.Contains(c))
+                if (AllowedSelectorChars.IndexOf(c) == -1)
                 {
                     AllowedSelectorChars += c;
                 }
@@ -88,7 +86,7 @@ namespace SmartFormat.Core.Parsing
         {
             foreach (var c in chars)
             {
-                if (!Operators.Contains(c))
+                if (Operators.IndexOf(c) == -1)
                 {
                     Operators += c;
                 }
@@ -214,7 +212,7 @@ namespace SmartFormat.Core.Parsing
                 else
                 {
                     // Placeholder is NOT null, so that means we're parsing the selectors:
-                    if (Operators.Contains(c))
+                    if (Operators.IndexOf(c) != -1)
                     {
                         // Add the selector:
                         if (i != lastI)
@@ -270,7 +268,7 @@ namespace SmartFormat.Core.Parsing
                         // Make sure it's alphanumeric:
                         if (('0' <= c && c <= '9')
                          || (AlphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'))
-                         || (AllowedSelectorChars.Contains(c)))
+                         || (AllowedSelectorChars.IndexOf(c) != -1))
                         { }
                         else
                         {
