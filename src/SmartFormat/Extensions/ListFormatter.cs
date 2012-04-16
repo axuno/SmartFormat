@@ -27,7 +27,8 @@ namespace SmartFormat.Extensions
             // See if we're trying to access a specific index:
             int itemIndex;
             var currentList = current as IList;
-            if (selector.SelectorIndex > 0 && currentList != null && int.TryParse(selector.Text, out itemIndex) && itemIndex < currentList.Count)
+    		var isAbsolute = (selector.SelectorIndex == 0 && selector.Operator.Length == 0);
+			if (!isAbsolute && currentList != null && int.TryParse(selector.Text, out itemIndex) && itemIndex < currentList.Count)
             {
                 // The current is a List, and the selector is a number;
                 // let's return the List item:
