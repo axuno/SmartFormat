@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using SmartFormat.Core;
 using SmartFormat.Core.Extensions;
@@ -18,11 +19,11 @@ namespace SmartFormat
         #region: Constructor :
 
         public SmartFormatter()
-            #if DEBUG
+#if DEBUG
             : this(Core.ErrorAction.ThrowError)
-            #else
+#else
             : this(ErrorAction.Ignore)
-            #endif
+#endif
         {
         }
 
@@ -30,16 +31,29 @@ namespace SmartFormat
         {
             this.Parser = new Parser(errorAction);
             this.ErrorAction = errorAction;
-            this.SourceExtensions = new List<ISource>();
-            this.FormatterExtensions = new List<IFormatter>();
+            this.sourceExtensions = new List<ISource>();
+            this.formatterExtensions = new List<IFormatter>();
+            this.userExtensions = new List<object>();
         }
 
         #endregion
 
         #region: Extension Registration :
 
-        public List<ISource> SourceExtensions { get; private set; }
-        public List<IFormatter> FormatterExtensions { get; private set; }
+        private readonly List<ISource> sourceExtensions;
+        private readonly List<IFormatter> formatterExtensions;
+        private readonly List<object> userExtensions;
+
+        public IEnumerable<ISource> SourceExtensions
+        {
+            get { return sourceExtensions; }
+        }
+
+        public IEnumerable<IFormatter> FormatterExtensions
+        {
+            get { return formatterExtensions; }
+        }
+
         /// <summary>
         /// Adds each extensions to this formatter.
         /// Each extension must implement ISource, IFormatter, or both.
@@ -47,7 +61,12 @@ namespace SmartFormat
         /// An exception will be thrown if the extension doesn't implement those interfaces.
         /// </summary>
         /// <param name="extensions"></param>
-        public void AddExtensions(params object[] extensions)
+        internal void AddExtensions(params object[] extensions)
+        {
+            AddExtensions(false, extensions);
+        }
+
+        private void AddExtensions(bool userExtension, params object[] extensions)
         {
             foreach (var extension in extensions)
             {
@@ -60,10 +79,44 @@ namespace SmartFormat
                     throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", extension.GetType().FullName), "extensions");
 
                 if (source != null)
-                    SourceExtensions.Add(source);
+                {
+                    if (userExtension)
+                        sourceExtensions.Insert(0, source);
+                    else
+                        sourceExtensions.Add(source);
+                }
                 if (formatter != null)
-                    FormatterExtensions.Add(formatter);
+                {
+                    if (userExtension)
+                        formatterExtensions.Insert(0, formatter);
+                    else
+                        formatterExtensions.Add(formatter);
+                }
             }
+        }
+
+        /// <summary>
+        /// Adds user extensions to this formatter.
+        /// Each extension must implement ISource, IFormatter, or both.
+        /// 
+        /// An exception will be thrown if the extension doesn't implement those interfaces.
+        /// </summary>
+        /// <param name="extensions"></param>
+        public void AddUserExtensions(params object[] extensions)
+        {
+            userExtensions.AddRange(extensions);
+            AddExtensions(true, extensions);
+        }
+
+        /// <summary>
+        /// Clears all user extensions
+        /// </summary>
+        public void ClearUserExtensions()
+        {
+            formatterExtensions.RemoveAll(userExtensions.Contains);
+            sourceExtensions.RemoveAll(userExtensions.Contains);
+
+            userExtensions.Clear();
         }
 
         #endregion
@@ -72,7 +125,7 @@ namespace SmartFormat
 
         public Parser Parser { get; set; }
         public ErrorAction ErrorAction { get; set; }
-        
+
         #endregion
 
         #region: Format Overloads :
@@ -85,7 +138,7 @@ namespace SmartFormat
         public string Format(IFormatProvider provider, string format, params object[] args)
         {
             var output = new StringOutput(format.Length + args.Length * 8);
-            
+
             var formatParsed = Parser.ParseFormat(format);
             object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, args, null, provider);
@@ -182,11 +235,11 @@ namespace SmartFormat
 
         private void CheckForExtensions()
         {
-            if (this.SourceExtensions.Count == 0)
+            if (this.sourceExtensions.Count == 0)
             {
                 throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
             }
-            if (this.FormatterExtensions.Count == 0)
+            if (this.formatterExtensions.Count == 0)
             {
                 throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
             }
@@ -241,6 +294,5 @@ namespace SmartFormat
         }
 
         #endregion
-
     }
 }
