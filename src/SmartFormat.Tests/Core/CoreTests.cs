@@ -239,5 +239,22 @@ namespace SmartFormat.Tests
 
             formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "------");
         }
+
+        [Test]
+        public void Formatter_Maintains_Tokens()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.ErrorAction = ErrorAction.MaintainTokens;
+
+            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--{0}--{0:ZZZZ}--");
+        }
+
+        [Test]
+        public void Formatter_Maintains_Object_Tokens()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.ErrorAction = ErrorAction.MaintainTokens;
+            formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
+        }
     }
 }
