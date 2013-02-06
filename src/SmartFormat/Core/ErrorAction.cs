@@ -12,7 +12,10 @@
         OutputErrorInResult, 
         
         /// <summary>Ignores errors and tries to output the data anyway</summary>
-        Ignore
+        Ignore,
+        
+        /// <summary>Leaves invalid tokens unmodified in the text.</summary>
+        MaintainTokens
     }
 
 }
