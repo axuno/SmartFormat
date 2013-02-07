@@ -222,6 +222,9 @@ namespace SmartFormat
                     output.Write(issue, formatDetails);
                     formatDetails.FormatError = null;
                     break;
+                case ErrorAction.MaintainTokens:
+                    output.Write(formatDetails.Placeholder.Text, formatDetails);
+                    break;
             }
         }
         private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, IOutput output, FormatDetails formatDetails)
@@ -236,6 +239,9 @@ namespace SmartFormat
                     formatDetails.FormatError = new FormatException(errorItem, innerException, startIndex);
                     output.Write(innerException.Message, formatDetails);
                     formatDetails.FormatError = null;
+                    break;
+                case ErrorAction.MaintainTokens:
+                    output.Write(formatDetails.Placeholder.Text, formatDetails);
                     break;
             }
         }
