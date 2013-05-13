@@ -38,6 +38,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Core\FormatCache.cs" />
     <Compile Include="Core\Parsing\ParsingErrors.cs" />
     <Compile Include="Core\Extensions\FormatDetails.cs" />
