@@ -38,6 +38,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Core\FormatCache.cs" />
     <Compile Include="Core\Parsing\ParsingErrors.cs" />
     <Compile Include="Core\Extensions\FormatDetails.cs" />
@@ -69,7 +72,9 @@
     <Compile Include="Extensions\ConditionalFormatter.cs" />
     <Compile Include="SmartFormatter.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="SmartFormat.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
