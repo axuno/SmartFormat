@@ -1,0 +1,6 @@
+*.suo
+bin
+debug
+obj
+src/packages/*
+!src/packages/repositories.config
