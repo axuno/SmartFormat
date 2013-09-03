@@ -68,8 +68,9 @@ namespace SmartFormat.Tests
 
                 string actual = null;
                 try
-                {
-                    actual = formatter.Format(format, args);
+				{
+					var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
+					actual = formatter.Format(specificCulture, format, args);
                     Assert.AreEqual(expected, actual);
                     Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
                 }

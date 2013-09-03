@@ -30,7 +30,7 @@ namespace SmartFormat.Tests
         public void Test_Default()
         {
             TestAllResults(
-                null,
+				CultureInfo.CreateSpecificCulture("en-us"),
                 "There {0:is|are} {0} {0:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},

@@ -24,7 +24,11 @@ namespace SmartFormat.Extensions
             // REFLECTION:
             // Let's see if the argSelector is a Selectors/Field/ParseFormat:
             var sourceType = current.GetType();
-            var members = sourceType.GetMember(selector.Text);
+
+	        var bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
+	        bindingFlags |= Smart.Settings.GetCaseSensitivityBindingFlag();
+
+			var members = sourceType.GetMember(selector.Text, bindingFlags);
             foreach (var member in members)
             {
                 switch (member.MemberType)
