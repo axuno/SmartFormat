@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
@@ -21,7 +22,7 @@ namespace SmartFormat.Extensions
             // See if current is a IDictionary and contains the selector:
             var rawDict = current as IDictionary;
 
-            if (rawDict != null && rawDict.Contains(selector.Text))
+            if (rawDict != null && rawDict.Keys.Cast<string>().Contains(selector.Text))
             {
                 result = rawDict[selector.Text];
                 handled = true;
