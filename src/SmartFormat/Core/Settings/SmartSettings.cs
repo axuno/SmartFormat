@@ -28,6 +28,21 @@ namespace SmartFormat.Core.Settings
 			}
 		}
 
+		internal StringComparison GetCaseSensitivityComparision()
+		{
+			{
+				switch (CaseSensitivity)
+				{
+					case CaseSensitivityType.CaseSensitiv:
+						return StringComparison.CurrentCulture;
+					case CaseSensitivityType.CaseInsensitiv:
+						return StringComparison.CurrentCultureIgnoreCase;
+					default:
+						throw new InvalidOperationException(string.Format("The case sensitivity type [{0}] is unknown.", CaseSensitivity));
+				}
+			}
+		}
+
 		internal BindingFlags GetCaseSensitivityBindingFlag()
 		{
 			switch (CaseSensitivity)
