@@ -26,8 +26,10 @@ namespace SmartFormat.Extensions
             {
                 result = rawDict[selector.Text];
                 handled = true;
-			}
+	            return;
+            }
 
+			// this check is for dynamics and generic dictionaries
 			var dict = current as IDictionary<string, object>;
 
 			if (dict != null && dict.ContainsKey(selector.Text))
