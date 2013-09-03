@@ -21,20 +21,32 @@ namespace SmartFormat.Extensions
 			// See if current is a IDictionary and contains the selector:
 			var rawDict = current as IDictionary;
 
-			if (rawDict != null && rawDict.Keys.Cast<string>().Contains(selector.Text, Smart.Settings.GetCaseSensitivityComparer()))
+			if (rawDict != null)
 			{
-				result = rawDict[selector.Text];
-				handled = true;
-				return;
+				foreach (DictionaryEntry entry in rawDict)
+				{
+					var key = (entry.Key as string) ?? entry.Key.ToString();
+
+					if (key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparision()))
+					{
+						result = entry.Value;
+						handled = true;
+						return;
+					}
+				}
 			}
 
 			// this check is for dynamics and generic dictionaries
 			var dict = current as IDictionary<string, object>;
 
-			if (dict != null && dict.Keys.Contains(selector.Text, Smart.Settings.GetCaseSensitivityComparer()))
+			if (dict != null)
 			{
-				result = dict[selector.Text];
-				handled = true;
+				var val = dict.FirstOrDefault(x => x.Key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparision())).Value;
+				if (val != null)
+				{
+					result = val;
+					handled = true;
+				}
 			}
 		}
 	}
