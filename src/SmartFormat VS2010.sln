@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat", "SmartFormat\SmartFormat.csproj", "{83A94F48-8529-4A41-B5E1-1684827180DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Tests", "SmartFormat.Tests\SmartFormat.Tests.csproj", "{5B6368BF-B7C3-440F-ABAA-52A48A837A46}"
@@ -12,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{7952E346
 		..\.gitignore = ..\.gitignore
 		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormatSL", "SmartFormatSL\SmartFormatSL.csproj", "{FDB5C591-2840-41C3-AF88-40F8A513B28F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +57,16 @@ Global
 		{54A06E44-EA03-4138-BCD6-C2D47527AA02}.Release|Mixed Platforms.Build.0 = Release|x86
 		{54A06E44-EA03-4138-BCD6-C2D47527AA02}.Release|x86.ActiveCfg = Release|x86
 		{54A06E44-EA03-4138-BCD6-C2D47527AA02}.Release|x86.Build.0 = Release|x86
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FDB5C591-2840-41C3-AF88-40F8A513B28F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

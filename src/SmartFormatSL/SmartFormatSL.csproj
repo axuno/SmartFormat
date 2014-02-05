@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FDB5C591-2840-41C3-AF88-40F8A513B28F}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SmartFormatSL</RootNamespace>
+    <AssemblyName>SmartFormatSL</AssemblyName>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core">
+      <HintPath>$(TargetFrameworkDirectory)System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Browser" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SmartFormat\Core\ErrorAction.cs">
+      <Link>Core\ErrorAction.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Extensions\FormatDetails.cs">
+      <Link>Core\Extensions\FormatDetails.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Extensions\IFormatter.cs">
+      <Link>Core\Extensions\IFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Extensions\ISource.cs">
+      <Link>Core\Extensions\ISource.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\FormatCache.cs">
+      <Link>Core\FormatCache.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\FormatException.cs">
+      <Link>Core\FormatException.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Output\IOutput.cs">
+      <Link>Core\Output\IOutput.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Output\StringOutput.cs">
+      <Link>Core\Output\StringOutput.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Output\TextWriterOutput.cs">
+      <Link>Core\Output\TextWriterOutput.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Parsing\Format.cs">
+      <Link>Core\Parsing\Format.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Parsing\FormatItem.cs">
+      <Link>Core\Parsing\FormatItem.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Parsing\LiteralText.cs">
+      <Link>Core\Parsing\LiteralText.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Parsing\Parser.cs">
+      <Link>Core\Parsing\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Parsing\ParsingErrors.cs">
+      <Link>Core\Parsing\ParsingErrors.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Parsing\Placeholder.cs">
+      <Link>Core\Parsing\Placeholder.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Core\Parsing\Selector.cs">
+      <Link>Core\Parsing\Selector.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\ConditionalFormatter.cs">
+      <Link>Extensions\ConditionalFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\DefaultFormatter.cs">
+      <Link>Extensions\DefaultFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\DefaultSource.cs">
+      <Link>Extensions\DefaultSource.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\DictionarySource.cs">
+      <Link>Extensions\DictionarySource.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\ListFormatter.cs">
+      <Link>Extensions\ListFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\PluralLocalizationFormatter.cs">
+      <Link>Extensions\PluralLocalizationFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\ReflectionSource.cs">
+      <Link>Extensions\ReflectionSource.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Extensions\TimeFormatter.cs">
+      <Link>Extensions\TimeFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Smart.cs">
+      <Link>Smart.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\SmartExtensions.cs">
+      <Link>SmartExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\SmartFormatter.cs">
+      <Link>SmartFormatter.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Utilities\FormatDelegate.cs">
+      <Link>Utilities\FormatDelegate.cs</Link>
+    </Compile>
+    <Compile Include="..\SmartFormat\Utilities\TimeSpanUtility.cs">
+      <Link>Utilities\TimeSpanUtility.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
