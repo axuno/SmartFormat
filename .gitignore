@@ -4,3 +4,6 @@ debug
 obj
 src/packages/*
 !src/packages/repositories.config
+*.user
+*.ncrunch*
+*.cache

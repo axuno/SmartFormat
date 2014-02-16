@@ -4,7 +4,7 @@
     <id>SmartFormat.NET</id>
     <version>$version$</version>
     <authors>Scott Rippey</authors>
-    <description>A string composition library written in C# (.NET 3.5) that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralisation, gender conjugation, and time and list formatting.</description>
+    <description>A string composition library written in C# (.NET 4) that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralisation, gender conjugation, and time and list formatting.</description>
     <licenseUrl>https://github.com/scottrippey/SmartFormat.NET/blob/master/license.txt</licenseUrl>
     <projectUrl>https://github.com/scottrippey/SmartFormat.NET#readme</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
