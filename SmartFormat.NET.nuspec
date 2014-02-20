@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>SmartFormat.NET</id>
+        <version>1.1.0.0</version>
+        <authors>Scott.Rippey,SeriousM</authors>
+        <owners>Scott.Rippey,SeriousM</owners>
+        <licenseUrl>https://github.com/scottrippey/SmartFormat.NET/blob/master/license.txt</licenseUrl>
+        <projectUrl>https://github.com/scottrippey/SmartFormat.NET#readme</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A string composition library written in C# (.NET 3.5) that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralisation, gender conjugation, and time and list formatting.</description>
+    </metadata>
+    <files>
+        <file src="build\NETv3.5\SmartFormat.dll" target="lib\net35-Client\SmartFormat.dll" />
+    </files>
+</package>

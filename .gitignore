@@ -7,3 +7,4 @@ src/packages/*
 *.user
 *.ncrunch*
 *.cache
+*.nupkg
