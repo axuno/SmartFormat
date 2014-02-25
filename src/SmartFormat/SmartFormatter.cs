@@ -40,29 +40,59 @@ namespace SmartFormat
 
         public List<ISource> SourceExtensions { get; private set; }
         public List<IFormatter> FormatterExtensions { get; private set; }
+
+		/// <summary>
+		/// Adds each extensions to this formatter.
+		/// Each extension must implement ISource, IFormatter, or both.
+		/// 
+		/// An exception will be thrown if the extension doesn't implement those interfaces.
+		/// </summary>
+		/// <param name="extensions"></param>
+		[Obsolete("Please use the specific overloads of AddExtensions().")]
+		public void AddExtensions(params object[] extensions)
+		{
+			foreach (var extension in extensions)
+			{
+				// We need to filter each extension to the correct list:
+				var source = extension as ISource;
+				var formatter = extension as IFormatter;
+
+				// If this object ISN'T a extension, throw an exception:
+				if (source == null && formatter == null)
+					throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", extension.GetType().FullName), "extensions");
+
+				if (source != null)
+					SourceExtensions.Add(source);
+				if (formatter != null)
+					FormatterExtensions.Add(formatter);
+			}
+		}
+
         /// <summary>
         /// Adds each extensions to this formatter.
-        /// Each extension must implement ISource, IFormatter, or both.
-        /// 
-        /// An exception will be thrown if the extension doesn't implement those interfaces.
+        /// Each extension must implement ISource.
         /// </summary>
-        /// <param name="extensions"></param>
-        public void AddExtensions(params object[] extensions)
+        /// <param name="sourceExtensions"></param>
+		public void AddExtensions(params ISource[] sourceExtensions)
         {
-            foreach (var extension in extensions)
+            foreach (var extension in sourceExtensions)
             {
-                // We need to filter each extension to the correct list:
-                var source = extension as ISource;
-                var formatter = extension as IFormatter;
+	            if (extension != null)
+                    SourceExtensions.Add(extension);
+            }
+        }
 
-                // If this object ISN'T a extension, throw an exception:
-                if (source == null && formatter == null)
-                    throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", extension.GetType().FullName), "extensions");
-
-                if (source != null)
-                    SourceExtensions.Add(source);
-                if (formatter != null)
-                    FormatterExtensions.Add(formatter);
+        /// <summary>
+        /// Adds each extensions to this formatter.
+        /// Each extension must implement IFormatter.
+        /// </summary>
+        /// <param name="formatterExtensions"></param>
+        public void AddExtensions(params IFormatter[] formatterExtensions)
+        {
+            foreach (var extension in formatterExtensions)
+            {
+	            if (extension != null)
+                    FormatterExtensions.Add(extension);
             }
         }
 
