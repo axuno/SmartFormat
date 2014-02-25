@@ -464,9 +464,8 @@ namespace SmartFormat.Tests
         {
             var Smart = new SmartFormatter();
             Smart.Parser.UseAlternativeEscapeChar('\\');
-            Smart.AddExtensions(
-                new DefaultFormatter(), 
-                new DefaultSource(Smart));
+            Smart.AddExtensions(new DefaultFormatter());
+            Smart.AddExtensions(new DefaultSource(Smart));
 
             var args = new object[] { "Zero", "One", "Two", 3 };
 

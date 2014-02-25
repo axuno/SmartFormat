@@ -66,15 +66,21 @@ namespace SmartFormat
 			// Add all extensions:
 			// Note, the order is important; the extensions
 			// will be executed in this order:
+
+			var listFormatter = new ListFormatter(result);
+			
 			result.AddExtensions(
-				new ListFormatter(result),
-				new PluralLocalizationFormatter("en"),
-				new ConditionalFormatter(),
-				new TimeFormatter("en"),
+				(ISource)listFormatter,
 				new ReflectionSource(result),
 				new DictionarySource(result),
 				// These default extensions reproduce the String.Format behavior:
-				new DefaultSource(result),
+				new DefaultSource(result)
+				);
+			result.AddExtensions(
+				(IFormatter)listFormatter,
+				new PluralLocalizationFormatter("en"),
+				new ConditionalFormatter(),
+				new TimeFormatter("en"),
 				new DefaultFormatter()
 				);
 
