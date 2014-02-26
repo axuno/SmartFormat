@@ -93,8 +93,8 @@ namespace SmartFormat.Tests
         {
 	        using (
 		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitiv,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitiv))
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
 	        {
 				var formatter = Smart.CreateDefaultSmartFormat();
 				formatter.AddExtensions(new DictionarySource(formatter));

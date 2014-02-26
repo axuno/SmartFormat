@@ -137,8 +137,8 @@ namespace SmartFormat.Tests
         {
 	        using (
 		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitiv,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitiv))
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
 	        {
 		        var p1 = MakeQuentin();
 
@@ -181,8 +181,8 @@ namespace SmartFormat.Tests
         {
 	        using (
 		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitiv,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitiv))
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
 	        {
 		        Size[] sizes = { new Size(1, 1), new Size(4, 3), new Size(16, 9) };
 
@@ -389,8 +389,8 @@ namespace SmartFormat.Tests
         {
 	        using (
 		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitiv,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitiv))
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
 	        {
 		        var p1 = new Person() { Birthday = DateTime.MinValue };
 

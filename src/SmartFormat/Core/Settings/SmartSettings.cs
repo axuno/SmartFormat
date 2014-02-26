@@ -8,7 +8,7 @@ namespace SmartFormat.Core.Settings
 	{
 		internal SmartSettings()
 		{
-			CaseSensitivity = CaseSensitivityType.CaseSensitiv;
+			CaseSensitivity = CaseSensitivityType.CaseSensitive;
 		}
 
 		public CaseSensitivityType CaseSensitivity { get; set; }
@@ -18,9 +18,9 @@ namespace SmartFormat.Core.Settings
 			{
 				switch (CaseSensitivity)
 				{
-					case CaseSensitivityType.CaseSensitiv:
+					case CaseSensitivityType.CaseSensitive:
 						return StringComparer.CurrentCulture;
-					case CaseSensitivityType.CaseInsensitiv:
+					case CaseSensitivityType.CaseInsensitive:
 						return StringComparer.CurrentCultureIgnoreCase;
 					default:
 						throw new InvalidOperationException(string.Format("The case sensitivity type [{0}] is unknown.", CaseSensitivity));
@@ -28,14 +28,14 @@ namespace SmartFormat.Core.Settings
 			}
 		}
 
-		internal StringComparison GetCaseSensitivityComparision()
+		internal StringComparison GetCaseSensitivityComparison()
 		{
 			{
 				switch (CaseSensitivity)
 				{
-					case CaseSensitivityType.CaseSensitiv:
+					case CaseSensitivityType.CaseSensitive:
 						return StringComparison.CurrentCulture;
-					case CaseSensitivityType.CaseInsensitiv:
+					case CaseSensitivityType.CaseInsensitive:
 						return StringComparison.CurrentCultureIgnoreCase;
 					default:
 						throw new InvalidOperationException(string.Format("The case sensitivity type [{0}] is unknown.", CaseSensitivity));
@@ -47,9 +47,9 @@ namespace SmartFormat.Core.Settings
 		{
 			switch (CaseSensitivity)
 			{
-				case CaseSensitivityType.CaseSensitiv:
+				case CaseSensitivityType.CaseSensitive:
 					return 0;
-				case CaseSensitivityType.CaseInsensitiv:
+				case CaseSensitivityType.CaseInsensitive:
 					return BindingFlags.IgnoreCase;
 				default:
 					throw new InvalidOperationException(string.Format("The case sensitivity type [{0}] is unknown.", CaseSensitivity));

@@ -49,8 +49,8 @@ namespace SmartFormat.Tests
         {
 	        using (
 		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitiv,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitiv))
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
 	        {
 		        var formats = new string[]
 			        {
@@ -87,8 +87,8 @@ namespace SmartFormat.Tests
         {
 	        using (
 		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitiv,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitiv))
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
 	        {
 		        var formats = new string[] { "{0} {0.ToLower} {toloWer} {touPPer}", };
 		        var expected = new string[] { "Zero zero zero ZERO", };
@@ -117,8 +117,8 @@ namespace SmartFormat.Tests
 		{
 			using (
 				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitiv,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitiv))
+					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
 			{
 				var formats = new string[] { "{field}" };
 				var expected = new string[] { "Field" };

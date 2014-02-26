@@ -26,7 +26,7 @@ namespace SmartFormat.Extensions
 				{
 					var key = (entry.Key as string) ?? entry.Key.ToString();
 
-					if (key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparision()))
+					if (key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparison()))
 					{
 						result = entry.Value;
 						handled = true;
@@ -40,7 +40,7 @@ namespace SmartFormat.Extensions
 
 			if (dict != null)
 			{
-				var val = dict.FirstOrDefault(x => x.Key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparision())).Value;
+				var val = dict.FirstOrDefault(x => x.Key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparison())).Value;
 				if (val != null)
 				{
 					result = val;
