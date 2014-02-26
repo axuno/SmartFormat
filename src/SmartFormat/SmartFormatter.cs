@@ -68,33 +68,25 @@ namespace SmartFormat
 			}
 		}
 
-        /// <summary>
-        /// Adds each extensions to this formatter.
-        /// Each extension must implement ISource.
-        /// </summary>
-        /// <param name="sourceExtensions"></param>
+		/// <summary>
+		/// Adds each extensions to this formatter.
+		/// Each extension must implement ISource.
+		/// </summary>
+		/// <param name="sourceExtensions"></param>
 		public void AddExtensions(params ISource[] sourceExtensions)
-        {
-            foreach (var extension in sourceExtensions)
-            {
-	            if (extension != null)
-                    SourceExtensions.Add(extension);
-            }
-        }
+		{
+			SourceExtensions.AddRange(sourceExtensions);
+		}
 
-        /// <summary>
-        /// Adds each extensions to this formatter.
-        /// Each extension must implement IFormatter.
-        /// </summary>
-        /// <param name="formatterExtensions"></param>
-        public void AddExtensions(params IFormatter[] formatterExtensions)
-        {
-            foreach (var extension in formatterExtensions)
-            {
-	            if (extension != null)
-                    FormatterExtensions.Add(extension);
-            }
-        }
+		/// <summary>
+		/// Adds each extensions to this formatter.
+		/// Each extension must implement IFormatter.
+		/// </summary>
+		/// <param name="formatterExtensions"></param>
+		public void AddExtensions(params IFormatter[] formatterExtensions)
+		{
+			FormatterExtensions.AddRange(formatterExtensions);
+		}
 
         #endregion
 
