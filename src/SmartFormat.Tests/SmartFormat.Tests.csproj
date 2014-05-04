@@ -43,6 +43,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
@@ -53,6 +54,7 @@
     </Compile>
     <Compile Include="Extensions\ListFormatterTests.cs" />
     <Compile Include="CodeProjectExampleTests.cs" />
+    <Compile Include="Extensions\XmlSourceTest.cs" />
     <Compile Include="TestUtils\ArgumentValidator.cs" />
     <Compile Include="TestUtils\EnumerableExtensions.cs" />
     <Compile Include="TestUtils\ExceptionCollection.cs" />
