@@ -8,7 +8,7 @@ namespace SmartFormat.Tests
     [TestFixture]
     public class XmlSourceTest
     {
-        private const string TwoLevelXml = "<root>" +
+        public const string TwoLevelXml = "<root>" +
                                       "<Person>" +
                                       "  <FirstName>Joe</FirstName>" +
                                       "  <LastName>Doe</LastName>" +

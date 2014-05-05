@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using SmartFormat.Core;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Demo.Sample_Extensions;
@@ -41,7 +42,7 @@ namespace SmartFormat.Demo
             args.Person = TestFactory.GetPerson();
             args.Date = DateTime.Now;
 	        args.Inventory = TestFactory.GetItems();
-
+            args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
             propertyGrid1.SelectedObject = args;
 
 
@@ -102,6 +103,12 @@ There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remainin
 |}
 </Items>
 "},
+ {"Xml Source", 
+@"It is possible to format Xml as input argument
+Example:
+  {Xml.Person.FirstName}'s phone number is {Xml.Phone}
+  or a concatenated text of xml element: {Xml.Person}
+"},
             };
 
 	        var listObjects = examples.Cast<object>().ToArray();
@@ -119,6 +126,9 @@ There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remainin
             public object Date { get; set; }
 			[TypeConverter(typeof(ArrayConverter))]
             public object Inventory { get; set; }
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            public object Xml { get; set; }
         }
 
         private void txtInput_TextChanged(object sender, EventArgs e)
