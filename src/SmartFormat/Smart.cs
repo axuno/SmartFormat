@@ -72,7 +72,8 @@ namespace SmartFormat
 			result.AddExtensions(
 				(ISource)listFormatter,
 				new ReflectionSource(result),
-				new DictionarySource(result),
+                new DictionarySource(result),
+                new XmlSource(result),
 				// These default extensions reproduce the String.Format behavior:
 				new DefaultSource(result)
 				);
