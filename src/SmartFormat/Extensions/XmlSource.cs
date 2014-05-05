@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Xml.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
@@ -23,17 +21,38 @@ namespace SmartFormat.Extensions
 		    var element = current as XElement;
 		    if (element != null)
 		    {
-		        foreach (var el in element.Elements())
+                // Find elements that match a selector
+		        var selectorMatchedElements = element.Elements(XName.Get(selector.Text)).ToArray();
+		        if (selectorMatchedElements.Any())
 		        {
-		            if (el.Name.LocalName.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparison()))
+		            var firstMatch = selectorMatchedElements.First();
+                    // if there are more XML child elements
+		            if (!IsLastSelector(selector, formatDetails.Placeholder))
 		            {
-		                result = el.Value;
+		                result = firstMatch;
 		                handled = true;
-		                return;
+		            }
+		            else
+		            {
+		                result = firstMatch.Value;
+		                handled = true;
 		            }
 		        }
 		    }
-
 		}
+
+        private static bool IsLastSelector(FormatItem selector, Placeholder placeholder)
+	    {
+            /*
+             * example:
+             * returns `true` if selector `Name` for placeholder `Person.Name`
+             * returns `false` if selector `Person` for placeholder `Person.Name`
+             * returns `true` if selector `Person` for placeholder `Person`
+             */
+
+            return placeholder
+                .Selectors.Select(s => s.Text)
+                .Last().Equals(selector.Text);
+	    }
 	}
 }
