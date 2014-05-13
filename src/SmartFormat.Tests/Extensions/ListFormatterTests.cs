@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Tests.Common;
 
@@ -82,6 +84,35 @@ namespace SmartFormat.Tests
 			var args = GetArgs();
 			Smart.Default.Test(formats, args, expected);
 		}
+
+        [Test]
+        /* added due to problems with [ThreadStatic] see: https://github.com/scottrippey/SmartFormat.NET/pull/23,
+         * if this test doesn't fail with usage of [ThreadStatic], run it again, because this test depends on the underlying ThreadPool */
+	    public void WithThreadPool_ShouldNotMixupCollectionIndex()
+        {
+            const string format = "{wheres.Count::>0? where |}{wheres:{}| and }";
+
+            List<string> wheres = new List<string>(){"test = @test"};
+
+            List<Task<string>> tasks = new List<Task<string>>();
+            for (int i = 0; i < 10; ++i)
+            {
+                tasks.Add(Task.Factory.StartNew(val =>
+                {
+                    Thread.Sleep(5 * (int)val); 
+                    string ret = Smart.Default.Format(format, new {wheres});
+                    Thread.Sleep(5 * (int)val); /* add some delay to force ThreadPool swapping */
+                    return ret;
+                }, i));
+            }
+
+            foreach (Task<string> t in tasks)
+            {
+                Assert.AreEqual(" where test = @test", t.Result);
+            }
+        }
+
+
 		[Test]
 		public void TestIndex()
 		{
