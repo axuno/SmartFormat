@@ -106,8 +106,9 @@ There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remainin
  {"Xml Source", 
 @"It is possible to format Xml as input argument
 Example:
-  {Xml.Person.FirstName}'s phone number is {Xml.Phone}
-  or a concatenated text of xml element: {Xml.Person}
+  There are {Xml.Person.Count} people: {Xml.Person: {FirstName}|,|, and}
+  #1:  {Xml.Person.0: {FirstName}'s phone number is {Phone}}
+  #2:  {Xml.Person.1: {FirstName}'s phone number is {Phone}}
 "},
             };
 

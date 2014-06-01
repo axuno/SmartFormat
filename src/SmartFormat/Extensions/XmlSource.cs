@@ -21,38 +21,19 @@ namespace SmartFormat.Extensions
 		    var element = current as XElement;
 		    if (element != null)
 		    {
+
                 // Find elements that match a selector
-		        var selectorMatchedElements = element.Elements(XName.Get(selector.Text)).ToArray();
+		        var selectorMatchedElements = element.Elements()
+                    .Where(x => x.Name.LocalName == selector.Text).ToList();
 		        if (selectorMatchedElements.Any())
 		        {
-		            var firstMatch = selectorMatchedElements.First();
-                    // if there are more XML child elements
-		            if (!IsLastSelector(selector, formatDetails.Placeholder))
-		            {
-		                result = firstMatch;
-		                handled = true;
-		            }
-		            else
-		            {
-		                result = firstMatch.Value;
-		                handled = true;
-		            }
+		            if (selectorMatchedElements.Count == 1)
+		                result = selectorMatchedElements[0];
+                    else
+		                result = selectorMatchedElements;
+		            handled = true;
 		        }
 		    }
 		}
-
-        private static bool IsLastSelector(FormatItem selector, Placeholder placeholder)
-	    {
-            /*
-             * example:
-             * returns `true` if selector `Name` for placeholder `Person.Name`
-             * returns `false` if selector `Person` for placeholder `Person.Name`
-             * returns `true` if selector `Person` for placeholder `Person`
-             */
-
-            return placeholder
-                .Selectors.Select(s => s.Text)
-                .Last().Equals(selector.Text);
-	    }
 	}
 }

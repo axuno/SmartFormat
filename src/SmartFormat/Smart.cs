@@ -82,6 +82,7 @@ namespace SmartFormat
 				new PluralLocalizationFormatter("en"),
 				new ConditionalFormatter(),
 				new TimeFormatter("en"),
+                new XElementFormatter(),
 				new DefaultFormatter()
 				);
 

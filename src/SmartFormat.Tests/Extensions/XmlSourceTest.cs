@@ -1,7 +1,6 @@
 ﻿using System.Xml.Linq;
 using NUnit.Framework;
 using SmartFormat.Core;
-using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests
 {
@@ -12,8 +11,13 @@ namespace SmartFormat.Tests
                                       "<Person>" +
                                       "  <FirstName>Joe</FirstName>" +
                                       "  <LastName>Doe</LastName>" +
+                                      "  <Phone>123-123-1234</Phone>" +
                                       "</Person>" +
-                                      "<Phone>123-123-1234</Phone>" +
+                                      "<Person>" +
+                                      "  <FirstName>Jack</FirstName>" +
+                                      "  <LastName>Doe</LastName>" +
+                                      "  <Phone>789-789-7890</Phone>" +
+                                      "</Person>" +
                                       "</root>";
 
         private const string OneLevelXml = "<root>" +
@@ -21,13 +25,34 @@ namespace SmartFormat.Tests
                                            "<LastName>Doe</LastName>" +
                                            "<Dob>1950-05-05</Dob>" +
                                            "</root>";
+        private const string OneLevelXmlWithNameSpaces = "<my:root xmlns:my='http://tempuri.org'>" +
+                                                   "<my:FirstName>Joe</my:FirstName>" +
+                                                   "<my:LastName>Doe</my:LastName>" +
+                                                   "<my:Dob>1950-05-05</my:Dob>" +
+                                                   "</my:root>";
+        private const string XmlMultipleFirstNameStr = "<root>" +
+                                                       "<FirstName>Joe</FirstName>" +
+                                                       "<FirstName>Jack</FirstName>" +
+                                                       "<LastName>Doe</LastName>" +
+                                                       "<FirstName>Jim</FirstName>" +
+                                                       "</root>";
 
         [Test]
         public void Format_SingleLevelXml_Replaced()
         {
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
-            Smart.Default.AddExtensions(new XmlSource(Smart.Default));
+            // act
+            var res = Smart.Format("Mr. {FirstName} {LastName}", xmlEl);
+            // assert
+            Assert.AreEqual("Mr. Joe Doe", res);
+        }
+
+        [Test]
+        public void Format_XmlWithNamespaces_IgnoringNamespace()
+        {
+            // arrange
+            var xmlEl = XElement.Parse(OneLevelXmlWithNameSpaces);
             // act
             var res = Smart.Format("Mr. {FirstName} {LastName}", xmlEl);
             // assert
@@ -39,7 +64,6 @@ namespace SmartFormat.Tests
         {
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
-            Smart.Default.AddExtensions(new XmlSource(Smart.Default));
             // act
             var res = Smart.Format("Mr. {{{LastName}}}", xmlEl);
             // assert
@@ -47,45 +71,36 @@ namespace SmartFormat.Tests
         }
 
         [Test]
-        public void Format_DuplicateElement_ReplacedWithFirst()
+        public void Format_MultipleElement_AccessibleByIndex()
         {
             // arrange
-            const string xmlStr = "<root>" +
-                                  "<FirstName>Joe</FirstName>" +
-                                  "<FirstName>Jack</FirstName>" +
-                                  "<LastName>Doe</LastName>" +
-                                  "<FirstName>Jim</FirstName>" +
-                                  "</root>";
-            var xmlEl = XElement.Parse(xmlStr);
-            Smart.Default.AddExtensions(new XmlSource(Smart.Default));
+            var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
-            var res = Smart.Format("Mr. {FirstName} {LastName}", xmlEl);
+            var res = Smart.Format("Mr. {FirstName.1} {LastName}", xmlEl);
             // assert
-            Assert.AreEqual("Mr. Joe Doe", res);
+            Assert.AreEqual("Mr. Jack Doe", res);
         }
 
         [Test]
-        public void Format_TwoLevelXml_TwoLevelSelectors_Replaced()
+        public void Format_MultipleElement_FormatsCount()
         {
             // arrange
-            var xmlEl = XElement.Parse(TwoLevelXml);
-            Smart.Default.AddExtensions(new XmlSource(Smart.Default));
+            var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
-            var res = Smart.Format("Mr. {Person.FirstName} {Person.LastName}, {Phone}", xmlEl);
+            var res = Smart.Format("There{FirstName.Count: is {} Doe | are {} Does}", xmlEl);
             // assert
-            Assert.AreEqual("Mr. Joe Doe, 123-123-1234", res);
+            Assert.AreEqual("There are 3 Does", res);
         }
-
+        
         [Test]
-        public void Format_TwoLevelXml_OneLevelSelector_Replaced()
+        public void Format_MultipleElement_FormatsAsList()
         {
             // arrange
-            var xmlEl = XElement.Parse(TwoLevelXml);
-            Smart.Default.AddExtensions(new XmlSource(Smart.Default));
+            var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
-            var res = Smart.Format("Mr. {Person}", xmlEl);
+            var res = Smart.Format("There are{FirstName: {}|,|, and} Doe", xmlEl);
             // assert
-            Assert.AreEqual("Mr. JoeDoe", res);
+            Assert.AreEqual("There are Joe, Jack, and Jim Doe", res);
         }
 
         [Test]
@@ -94,7 +109,6 @@ namespace SmartFormat.Tests
         {
             // arrange
             var xmlEl = XElement.Parse(TwoLevelXml);
-            Smart.Default.AddExtensions(new XmlSource(Smart.Default));
             // act
             Smart.Format("{SomethingNonExisting}{EvenMore}", xmlEl);
         }

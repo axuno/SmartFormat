@@ -47,6 +47,7 @@
     <Compile Include="Core\FormatCache.cs" />
     <Compile Include="Core\Parsing\ParsingErrors.cs" />
     <Compile Include="Core\Extensions\FormatDetails.cs" />
+    <Compile Include="Extensions\XElementFormatter.cs" />
     <Compile Include="Extensions\XmlSource.cs" />
     <Compile Include="Extensions\DictionarySource.cs" />
     <Compile Include="Extensions\PluralLocalizationFormatter.cs" />
