@@ -49,6 +49,17 @@ namespace SmartFormat.Tests
         }
 
         [Test]
+        public void Format_SingleLevelXml_CanAccessWithIndex0()
+        {
+            // arrange
+            var xmlEl = XElement.Parse(OneLevelXml);
+            // act
+            var res = Smart.Format("Mr. {FirstName.0}", xmlEl);
+            // assert
+            Assert.AreEqual("Mr. Joe", res);
+        }
+
+        [Test]
         public void Format_XmlWithNamespaces_IgnoringNamespace()
         {
             // arrange
@@ -79,6 +90,17 @@ namespace SmartFormat.Tests
             var res = Smart.Format("Mr. {FirstName.1} {LastName}", xmlEl);
             // assert
             Assert.AreEqual("Mr. Jack Doe", res);
+        }
+
+        [Test]
+        public void Format_MultipleElement_WithoutIndexesReturnsFirst()
+        {
+            // arrange
+            var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
+            // act
+            var res = Smart.Format("Mr. {FirstName}", xmlEl);
+            // assert
+            Assert.AreEqual("Mr. Joe", res);
         }
 
         [Test]

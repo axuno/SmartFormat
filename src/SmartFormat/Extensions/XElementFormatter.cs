@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections.Generic;
+using System.Xml.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
@@ -12,10 +13,19 @@ namespace SmartFormat.Extensions
         public void EvaluateFormat(object current, Format format,
             ref bool handled, IOutput output, FormatDetails formatDetails)
         {
+            XElement currentXElement = null;
             if (format != null && format.HasNested) return;
-            if (current is XElement)
+            // if we need to format list of XElements then we just take and format first
+            var xElmentsAsList = current as IList<XElement>;
+            if (xElmentsAsList != null && xElmentsAsList.Count > 0)
             {
-                var currentAsXElement = current as XElement;
+                currentXElement = xElmentsAsList[0];
+                handled = true;
+            }
+
+            var currentAsXElement = (currentXElement) ?? current as XElement;
+            if (currentAsXElement != null)
+            {
                 output.Write(currentAsXElement.Value, formatDetails);
                 handled = true;
             }

@@ -21,16 +21,12 @@ namespace SmartFormat.Extensions
 		    var element = current as XElement;
 		    if (element != null)
 		    {
-
                 // Find elements that match a selector
 		        var selectorMatchedElements = element.Elements()
                     .Where(x => x.Name.LocalName == selector.Text).ToList();
 		        if (selectorMatchedElements.Any())
 		        {
-		            if (selectorMatchedElements.Count == 1)
-		                result = selectorMatchedElements[0];
-                    else
-		                result = selectorMatchedElements;
+	                result = selectorMatchedElements;
 		            handled = true;
 		        }
 		    }
