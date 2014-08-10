@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
@@ -60,8 +61,17 @@ namespace SmartFormat.Extensions
         }
 
 
-        [ThreadStatic]
-        private int CollectionIndex = -1;
+        private static string key = "664c3d47-8d00-4825-b4fb-f3dd7c8a9bdf";
+        private static int CollectionIndex
+        {
+            get
+            {
+                object val = CallContext.LogicalGetData(key);
+                return val != null ? (int)val : -1;
+            }
+            set { CallContext.LogicalSetData(key, value); }
+        }
+
         /// <summary>
         /// If the source value is an array (or supports ICollection), 
         /// then each item will be custom formatted.
