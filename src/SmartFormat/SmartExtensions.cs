@@ -18,6 +18,16 @@ namespace SmartFormat
             Smart.Default.FormatInto(output, format, args);
         }
 
+        /// <summary> AppendLines a formatted string, using the same semantics as Smart.Format. </summary>
+        /// <param name="sb">The StringBuilder that will be used for output</param>
+        /// <param name="format">The template that defines how the arguments are formatted</param>
+        /// <param name="args">A list of arguments to be used in formatting</param>
+        public static void AppendLineSmart(this StringBuilder sb, string format, params object[] args)
+        {
+            var output = new StringOutput(sb);
+            Smart.Default.FormatInto(output, format, args);
+            sb.AppendLine();
+        }
         #endregion
 
         #region: TextWriter :
