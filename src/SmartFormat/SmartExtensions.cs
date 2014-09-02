@@ -24,10 +24,10 @@ namespace SmartFormat
         /// <param name="args">A list of arguments to be used in formatting</param>
         public static void AppendLineSmart(this StringBuilder sb, string format, params object[] args)
         {
-            var output = new StringOutput(sb);
-            Smart.Default.FormatInto(output, format, args);
+            sb.AppendSmart(format, args);            
             sb.AppendLine();
         }
+
         #endregion
 
         #region: TextWriter :
