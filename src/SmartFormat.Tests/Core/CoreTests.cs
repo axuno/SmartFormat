@@ -253,5 +253,14 @@ namespace SmartFormat.Tests
             formatter.ErrorAction = ErrorAction.MaintainTokens;
             formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
         }
+
+        [Test]
+        public void Formatter_AlignNull()
+        {
+            string name = null;
+            var obj = new { name = name };
+            var str2 = Smart.Format("Name: {name,-10}| Column 2", obj);
+            Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
+        }
     }
 }
