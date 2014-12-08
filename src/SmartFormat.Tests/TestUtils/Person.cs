@@ -9,45 +9,45 @@ namespace SmartFormat.Tests
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Person
     {
-	    public Person()
-	    {
+        public Person()
+        {
             this.Friends = new List<Person>();
-	    }
-	    public Person(string newName, Gender gender, DateTime newBirthday, string newAddress, params Person[] newFriends)
-	    {
-		    this.FullName = newName;
-	        this.Gender = gender;
-		    this.Birthday = newBirthday;
-		    if (!string.IsNullOrEmpty(newAddress))
-			    this.Address = Address.Parse(newAddress);
-		    this.Friends = new List<Person>(newFriends);
-	    }
+        }
+        public Person(string newName, Gender gender, DateTime newBirthday, string newAddress, params Person[] newFriends)
+        {
+            this.FullName = newName;
+            this.Gender = gender;
+            this.Birthday = newBirthday;
+            if (!string.IsNullOrEmpty(newAddress))
+                this.Address = Address.Parse(newAddress);
+            this.Friends = new List<Person>(newFriends);
+        }
 
-	    public string FirstName { get; set; }
+        public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MiddleName { get; set; }
-	    public string FullName {
-		    get {
-			    if (string.IsNullOrEmpty(this.MiddleName)) {
-				    return this.FirstName + " " + this.LastName;
-			    } else {
-				    return this.FirstName + " " + this.MiddleName + " " + this.LastName;
-			    }
-		    }
-		    set {
-			    string[] names = value.Split(' ');
-			    this.FirstName = names[0];
-			    if (names.Length == 2) {
-				    this.LastName = names[1];
-			    } else if (names.Length == 3) {
-				    this.MiddleName = names[1];
-				    this.LastName = names[2];
-			    } else {
-				    this.MiddleName = names[1];
-				    this.LastName = string.Join(" ", names, 2, names.Length - 2);
-			    }
-		    }
-	    }
+        public string FullName {
+            get {
+                if (string.IsNullOrEmpty(this.MiddleName)) {
+                    return this.FirstName + " " + this.LastName;
+                } else {
+                    return this.FirstName + " " + this.MiddleName + " " + this.LastName;
+                }
+            }
+            set {
+                string[] names = value.Split(' ');
+                this.FirstName = names[0];
+                if (names.Length == 2) {
+                    this.LastName = names[1];
+                } else if (names.Length == 3) {
+                    this.MiddleName = names[1];
+                    this.LastName = names[2];
+                } else {
+                    this.MiddleName = names[1];
+                    this.LastName = string.Join(" ", names, 2, names.Length - 2);
+                }
+            }
+        }
         public string Name
         {
             get
@@ -74,14 +74,14 @@ namespace SmartFormat.Tests
         public Address Address { get; set; }
 
         public List<Person> Friends { get; set; }
-	    public int NumberOfFriends {
-		    get { return this.Friends.Count; }
-	    }
+        public int NumberOfFriends {
+            get { return this.Friends.Count; }
+        }
 
-	    public override string ToString()
-	    {
-		    return LastName + ", " + FirstName;
-	    }
+        public override string ToString()
+        {
+            return LastName + ", " + FirstName;
+        }
 
         public Person Spouse { get; set; }
 
