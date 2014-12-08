@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Core.Parsing;
@@ -255,6 +252,15 @@ namespace SmartFormat.Tests
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.ErrorAction = ErrorAction.MaintainTokens;
             formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
+        }
+
+        [Test]
+        public void Formatter_AlignNull()
+        {
+            string name = null;
+            var obj = new { name = name };
+            var str2 = Smart.Format("Name: {name,-10}| Column 2", obj);
+            Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
         }
     }
 }

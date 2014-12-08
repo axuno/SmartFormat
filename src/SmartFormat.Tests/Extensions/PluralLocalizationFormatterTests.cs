@@ -1,11 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using SmartFormat.Core;
-using SmartFormat.Extensions;
 using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
 
 namespace SmartFormat.Tests
@@ -30,7 +25,7 @@ namespace SmartFormat.Tests
         public void Test_Default()
         {
             TestAllResults(
-				CultureInfo.CreateSpecificCulture("en-us"),
+                CultureInfo.CreateSpecificCulture("en-us"),
                 "There {0:is|are} {0} {0:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},
