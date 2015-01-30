@@ -1,11 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using SmartFormat.Core;
-using SmartFormat.Extensions;
 using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
 
 namespace SmartFormat.Tests
@@ -30,7 +25,7 @@ namespace SmartFormat.Tests
         public void Test_Default()
         {
             TestAllResults(
-				CultureInfo.CreateSpecificCulture("en-us"),
+                CultureInfo.CreateSpecificCulture("en-us"),
                 "There {0:is|are} {0} {0:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},
@@ -83,6 +78,28 @@ namespace SmartFormat.Tests
                     {1.5m, "Seçili nesneleri silmek istiyor musunuz?"},
                     {   2, "Seçili nesneleri silmek istiyor musunuz?"},
                     {  11, "Seçili nesneleri silmek istiyor musunuz?"},
+                });
+        }
+
+        [Test]
+        public void Test_Russian()
+        {
+            TestAllResults(
+                CultureInfo.GetCultureInfo("ru-RU"),
+                "Я купил {0} {0:банан|банана|бананов}.",
+                new ExpectedResults {
+                    {   0, "Я купил 0 бананов."},
+                    {   1, "Я купил 1 банан."},
+                    {   2, "Я купил 2 банана."},
+                    {  11, "Я купил 11 бананов."},
+                    {  20, "Я купил 20 бананов."},
+                    {  21, "Я купил 21 банан."},
+                    {  22, "Я купил 22 банана."},
+                    {  25, "Я купил 25 бананов."},
+                    {  120, "Я купил 120 бананов."},
+                    {  121, "Я купил 121 банан."},
+                    {  122, "Я купил 122 банана."},
+                    {  125, "Я купил 125 бананов."},
                 });
         }
 

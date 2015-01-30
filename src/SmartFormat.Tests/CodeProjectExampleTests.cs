@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-
 using NUnit.Framework;
-using SmartFormat.Core;
-using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.Utilities;
@@ -20,17 +14,17 @@ namespace SmartFormat.Tests
         private Person MakeQuentin()
         {
             var p = new Person() 
-			{
-				FullName = "Quentin Starin",
-				Birthday = DateTime.Today.AddYears(-30),
-				Address = new Address("101 1st Ave", "Minneapolis", States.Minnesota, "55401"),
-				Friends = new List<Person>
-					{
-						new Person() { FullName = "John Smith", Birthday = new DateTime(1978, 1, 1) },
-						new Person() { FullName = "Bob Johnson", Birthday = new DateTime(1957, 1, 1) },
-						new Person() { FullName = "Mary Meyer", Birthday = new DateTime(1990, 1, 1) },
-						new Person() { FullName = "Dr. Jamal Cornucopia", Birthday = new DateTime(1973, 1, 1) }
-					}
+            {
+                FullName = "Quentin Starin",
+                Birthday = DateTime.Today.AddYears(-30),
+                Address = new Address("101 1st Ave", "Minneapolis", States.Minnesota, "55401"),
+                Friends = new List<Person>
+                    {
+                        new Person() { FullName = "John Smith", Birthday = new DateTime(1978, 1, 1) },
+                        new Person() { FullName = "Bob Johnson", Birthday = new DateTime(1957, 1, 1) },
+                        new Person() { FullName = "Mary Meyer", Birthday = new DateTime(1990, 1, 1) },
+                        new Person() { FullName = "Dr. Jamal Cornucopia", Birthday = new DateTime(1973, 1, 1) }
+                    }
             };
 
             return p;
@@ -54,7 +48,7 @@ namespace SmartFormat.Tests
             var formatString = "{0} is {1} years old and has {2:N2} friends.";
             var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
-			var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
+            var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
             string actualOutput = Smart.Format(specificCulture, formatString, p.FirstName, p.Age, p.Friends.Count);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
@@ -68,8 +62,8 @@ namespace SmartFormat.Tests
             var formatString = "{FirstName} is {Age} years old and has {Friends.Count:N2} friends.";
             var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
-			var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
-			string actualOutput = Smart.Format(specificCulture, formatString, p);
+            var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
+            string actualOutput = Smart.Format(specificCulture, formatString, p);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -90,7 +84,7 @@ namespace SmartFormat.Tests
         public void BasicArray()
         {
             var data = new DateTime[] 
-				{
+                {
                     new DateTime(1999, 12, 31),
                     new DateTime(2010, 10, 10),
                     new DateTime(3000, 1, 1),
@@ -99,8 +93,8 @@ namespace SmartFormat.Tests
             var formatString = "All dates: {0:{:M/d/yyyy}| and }.";
             var expectedOutput = "All dates: 12/31/1999 and 10/10/2010 and 1/1/3000.";
 
-			var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
-			string actualOutput = Smart.Format(specificCulture, formatString, data);
+            var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
+            string actualOutput = Smart.Format(specificCulture, formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -135,19 +129,19 @@ namespace SmartFormat.Tests
         [Test]
         public void DotNotation_CaseInsensitive()
         {
-	        using (
-		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-	        {
-		        var p1 = MakeQuentin();
+            using (
+                new SmartSettingOverride(
+                    x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+                    x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
+            {
+                var p1 = MakeQuentin();
 
-		        var formatString = "{aDDress.ciTy}, {Address.sTate} {Address.ZiP}";
-		        var expectedOutput = "Minneapolis, Minnesota 55401";
+                var formatString = "{aDDress.ciTy}, {Address.sTate} {Address.ZiP}";
+                var expectedOutput = "Minneapolis, Minnesota 55401";
 
-		        string actualOutput = Smart.Format(formatString, p1);
-		        Assert.AreEqual(expectedOutput, actualOutput);
-	        }
+                string actualOutput = Smart.Format(formatString, p1);
+                Assert.AreEqual(expectedOutput, actualOutput);
+            }
         }
 
 
@@ -179,19 +173,19 @@ namespace SmartFormat.Tests
         [Test]
         public void NestingCollection_CaseInsensitive()
         {
-	        using (
-		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-	        {
-		        Size[] sizes = { new Size(1, 1), new Size(4, 3), new Size(16, 9) };
+            using (
+                new SmartSettingOverride(
+                    x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+                    x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
+            {
+                Size[] sizes = { new Size(1, 1), new Size(4, 3), new Size(16, 9) };
 
-		        var formatString = "{0:({widTh} x {hEIght})| and }";
-		        var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
+                var formatString = "{0:({widTh} x {hEIght})| and }";
+                var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
 
-		        string actualOutput = Smart.Format(formatString, sizes);
-		        Assert.AreEqual(expectedOutput, actualOutput);
-	        }
+                string actualOutput = Smart.Format(formatString, sizes);
+                Assert.AreEqual(expectedOutput, actualOutput);
+            }
         }
 
 
@@ -387,19 +381,19 @@ namespace SmartFormat.Tests
         [Test]
         public void ComplexConditionFirstMatchingCase_CaseInsensitive()
         {
-	        using (
-		        new SmartSettingOverride(
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-			        x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-	        {
-		        var p1 = new Person() { Birthday = DateTime.MinValue };
+            using (
+                new SmartSettingOverride(
+                    x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+                    x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
+            {
+                var p1 = new Person() { Birthday = DateTime.MinValue };
 
-		        var formatString = "{aGe::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
-		        var expectedOutput = "Senior Citizen";
+                var formatString = "{aGe::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
+                var expectedOutput = "Senior Citizen";
 
-		        string actualOutput = Smart.Format(formatString, p1);
-		        Assert.AreEqual(expectedOutput, actualOutput);
-	        }
+                string actualOutput = Smart.Format(formatString, p1);
+                Assert.AreEqual(expectedOutput, actualOutput);
+            }
         }
 
 
@@ -428,8 +422,8 @@ namespace SmartFormat.Tests
             var formatString = "{0:{:M/d/yyyy}|, |, and }.";
             var expectedOutput = "12/31/1999, 10/10/2010, and 1/1/3000.";
 
-	        var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
-	        string actualOutput = Smart.Format(specificCulture, formatString, data);
+            var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
+            string actualOutput = Smart.Format(specificCulture, formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 

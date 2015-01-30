@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using SmartFormat.Core;
 using SmartFormat.Tests.Common;
 
 namespace SmartFormat.Tests
@@ -68,9 +64,9 @@ namespace SmartFormat.Tests
 
                 string actual = null;
                 try
-				{
-					var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
-					actual = formatter.Format(specificCulture, format, args);
+                {
+                    var specificCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-us");
+                    actual = formatter.Format(specificCulture, format, args);
                     Assert.AreEqual(expected, actual);
                     Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
                 }
