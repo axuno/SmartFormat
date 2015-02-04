@@ -79,7 +79,7 @@ namespace SmartFormat.Extensions
                 
         private PluralFormatInfo.PluralRuleDelegate GetPluralRule(IFormatProvider provider)
         {
-            // Let's retirm the correct Plural Rule to use:
+            // Let's determine the correct Plural Rule to use:
             PluralFormatInfo pluralFormatInfo = null;
 
             // See if a custom PluralFormatInfo is available from the FormatProvider:
