@@ -49,6 +49,7 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Extensions\StringBuilderTests.cs" />
     <Compile Include="Extensions\DictionaryFormatterTests.cs">
       <SubType>Code</SubType>
     </Compile>

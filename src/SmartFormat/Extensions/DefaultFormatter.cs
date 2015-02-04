@@ -26,7 +26,7 @@ namespace SmartFormat.Extensions
             // If the object is null, we shouldn't write anything
             if (current == null)
             {
-                return;
+                current = "";
             }
 
 
