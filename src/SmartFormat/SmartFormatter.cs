@@ -97,7 +97,7 @@ namespace SmartFormat
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetExtension<T>() where T : class, ISource
+        public T GetSourceExtension<T>() where T : class, ISource
         {
             foreach (var extension in SourceExtensions)
             {
@@ -117,7 +117,7 @@ namespace SmartFormat
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetExtension<T>() where T : class, IFormatter
+        public T GetFormatterExtension<T>() where T : class, IFormatter
         {
             foreach (var extension in FormatterExtensions)
             {
