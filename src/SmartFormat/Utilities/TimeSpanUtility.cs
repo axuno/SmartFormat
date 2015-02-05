@@ -438,7 +438,7 @@ namespace SmartFormat.Utilities
     /// </summary>
     public class TimeTextInfo
     {
-        private PluralFormatInfo.PluralRuleDelegate PluralRule;
+        private PluralRules.PluralRuleDelegate PluralRule;
         private string[] week;
         private string[] day;
         private string[] hour;
@@ -453,7 +453,7 @@ namespace SmartFormat.Utilities
         private string[] ms;
         private string lessThan;
 
-        public TimeTextInfo(PluralFormatInfo.PluralRuleDelegate pluralRule, string[] week, string[] day, string[] hour, string[] minute, string[] second, string[] millisecond, string[] w, string[] d, string[] h, string[] m, string[] s, string[] ms, string lessThan)
+        public TimeTextInfo(PluralRules.PluralRuleDelegate pluralRule, string[] week, string[] day, string[] hour, string[] minute, string[] second, string[] millisecond, string[] w, string[] d, string[] h, string[] m, string[] s, string[] ms, string lessThan)
         {
             this.PluralRule = pluralRule;
             
@@ -487,7 +487,7 @@ namespace SmartFormat.Utilities
             this.lessThan = lessThan;
         }
 
-        private static string getValue(PluralFormatInfo.PluralRuleDelegate pluralRule, int value, string[] units)
+        private static string getValue(PluralRules.PluralRuleDelegate pluralRule, int value, string[] units)
         {
             // Get the plural index from the plural rule,
             // unless there's only 1 unit in the first place:
@@ -540,7 +540,7 @@ namespace SmartFormat.Utilities
             get
             {
                 return new TimeTextInfo(
-                    CommonLanguageRules.GetPluralRule("en"),
+                    PluralRules.GetPluralRule("en"),
                     new[] { "{0} week", "{0} weeks" }, 
                     new[] { "{0} day", "{0} days" }, 
                     new[] { "{0} hour", "{0} hours" },

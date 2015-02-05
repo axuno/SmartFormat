@@ -103,6 +103,48 @@ namespace SmartFormat.Tests
                 });
         }
 
+        [Test]
+        public void Test_Polish()
+        {
+            TestAllResults(
+                CultureInfo.GetCultureInfo("pl"),
+                "{0} {0:miesiąc|miesiące|miesięcy} temu",
+                new ExpectedResults {
+                    {   0, "0 miesięcy temu"},
+                    {   1, "1 miesiąc temu"},
+                    {   2, "2 miesiące temu"},
+                    {   3, "3 miesiące temu"},
+                    {   4, "4 miesiące temu"},
+                    {   5, "5 miesięcy temu"},
+                    {   6, "6 miesięcy temu"},
+                    {   7, "7 miesięcy temu"},
+                    {   8, "8 miesięcy temu"},
+                    {   9, "9 miesięcy temu"},
+                    {  10, "10 miesięcy temu"},
+                    {  11, "11 miesięcy temu"},
+                    {  12, "12 miesięcy temu"},
+                    {  13, "13 miesięcy temu"},
+                    {  14, "14 miesięcy temu"},
+                    {  15, "15 miesięcy temu"},
+                    {  16, "16 miesięcy temu"},
+                    {  17, "17 miesięcy temu"},
+                    {  18, "18 miesięcy temu"},
+                    {  19, "19 miesięcy temu"},
+                    {  20, "20 miesięcy temu"},
+                    {  21, "21 miesięcy temu"},
+                    {  22, "22 miesiące temu"},
+                    {  23, "23 miesiące temu"},
+                    {  24, "24 miesiące temu"},
+                    {  25, "25 miesięcy temu"},
+                    {  100, "100 miesięcy temu"},
+                    {  101, "101 miesięcy temu"},
+                    {  102, "102 miesiące temu"},
+                    {  103, "103 miesiące temu"},
+                    {  104, "104 miesiące temu"},
+                    {  105, "105 miesięcy temu"},
+                });
+        }
+
 
     }
 }

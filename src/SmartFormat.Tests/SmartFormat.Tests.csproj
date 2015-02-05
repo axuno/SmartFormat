@@ -49,6 +49,7 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Core\FormatterTests.cs" />
     <Compile Include="Extensions\StringBuilderTests.cs" />
     <Compile Include="Extensions\DictionaryFormatterTests.cs">
       <SubType>Code</SubType>
@@ -60,7 +61,7 @@
     <Compile Include="TestUtils\EnumerableExtensions.cs" />
     <Compile Include="TestUtils\ExceptionCollection.cs" />
     <Compile Include="Extensions\ConditionalFormatterTests.cs" />
-    <Compile Include="Core\CoreTests.cs" />
+    <Compile Include="Core\ParserTests.cs" />
     <Compile Include="Utilities\FormatDelegateTests.cs" />
     <Compile Include="PerformanceTests.cs" />
     <Compile Include="Extensions\PluralLocalizationFormatterTests.cs">
