@@ -95,6 +95,25 @@ namespace SmartFormat.Tests
             }
         }
 
+        [Test]
+        public void Parser_UseAlternativeBraces()
+        {
+            var parser = GetRegularParser();
+            parser.UseAlternativeBraces('[', ']');
+            var format = "aaa [bbb] [ccc:ddd] {eee} [fff:{ggg}] [hhh:[iii:[] ] ] jjj";
+            var parsed = parser.ParseFormat(format);
+
+            Assert.AreEqual(9, parsed.Items.Count);
+            
+            Assert.AreEqual("bbb", ((Placeholder)parsed.Items[1]).Selectors[0].Text);
+            Assert.AreEqual("ccc", ((Placeholder)parsed.Items[3]).Selectors[0].Text);
+            Assert.AreEqual("ddd", ((Placeholder)parsed.Items[3]).Format.Items[0].Text);
+            Assert.AreEqual(" {eee} ", ((LiteralText)parsed.Items[4]).Text);
+            Assert.AreEqual("{ggg}", ((Placeholder)parsed.Items[5]).Format.Items[0].Text);
+            Assert.AreEqual("iii", ((Placeholder)((Placeholder)parsed.Items[7]).Format.Items[0]).Selectors[0].Text);
+            
+        }
+
 
 
         private static Parser GetRegularParser()

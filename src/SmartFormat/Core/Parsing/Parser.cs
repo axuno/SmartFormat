@@ -114,7 +114,17 @@
         {
             this.AlternativeEscaping = false;
         }
-                
+
+
+        private char OpeningBrace = '{';
+        private char ClosingBrace = '}';
+
+        public void UseAlternativeBraces(char opening, char closing)
+        {
+            OpeningBrace = opening;
+            ClosingBrace = closing;
+        }
+        
         #endregion
 
         #region: Parsing :
@@ -137,7 +147,7 @@
                 var c = format[i];
                 if (currentPlaceholder == null)
                 {
-                    if (c == '{')
+                    if (c == OpeningBrace)
                     {
                         // Finish the last text item:
                         if (i != lastI)
@@ -148,7 +158,7 @@
                         if (!this.AlternativeEscaping)
                         {
                             var nextI = lastI;
-                            if (nextI < length && format[nextI] == '{')
+                            if (nextI < length && format[nextI] == OpeningBrace)
                             {
                                 i++;
                                 continue;
@@ -163,7 +173,7 @@
                         operatorIndex = i+1;
                         selectorIndex = 0;
                     }
-                    else if (c == '}')
+                    else if (c == ClosingBrace)
                     {
                         // Finish the last text item:
                         if (i != lastI)
@@ -174,7 +184,7 @@
                         if (!this.AlternativeEscaping)
                         {
                             var nextI = lastI;
-                            if (nextI < length && format[nextI] == '}')
+                            if (nextI < length && format[nextI] == ClosingBrace)
                             {
                                 i++;
                                 continue;
@@ -197,7 +207,7 @@
                     {
                         // See if the next char is a brace that should be escaped:
                         var nextI = i + 1;
-                        if (nextI < length && (format[nextI] == '{' || format[nextI] == '}'))
+                        if (nextI < length && (format[nextI] == OpeningBrace || format[nextI] == ClosingBrace))
                         {
                             // Finish the last text item:
                             if (i != lastI)
@@ -243,7 +253,7 @@
                         current = currentPlaceholder.Format;
                         currentPlaceholder = null;
                     }
-                    else if (c == '}')
+                    else if (c == ClosingBrace)
                     {
                         // Add the selector:
                         if (i != lastI)
