@@ -36,10 +36,11 @@ namespace SmartFormat
 
         #endregion
 
-        #region: Extension Registration :
+        #region: Extension Registry :
 
         public List<ISource> SourceExtensions { get; private set; }
         public List<IFormatter> FormatterExtensions { get; private set; }
+
 
 		/// <summary>
 		/// Adds each extensions to this formatter.
@@ -87,6 +88,47 @@ namespace SmartFormat
 		{
 			FormatterExtensions.AddRange(formatterExtensions);
 		}
+        
+
+        /// <summary>
+        /// Searches for a Source Extension of the given type, and returns it.
+        /// This can be used to easily find and configure extensions.
+        /// Returns null if the type cannot be found.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetSourceExtension<T>() where T : class, ISource
+        {
+            foreach (var extension in SourceExtensions)
+            {
+                var asType = extension as T;
+                if (asType != null)
+                {
+                    return asType;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Searches for a Formatter Extension of the given type, and returns it.
+        /// This can be used to easily find and configure extensions.
+        /// Returns null if the type cannot be found.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetFormatterExtension<T>() where T : class, IFormatter
+        {
+            foreach (var extension in FormatterExtensions)
+            {
+                var asType = extension as T;
+                if (asType != null)
+                {
+                    return asType;
+                }
+            }
+            return null;
+        }
 
         #endregion
 

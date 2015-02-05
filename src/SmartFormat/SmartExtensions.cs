@@ -24,7 +24,7 @@ namespace SmartFormat
         /// <param name="args">A list of arguments to be used in formatting</param>
         public static void AppendLineSmart(this StringBuilder sb, string format, params object[] args)
         {
-            sb.AppendSmart(format, args);            
+            AppendSmart(sb, format, args);
             sb.AppendLine();
         }
 
@@ -40,6 +40,16 @@ namespace SmartFormat
         {
             var output = new TextWriterOutput(writer);
             Smart.Default.FormatInto(output, format, args);
+        }
+
+        /// <summary> Writes out a formatted string, using the same semantics as Smart.Format. </summary>
+        /// <param name="writer">The TextWriter that will be used for output</param>
+        /// <param name="format">The template that defines how the arguments are formatted</param>
+        /// <param name="args">A list of arguments to be used in formatting</param>
+        public static void WriteLineSmart(this System.IO.TextWriter writer, string format, params object[] args)
+        {
+            WriteSmart(writer, format, args);
+            writer.WriteLine();
         }
 
         #endregion
