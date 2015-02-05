@@ -9,7 +9,7 @@ namespace SmartFormat.Utilities
         // The following language codes came from:
         // http://www.loc.gov/standards/iso639-2/php/code_list.php
 
-        public static PluralFormatInfo.PluralRuleDelegate GetPluralRule(string twoLetterISOLanguageName)
+        public static PluralRules.PluralRuleDelegate GetPluralRule(string twoLetterISOLanguageName)
         {
             switch (twoLetterISOLanguageName)
             {

@@ -4,10 +4,25 @@ namespace SmartFormat.Utilities
 {
     public static class PluralRules
     {
+        /// <summary>
+        /// This delegate determines which singular or plural word 
+        /// should be chosen for the given quantity.
+        /// 
+        /// This allows each language to define its own behavior 
+        /// for singular or plural words.
+        /// 
+        /// It should return the index of the correct parameter.
+        /// </summary>
+        /// <param name="value">The value that is being referenced by the singular or plural words</param>
+        /// <param name="pluralCount"></param>
+        /// <returns></returns>
+        public delegate int PluralRuleDelegate(decimal value, int pluralCount);
+
+        
         /// <summary>Construct a ruleset for the language code.</summary>
         /// <param name="twoLetterISOLanguageName">The language code in two-letter ISO-639 format.</param>
-        /// <remarks>The pluralisation rules are taken from <see cref="http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/language_plural_rules.html"/>.</remarks>
-        public static PluralFormatInfo.PluralRuleDelegate GetPluralRule(string twoLetterISOLanguageName)
+        /// <remarks>The pluralization rules are taken from <see cref="http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/language_plural_rules.html"/>.</remarks>
+        public static PluralRuleDelegate GetPluralRule(string twoLetterISOLanguageName)
         {
             switch (twoLetterISOLanguageName)
             {

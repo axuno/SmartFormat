@@ -11,7 +11,6 @@ namespace SmartFormat.Extensions
 {
     public class PluralLocalizationFormatter : IFormatter
     {
-        private readonly PluralFormatInfo defaultPluralFormatInfo;
         /// <summary>
         /// Initializes the plugin with rules for many common languages.
         /// If no CultureInfo is supplied to the formatter, the
@@ -19,15 +18,52 @@ namespace SmartFormat.Extensions
         /// </summary>
         public PluralLocalizationFormatter(string defaultTwoLetterISOLanguageName)
         {
-            this.defaultPluralFormatInfo = new CommonLanguagesPluralFormatInfo(defaultTwoLetterISOLanguageName);
+            this.DefaultTwoLetterISOLanguageName = defaultTwoLetterISOLanguageName;
         }
-        /// <summary>
-        /// Initializes the plugin with a custom default rule provider.
-        /// </summary>
-        /// <param name="defaultPluralFormatInfo"></param>
-        public PluralLocalizationFormatter(PluralFormatInfo defaultPluralFormatInfo)
+
+        private PluralRules.PluralRuleDelegate defaultPluralRule;
+        private string defaultTwoLetterISOLanguageName;
+        public string DefaultTwoLetterISOLanguageName
         {
-            this.defaultPluralFormatInfo = defaultPluralFormatInfo;
+            get
+            {
+                return this.defaultTwoLetterISOLanguageName;
+            }
+            set
+            {
+                this.defaultTwoLetterISOLanguageName = value;
+                this.defaultPluralRule = PluralRules.GetPluralRule(value);
+            }
+        }
+
+        private PluralRules.PluralRuleDelegate GetPluralRule(IFormatProvider provider)
+        {
+            // See if a CustomPluralRuleProvider is available from the FormatProvider:
+            if (provider != null)
+            {
+                var pluralRuleProvider = (CustomPluralRuleProvider) provider.GetFormat(typeof (CustomPluralRuleProvider));
+                if (pluralRuleProvider != null)
+                {
+                    return pluralRuleProvider.GetPluralRule();
+                }
+            }
+
+            // Use the CultureInfo, if provided:
+            var cultureInfo = provider as CultureInfo;
+            if (cultureInfo != null)
+            {
+                var culturePluralRule = PluralRules.GetPluralRule(cultureInfo.TwoLetterISOLanguageName);
+                return culturePluralRule;
+            }
+
+
+            // Use the default, if provided:
+            if (this.defaultPluralRule != null)
+            {
+                return this.defaultPluralRule;
+            } 
+
+            return null;
         }
 
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
@@ -78,92 +114,28 @@ namespace SmartFormat.Extensions
             handled = true;
         }
                 
-        private PluralFormatInfo.PluralRuleDelegate GetPluralRule(IFormatProvider provider)
-        {
-            // Let's determine the correct Plural Rule to use:
-            PluralFormatInfo pluralFormatInfo = null;
-
-            // See if a custom PluralFormatInfo is available from the FormatProvider:
-            if (provider != null)
-            {
-                pluralFormatInfo = (PluralFormatInfo)provider.GetFormat(typeof (PluralFormatInfo));
-            }
-
-            // If no custom PluralFormatInfo, let's use our default:
-            if (pluralFormatInfo == null)
-            {
-                pluralFormatInfo = defaultPluralFormatInfo;
-            }
-
-            // Only continue if we have a PluralFormatInfo:
-            if (pluralFormatInfo == null)
-            {
-                return null;
-            }
-
-
-            // Get the culture, only if it was provided:
-            var cultureInfo = provider as CultureInfo;
-
-            // Retrieve the plural rule from the PluralFormatInfo:
-            return pluralFormatInfo.GetPluralRule(cultureInfo);
-        }
-
     }
 
-    public class PluralFormatInfo : IFormatProvider
+    /// <summary>
+    /// Use this class to provide custom plural rules to Smart.Format
+    /// </summary>
+    public class CustomPluralRuleProvider : IFormatProvider
     {
         public object GetFormat(Type formatType)
         {
-            return (formatType == typeof(PluralFormatInfo)) ? this : null;
+            return (formatType == typeof(CustomPluralRuleProvider)) ? this : null;
         }
 
-        /// <summary>
-        /// This delegate determines which singular or plural word 
-        /// should be chosen for the given quantity.
-        /// 
-        /// This allows each language to define its own behavior 
-        /// for singular or plural words.
-        /// 
-        /// It should return the index of the correct parameter.
-        /// </summary>
-        /// <param name="value">The value that is being referenced by the singular or plural words</param>
-        /// <param name="pluralCount"></param>
-        /// <returns></returns>
-        public delegate int PluralRuleDelegate(decimal value, int pluralCount);
-
-        private readonly PluralRuleDelegate pluralRule;
-        public PluralFormatInfo(PluralRuleDelegate pluralRule)
+        private readonly PluralRules.PluralRuleDelegate pluralRule;
+        public CustomPluralRuleProvider(PluralRules.PluralRuleDelegate pluralRule)
         {
             this.pluralRule = pluralRule;
         }
 
-        public virtual PluralRuleDelegate GetPluralRule(CultureInfo culture)
+        public PluralRules.PluralRuleDelegate GetPluralRule()
         {
             return pluralRule;
         }
     }
 
-    public class CommonLanguagesPluralFormatInfo : PluralFormatInfo
-    {
-        private string defaultTwoLetterISOLanguageName;
-        public CommonLanguagesPluralFormatInfo(string defaultTwoLetterIsoLanguageName) : base(null)
-        {
-            this.defaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
-        }
-
-        #region: Common Language Rules :
-
-        public override PluralRuleDelegate GetPluralRule(CultureInfo cultureInfo)
-        {
-            if (cultureInfo != null)
-            {
-                return PluralRules.GetPluralRule(cultureInfo.TwoLetterISOLanguageName);
-            }
-            return PluralRules.GetPluralRule(defaultTwoLetterISOLanguageName);
-        }
-
-        #endregion
-
-    }
 }
