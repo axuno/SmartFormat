@@ -27,7 +27,7 @@ namespace SmartFormat.Extensions
         public TimeFormatter(string defaultTwoLetterLanguageName)
         {
             this.DefaultFormatOptions = TimeSpanUtility.DefaultFormatOptions;
-            this.defaultTwoLetterISOLanguageName = defaultTwoLetterLanguageName;
+            this.DefaultTwoLetterISOLanguageName = defaultTwoLetterLanguageName;
         }
 
         #endregion
@@ -35,7 +35,7 @@ namespace SmartFormat.Extensions
         #region Defaults
 
         public TimeSpanFormatOptions DefaultFormatOptions { get; set; }
-        private string defaultTwoLetterISOLanguageName;
+        public string DefaultTwoLetterISOLanguageName { get; set; };
 
         #endregion
 
@@ -94,7 +94,7 @@ namespace SmartFormat.Extensions
             }
 
             // Return the default if the provider couldn't provide:
-            return CommonLanguagesTimeTextInfo.GetTimeTextInfo(defaultTwoLetterISOLanguageName);
+            return CommonLanguagesTimeTextInfo.GetTimeTextInfo(DefaultTwoLetterISOLanguageName);
         }
 
         #endregion
