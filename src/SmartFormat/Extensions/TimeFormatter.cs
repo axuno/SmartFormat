@@ -35,7 +35,7 @@ namespace SmartFormat.Extensions
         #region Defaults
 
         public TimeSpanFormatOptions DefaultFormatOptions { get; set; }
-        public string DefaultTwoLetterISOLanguageName { get; set; };
+        public string DefaultTwoLetterISOLanguageName { get; set; }
 
         #endregion
 
