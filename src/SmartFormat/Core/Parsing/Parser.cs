@@ -25,14 +25,14 @@
         /// This allows optimized alpha-character detection.
         /// Specify any additional selector chars in AllowedSelectorChars.
         /// </summary>
-        private bool AlphanumericSelectors = false;
+        private bool alphanumericSelectors = false;
         /// <summary>
         /// A list of allowable selector characters,
         /// to support additional selector syntaxes such as math.
         /// Digits are always included, and letters can be included 
         /// with AlphanumericSelectors.
         /// </summary>
-        private string AllowedSelectorChars = "";
+        private string allowedSelectorChars = "";
 
         /// <summary>
         /// A list of characters that come between selectors.
@@ -40,26 +40,26 @@
         /// or even math symbols.
         /// By default, there are no operators.
         /// </summary>
-        private string Operators = "";
+        private string operators = "";
 
         /// <summary>
         /// If false, double-curly braces are escaped.
         /// If true, the AlternativeEscapeChar is used for escaping braces.
         /// </summary>
-        private bool AlternativeEscaping = false;
+        private bool alternativeEscaping = false;
 
         /// <summary>
         /// If AlternativeEscaping is true, then this character is
         /// used to escape curly braces.
         /// </summary>
-        private char AlternativeEscapeChar = '\\';
+        private char alternativeEscapeChar = '\\';
 
         /// <summary>
         /// Includes a-z and A-Z in the list of allowed selector chars.
         /// </summary>
         public void AddAlphanumericSelectors()
         {
-            AlphanumericSelectors = true;
+            alphanumericSelectors = true;
         }
         /// <summary>
         /// Adds specific characters to the allowed selector chars.
@@ -69,9 +69,9 @@
         {
             foreach (var c in chars)
             {
-                if (AllowedSelectorChars.IndexOf(c) == -1)
+                if (allowedSelectorChars.IndexOf(c) == -1)
                 {
-                    AllowedSelectorChars += c;
+                    allowedSelectorChars += c;
                 }
             }
 
@@ -86,9 +86,9 @@
         {
             foreach (var c in chars)
             {
-                if (Operators.IndexOf(c) == -1)
+                if (operators.IndexOf(c) == -1)
                 {
-                    Operators += c;
+                    operators += c;
                 }
             }
         }
@@ -101,8 +101,8 @@
         /// <param name="alternativeEscapeChar"></param>
         public void UseAlternativeEscapeChar(char alternativeEscapeChar)
         {
-            this.AlternativeEscapeChar = alternativeEscapeChar;
-            this.AlternativeEscaping = true;
+            this.alternativeEscapeChar = alternativeEscapeChar;
+            this.alternativeEscaping = true;
         }
         /// <summary>
         /// [Default] 
@@ -112,17 +112,17 @@
         /// </summary>
         public void UseBraceEscaping()
         {
-            this.AlternativeEscaping = false;
+            this.alternativeEscaping = false;
         }
 
 
-        private char OpeningBrace = '{';
-        private char ClosingBrace = '}';
+        private char openingBrace = '{';
+        private char closingBrace = '}';
 
         public void UseAlternativeBraces(char opening, char closing)
         {
-            OpeningBrace = opening;
-            ClosingBrace = closing;
+            openingBrace = opening;
+            closingBrace = closing;
         }
         
         #endregion
@@ -138,6 +138,11 @@
             // Store parsing errors until the end:
             var parsingErrors = new ParsingErrors(result);
 
+			// Cache properties:
+			var openingBrace = this.openingBrace;
+			var closingBrace = this.closingBrace;
+
+
             int nestedDepth = 0;
             int lastI = 0;
             int operatorIndex = 0;
@@ -145,9 +150,9 @@
             for (int i = 0, length = format.Length; i < length; i++)
             {
                 var c = format[i];
-                if (currentPlaceholder == null)
+	            if (currentPlaceholder == null)
                 {
-                    if (c == OpeningBrace)
+	                if (c == openingBrace)
                     {
                         // Finish the last text item:
                         if (i != lastI)
@@ -155,10 +160,10 @@
                         lastI = i + 1;
 
                         // See if this brace should be escaped:
-                        if (!this.AlternativeEscaping)
+                        if (!this.alternativeEscaping)
                         {
                             var nextI = lastI;
-                            if (nextI < length && format[nextI] == OpeningBrace)
+                            if (nextI < length && format[nextI] == openingBrace)
                             {
                                 i++;
                                 continue;
@@ -173,7 +178,7 @@
                         operatorIndex = i+1;
                         selectorIndex = 0;
                     }
-                    else if (c == ClosingBrace)
+                    else if (c == closingBrace)
                     {
                         // Finish the last text item:
                         if (i != lastI)
@@ -181,10 +186,10 @@
                         lastI = i + 1;
 
                         // See if this brace should be escaped:
-                        if (!this.AlternativeEscaping)
+                        if (!this.alternativeEscaping)
                         {
                             var nextI = lastI;
-                            if (nextI < length && format[nextI] == ClosingBrace)
+                            if (nextI < length && format[nextI] == closingBrace)
                             {
                                 i++;
                                 continue;
@@ -203,11 +208,11 @@
                         current.parent.endIndex = i + 1;
                         current = current.parent.parent;
                     }
-                    else if (this.AlternativeEscaping && c == this.AlternativeEscapeChar)
+                    else if (this.alternativeEscaping && c == this.alternativeEscapeChar)
                     {
                         // See if the next char is a brace that should be escaped:
                         var nextI = i + 1;
-                        if (nextI < length && (format[nextI] == OpeningBrace || format[nextI] == ClosingBrace))
+                        if (nextI < length && (format[nextI] == openingBrace || format[nextI] == closingBrace))
                         {
                             // Finish the last text item:
                             if (i != lastI)
@@ -222,7 +227,7 @@
                 else
                 {
                     // Placeholder is NOT null, so that means we're parsing the selectors:
-                    if (Operators.IndexOf(c) != -1)
+                    if (operators.IndexOf(c) != -1)
                     {
                         // Add the selector:
                         if (i != lastI)
@@ -237,14 +242,14 @@
                     else if (c == ':')
                     {
                         // Add the selector:
-                        if (i != lastI)
+	                    if (i != lastI)
+	                    {
                             currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
+	                    }
                         else if (operatorIndex != i)
                         {
                             // There are trailing operators.  For now, this is an error.
                             parsingErrors.AddIssue(current, "There are trailing operators in the selector", operatorIndex, i);
-                            //var issue = "There are trailing operators in the selector";
-                            //ParserError(format, operatorIndex, issue, result);
                         }
                         lastI = i + 1;
 
@@ -253,7 +258,7 @@
                         current = currentPlaceholder.Format;
                         currentPlaceholder = null;
                     }
-                    else if (c == ClosingBrace)
+                    else if (c == closingBrace)
                     {
                         // Add the selector:
                         if (i != lastI)
@@ -262,7 +267,6 @@
                         {
                             // There are trailing operators.  For now, this is an error.
                             parsingErrors.AddIssue(current, "There are trailing operators in the selector", operatorIndex, i);
-                            //ParserError(format, operatorIndex, "There are trailing operators in the selector", result);
                         }
                         lastI = i + 1;
 
@@ -277,14 +281,13 @@
                         // Let's make sure the selector characters are valid:
                         // Make sure it's alphanumeric:
                         if (('0' <= c && c <= '9')
-                         || (AlphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'))
-                         || (AllowedSelectorChars.IndexOf(c) != -1))
+                         || (alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'))
+                         || (allowedSelectorChars.IndexOf(c) != -1))
                         { }
                         else
                         {
                             // Invalid character in the selector.
                             parsingErrors.AddIssue(current, "Invalid character in the selector", i, i + 1);
-                            //ParserError(format, i, "Invalid character in the selector", result);
                         }
                     }
                 }
@@ -297,7 +300,6 @@
             // Check that the format is finished:
             if (current.parent != null || currentPlaceholder != null)
             {
-                //ParserError(format, format.Length, "Format string is missing a closing brace", result);
                 parsingErrors.AddIssue(current, "Format string is missing a closing brace", format.Length, format.Length);
                 current.endIndex = format.Length;
                 while (current.parent != null)
@@ -308,7 +310,7 @@
             }
 
             // Check if there were any parsing errors:
-            if (parsingErrors.HasIssues && ErrorAction == Core.ErrorAction.ThrowError) throw parsingErrors;
+            if (parsingErrors.HasIssues && ErrorAction == ErrorAction.ThrowError) throw parsingErrors;
 
             return result;
         }
@@ -318,26 +320,6 @@
         #region: Errors :
 
         public ErrorAction ErrorAction { get; set; }
-
-        ///// <summary>
-        ///// Determines what to do, based on the ErrorAction.
-        ///// </summary>
-        ///// <param name="format"></param>
-        ///// <param name="index"></param>
-        ///// <param name="issue"></param>
-        ///// <param name="formatSoFar"></param>
-        //public void ParserError(string format, int index, string issue, Format formatSoFar)
-        //{
-        //    switch (this.ErrorAction)
-        //    {
-        //        case ErrorAction.ThrowError:
-        //            throw new FormatException(format, index, issue, formatSoFar);
-        //        case ErrorAction.OutputErrorInResult:
-        //            // We don't really have a way to output the error in the result.
-        //        case ErrorAction.Ignore:
-        //            return;
-        //    }
-        //}
 
         #endregion
 
