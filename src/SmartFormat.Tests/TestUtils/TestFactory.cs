@@ -29,20 +29,20 @@ namespace SmartFormat.Tests
 		public static List<object> GetItems()
 		{
 			return new List<object>
-				       {
-					       new
-						       {
-							       Name = "Table",
-							       Price = 119.99,
-							       Components = new List<object> { new { Name = "Screws", Count = 25 }, new { Name = "Pillow", Count = 1 } }
-						       },
-					       new
-						       {
-							       Name = "Chair",
-							       Price = 49,
-							       Components = new List<object> { new { Name = "Screws", Count = 12 }, new { Name = "Leg", Count = 4 } }
-						       }
-				       };
+					   {
+						   new
+							   {
+								   Name = "Table",
+								   Price = 119.99,
+								   Components = new List<object> { new { Name = "Screws", Count = 25 }, new { Name = "Pillow", Count = 1 } }
+							   },
+						   new
+							   {
+								   Name = "Chair",
+								   Price = 49,
+								   Components = new List<object> { new { Name = "Screws", Count = 12 }, new { Name = "Leg", Count = 4 } }
+							   }
+					   };
 		}
 	}
 }

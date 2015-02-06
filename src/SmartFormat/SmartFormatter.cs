@@ -9,37 +9,37 @@ using FormatException = SmartFormat.Core.FormatException;
 
 namespace SmartFormat
 {
-    /// <summary>
-    /// This class contains the Format method that constructs 
-    /// the composite string by invoking each extension.
-    /// </summary>
-    public class SmartFormatter
-    {
-        #region: Constructor :
+	/// <summary>
+	/// This class contains the Format method that constructs
+	/// the composite string by invoking each extension.
+	/// </summary>
+	public class SmartFormatter
+	{
+		#region: Constructor :
 
-        public SmartFormatter()
-            #if DEBUG
-            : this(Core.ErrorAction.ThrowError)
-            #else
-            : this(ErrorAction.Ignore)
-            #endif
-        {
-        }
+		public SmartFormatter()
+			#if DEBUG
+			: this(Core.ErrorAction.ThrowError)
+			#else
+			: this(ErrorAction.Ignore)
+			#endif
+		{
+		}
 
-        public SmartFormatter(ErrorAction errorAction)
-        {
-            this.Parser = new Parser(errorAction);
-            this.ErrorAction = errorAction;
-            this.SourceExtensions = new List<ISource>();
-            this.FormatterExtensions = new List<IFormatter>();
-        }
+		public SmartFormatter(ErrorAction errorAction)
+		{
+			this.Parser = new Parser(errorAction);
+			this.ErrorAction = errorAction;
+			this.SourceExtensions = new List<ISource>();
+			this.FormatterExtensions = new List<IFormatter>();
+		}
 
-        #endregion
+		#endregion
 
-        #region: Extension Registry :
+		#region: Extension Registry :
 
-        public List<ISource> SourceExtensions { get; private set; }
-        public List<IFormatter> FormatterExtensions { get; private set; }
+		public List<ISource> SourceExtensions { get; private set; }
+		public List<IFormatter> FormatterExtensions { get; private set; }
 
 
 		/// <summary>
@@ -88,213 +88,213 @@ namespace SmartFormat
 		{
 			FormatterExtensions.InsertRange(0, formatterExtensions);
 		}
-        
 
-        /// <summary>
-        /// Searches for a Source Extension of the given type, and returns it.
-        /// This can be used to easily find and configure extensions.
-        /// Returns null if the type cannot be found.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T GetSourceExtension<T>() where T : class, ISource
-        {
+
+		/// <summary>
+		/// Searches for a Source Extension of the given type, and returns it.
+		/// This can be used to easily find and configure extensions.
+		/// Returns null if the type cannot be found.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public T GetSourceExtension<T>() where T : class, ISource
+		{
 			return SourceExtensions.OfType<T>().First();
-        }
+		}
 
-        /// <summary>
-        /// Searches for a Formatter Extension of the given type, and returns it.
-        /// This can be used to easily find and configure extensions.
-        /// Returns null if the type cannot be found.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T GetFormatterExtension<T>() where T : class, IFormatter
-        {
+		/// <summary>
+		/// Searches for a Formatter Extension of the given type, and returns it.
+		/// This can be used to easily find and configure extensions.
+		/// Returns null if the type cannot be found.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public T GetFormatterExtension<T>() where T : class, IFormatter
+		{
 			return FormatterExtensions.OfType<T>().First();
-        }
+		}
 
-        #endregion
+		#endregion
 
-        #region: Properties :
+		#region: Properties :
 
-        public Parser Parser { get; set; }
-        public ErrorAction ErrorAction { get; set; }
-        
-        #endregion
+		public Parser Parser { get; set; }
+		public ErrorAction ErrorAction { get; set; }
 
-        #region: Format Overloads :
+		#endregion
 
-        public string Format(string format, params object[] args)
-        {
-            return Format(null, format, args);
-        }
+		#region: Format Overloads :
 
-        public string Format(IFormatProvider provider, string format, params object[] args)
-        {
-            var output = new StringOutput(format.Length + args.Length * 8);
-            
-            var formatParsed = Parser.ParseFormat(format);
-            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, null, provider);
-            Format(output, formatParsed, current, formatDetails);
+		public string Format(string format, params object[] args)
+		{
+			return Format(null, format, args);
+		}
 
-            return output.ToString();
-        }
+		public string Format(IFormatProvider provider, string format, params object[] args)
+		{
+			var output = new StringOutput(format.Length + args.Length * 8);
 
-        public void FormatInto(IOutput output, string format, params object[] args)
-        {
-            var formatParsed = Parser.ParseFormat(format);
-            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, null, null);
-            Format(output, formatParsed, current, formatDetails);
-        }
+			var formatParsed = Parser.ParseFormat(format);
+			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+			var formatDetails = new FormatDetails(this, args, null, provider);
+			Format(output, formatParsed, current, formatDetails);
 
-        public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
-        {
-            var output = new StringOutput(format.Length + args.Length * 8);
+			return output.ToString();
+		}
 
-            if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
-            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, cache, null);
-            Format(output, cache.Format, current, formatDetails);
+		public void FormatInto(IOutput output, string format, params object[] args)
+		{
+			var formatParsed = Parser.ParseFormat(format);
+			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+			var formatDetails = new FormatDetails(this, args, null, null);
+			Format(output, formatParsed, current, formatDetails);
+		}
 
-            return output.ToString();
-        }
+		public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
+		{
+			var output = new StringOutput(format.Length + args.Length * 8);
 
-        public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
-        {
-            if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
-            object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, args, cache, null);
-            Format(output, cache.Format, current, formatDetails);
-        }
+			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
+			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+			var formatDetails = new FormatDetails(this, args, cache, null);
+			Format(output, cache.Format, current, formatDetails);
 
-        #endregion
+			return output.ToString();
+		}
 
-        #region: Format :
+		public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
+		{
+			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
+			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+			var formatDetails = new FormatDetails(this, args, cache, null);
+			Format(output, cache.Format, current, formatDetails);
+		}
 
-        public void Format(IOutput output, Format format, object current, FormatDetails formatDetails)
-        {
-            // Before we start, make sure we have at least one source extension and one formatter extension:
-            CheckForExtensions();
-            Placeholder originalPlaceholder = formatDetails.Placeholder;
-            foreach (var item in format.Items)
-            {
-                var literalItem = item as LiteralText;
-                if (literalItem != null)
-                {
-                    formatDetails.Placeholder = originalPlaceholder;
-                    output.Write(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex, formatDetails);
-                    continue;
-                } // Otherwise, the item is a placeholder.
+		#endregion
 
-                var placeholder = (Placeholder)item;
-                object context = current;
-                formatDetails.Placeholder = placeholder;
+		#region: Format :
 
-                bool handled;
-                // Evaluate the selectors:
-                foreach (var selector in placeholder.Selectors)
-                {
-                    handled = false;
-                    var result = context;
-                    InvokeSourceExtensions(context, selector, ref handled, ref result, formatDetails);
-                    if (!handled)
-                    {
-                        // The selector wasn't handled, which means it isn't valid
-                        FormatError(selector, string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector.startIndex, output, formatDetails);
-                        context = null;
-                        break;
-                    }
-                    context = result;
-                }
+		public void Format(IOutput output, Format format, object current, FormatDetails formatDetails)
+		{
+			// Before we start, make sure we have at least one source extension and one formatter extension:
+			CheckForExtensions();
+			Placeholder originalPlaceholder = formatDetails.Placeholder;
+			foreach (var item in format.Items)
+			{
+				var literalItem = item as LiteralText;
+				if (literalItem != null)
+				{
+					formatDetails.Placeholder = originalPlaceholder;
+					output.Write(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex, formatDetails);
+					continue;
+				} // Otherwise, the item is a placeholder.
 
-                // Evaluate the format:
-                handled = false;
-                try
-                {
-                    InvokeFormatterExtensions(context, placeholder.Format, ref handled, output, formatDetails);
-                }
-                catch (Exception ex)
-                {
-                    // An error occurred while formatting.
-                    var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
-                    FormatError(item, ex, errorIndex, output, formatDetails);
-                    continue;
-                }
+				var placeholder = (Placeholder)item;
+				object context = current;
+				formatDetails.Placeholder = placeholder;
 
-            }
+				bool handled;
+				// Evaluate the selectors:
+				foreach (var selector in placeholder.Selectors)
+				{
+					handled = false;
+					var result = context;
+					InvokeSourceExtensions(context, selector, ref handled, ref result, formatDetails);
+					if (!handled)
+					{
+						// The selector wasn't handled, which means it isn't valid
+						FormatError(selector, string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector.startIndex, output, formatDetails);
+						context = null;
+						break;
+					}
+					context = result;
+				}
 
-        }
+				// Evaluate the format:
+				handled = false;
+				try
+				{
+					InvokeFormatterExtensions(context, placeholder.Format, ref handled, output, formatDetails);
+				}
+				catch (Exception ex)
+				{
+					// An error occurred while formatting.
+					var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
+					FormatError(item, ex, errorIndex, output, formatDetails);
+					continue;
+				}
 
-        private void CheckForExtensions()
-        {
-            if (this.SourceExtensions.Count == 0)
-            {
-                throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
-            }
-            if (this.FormatterExtensions.Count == 0)
-            {
-                throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
-            }
-        }
+			}
 
-        private void InvokeSourceExtensions(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
-        {
-            foreach (var sourceExtension in this.SourceExtensions)
-            {
-                sourceExtension.EvaluateSelector(current, selector, ref handled, ref result, formatDetails);
-                if (handled) break;
-            }
-        }
-        private void InvokeFormatterExtensions(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
-        {
-            foreach (var formatterExtension in this.FormatterExtensions)
-            {
-                formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
-                if (handled) break;
-            }
-        }
+		}
 
-        private void FormatError(FormatItem errorItem, string issue, int startIndex, IOutput output, FormatDetails formatDetails)
-        {
-            switch (this.ErrorAction)
-            {
-                case ErrorAction.Ignore:
-                    return;
-                case ErrorAction.ThrowError:
-                    throw new FormatException(errorItem, issue, startIndex);
-                case ErrorAction.OutputErrorInResult:
-                    formatDetails.FormatError = new FormatException(errorItem, issue, startIndex);
-                    output.Write(issue, formatDetails);
-                    formatDetails.FormatError = null;
-                    break;
-                case ErrorAction.MaintainTokens:
-                    output.Write(formatDetails.Placeholder.Text, formatDetails);
-                    break;
-            }
-        }
-        private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, IOutput output, FormatDetails formatDetails)
-        {
-            switch (this.ErrorAction)
-            {
-                case ErrorAction.Ignore:
-                    return;
-                case ErrorAction.ThrowError:
-                    throw new FormatException(errorItem, innerException, startIndex);
-                case ErrorAction.OutputErrorInResult:
-                    formatDetails.FormatError = new FormatException(errorItem, innerException, startIndex);
-                    output.Write(innerException.Message, formatDetails);
-                    formatDetails.FormatError = null;
-                    break;
-                case ErrorAction.MaintainTokens:
-                    output.Write(formatDetails.Placeholder.Text, formatDetails);
-                    break;
-            }
-        }
+		private void CheckForExtensions()
+		{
+			if (this.SourceExtensions.Count == 0)
+			{
+				throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
+			}
+			if (this.FormatterExtensions.Count == 0)
+			{
+				throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
+			}
+		}
 
-        #endregion
+		private void InvokeSourceExtensions(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
+		{
+			foreach (var sourceExtension in this.SourceExtensions)
+			{
+				sourceExtension.EvaluateSelector(current, selector, ref handled, ref result, formatDetails);
+				if (handled) break;
+			}
+		}
+		private void InvokeFormatterExtensions(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+		{
+			foreach (var formatterExtension in this.FormatterExtensions)
+			{
+				formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
+				if (handled) break;
+			}
+		}
 
-    }
+		private void FormatError(FormatItem errorItem, string issue, int startIndex, IOutput output, FormatDetails formatDetails)
+		{
+			switch (this.ErrorAction)
+			{
+				case ErrorAction.Ignore:
+					return;
+				case ErrorAction.ThrowError:
+					throw new FormatException(errorItem, issue, startIndex);
+				case ErrorAction.OutputErrorInResult:
+					formatDetails.FormatError = new FormatException(errorItem, issue, startIndex);
+					output.Write(issue, formatDetails);
+					formatDetails.FormatError = null;
+					break;
+				case ErrorAction.MaintainTokens:
+					output.Write(formatDetails.Placeholder.Text, formatDetails);
+					break;
+			}
+		}
+		private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, IOutput output, FormatDetails formatDetails)
+		{
+			switch (this.ErrorAction)
+			{
+				case ErrorAction.Ignore:
+					return;
+				case ErrorAction.ThrowError:
+					throw new FormatException(errorItem, innerException, startIndex);
+				case ErrorAction.OutputErrorInResult:
+					formatDetails.FormatError = new FormatException(errorItem, innerException, startIndex);
+					output.Write(innerException.Message, formatDetails);
+					formatDetails.FormatError = null;
+					break;
+				case ErrorAction.MaintainTokens:
+					output.Write(formatDetails.Placeholder.Text, formatDetails);
+					break;
+			}
+		}
+
+		#endregion
+
+	}
 }

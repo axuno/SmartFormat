@@ -16,20 +16,20 @@ namespace SmartFormat.Extensions
 		}
 
 		public void EvaluateSelector(object current, Selector selector, ref bool handled,
-            ref object result, FormatDetails formatDetails)
+			ref object result, FormatDetails formatDetails)
 		{
-		    var element = current as XElement;
-		    if (element != null)
-		    {
-                // Find elements that match a selector
-		        var selectorMatchedElements = element.Elements()
-                    .Where(x => x.Name.LocalName == selector.Text).ToList();
-		        if (selectorMatchedElements.Any())
-		        {
-	                result = selectorMatchedElements;
-		            handled = true;
-		        }
-		    }
+			var element = current as XElement;
+			if (element != null)
+			{
+				// Find elements that match a selector
+				var selectorMatchedElements = element.Elements()
+					.Where(x => x.Name.LocalName == selector.Text).ToList();
+				if (selectorMatchedElements.Any())
+				{
+					result = selectorMatchedElements;
+					handled = true;
+				}
+			}
 		}
 	}
 }
