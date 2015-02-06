@@ -10,21 +10,23 @@ namespace SmartFormat.Core.Parsing
 	/// </summary>
 	public class NamedFormatter : FormatItem
 	{
-		private int optionsIndex;
-		public NamedFormatter(string baseString, int startIndex, int endIndex, int optionsIndex = -1)
+		public int optionsStartIndex;
+		public int optionsEndIndex;
+
+		public NamedFormatter(string baseString, int startIndex, int endIndex)
 			: base(baseString, startIndex, endIndex)
 		{
-			this.optionsIndex = optionsIndex;
+			this.optionsStartIndex = -1;
 		}
 
-		public string FormatterName
+		public string Name
 		{
 			get
 			{
 				var endOfName = endIndex;
-				if (this.optionsIndex != -1)
+				if (this.optionsStartIndex != -1)
 				{
-					endOfName = optionsIndex;
+					endOfName = optionsStartIndex;
 				}
 				return this.baseString.Substring(startIndex, endOfName - startIndex);
 			}
@@ -33,12 +35,12 @@ namespace SmartFormat.Core.Parsing
 		{
 			get
 			{
-				if (this.optionsIndex == -1)
+				if (this.optionsStartIndex == -1)
 				{
 					return "";
 				}
-				var startOfOptions = optionsIndex + 1;
-				var endOfOptions = endIndex - 1;
+				var startOfOptions = optionsStartIndex + 1;
+				var endOfOptions = optionsEndIndex - 1;
 				return this.baseString.Substring(startOfOptions, endOfOptions - startOfOptions);
 			}
 		}

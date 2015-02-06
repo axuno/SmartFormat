@@ -19,7 +19,8 @@ namespace SmartFormat.Core.Parsing
 
         public readonly Format parent;
         public List<Selector> Selectors { get; private set; }
-        public Format Format { get; set; }
+        public NamedFormatter NamedFormatter { get; set; }
+		public Format Format { get; set; }
         public int Alignment { get; set; }
         public int NestedDepth { get; set; }
 
