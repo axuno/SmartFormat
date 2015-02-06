@@ -68,7 +68,7 @@ namespace SmartFormat.Tests
 			string name = null;
 			var obj = new { name = name };
 			var str2 = Smart.Format("Name: {name,-10}| Column 2", obj);
-			Assert.That(str2, Is.EqualTo("Name:		   | Column 2"));
+			Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
 		}
 	}
 }
