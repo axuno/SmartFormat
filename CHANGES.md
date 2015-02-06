@@ -4,6 +4,7 @@ LATEST
 - Added `SmartFormatter.GetFormatterExtension` and `GetSourceExtension` methods, 
   which can be used to configure extensions
 - Added `DefaultTwoLetterISOLanguageName` properties to the `TimeSpanFormatter` and `PluralLocalizationFormatter`
+- Fixed `AddExtensions` to insert new extensions before existing ones (otherwise, it's pretty useless) (#17)
 
 V1.1
 ====
