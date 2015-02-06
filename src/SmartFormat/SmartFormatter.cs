@@ -52,7 +52,7 @@ namespace SmartFormat
 		[Obsolete("Please use the specific overloads of AddExtensions().")]
 		public void AddExtensions(params object[] extensions)
 		{
-			foreach (var extension in extensions)
+			foreach (var extension in extensions.Reverse())
 			{
 				// We need to filter each extension to the correct list:
 				var source = extension as ISource;
@@ -63,9 +63,9 @@ namespace SmartFormat
 					throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", extension.GetType().FullName), "extensions");
 
 				if (source != null)
-					SourceExtensions.Add(source);
+					SourceExtensions.Insert(0, source);
 				if (formatter != null)
-					FormatterExtensions.Add(formatter);
+					FormatterExtensions.Insert(0, formatter);
 			}
 		}
 
@@ -76,7 +76,7 @@ namespace SmartFormat
 		/// <param name="sourceExtensions"></param>
 		public void AddExtensions(params ISource[] sourceExtensions)
 		{
-			SourceExtensions.AddRange(sourceExtensions);
+			SourceExtensions.InsertRange(0, sourceExtensions);
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace SmartFormat
 		/// <param name="formatterExtensions"></param>
 		public void AddExtensions(params IFormatter[] formatterExtensions)
 		{
-			FormatterExtensions.AddRange(formatterExtensions);
+			FormatterExtensions.InsertRange(0, formatterExtensions);
 		}
         
 
@@ -99,15 +99,7 @@ namespace SmartFormat
         /// <returns></returns>
         public T GetSourceExtension<T>() where T : class, ISource
         {
-            foreach (var extension in SourceExtensions)
-            {
-                var asType = extension as T;
-                if (asType != null)
-                {
-                    return asType;
-                }
-            }
-            return null;
+			return SourceExtensions.OfType<T>().First();
         }
 
         /// <summary>
@@ -119,15 +111,7 @@ namespace SmartFormat
         /// <returns></returns>
         public T GetFormatterExtension<T>() where T : class, IFormatter
         {
-            foreach (var extension in FormatterExtensions)
-            {
-                var asType = extension as T;
-                if (asType != null)
-                {
-                    return asType;
-                }
-            }
-            return null;
+			return FormatterExtensions.OfType<T>().First();
         }
 
         #endregion
