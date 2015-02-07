@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
 	[TestFixture]
 	public class ConditionalFormatterTests

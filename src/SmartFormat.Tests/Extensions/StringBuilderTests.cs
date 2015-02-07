@@ -3,7 +3,7 @@ using System.Text;
 using NUnit.Framework;
 using SmartFormat.Tests.Common;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
 	[TestFixture]
 	public class StringBuilderTests

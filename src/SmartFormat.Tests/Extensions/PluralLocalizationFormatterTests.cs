@@ -3,7 +3,7 @@ using System.Globalization;
 using NUnit.Framework;
 using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
 	[TestFixture]
 	public class PluralLocalizationFormatterTests

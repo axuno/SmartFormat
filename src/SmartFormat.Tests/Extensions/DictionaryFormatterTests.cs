@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 using NUnit.Framework;
-
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.Utilities;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
 	[TestFixture]
 	public class DictionaryFormatterTests

@@ -1,10 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
-
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.Utilities;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
 	[TestFixture]
 	public class ReflectionFormatterTests

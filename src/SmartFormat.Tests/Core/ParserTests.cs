@@ -5,7 +5,7 @@ using SmartFormat.Core;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Tests.Common;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Core
 {
 	[TestFixture]
 	public class ParserTests

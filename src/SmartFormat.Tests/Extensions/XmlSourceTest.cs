@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using SmartFormat.Core;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
 	[TestFixture]
 	public class XmlSourceTest

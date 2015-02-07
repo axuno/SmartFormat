@@ -56,7 +56,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Extensions\ListFormatterTests.cs" />
-    <Compile Include="CodeProjectExampleTests.cs" />
+    <Compile Include="OldTests\CodeProjectExampleTests.cs" />
     <Compile Include="Extensions\XmlSourceTest.cs" />
     <Compile Include="TestUtils\ArgumentValidator.cs" />
     <Compile Include="TestUtils\EnumerableExtensions.cs" />
@@ -65,7 +65,7 @@
     <Compile Include="Core\ParserTests.cs" />
     <Compile Include="Core\NestingTests.cs" />
     <Compile Include="Utilities\FormatDelegateTests.cs" />
-    <Compile Include="PerformanceTests.cs" />
+    <Compile Include="OldTests\PerformanceTests.cs" />
     <Compile Include="Extensions\PluralLocalizationFormatterTests.cs">
       <SubType>Code</SubType>
     </Compile>

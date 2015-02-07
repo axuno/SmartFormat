@@ -6,7 +6,7 @@ using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.Utilities;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.OldTests
 {
 	[TestFixture]
 	public class CodeProjectExampleTests

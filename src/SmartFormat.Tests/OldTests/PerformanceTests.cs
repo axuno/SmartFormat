@@ -4,7 +4,7 @@ using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Extensions;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.OldTests
 {
 	[TestFixture, Explicit]
 	public class PerformanceTests

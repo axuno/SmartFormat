@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
 	[TestFixture]
 	public class ListFormatterTests

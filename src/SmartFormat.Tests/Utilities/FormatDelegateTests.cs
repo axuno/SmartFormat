@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using SmartFormat.Utilities;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Utilities
 {
 	[TestFixture]
 	public class FormatDelegateTests

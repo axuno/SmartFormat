@@ -4,7 +4,7 @@ using SmartFormat.Core;
 using SmartFormat.Utilities;
 using FormatException = SmartFormat.Core.FormatException;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Core
 {
 	[TestFixture]
 	public class FormatterTests
