@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>$id$</id>
+        <id>SmartFormat.NET</id>
         <description>$description$</description>
         <version>$version$</version>
         <authors>$author$</authors>
@@ -11,6 +11,6 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
     </metadata>
     <files>
-        <file src="build\NETv3.5\SmartFormat.dll" target="lib\net35-Client\SmartFormat.dll" />
+        <file src="bin\Release\**\*.*" target="lib" />
     </files>
 </package>
