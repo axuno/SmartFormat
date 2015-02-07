@@ -1,5 +1,11 @@
 LATEST
 ====
+
+
+v1.2
+====
+- Added .NET v3.5 and .NET v4.0 builds
+- Added "releases" folder to hold official releases
 - Added `UseAlternativeBraces` method, so that templates can use alternative characters
 - Added `SmartFormatter.GetFormatterExtension` and `GetSourceExtension` methods, 
   which can be used to configure extensions
