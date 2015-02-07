@@ -1,5 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == '' ">
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkProfile)' == '' ">
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' ">
+    <DefineConstants>NET20</DefineConstants>
+    <OutputPath>bin\$(Configuration)\net20</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">
+    <DefineConstants>NET35</DefineConstants>
+    <OutputPath>bin\$(Configuration)\net35</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">
+    <DefineConstants>NET40</DefineConstants>
+    <OutputPath>bin\$(Configuration)\net40</OutputPath>
+  </PropertyGroup>
+  
+  
+  
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,15 +32,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SmartFormat</RootNamespace>
     <AssemblyName>SmartFormat</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +45,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -79,7 +97,6 @@
     <Compile Include="Extensions\ConditionalFormatter.cs" />
     <Compile Include="SmartFormatter.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -88,4 +105,21 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterBuild">
+    <!-- Build net20 -->
+    <!-- (Disabled, due to Linq references)
+    <MSBuild Condition=" '$(TargetFrameworkVersion)' == 'v4.0' "
+      Projects="$(MSBuildProjectFile)"
+      Properties="TargetFrameworkVersion=v2.0"
+      RunEachTargetSeparately="true"  />
+      -->
+    <!-- Build net35 -->
+    <MSBuild Condition=" '$(TargetFrameworkVersion)' == 'v4.0' "
+      Projects="$(MSBuildProjectFile)"
+      Properties="TargetFrameworkVersion=v3.5"
+      RunEachTargetSeparately="true"  />
+    
+  </Target>
+
+
 </Project>
