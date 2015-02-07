@@ -36,9 +36,17 @@ namespace SmartFormat.Extensions
 			}
 		}
 
-		private PluralRules.PluralRuleDelegate GetPluralRule(IFormatProvider provider)
+		private PluralRules.PluralRuleDelegate GetPluralRule(FormatDetails formatDetails)
 		{
+            // See if the language was explicitly passed:
+		    var pluralOptions = formatDetails.FormatterOptions;
+		    if (pluralOptions.Length != 0)
+		    {
+		        return PluralRules.GetPluralRule(pluralOptions);
+		    }
+
 			// See if a CustomPluralRuleProvider is available from the FormatProvider:
+		    var provider = formatDetails.Provider;
 			if (provider != null)
 			{
 				var pluralRuleProvider = (CustomPluralRuleProvider) provider.GetFormat(typeof (CustomPluralRuleProvider));
@@ -91,7 +99,7 @@ namespace SmartFormat.Extensions
 
 			// Get the plural rule:
 			var provider = formatDetails.Provider;
-			var pluralRule = GetPluralRule(provider);
+			var pluralRule = GetPluralRule(formatDetails);
 
 			if (pluralRule == null)
 			{
