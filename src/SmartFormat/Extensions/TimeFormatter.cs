@@ -71,6 +71,16 @@ namespace SmartFormat.Extensions
 
 		}
 
+		public string Name
+		{
+			get { return "timespan"; }
+		}
+
+		public string ShortName
+		{
+			get { return "time"; }
+		}
+
 		private TimeTextInfo GetTimeTextInfo(IFormatProvider provider)
 		{
 			if (provider != null)

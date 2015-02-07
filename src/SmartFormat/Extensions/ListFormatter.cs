@@ -186,5 +186,14 @@ namespace SmartFormat.Extensions
 			handled = true;
 		}
 
+		public string Name
+		{
+			get { return "list"; }
+		}
+
+		public string ShortName
+		{
+			get { return "l"; }
+		}
 	}
 }

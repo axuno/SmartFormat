@@ -173,6 +173,16 @@ namespace SmartFormat.Extensions
 			handled = true;
 		}
 
+		public string Name
+		{
+			get { return "choose"; }
+		}
+
+		public string ShortName
+		{
+			get { return "c"; }
+		}
+
 
 		/// <summary>
 		/// Evaluates a conditional format.

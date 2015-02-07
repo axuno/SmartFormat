@@ -114,6 +114,14 @@ namespace SmartFormat.Extensions
 			handled = true;
 		}
 
+		public string Name
+		{
+			get { return "plural"; }
+		}
+
+		public string ShortName {
+			get { return "p"; }
+		}
 	}
 
 	/// <summary>

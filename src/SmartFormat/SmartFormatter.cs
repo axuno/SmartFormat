@@ -250,10 +250,26 @@ namespace SmartFormat
 		}
 		private void InvokeFormatterExtensions(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
 		{
-			foreach (var formatterExtension in this.FormatterExtensions)
+			var namedFormatter = formatDetails.Placeholder.NamedFormatter;
+			if (namedFormatter != null)
 			{
-				formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
-				if (handled) break;
+				// Evaluate JUST the named formatter:
+				var name = namedFormatter.Name;
+				foreach (var formatterExtension in this.FormatterExtensions)
+				{
+					if (formatterExtension.Name != name && formatterExtension.ShortName != name) continue;
+					formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
+					if (handled) break;
+				}
+			}
+			else
+			{
+				// Try all formatters until formatting has been handled:
+				foreach (var formatterExtension in this.FormatterExtensions)
+				{
+					formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
+					if (handled) break;
+				}
 			}
 		}
 

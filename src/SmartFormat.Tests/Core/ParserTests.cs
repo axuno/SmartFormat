@@ -248,6 +248,8 @@ namespace SmartFormat.Tests
 		// Has nesting:
 		[TestCase(@"{0:format{}}")]
 		// Empty:
+		[TestCase(@"{0}")]
+		[TestCase(@"{0:}")]
 		[TestCase(@"{0::}")]
 		[TestCase(@"{0:()}")]
 		[TestCase(@"{0:():}")]

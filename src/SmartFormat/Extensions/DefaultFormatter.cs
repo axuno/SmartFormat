@@ -83,5 +83,15 @@ namespace SmartFormat.Extensions
 				}
 			}
 		}
+
+		public string Name
+		{
+			get { return "default"; }
+		}
+
+		public string ShortName
+		{
+			get { return "d"; }
+		}
 	}
 }

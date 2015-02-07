@@ -30,6 +30,17 @@ namespace SmartFormat.Extensions
 				handled = true;
 			}
 		}
+
+		public string Name
+		{
+			get { return "xelement"; }
+		}
+
+		public string ShortName
+		{
+			get { return "xml"; }
+		}
+
 		#endregion
 	}
 

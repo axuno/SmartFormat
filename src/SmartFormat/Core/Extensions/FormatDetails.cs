@@ -38,6 +38,18 @@ namespace SmartFormat.Core.Extensions
 		public FormatCache FormatCache { get; internal set; }
 
 		/// <summary>
+		/// When a named formatter is used, this will return the "options" that were passed to the formatter.
+		/// For example, in "{0:choose(1,2,3):format}", FormatterOptions will be "1,2,3".
+		/// </summary>
+		public string FormatterOptions
+		{
+			get
+			{
+				return this.Placeholder.NamedFormatter != null ? this.Placeholder.NamedFormatter.Options : "";
+			}
+		}
+
+		/// <summary>
 		/// The Format Provider that can be used to determine how to
 		/// format items such as numbers, dates, and anything else that
 		/// might be culture-specific.
