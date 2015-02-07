@@ -12,7 +12,11 @@ namespace SmartFormat.Extensions
         private static readonly Regex complexConditionPattern
             = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
             //   Description:      and/or    comparator     value
+#if !SILVERLIGHT
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+#else
+            RegexOptions.IgnorePatternWhitespace);
+#endif
 
 
         public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
@@ -94,7 +98,7 @@ namespace SmartFormat.Extensions
                 } 
                 else
                 {
-                    paramIndex = Math.Min((int)Math.Floor(currentNumber), paramCount - 1);
+                    paramIndex = Math.Min((int)Decimal.Floor(currentNumber), paramCount - 1);
                 }
             } 
             else if (current is bool) {
