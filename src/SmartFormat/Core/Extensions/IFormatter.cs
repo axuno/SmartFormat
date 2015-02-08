@@ -14,7 +14,6 @@ namespace SmartFormat.Core.Extensions
 		/// <param name="formatDetails"> Contains extra information about the item being formatted. </param>
 		void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails);
 
-		string Name { get; }
-		string ShortName { get; }
+		string[] Names { get; set; }
 	}
 }

@@ -11,7 +11,10 @@ namespace SmartFormat.Extensions
 {
 	public class PluralLocalizationFormatter : IFormatter
 	{
-		/// <summary>
+        private string[] names = { "plural", "p" };
+        public string[] Names { get { return names; } set { names = value; } }
+        
+        /// <summary>
 		/// Initializes the plugin with rules for many common languages.
 		/// If no CultureInfo is supplied to the formatter, the
 		/// default language rules will be used by default.
@@ -122,15 +125,7 @@ namespace SmartFormat.Extensions
 			handled = true;
 		}
 
-		public string Name
-		{
-			get { return "plural"; }
-		}
-
-		public string ShortName {
-			get { return "p"; }
-		}
-	}
+    }
 
 	/// <summary>
 	/// Use this class to provide custom plural rules to Smart.Format

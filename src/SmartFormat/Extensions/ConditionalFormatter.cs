@@ -7,9 +7,11 @@ using SmartFormat.Core.Parsing;
 namespace SmartFormat.Extensions
 {
 	public class ConditionalFormatter : IFormatter
-	{
+    {
+        private string[] names = { "choose", "c" };
+        public string[] Names { get { return names; } set { names = value; } }
 
-		private static readonly Regex complexConditionPattern
+        private static readonly Regex complexConditionPattern
 			= new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
 			//   Description:	  and/or	comparator	 value
 			RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -172,17 +174,6 @@ namespace SmartFormat.Extensions
 			formatDetails.Formatter.Format(output, selectedParameter, current, formatDetails);
 			handled = true;
 		}
-
-		public string Name
-		{
-			get { return "choose"; }
-		}
-
-		public string ShortName
-		{
-			get { return "c"; }
-		}
-
 
 		/// <summary>
 		/// Evaluates a conditional format.

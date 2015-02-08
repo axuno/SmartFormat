@@ -10,6 +10,8 @@ namespace SmartFormat.Extensions
 {
 	public class ListFormatter : IFormatter, ISource
 	{
+        private string[] names = { "list", "l" };
+        public string[] Names { get { return names; } set { names = value; } }
 
 		public ListFormatter(SmartFormatter formatter)
 		{
@@ -186,14 +188,5 @@ namespace SmartFormat.Extensions
 			handled = true;
 		}
 
-		public string Name
-		{
-			get { return "list"; }
-		}
-
-		public string ShortName
-		{
-			get { return "l"; }
-		}
 	}
 }

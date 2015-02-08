@@ -9,6 +9,8 @@ namespace SmartFormat.Extensions
 	public class XElementFormatter : IFormatter
 	{
 		#region IFormatter
+	    private string[] names = {"xelement", "xml", "x"};
+        public string[] Names { get { return names; } set { names = value; } }
 
 		public void EvaluateFormat(object current, Format format,
 			ref bool handled, IOutput output, FormatDetails formatDetails)
@@ -29,16 +31,6 @@ namespace SmartFormat.Extensions
 				output.Write(currentAsXElement.Value, formatDetails);
 				handled = true;
 			}
-		}
-
-		public string Name
-		{
-			get { return "xelement"; }
-		}
-
-		public string ShortName
-		{
-			get { return "xml"; }
 		}
 
 		#endregion

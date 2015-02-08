@@ -11,6 +11,8 @@ namespace SmartFormat.Extensions
 {
 	public class TimeFormatter : IFormatter
 	{
+        private string[] names = { "timespan", "time", "t" };
+        public string[] Names { get { return names; } set { names = value; } }
 
 		#region Constructors
 
@@ -69,16 +71,6 @@ namespace SmartFormat.Extensions
 			output.Write(timeString, formatDetails);
 			handled = true;
 
-		}
-
-		public string Name
-		{
-			get { return "timespan"; }
-		}
-
-		public string ShortName
-		{
-			get { return "time"; }
 		}
 
 		private TimeTextInfo GetTimeTextInfo(IFormatProvider provider)

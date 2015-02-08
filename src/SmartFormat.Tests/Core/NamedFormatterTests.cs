@@ -90,6 +90,9 @@ namespace SmartFormat.Tests.Core
 
 		private class TestExtension1 : IFormatter
 		{
+            private string[] names = { "test1", "t1" };
+            public string[] Names { get { return names; } set { names = value; } }
+
 			public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
 			{
 				var options = formatDetails.FormatterOptions;
@@ -97,20 +100,13 @@ namespace SmartFormat.Tests.Core
 				output.Write("TestExtension1 Options: " + options + ", Format: " + formatString, formatDetails);
 				handled = true;
 			}
-
-			public string Name
-			{
-				get { return "test1"; }
-			}
-
-			public string ShortName
-			{
-				get { return "t1"; }
-			}
 		}
 		private class TestExtension2 : IFormatter
 		{
-			public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+            private string[] names = { "test2", "t2" };
+            public string[] Names { get { return names; } set { names = value; } }
+
+            public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
 			{
 				var options = formatDetails.FormatterOptions;
 				var formatString = format != null ? format.ToString() : "";
@@ -118,15 +114,6 @@ namespace SmartFormat.Tests.Core
 				handled = true;
 			}
 
-			public string Name
-			{
-				get { return "test2"; }
-			}
-
-			public string ShortName
-			{
-				get { return "t2"; }
-			}
 		}
 
 		#endregion
