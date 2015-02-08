@@ -7,10 +7,10 @@ namespace SmartFormat.Extensions
 {
 	public class DefaultFormatter : IFormatter
 	{
-        private string[] names = { "default", "d" };
-        public string[] Names { get { return names; } set { names = value; } }
-        
-        /// <summary>
+		private string[] names = { "default", "d" };
+		public string[] Names { get { return names; } set { names = value; } }
+		
+		/// <summary>
 		/// Do the default formatting, same logic as "String.Format".
 		/// </summary>
 		public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)

@@ -90,8 +90,8 @@ namespace SmartFormat.Tests.Core
 
 		private class TestExtension1 : IFormatter
 		{
-            private string[] names = { "test1", "t1" };
-            public string[] Names { get { return names; } set { names = value; } }
+			private string[] names = { "test1", "t1" };
+			public string[] Names { get { return names; } set { names = value; } }
 
 			public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
 			{
@@ -103,10 +103,10 @@ namespace SmartFormat.Tests.Core
 		}
 		private class TestExtension2 : IFormatter
 		{
-            private string[] names = { "test2", "t2" };
-            public string[] Names { get { return names; } set { names = value; } }
+			private string[] names = { "test2", "t2" };
+			public string[] Names { get { return names; } set { names = value; } }
 
-            public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+			public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
 			{
 				var options = formatDetails.FormatterOptions;
 				var formatString = format != null ? format.ToString() : "";

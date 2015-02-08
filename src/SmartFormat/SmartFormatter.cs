@@ -257,7 +257,7 @@ namespace SmartFormat
 				var name = namedFormatter.Name;
 				foreach (var formatterExtension in this.FormatterExtensions)
 				{
-				    if (!formatterExtension.Names.Contains(name)) continue;
+					if (!formatterExtension.Names.Contains(name)) continue;
 					formatterExtension.EvaluateFormat(current, format, ref handled, output, formatDetails);
 					if (handled) break;
 				}

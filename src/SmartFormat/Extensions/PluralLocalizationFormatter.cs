@@ -11,10 +11,10 @@ namespace SmartFormat.Extensions
 {
 	public class PluralLocalizationFormatter : IFormatter
 	{
-        private string[] names = { "plural", "p" };
-        public string[] Names { get { return names; } set { names = value; } }
-        
-        /// <summary>
+		private string[] names = { "plural", "p" };
+		public string[] Names { get { return names; } set { names = value; } }
+		
+		/// <summary>
 		/// Initializes the plugin with rules for many common languages.
 		/// If no CultureInfo is supplied to the formatter, the
 		/// default language rules will be used by default.
@@ -41,15 +41,15 @@ namespace SmartFormat.Extensions
 
 		private PluralRules.PluralRuleDelegate GetPluralRule(FormatDetails formatDetails)
 		{
-            // See if the language was explicitly passed:
-		    var pluralOptions = formatDetails.FormatterOptions;
-		    if (pluralOptions.Length != 0)
-		    {
-		        return PluralRules.GetPluralRule(pluralOptions);
-		    }
+			// See if the language was explicitly passed:
+			var pluralOptions = formatDetails.FormatterOptions;
+			if (pluralOptions.Length != 0)
+			{
+				return PluralRules.GetPluralRule(pluralOptions);
+			}
 
 			// See if a CustomPluralRuleProvider is available from the FormatProvider:
-		    var provider = formatDetails.Provider;
+			var provider = formatDetails.Provider;
 			if (provider != null)
 			{
 				var pluralRuleProvider = (CustomPluralRuleProvider) provider.GetFormat(typeof (CustomPluralRuleProvider));
@@ -125,7 +125,7 @@ namespace SmartFormat.Extensions
 			handled = true;
 		}
 
-    }
+	}
 
 	/// <summary>
 	/// Use this class to provide custom plural rules to Smart.Format

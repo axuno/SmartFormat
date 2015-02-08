@@ -145,16 +145,16 @@ namespace SmartFormat.Tests.Extensions
 				});
 		}
 
-	    [Test]
-        [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 0, "0 zero miesięcy")]
-        [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 1, "1 one miesiąc")]
-        [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 2, "2 many miesiące")]
-        [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 5, "5 many miesięcy")]
-	    public void NamedFormatter_should_use_specific_language(string format, object arg0, string expectedResult)
-	    {
-	        var actualResult = Smart.Format(format, arg0);
-            Assert.AreEqual(expectedResult, actualResult);
-	    }
+		[Test]
+		[TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 0, "0 zero miesięcy")]
+		[TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 1, "1 one miesiąc")]
+		[TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 2, "2 many miesiące")]
+		[TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 5, "5 many miesięcy")]
+		public void NamedFormatter_should_use_specific_language(string format, object arg0, string expectedResult)
+		{
+			var actualResult = Smart.Format(format, arg0);
+			Assert.AreEqual(expectedResult, actualResult);
+		}
 
 
 	}
