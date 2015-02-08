@@ -11,8 +11,8 @@ namespace SmartFormat.Extensions
 {
 	public class TimeFormatter : IFormatter
 	{
-        private string[] names = { "timespan", "time", "t" };
-        public string[] Names { get { return names; } set { names = value; } }
+		private string[] names = { "timespan", "time", "t" };
+		public string[] Names { get { return names; } set { names = value; } }
 
 		#region Constructors
 
@@ -46,15 +46,26 @@ namespace SmartFormat.Extensions
 		public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
 		{
 			if (format != null && format.HasNested) return;
-			var formatText = format != null ? format.Text : "";
+			string options;
+			if (formatDetails.FormatterOptions != "") 
+				options = formatDetails.FormatterOptions;
+			else if (format != null) 
+				options = format.Text;
+			else 
+				options = "";
+			
 			TimeSpan fromTime;
 			if (current is TimeSpan)
 			{
 				fromTime = (TimeSpan)current;
 			}
-			else if (current is DateTime && formatText.StartsWith("timestring"))
+			else if (current is DateTime && formatDetails.FormatterOptions != "")
 			{
-				formatText = formatText.Substring(10);
+				fromTime = DateTime.Now.Subtract((DateTime)current);
+			}
+			else if (current is DateTime && options.StartsWith("timestring"))
+			{
+				options = options.Substring(10);
 				fromTime = DateTime.Now.Subtract((DateTime)current);
 			}
 			else
@@ -66,7 +77,7 @@ namespace SmartFormat.Extensions
 			{
 				return;
 			}
-			var formattingOptions = TimeSpanFormatOptionsConverter.Parse(formatText);
+			var formattingOptions = TimeSpanFormatOptionsConverter.Parse(options);
 			var timeString = TimeSpanUtility.ToTimeString(fromTime, formattingOptions, timeTextInfo);
 			output.Write(timeString, formatDetails);
 			handled = true;
