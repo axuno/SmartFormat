@@ -15,9 +15,11 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void EvaluateSelector(object current, Selector selector, ref bool handled,
-			ref object result, FormatDetails formatDetails)
+		public void EvaluateSelector(FormattingInfo formattingInfo)
 		{
+			var current = formattingInfo.CurrentValue;
+			var selector = formattingInfo.Selector;
+
 			var element = current as XElement;
 			if (element != null)
 			{
@@ -26,8 +28,8 @@ namespace SmartFormat.Extensions
 					.Where(x => x.Name.LocalName == selector.Text).ToList();
 				if (selectorMatchedElements.Any())
 				{
-					result = selectorMatchedElements;
-					handled = true;
+					formattingInfo.CurrentValue = selectorMatchedElements;
+					formattingInfo.Handled = true;
 				}
 			}
 		}

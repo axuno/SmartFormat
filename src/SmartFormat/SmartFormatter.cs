@@ -170,15 +170,16 @@ namespace SmartFormat
 			Format(output, cache.Format, current, formatDetails);
 		}
 
-		#endregion
-
-		#region: Format :
-
 		public void Format(IOutput output, Format format, object current, FormatDetails formatDetails)
 		{
 			var formattingInfo = new FormattingInfo(current, format, formatDetails);
 			Format(formattingInfo);
 		}
+
+		#endregion
+
+		#region: Format :
+
 		public void Format(FormattingInfo formattingInfo)
 		{
 			// Before we start, make sure we have at least one source extension and one formatter extension:
@@ -226,25 +227,21 @@ namespace SmartFormat
 
 		}
 
-		private void EvaluateSelectors(FormattingInfo formattingInfo)
+		private void EvaluateSelectors(FormattingInfo childFormattingInfo)
 		{
-			var current = formattingInfo.CurrentValue;
-			var placeholder = formattingInfo.Placeholder;
+			var placeholder = childFormattingInfo.Placeholder;
 			foreach (var selector in placeholder.Selectors)
 			{
-				var result = current;
-				var handled = false;
-				InvokeSourceExtensions(current, selector, ref handled, ref result, formattingInfo.FormatDetails);
-				if (!handled)
+				childFormattingInfo.Selector = selector;
+				InvokeSourceExtensions(childFormattingInfo);
+				if (!childFormattingInfo.Handled)
 				{
 					// The selector wasn't handled, which means it isn't valid
-					FormatError(selector, string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector.startIndex, formattingInfo);
-					current = null;
+					FormatError(selector, string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector.startIndex, childFormattingInfo);
+					childFormattingInfo.CurrentValue = null;
 					break;
 				}
-				current = result;
 			}
-			formattingInfo.CurrentValue = current;
 		}
 
 		private void EvaluateFormatters(FormattingInfo formattingInfo)
@@ -264,12 +261,13 @@ namespace SmartFormat
 			}
 		}
 
-		private void InvokeSourceExtensions(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
+		private void InvokeSourceExtensions(FormattingInfo formattingInfo)
 		{
+			formattingInfo.Handled = false;
 			foreach (var sourceExtension in this.SourceExtensions)
 			{
-				sourceExtension.EvaluateSelector(current, selector, ref handled, ref result, formatDetails);
-				if (handled) break;
+				sourceExtension.EvaluateSelector(formattingInfo);
+				if (formattingInfo.Handled) break;
 			}
 		}
 		private void InvokeFormatterExtensions(FormattingInfo formattingInfo)

@@ -14,8 +14,11 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
+		public void EvaluateSelector(FormattingInfo formattingInfo)
 		{
+			var current = formattingInfo.CurrentValue;
+			var selector = formattingInfo.Selector;
+
 			if (current == null)
 			{
 				return;
@@ -36,8 +39,8 @@ namespace SmartFormat.Extensions
 					case MemberTypes.Field:
 						//  Selector is a Field; retrieve the value:
 						var field = (FieldInfo) member;
-						result = field.GetValue(current);
-						handled = true;
+						formattingInfo.CurrentValue = field.GetValue(current);
+						formattingInfo.Handled = true;
 						return;
 					case MemberTypes.Property:
 					case MemberTypes.Method:
@@ -76,8 +79,8 @@ namespace SmartFormat.Extensions
 						}
 
 						//  Retrieve the Selectors/ParseFormat value:
-						result = method.Invoke(current, new object[0]);
-						handled = true;
+						formattingInfo.CurrentValue = method.Invoke(current, new object[0]);
+						formattingInfo.Handled = true;
 						return;
 
 				}

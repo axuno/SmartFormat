@@ -13,19 +13,15 @@ namespace SmartFormat.Core.Extensions
 			FormatDetails = formatDetails;
 		}
 
-		public FormattingInfo(object currentValue, Placeholder placeholder, FormatDetails formatDetails)
-		{
-			this.CurrentValue = currentValue;
-			this.Format = placeholder.Format;
-			this.Placeholder = placeholder;
-			this.FormatDetails = formatDetails;
-		}
-
 		public FormattingInfo(FormatDetails formatDetails)
 		{
 			this.FormatDetails = formatDetails;
 		}
 
+		public Selector Selector { get; set; }
+
+	
+		
 		public void SetCurrent(object currentValue, Placeholder placeholder)
 		{
 			this.CurrentValue = currentValue;
@@ -33,7 +29,6 @@ namespace SmartFormat.Core.Extensions
 			this.Format = placeholder.Format;
 			
 		}
-
 
 		/// <summary>
 		/// The current value that is to be formatted.

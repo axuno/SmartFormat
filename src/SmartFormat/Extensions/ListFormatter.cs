@@ -25,8 +25,11 @@ namespace SmartFormat.Extensions
 		/// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
 		/// The ".2" selector is used to reference Dates[2].
 		/// </summary>
-		public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
+		public void EvaluateSelector(FormattingInfo formattingInfo)
 		{
+			var current = formattingInfo.CurrentValue;
+			var selector = formattingInfo.Selector;
+
 			// See if we're trying to access a specific index:
 			int itemIndex;
 			var currentList = current as IList;
@@ -37,8 +40,8 @@ namespace SmartFormat.Extensions
 				// let's return the List item:
 				// Example: {People[2].Name}
 				//		   ^List  ^itemIndex
-				result = currentList[itemIndex];
-				handled = true;
+				formattingInfo.CurrentValue = currentList[itemIndex];
+				formattingInfo.Handled = true;
 			}
 
 
@@ -48,16 +51,16 @@ namespace SmartFormat.Extensions
 				// Looking for "{Index}"
 				if (selector.SelectorIndex == 0)
 				{
-					result = CollectionIndex;
-					handled = true;
+					formattingInfo.CurrentValue = CollectionIndex;
+					formattingInfo.Handled = true;
 					return;
 				}
 
 				// Looking for 2 lists to sync: "{List1: {List2[Index]} }"
 				if (currentList != null && 0 <= CollectionIndex && CollectionIndex < currentList.Count)
 				{
-					result = currentList[CollectionIndex];
-					handled = true;
+					formattingInfo.CurrentValue = currentList[CollectionIndex];
+					formattingInfo.Handled = true;
 				}
 			}
 		}
