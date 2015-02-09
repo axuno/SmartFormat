@@ -61,7 +61,6 @@
     <Compile Include="Core\FormatCache.cs" />
     <Compile Include="Core\Parsing\ParsingErrors.cs" />
     <Compile Include="Core\Extensions\FormatDetails.cs" />
-    <Compile Include="Core\Parsing\NamedFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\PluralRules.cs" />
     <Compile Include="Utilities\PluralRules_Old.cs" />

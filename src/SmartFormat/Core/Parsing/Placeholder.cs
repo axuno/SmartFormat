@@ -21,18 +21,18 @@ namespace SmartFormat.Core.Parsing
 			this.parent = parent;
 			this.Selectors = new List<Selector>();
 			this.NestedDepth = nestedDepth;
+			this.FormatterName = "";
+			this.FormatterOptions = "";
 		}
 
 		public readonly Format parent;
+		public int NestedDepth { get; set; }
+
 		public List<Selector> Selectors { get; private set; }
 		public int Alignment { get; set; }
-
-		public NamedFormatter NamedFormatter { get; set; }
-		public string FormatterName { get { return NamedFormatter == null ? "" : NamedFormatter.Name; } }
-		public string FormatterOptions { get { return NamedFormatter == null ? "" : NamedFormatter.Options; } }
-
+		public string FormatterName { get; set; }
+		public string FormatterOptions { get; set; }
 		public Format Format { get; set; }
-		public int NestedDepth { get; set; }
 
 		public override string ToString()
 		{
@@ -46,6 +46,17 @@ namespace SmartFormat.Core.Parsing
 			{
 				result.Append(',');
 				result.Append(Alignment);
+			}
+			if (FormatterName != "")
+			{
+				result.Append(':');
+				result.Append(FormatterName);
+				if (FormatterOptions != "")
+				{
+					result.Append('(');
+					result.Append(FormatterOptions);
+					result.Append(')');
+				}
 			}
 			if (Format != null)
 			{

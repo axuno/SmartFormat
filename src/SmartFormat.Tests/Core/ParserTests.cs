@@ -222,15 +222,14 @@ namespace SmartFormat.Tests.Core
 		[TestCase("{0:name:format}", "name", "", "format")]
 		[TestCase("{0:name():format}", "name", "", "format")]
 		[TestCase("{0:name:}", "name", "", "")]
-		[TestCase("{0:name()}", "name", "", "")]
+		[TestCase("{0:name():}", "name", "", "")]
 		[TestCase("{0:name(1,2,3):format}", "name", "1,2,3", "format")]
-		[TestCase("{0:name(1,2,3)}", "name", "1,2,3", "")]
+		[TestCase("{0:name(1,2,3):}", "name", "1,2,3", "")]
 		public void NamedFormatter_should_be_parsed_correctly(string format, string expectedName, string expectedOptions, string expectedFormat)
 		{
 			var placeholder = (Placeholder) Parse(format).Items[0];
-			Assert.IsNotNull(placeholder.NamedFormatter);
-			Assert.AreEqual(expectedName, placeholder.NamedFormatter.Name);
-			Assert.AreEqual(expectedOptions, placeholder.NamedFormatter.Options);
+			Assert.AreEqual(expectedName, placeholder.FormatterName);
+			Assert.AreEqual(expectedOptions, placeholder.FormatterOptions);
 			Assert.AreEqual(expectedFormat, placeholder.Format.ToString());
 		}
 
@@ -261,7 +260,8 @@ namespace SmartFormat.Tests.Core
 			parser.UseAlternativeEscapeChar('\\');
 			
 			var placeholder = (Placeholder)parser.ParseFormat(format).Items[0];
-			Assert.IsNull(placeholder.NamedFormatter);
+			Assert.IsEmpty(placeholder.FormatterName);
+			Assert.IsEmpty(placeholder.FormatterOptions);
 		}
 
 	}

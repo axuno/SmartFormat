@@ -134,7 +134,9 @@
 			var result = new Format(format);
 			var current = result;
 			Placeholder currentPlaceholder = null;
-			NamedFormatter lookingForNamedFormatter = null;
+			var namedFormatterStartIndex = -1;
+			var namedFormatterOptionsStartIndex = -1;
+			var namedFormatterOptionsEndIndex = -1;
 
 			// Store parsing errors until the end:
 			var parsingErrors = new ParsingErrors(result);
@@ -180,7 +182,7 @@
 						current.HasNested = true;
 						operatorIndex = i+1;
 						selectorIndex = 0;
-						lookingForNamedFormatter = null;
+						namedFormatterStartIndex = -1;
 					}
 					else if (c == closingBrace)
 					{
@@ -211,11 +213,11 @@
 						current.endIndex = i;
 						current.parent.endIndex = i + 1;
 						current = current.parent.parent;
-						lookingForNamedFormatter = null;
+						namedFormatterStartIndex = -1;
 					}
 					else if (this.alternativeEscaping && c == this.alternativeEscapeChar)
 					{
-						lookingForNamedFormatter = null;
+						namedFormatterStartIndex = -1;
 						// See if the next char is a brace that should be escaped:
 						var nextI = i + 1;
 						if (nextI < length && (format[nextI] == openingBrace || format[nextI] == closingBrace))
@@ -231,43 +233,53 @@
 							continue;
 						}
 					}
-					else if (lookingForNamedFormatter != null)
+					else if (namedFormatterStartIndex != -1)
 					{
 						if (c == '(')
 						{
-							var emptyName = (lookingForNamedFormatter.startIndex == i);
+							var emptyName = (namedFormatterStartIndex == i);
 							if (emptyName)
 							{
-								lookingForNamedFormatter = null;
+								namedFormatterStartIndex = -1;
 								continue;
 							}
-							lookingForNamedFormatter.optionsStartIndex = i;
+							namedFormatterOptionsStartIndex = i;
 						}
 						else if (c == ')')
 						{
-							var hasOpeningParenthesis = (lookingForNamedFormatter.optionsStartIndex != -1);
+							var hasOpeningParenthesis = (namedFormatterOptionsStartIndex != -1);
 							if (!hasOpeningParenthesis)
 							{
-								lookingForNamedFormatter = null;
+								namedFormatterStartIndex = -1;
 								continue;
 							}
 							lastI = i + 1;
-							lookingForNamedFormatter.optionsEndIndex = lastI;
-							lookingForNamedFormatter.endIndex = lastI;
-							current.parent.NamedFormatter = lookingForNamedFormatter;
+							namedFormatterOptionsEndIndex = i;
 						}
 						else if (c == ':')
 						{
-							var emptyName = (lookingForNamedFormatter.startIndex == i);
-							if (emptyName)
+							var emptyName = (namedFormatterStartIndex == i);
+							// ensure no trailing chars past ')'
+							var invalidClosingParenthesis = (namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex != i - 1);
+							if (emptyName || invalidClosingParenthesis)
 							{
-								lookingForNamedFormatter = null;
+								namedFormatterStartIndex = -1;
 								continue;
 							}
 							lastI = i + 1;
-							lookingForNamedFormatter.endIndex = i;
-							current.parent.NamedFormatter = lookingForNamedFormatter;
-							lookingForNamedFormatter = null;
+
+							var parentPlaceholder = current.parent;
+							if (namedFormatterOptionsStartIndex == -1)
+							{
+								parentPlaceholder.FormatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
+							}
+							else
+							{
+								parentPlaceholder.FormatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
+								parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+							}
+
+							namedFormatterStartIndex = -1;
 						}
 					}
 				}
@@ -305,7 +317,9 @@
 						currentPlaceholder.Format = new Format(currentPlaceholder, i + 1);
 						current = currentPlaceholder.Format;
 						currentPlaceholder = null;
-						lookingForNamedFormatter = new NamedFormatter(format, lastI, -1);
+						namedFormatterStartIndex = lastI;
+						namedFormatterOptionsStartIndex = -1;
+						namedFormatterOptionsEndIndex = -1;
 					}
 					else if (c == closingBrace)
 					{
