@@ -17,7 +17,7 @@ namespace SmartFormat.Extensions
 			RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 
-		public void EvaluateFormat(FormattingInfo formattingInfo)
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;

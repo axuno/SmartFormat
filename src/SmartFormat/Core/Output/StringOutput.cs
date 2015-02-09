@@ -25,11 +25,11 @@ namespace SmartFormat.Core.Output
 		}
 
 
-		public void Write(string text, FormattingInfo formattingInfo)
+		public void Write(string text, IFormattingInfo formattingInfo)
 		{
 			output.Append(text);
 		}
-		public void Write(string text, int startIndex, int length, FormattingInfo formattingInfo)
+		public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
 		{
 			output.Append(text, startIndex, length);
 		}

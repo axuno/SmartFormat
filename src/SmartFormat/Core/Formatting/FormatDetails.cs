@@ -2,7 +2,7 @@
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core.Extensions
+namespace SmartFormat.Core.Formatting
 {
 	/// <summary>
 	/// Contains extra information about the item currently being formatted.

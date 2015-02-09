@@ -15,21 +15,18 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void EvaluateSelector(FormattingInfo formattingInfo)
+		public void EvaluateSelector(ISelectorInfo selectorInfo)
 		{
-			var current = formattingInfo.CurrentValue;
-			var selector = formattingInfo.Selector;
-
-			var element = current as XElement;
+			var element = selectorInfo.CurrentValue as XElement;
 			if (element != null)
 			{
 				// Find elements that match a selector
 				var selectorMatchedElements = element.Elements()
-					.Where(x => x.Name.LocalName == selector.Text).ToList();
+					.Where(x => x.Name.LocalName == selectorInfo.Selector.Text).ToList();
 				if (selectorMatchedElements.Any())
 				{
-					formattingInfo.CurrentValue = selectorMatchedElements;
-					formattingInfo.Handled = true;
+					selectorInfo.Result = selectorMatchedElements;
+					selectorInfo.Handled = true;
 				}
 			}
 		}

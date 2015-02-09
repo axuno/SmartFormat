@@ -13,7 +13,7 @@ namespace SmartFormat.Extensions
 		/// <summary>
 		/// Do the default formatting, same logic as "String.Format".
 		/// </summary>
-		public void EvaluateFormat(FormattingInfo formattingInfo)
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			// This function always handles the method:
 			formattingInfo.Handled = true;
@@ -68,9 +68,9 @@ namespace SmartFormat.Extensions
 
 
 			// See if there's a pre-alignment to consider:
-			if (formattingInfo.Placeholder.Alignment > 0)
+			if (formattingInfo.Alignment > 0)
 			{
-				var spaces = formattingInfo.Placeholder.Alignment - result.Length;
+				var spaces = formattingInfo.Alignment - result.Length;
 				if (spaces > 0)
 				{
 					formattingInfo.Write(new String(' ', spaces));
@@ -82,9 +82,9 @@ namespace SmartFormat.Extensions
 
 
 			// See if there's a post-alignment to consider:
-			if (formattingInfo.Placeholder.Alignment < 0)
+			if (formattingInfo.Alignment < 0)
 			{
-				var spaces = -formattingInfo.Placeholder.Alignment - result.Length;
+				var spaces = -formattingInfo.Alignment - result.Length;
 				if (spaces > 0)
 				{
 					formattingInfo.Write(new String(' ', spaces));

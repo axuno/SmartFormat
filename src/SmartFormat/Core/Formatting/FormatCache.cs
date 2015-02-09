@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core
+namespace SmartFormat.Core.Formatting
 {
 	/// <summary>
 	/// Caches information about a format operation

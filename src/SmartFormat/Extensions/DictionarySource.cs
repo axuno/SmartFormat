@@ -16,10 +16,10 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void EvaluateSelector(FormattingInfo formattingInfo)
+		public void EvaluateSelector(ISelectorInfo selectorInfo)
 		{
-			var current = formattingInfo.CurrentValue;
-			var selector = formattingInfo.Selector;
+			var current = selectorInfo.CurrentValue;
+			var selector = selectorInfo.Selector;
 
 			// See if current is a IDictionary and contains the selector:
 			var rawDict = current as IDictionary;
@@ -31,8 +31,8 @@ namespace SmartFormat.Extensions
 
 					if (key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparison()))
 					{
-						formattingInfo.CurrentValue = entry.Value;
-						formattingInfo.Handled = true;
+						selectorInfo.Result = entry.Value;
+						selectorInfo.Handled = true;
 						return;
 					}
 				}
@@ -46,8 +46,8 @@ namespace SmartFormat.Extensions
 				var val = dict.FirstOrDefault(x => x.Key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparison())).Value;
 				if (val != null)
 				{
-					formattingInfo.CurrentValue = val;
-					formattingInfo.Handled = true;
+					selectorInfo.Result = val;
+					selectorInfo.Handled = true;
 				}
 			}
 		}

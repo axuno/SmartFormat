@@ -1,8 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core;
+using SmartFormat.Core.Settings;
 using SmartFormat.Utilities;
-using FormatException = SmartFormat.Core.FormatException;
+using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat.Tests.Core
 {

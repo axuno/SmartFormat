@@ -90,9 +90,9 @@ namespace SmartFormat.Tests.Core
 			private string[] names = { "test1", "t1" };
 			public string[] Names { get { return names; } set { names = value; } }
 
-			public void EvaluateFormat(FormattingInfo formattingInfo)
+			public void EvaluateFormat(IFormattingInfo formattingInfo)
 			{
-				var options = formattingInfo.Placeholder.FormatterOptions;
+				var options = formattingInfo.FormatterOptions;
 				var format = formattingInfo.Format;
 				var formatString = format != null ? format.ToString() : "";
 				formattingInfo.Write("TestExtension1 Options: " + options + ", Format: " + formatString);
@@ -104,9 +104,9 @@ namespace SmartFormat.Tests.Core
 			private string[] names = { "test2", "t2" };
 			public string[] Names { get { return names; } set { names = value; } }
 
-			public void EvaluateFormat(FormattingInfo formattingInfo)
+			public void EvaluateFormat(IFormattingInfo formattingInfo)
 			{
-				var options = formattingInfo.Placeholder.FormatterOptions;
+				var options = formattingInfo.FormatterOptions;
 				var format = formattingInfo.Format;
 				var formatString = format != null ? format.ToString() : "";
 				formattingInfo.Write("TestExtension2 Options: " + options + ", Format: " + formatString);

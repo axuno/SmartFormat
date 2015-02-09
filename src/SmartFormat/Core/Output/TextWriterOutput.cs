@@ -15,12 +15,12 @@ namespace SmartFormat.Core.Output
 		}
 		public TextWriter Output { get; private set; }
 
-		public void Write(string text, FormattingInfo formattingInfo)
+		public void Write(string text, IFormattingInfo formattingInfo)
 		{
 			Output.Write(text);
 		}
 
-		public void Write(string text, int startIndex, int length, FormattingInfo formattingInfo)
+		public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
 		{
 			Output.Write(text.Substring(startIndex, length));
 		}

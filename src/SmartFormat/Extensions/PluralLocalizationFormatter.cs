@@ -5,7 +5,7 @@ using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Utilities;
-using FormatException = SmartFormat.Core.FormatException;
+using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat.Extensions
 {
@@ -39,10 +39,10 @@ namespace SmartFormat.Extensions
 			}
 		}
 
-		private PluralRules.PluralRuleDelegate GetPluralRule(FormattingInfo formattingInfo)
+		private PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
 		{
 			// See if the language was explicitly passed:
-			var pluralOptions = formattingInfo.Placeholder.FormatterOptions;
+			var pluralOptions = formattingInfo.FormatterOptions;
 			if (pluralOptions.Length != 0)
 			{
 				return PluralRules.GetPluralRule(pluralOptions);
@@ -77,7 +77,7 @@ namespace SmartFormat.Extensions
 			return null;
 		}
 
-		public void EvaluateFormat(FormattingInfo formattingInfo)
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;

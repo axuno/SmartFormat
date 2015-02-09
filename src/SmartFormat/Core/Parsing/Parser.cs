@@ -1,4 +1,6 @@
-﻿namespace SmartFormat.Core.Parsing
+﻿using SmartFormat.Core.Settings;
+
+namespace SmartFormat.Core.Parsing
 {
 	/// <summary>
 	/// Parses a format string.

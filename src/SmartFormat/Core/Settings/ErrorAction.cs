@@ -1,4 +1,4 @@
-﻿namespace SmartFormat.Core
+﻿namespace SmartFormat.Core.Settings
 {
 	/// <summary>
 	/// Determines how format errors are handled.

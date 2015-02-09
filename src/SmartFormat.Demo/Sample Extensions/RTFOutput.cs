@@ -30,12 +30,12 @@ namespace SmartFormat.Demo.Sample_Extensions
 			output = new RTFBuilder();
 		}
 
-		public void Write(string text, FormattingInfo formattingInfo)
+		public void Write(string text, IFormattingInfo formattingInfo)
 		{
 			Write(text, 0, text.Length, formattingInfo);
 		}
 
-		public void Write(string text, int startIndex, int length, FormattingInfo formattingInfo)
+		public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
 		{
 			// Depending on the nested level, we will color this item differently:
 			if (formattingInfo.FormatDetails.FormatError != null)

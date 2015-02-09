@@ -7,7 +7,7 @@ namespace SmartFormat.Core.Extensions
 	public interface IFormatter
 	{
 		/// <summary> Takes the current object and writes it to the output, using the specified format. </summary>
-		void EvaluateFormat(FormattingInfo formattingInfo);
+		void EvaluateFormat(IFormattingInfo formattingInfo);
 
 		string[] Names { get; set; }
 	}

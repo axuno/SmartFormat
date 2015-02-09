@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.OldTests

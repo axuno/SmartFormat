@@ -1,6 +1,7 @@
 ﻿using System.Xml.Linq;
 using NUnit.Framework;
 using SmartFormat.Core;
+using SmartFormat.Core.Formatting;
 
 namespace SmartFormat.Tests.Extensions
 {

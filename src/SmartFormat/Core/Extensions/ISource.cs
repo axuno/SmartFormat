@@ -10,7 +10,7 @@ namespace SmartFormat.Core.Extensions
 		/// <summary>
 		/// Takes the current object and evaluates the selector.
 		/// </summary>
-		/// <param name="formattingInfo"></param>
-		void EvaluateSelector(FormattingInfo formattingInfo);
+		/// <param name="selectorInfo"></param>
+		void EvaluateSelector(ISelectorInfo selectorInfo);
 	}
 }

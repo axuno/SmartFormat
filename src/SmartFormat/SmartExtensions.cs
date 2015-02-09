@@ -1,5 +1,6 @@
 using System.Text;
 using SmartFormat.Core;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 
 namespace SmartFormat

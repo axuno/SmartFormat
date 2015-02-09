@@ -1,10 +1,11 @@
 ﻿using System;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Extensions
 {
-	public class FormattingInfo
+	public class FormattingInfo : IFormattingInfo, ISelectorInfo
 	{
 		public FormattingInfo(object currentValue, Format format, FormatDetails formatDetails)
 		{
@@ -19,16 +20,8 @@ namespace SmartFormat.Core.Extensions
 		}
 
 		public Selector Selector { get; set; }
+		public object Result { get; set; }
 
-	
-		
-		public void SetCurrent(object currentValue, Placeholder placeholder)
-		{
-			this.CurrentValue = currentValue;
-			this.Placeholder = placeholder;
-			this.Format = placeholder.Format;
-			
-		}
 
 		/// <summary>
 		/// The current value that is to be formatted.
@@ -38,18 +31,26 @@ namespace SmartFormat.Core.Extensions
 		/// the CurrentValue would be the value of "Items.Length".
 		/// </example>
 		public object CurrentValue { get; set; }
-
-		public Placeholder Placeholder { get; private set; }
-
-		public Format Format { get; private set; }
-
 		/// <summary>
 		/// A flag to indicate that formatting has been handled.
 		/// </summary>
 		[Obsolete("Named formatters has made this flag obsolete. Still available, though, for backwards compatibility.")]
 		public bool Handled { get; set; }
-
 		public FormatDetails FormatDetails { get; private set; }
+
+
+		public void SetCurrent(object currentValue, Placeholder placeholder)
+		{
+			this.CurrentValue = currentValue;
+			this.Placeholder = placeholder;
+			this.Format = placeholder.Format;
+		}
+
+		public Placeholder Placeholder { get; private set; }
+		public int Alignment { get { return this.Placeholder.Alignment; }}
+		public string FormatterOptions { get { return Placeholder.FormatterOptions; } }
+
+		public Format Format { get; private set; }
 
 		/// <summary>
 		/// Writes a string to the output.

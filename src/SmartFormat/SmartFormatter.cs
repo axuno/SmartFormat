@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using SmartFormat.Core;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
-using FormatException = SmartFormat.Core.FormatException;
+using SmartFormat.Core.Settings;
+using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat
 {
@@ -19,7 +21,7 @@ namespace SmartFormat
 
 		public SmartFormatter()
 			#if DEBUG
-			: this(Core.ErrorAction.ThrowError)
+			: this(ErrorAction.ThrowError)
 			#else
 			: this(ErrorAction.Ignore)
 			#endif
@@ -233,6 +235,8 @@ namespace SmartFormat
 			foreach (var selector in placeholder.Selectors)
 			{
 				childFormattingInfo.Selector = selector;
+				childFormattingInfo.Result = null;
+				childFormattingInfo.Handled = false;
 				InvokeSourceExtensions(childFormattingInfo);
 				if (!childFormattingInfo.Handled)
 				{
@@ -241,6 +245,7 @@ namespace SmartFormat
 					childFormattingInfo.CurrentValue = null;
 					break;
 				}
+				childFormattingInfo.CurrentValue = childFormattingInfo.Result;
 			}
 		}
 
@@ -272,7 +277,7 @@ namespace SmartFormat
 		}
 		private void InvokeFormatterExtensions(FormattingInfo formattingInfo)
 		{
-			var formatterName = formattingInfo.Placeholder.FormatterName; // formatDetails.Placeholder.NamedFormatter;
+			var formatterName = formattingInfo.Placeholder.FormatterName;
 			if (formatterName != "")
 			{
 				// Evaluate JUST the named formatter:

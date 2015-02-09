@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 using SmartFormat.Tests.Common;
 
 namespace SmartFormat.Tests.Core

@@ -25,10 +25,10 @@ namespace SmartFormat.Extensions
 		/// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
 		/// The ".2" selector is used to reference Dates[2].
 		/// </summary>
-		public void EvaluateSelector(FormattingInfo formattingInfo)
+		public void EvaluateSelector(ISelectorInfo selectorInfo)
 		{
-			var current = formattingInfo.CurrentValue;
-			var selector = formattingInfo.Selector;
+			var current = selectorInfo.CurrentValue;
+			var selector = selectorInfo.Selector;
 
 			// See if we're trying to access a specific index:
 			int itemIndex;
@@ -40,8 +40,8 @@ namespace SmartFormat.Extensions
 				// let's return the List item:
 				// Example: {People[2].Name}
 				//		   ^List  ^itemIndex
-				formattingInfo.CurrentValue = currentList[itemIndex];
-				formattingInfo.Handled = true;
+				selectorInfo.Result = currentList[itemIndex];
+				selectorInfo.Handled = true;
 			}
 
 
@@ -51,16 +51,16 @@ namespace SmartFormat.Extensions
 				// Looking for "{Index}"
 				if (selector.SelectorIndex == 0)
 				{
-					formattingInfo.CurrentValue = CollectionIndex;
-					formattingInfo.Handled = true;
+					selectorInfo.Result = CollectionIndex;
+					selectorInfo.Handled = true;
 					return;
 				}
 
 				// Looking for 2 lists to sync: "{List1: {List2[Index]} }"
 				if (currentList != null && 0 <= CollectionIndex && CollectionIndex < currentList.Count)
 				{
-					formattingInfo.CurrentValue = currentList[CollectionIndex];
-					formattingInfo.Handled = true;
+					selectorInfo.Result = currentList[CollectionIndex];
+					selectorInfo.Handled = true;
 				}
 			}
 		}
@@ -104,7 +104,7 @@ namespace SmartFormat.Extensions
 		/// In this example, format = "{Width}x{Height}".  Notice the nested braces.
 		///
 		/// </summary>
-		public void EvaluateFormat(FormattingInfo formattingInfo)
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
@@ -138,6 +138,7 @@ namespace SmartFormat.Extensions
 			var lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : spacer;
 			var twoSpacer = (parameters.Count >= 4) ? parameters[3].Text : lastSpacer;
 
+			// TODO: Deprecate:
 			if (!itemFormat.HasNested)
 			{
 				// The format is not nested,
@@ -146,7 +147,7 @@ namespace SmartFormat.Extensions
 				newItemFormat.startIndex = itemFormat.startIndex;
 				newItemFormat.endIndex = itemFormat.endIndex;
 				newItemFormat.HasNested = true;
-				var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, formattingInfo.Placeholder.NestedDepth);
+				var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, 0);
 				newPlaceholder.Format = itemFormat;
 				newPlaceholder.endIndex = itemFormat.endIndex;
 				newItemFormat.Items.Add(newPlaceholder);

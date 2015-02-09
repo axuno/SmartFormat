@@ -1,7 +1,7 @@
 ﻿using System;
 using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core
+namespace SmartFormat.Core.Formatting
 {
 	/// <summary>
 	/// An exception caused by either a parsing issue
