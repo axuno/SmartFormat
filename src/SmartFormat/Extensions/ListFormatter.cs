@@ -101,8 +101,13 @@ namespace SmartFormat.Extensions
 		/// In this example, format = "{Width}x{Height}".  Notice the nested braces.
 		///
 		/// </summary>
-		public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+		public void EvaluateFormat(FormattingInfo formattingInfo)
 		{
+			var format = formattingInfo.Format;
+			var current = formattingInfo.CurrentValue;
+			var formatDetails = formattingInfo.FormatDetails;
+			var output = formattingInfo.FormatDetails.Output;
+
 			// This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
 
 			// This extension requires at least IEnumerable
@@ -138,7 +143,7 @@ namespace SmartFormat.Extensions
 				newItemFormat.startIndex = itemFormat.startIndex;
 				newItemFormat.endIndex = itemFormat.endIndex;
 				newItemFormat.HasNested = true;
-				var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, formatDetails.Placeholder.NestedDepth);
+				var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, formattingInfo.Placeholder.NestedDepth);
 				newPlaceholder.Format = itemFormat;
 				newPlaceholder.endIndex = itemFormat.endIndex;
 				newItemFormat.Items.Add(newPlaceholder);
@@ -168,15 +173,15 @@ namespace SmartFormat.Extensions
 					// Don't write the spacer.
 				}
 				else if (CollectionIndex < items.Count - 1) {
-					output.Write(spacer, formatDetails);
+					formattingInfo.Write(spacer);
 				}
 				else if (CollectionIndex == 1)
 				{
-					output.Write(twoSpacer, formatDetails);
+					formattingInfo.Write(twoSpacer);
 				}
 				else
 				{
-					output.Write(lastSpacer, formatDetails);
+					formattingInfo.Write(lastSpacer);
 				}
 
 				// Output the nested format for this item:
@@ -185,7 +190,7 @@ namespace SmartFormat.Extensions
 
 			CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex
 
-			handled = true;
+			formattingInfo.Handled = true;
 		}
 
 	}

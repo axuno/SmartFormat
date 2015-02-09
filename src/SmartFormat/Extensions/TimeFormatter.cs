@@ -43,12 +43,17 @@ namespace SmartFormat.Extensions
 
 		#region IFormatter
 
-		public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+		public void EvaluateFormat(FormattingInfo formattingInfo)
 		{
+			var format = formattingInfo.Format;
+			var current = formattingInfo.CurrentValue;
+			var formatDetails = formattingInfo.FormatDetails;
+			var output = formattingInfo.FormatDetails.Output;
+
 			if (format != null && format.HasNested) return;
 			string options;
-			if (formatDetails.FormatterOptions != "") 
-				options = formatDetails.FormatterOptions;
+			if (formattingInfo.Placeholder.FormatterOptions != "") 
+				options = formattingInfo.Placeholder.FormatterOptions;
 			else if (format != null) 
 				options = format.Text;
 			else 
@@ -59,7 +64,7 @@ namespace SmartFormat.Extensions
 			{
 				fromTime = (TimeSpan)current;
 			}
-			else if (current is DateTime && formatDetails.FormatterOptions != "")
+			else if (current is DateTime && formattingInfo.Placeholder.FormatterOptions != "")
 			{
 				fromTime = DateTime.Now.Subtract((DateTime)current);
 			}
@@ -79,8 +84,8 @@ namespace SmartFormat.Extensions
 			}
 			var formattingOptions = TimeSpanFormatOptionsConverter.Parse(options);
 			var timeString = TimeSpanUtility.ToTimeString(fromTime, formattingOptions, timeTextInfo);
-			output.Write(timeString, formatDetails);
-			handled = true;
+			formattingInfo.Write(timeString);
+			formattingInfo.Handled = true;
 
 		}
 

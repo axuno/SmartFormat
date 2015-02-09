@@ -4,10 +4,16 @@ using System.Text;
 namespace SmartFormat.Core.Parsing
 {
 	/// <summary>
-	/// Represents the placeholder in a parsed format string,
-	/// including the <see cref="Selector"/>s
-	/// and the item <see cref="Format"/>.
+	/// A placeholder is the part of a format string between the { braces }.
 	/// </summary>
+	/// <example>
+	/// For example, in "{Items.Length,10:choose(1,2,3):one|two|three}",
+	/// the <see cref="Alignment"/>s is "10", 
+	/// the <see cref="Selector"/>s are "Items" and "Length", 
+	/// the <see cref="FormatterName" /> is "choose",
+	/// the <see cref="FormatterOptions"/> is "1,2,3",
+	/// and the <see cref="Format"/> is "one|two|three".
+	/// </example>
 	public class Placeholder : FormatItem
 	{
 		public Placeholder(Format parent, int startIndex, int nestedDepth) : base(parent, startIndex)
@@ -19,9 +25,13 @@ namespace SmartFormat.Core.Parsing
 
 		public readonly Format parent;
 		public List<Selector> Selectors { get; private set; }
-		public NamedFormatter NamedFormatter { get; set; }
-		public Format Format { get; set; }
 		public int Alignment { get; set; }
+
+		public NamedFormatter NamedFormatter { get; set; }
+		public string FormatterName { get { return NamedFormatter == null ? "" : NamedFormatter.Name; } }
+		public string FormatterOptions { get { return NamedFormatter == null ? "" : NamedFormatter.Options; } }
+
+		public Format Format { get; set; }
 		public int NestedDepth { get; set; }
 
 		public override string ToString()

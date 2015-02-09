@@ -13,10 +13,15 @@ namespace SmartFormat.Extensions
 		/// <summary>
 		/// Do the default formatting, same logic as "String.Format".
 		/// </summary>
-		public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+		public void EvaluateFormat(FormattingInfo formattingInfo)
 		{
 			// This function always handles the method:
-			handled = true;
+			formattingInfo.Handled = true;
+
+			var format = formattingInfo.Format;
+			var formatDetails = formattingInfo.FormatDetails;
+			var output = formattingInfo.FormatDetails.Output;
+			var current = formattingInfo.CurrentValue;
 
 			// If the format has nested placeholders, we process those first
 			// instead of formatting the item:
@@ -63,26 +68,26 @@ namespace SmartFormat.Extensions
 
 
 			// See if there's a pre-alignment to consider:
-			if (formatDetails.Placeholder.Alignment > 0)
+			if (formattingInfo.Placeholder.Alignment > 0)
 			{
-				var spaces = formatDetails.Placeholder.Alignment - result.Length;
+				var spaces = formattingInfo.Placeholder.Alignment - result.Length;
 				if (spaces > 0)
 				{
-					output.Write(new String(' ', spaces), formatDetails);
+					formattingInfo.Write(new String(' ', spaces));
 				}
 			}
 
 			// Output the result:
-			output.Write(result, formatDetails);
+			formattingInfo.Write(result);
 
 
 			// See if there's a post-alignment to consider:
-			if (formatDetails.Placeholder.Alignment < 0)
+			if (formattingInfo.Placeholder.Alignment < 0)
 			{
-				var spaces = -formatDetails.Placeholder.Alignment - result.Length;
+				var spaces = -formattingInfo.Placeholder.Alignment - result.Length;
 				if (spaces > 0)
 				{
-					output.Write(new String(' ', spaces), formatDetails);
+					formattingInfo.Write(new String(' ', spaces));
 				}
 			}
 		}

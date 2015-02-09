@@ -31,12 +31,12 @@ namespace SmartFormat.Extensions
 					handled = true;
 				}
 				// Alignment:
-				// An alignment item should be preceeded by a comma
+				// An alignment item should be preceded by a comma
 				else if (selector.Operator == ",")
 				{
 					// This selector is actually an Alignment modifier.
 					result = current; // (don't change the current item)
-					formatDetails.Placeholder.Alignment = selectorValue; // Set the alignment
+					//placeholder.Alignment = selectorValue; // Set the alignment
 					handled = true;
 				}
 			}

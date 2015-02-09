@@ -93,12 +93,13 @@ namespace SmartFormat.Tests.Core
 			private string[] names = { "test1", "t1" };
 			public string[] Names { get { return names; } set { names = value; } }
 
-			public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+			public void EvaluateFormat(FormattingInfo formattingInfo)
 			{
-				var options = formatDetails.FormatterOptions;
+				var options = formattingInfo.Placeholder.FormatterOptions;
+				var format = formattingInfo.Format;
 				var formatString = format != null ? format.ToString() : "";
-				output.Write("TestExtension1 Options: " + options + ", Format: " + formatString, formatDetails);
-				handled = true;
+				formattingInfo.Write("TestExtension1 Options: " + options + ", Format: " + formatString);
+				formattingInfo.Handled = true;
 			}
 		}
 		private class TestExtension2 : IFormatter
@@ -106,12 +107,13 @@ namespace SmartFormat.Tests.Core
 			private string[] names = { "test2", "t2" };
 			public string[] Names { get { return names; } set { names = value; } }
 
-			public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+			public void EvaluateFormat(FormattingInfo formattingInfo)
 			{
-				var options = formatDetails.FormatterOptions;
+				var options = formattingInfo.Placeholder.FormatterOptions;
+				var format = formattingInfo.Format;
 				var formatString = format != null ? format.ToString() : "";
-				output.Write("TestExtension2 Options: " + options + ", Format: " + formatString, formatDetails);
-				handled = true;
+				formattingInfo.Write("TestExtension2 Options: " + options + ", Format: " + formatString);
+				formattingInfo.Handled = true;
 			}
 
 		}

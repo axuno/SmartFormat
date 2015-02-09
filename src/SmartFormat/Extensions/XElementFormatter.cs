@@ -8,13 +8,16 @@ namespace SmartFormat.Extensions
 {
 	public class XElementFormatter : IFormatter
 	{
-		#region IFormatter
 		private string[] names = {"xelement", "xml", "x"};
 		public string[] Names { get { return names; } set { names = value; } }
 
-		public void EvaluateFormat(object current, Format format,
-			ref bool handled, IOutput output, FormatDetails formatDetails)
+		public void EvaluateFormat(FormattingInfo formattingInfo)
 		{
+			var format = formattingInfo.Format;
+			var current = formattingInfo.CurrentValue;
+			var formatDetails = formattingInfo.FormatDetails;
+			var output = formattingInfo.FormatDetails.Output;
+
 			XElement currentXElement = null;
 			if (format != null && format.HasNested) return;
 			// if we need to format list of XElements then we just take and format first
@@ -22,18 +25,17 @@ namespace SmartFormat.Extensions
 			if (xElmentsAsList != null && xElmentsAsList.Count > 0)
 			{
 				currentXElement = xElmentsAsList[0];
-				handled = true;
+				formattingInfo.Handled = true;
 			}
 
 			var currentAsXElement = (currentXElement) ?? current as XElement;
 			if (currentAsXElement != null)
 			{
-				output.Write(currentAsXElement.Value, formatDetails);
-				handled = true;
+				formattingInfo.Write(currentAsXElement.Value);
+				formattingInfo.Handled = true;
 			}
 		}
 
-		#endregion
 	}
 
 }

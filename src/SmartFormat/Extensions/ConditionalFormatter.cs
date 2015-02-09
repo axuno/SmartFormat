@@ -17,8 +17,12 @@ namespace SmartFormat.Extensions
 			RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 
-		public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+		public void EvaluateFormat(FormattingInfo formattingInfo)
 		{
+			var format = formattingInfo.Format;
+			var current = formattingInfo.CurrentValue;
+			var formatDetails = formattingInfo.FormatDetails;
+			
 			if (format == null) return;
 			// Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
 			if (format.baseString[format.startIndex] == ':')
@@ -54,7 +58,7 @@ namespace SmartFormat.Extensions
 					{
 						// We reached the end of our parameters,
 						// so we output nothing
-						handled = true;
+						formattingInfo.Handled = true;
 						return;
 					}
 					bool conditionWasTrue;
@@ -76,8 +80,8 @@ namespace SmartFormat.Extensions
 					// If the conditional statement was true, then we can break.
 					if (conditionWasTrue)
 					{
-						formatDetails.Formatter.Format(output, outputItem, current, formatDetails);
-						handled = true;
+						formatDetails.Formatter.Format(formattingInfo.FormatDetails.Output, outputItem, current, formatDetails);
+						formattingInfo.Handled = true;
 						return;
 					}
 				}
@@ -171,8 +175,8 @@ namespace SmartFormat.Extensions
 			var selectedParameter = parameters[paramIndex];
 
 			// Output the selectedParameter:
-			formatDetails.Formatter.Format(output, selectedParameter, current, formatDetails);
-			handled = true;
+			formatDetails.Formatter.Format(formatDetails.Output, selectedParameter, current, formatDetails);
+			formattingInfo.Handled = true;
 		}
 
 		/// <summary>

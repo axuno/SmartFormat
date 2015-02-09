@@ -39,17 +39,17 @@ namespace SmartFormat.Extensions
 			}
 		}
 
-		private PluralRules.PluralRuleDelegate GetPluralRule(FormatDetails formatDetails)
+		private PluralRules.PluralRuleDelegate GetPluralRule(FormattingInfo formattingInfo)
 		{
 			// See if the language was explicitly passed:
-			var pluralOptions = formatDetails.FormatterOptions;
+			var pluralOptions = formattingInfo.Placeholder.FormatterOptions;
 			if (pluralOptions.Length != 0)
 			{
 				return PluralRules.GetPluralRule(pluralOptions);
 			}
 
 			// See if a CustomPluralRuleProvider is available from the FormatProvider:
-			var provider = formatDetails.Provider;
+			var provider = formattingInfo.FormatDetails.Provider;
 			if (provider != null)
 			{
 				var pluralRuleProvider = (CustomPluralRuleProvider) provider.GetFormat(typeof (CustomPluralRuleProvider));
@@ -77,8 +77,13 @@ namespace SmartFormat.Extensions
 			return null;
 		}
 
-		public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+		public void EvaluateFormat(FormattingInfo formattingInfo)
 		{
+			var format = formattingInfo.Format;
+			var current = formattingInfo.CurrentValue;
+			var formatDetails = formattingInfo.FormatDetails;
+			var output = formattingInfo.FormatDetails.Output;
+
 			// Ignore formats that start with "?" (this can be used to bypass this extension)
 			if (format == null || format.baseString[format.startIndex] == ':')
 			{
@@ -101,8 +106,7 @@ namespace SmartFormat.Extensions
 			var value = Convert.ToDecimal(current);
 
 			// Get the plural rule:
-			var provider = formatDetails.Provider;
-			var pluralRule = GetPluralRule(formatDetails);
+			var pluralRule = GetPluralRule(formattingInfo);
 
 			if (pluralRule == null)
 			{
@@ -122,7 +126,7 @@ namespace SmartFormat.Extensions
 			// Output the selected word (allowing for nested formats):
 			var pluralForm = pluralWords[pluralIndex];
 			formatDetails.Formatter.Format(output, pluralForm, current, formatDetails);
-			handled = true;
+			formattingInfo.Handled = true;
 		}
 
 	}
