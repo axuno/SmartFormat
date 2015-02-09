@@ -13,7 +13,7 @@ namespace SmartFormat.Extensions
 		/// <summary>
 		/// Do the default formatting, same logic as "String.Format".
 		/// </summary>
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			// This function always handles the method:
 			formattingInfo.Handled = true;

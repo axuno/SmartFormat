@@ -190,7 +190,6 @@ namespace SmartFormat
 			var childFormattingInfo = new FormattingInfo(formattingInfo.FormatDetails);
 			foreach (var item in formattingInfo.Format.Items)
 			{
-				
 				var literalItem = item as LiteralText;
 				if (literalItem != null)
 				{
@@ -285,7 +284,7 @@ namespace SmartFormat
 				foreach (var formatterExtension in this.FormatterExtensions)
 				{
 					if (!formatterExtension.Names.Contains(formatterName)) continue;
-					formatterExtension.EvaluateFormat(formattingInfo);
+					formatterExtension.TryEvaluateFormat(formattingInfo);
 					if (formattingInfo.Handled) break;
 				}
 			}
@@ -295,7 +294,7 @@ namespace SmartFormat
 				formattingInfo.Handled = false;
 				foreach (var formatterExtension in this.FormatterExtensions)
 				{
-					formatterExtension.EvaluateFormat(formattingInfo);
+					formatterExtension.TryEvaluateFormat(formattingInfo);
 					if (formattingInfo.Handled) break;
 				}
 			}

@@ -43,7 +43,7 @@ namespace SmartFormat.Extensions
 
 		#region IFormatter
 
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;

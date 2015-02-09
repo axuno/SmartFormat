@@ -104,7 +104,7 @@ namespace SmartFormat.Extensions
 		/// In this example, format = "{Width}x{Height}".  Notice the nested braces.
 		///
 		/// </summary>
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
