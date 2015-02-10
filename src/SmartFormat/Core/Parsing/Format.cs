@@ -152,9 +152,16 @@ namespace SmartFormat.Core.Parsing
 
 		#region: Split :
 
+		private char splitCacheChar;
+		private IList<Format> splitCache;
 		public IList<Format> Split(char search)
 		{
-			return Split(search, -1);
+			if (this.splitCache == null || this.splitCacheChar != search)
+			{
+				this.splitCacheChar = search;
+				this.splitCache = Split(search, -1);
+			}
+			return this.splitCache;
 		}
 
 		public IList<Format> Split(char search, int maxCount)
