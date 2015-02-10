@@ -174,7 +174,7 @@ namespace SmartFormat
 
 		public void Format(IOutput output, Format format, object current, FormatDetails formatDetails)
 		{
-			var formattingInfo = new FormattingInfo(current, format, formatDetails);
+			var formattingInfo = new FormattingInfo(formatDetails, format, current);
 			Format(formattingInfo);
 		}
 
@@ -186,21 +186,18 @@ namespace SmartFormat
 		{
 			// Before we start, make sure we have at least one source extension and one formatter extension:
 			CheckForExtensions();
-			//Placeholder originalPlaceholder = formatDetails.Placeholder;
-			var childFormattingInfo = new FormattingInfo(formattingInfo.FormatDetails);
 			foreach (var item in formattingInfo.Format.Items)
 			{
 				var literalItem = item as LiteralText;
 				if (literalItem != null)
 				{
-					//formattingInfo.Placeholder = originalPlaceholder;
 					formattingInfo.Write(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
 					continue;
 				} 
 				
 				// Otherwise, the item must be a placeholder.
 				var placeholder = (Placeholder)item;
-				childFormattingInfo.SetCurrent(formattingInfo.CurrentValue, placeholder);
+				var childFormattingInfo = formattingInfo.CreateChild(placeholder);
 				try
 				{
 					EvaluateSelectors(childFormattingInfo);

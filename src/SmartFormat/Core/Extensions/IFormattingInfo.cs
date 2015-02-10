@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
@@ -34,6 +35,7 @@ namespace SmartFormat.Core.Extensions
 		/// <summary>
 		/// A flag to indicate that formatting has been handled.
 		/// </summary>
+		[Obsolete("Named formatters has made this flag obsolete. Still available, though, for backwards compatibility.")]
 		bool Handled { get; set; }
 
 		/// <summary>

@@ -7,21 +7,36 @@ namespace SmartFormat.Core.Extensions
 {
 	public class FormattingInfo : IFormattingInfo, ISelectorInfo
 	{
-		public FormattingInfo(object currentValue, Format format, FormatDetails formatDetails)
+		public FormattingInfo(FormatDetails formatDetails, Format format, object currentValue)
 		{
 			CurrentValue = currentValue;
 			Format = format;
 			FormatDetails = formatDetails;
 		}
 
-		public FormattingInfo(FormatDetails formatDetails)
+		public FormattingInfo(FormatDetails formatDetails, Placeholder placeholder, object currentValue)
 		{
 			this.FormatDetails = formatDetails;
+			this.Placeholder = placeholder;
+			this.Format = placeholder.Format;
+			this.CurrentValue = currentValue;
 		}
+
+		public FormattingInfo CreateChild(Format format, object currentValue)
+		{
+			return new FormattingInfo(this.FormatDetails, format, currentValue);
+		}
+
+		public FormattingInfo CreateChild(Placeholder placeholder)
+		{
+			return new FormattingInfo(this.FormatDetails, placeholder, this.CurrentValue);
+		}
+
+
+		public FormatDetails FormatDetails { get; private set; }
 
 		public Selector Selector { get; set; }
 		public object Result { get; set; }
-
 
 		/// <summary>
 		/// The current value that is to be formatted.
@@ -31,20 +46,11 @@ namespace SmartFormat.Core.Extensions
 		/// the CurrentValue would be the value of "Items.Length".
 		/// </example>
 		public object CurrentValue { get; set; }
+
 		/// <summary>
 		/// A flag to indicate that formatting has been handled.
 		/// </summary>
-		[Obsolete("Named formatters has made this flag obsolete. Still available, though, for backwards compatibility.")]
 		public bool Handled { get; set; }
-		public FormatDetails FormatDetails { get; private set; }
-
-
-		public void SetCurrent(object currentValue, Placeholder placeholder)
-		{
-			this.CurrentValue = currentValue;
-			this.Placeholder = placeholder;
-			this.Format = placeholder.Format;
-		}
 
 		public Placeholder Placeholder { get; private set; }
 		public int Alignment { get { return this.Placeholder.Alignment; }}
@@ -72,17 +78,16 @@ namespace SmartFormat.Core.Extensions
 			this.FormatDetails.Output.Write(text, startIndex, length, this);
 		}
 
-		public void Write(Format nestedFormat, object currentValue)
+		/// <summary>
+		/// Writes the nested format to the output.
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="value"></param>
+		public void Write(Format format, object value)
 		{
-			var nestedFormatInfo = this.CreateChild(nestedFormat, currentValue);
+			var nestedFormatInfo = this.CreateChild(format, value);
 			this.FormatDetails.Formatter.Format(nestedFormatInfo);
 		}
-
-		public FormattingInfo CreateChild(Format format, object currentValue)
-		{
-			return new FormattingInfo(currentValue, format, this.FormatDetails);
-		}
-
 
 	}
 }
