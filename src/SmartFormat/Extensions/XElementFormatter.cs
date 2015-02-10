@@ -20,8 +20,6 @@ namespace SmartFormat.Extensions
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
-			var formatDetails = formattingInfo.FormatDetails;
-			var output = formattingInfo.FormatDetails.Output;
 
 			XElement currentXElement = null;
 			if (format != null && format.HasNested) return;

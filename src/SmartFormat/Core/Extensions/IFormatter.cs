@@ -1,5 +1,4 @@
-﻿using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Output;
+﻿using SmartFormat.Core.Formatting;
 
 namespace SmartFormat.Core.Extensions
 {

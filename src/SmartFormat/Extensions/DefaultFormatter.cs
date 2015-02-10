@@ -1,5 +1,6 @@
 ﻿using System;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
@@ -23,15 +24,13 @@ namespace SmartFormat.Extensions
 			formattingInfo.Handled = true;
 
 			var format = formattingInfo.Format;
-			var formatDetails = formattingInfo.FormatDetails;
-			var output = formattingInfo.FormatDetails.Output;
 			var current = formattingInfo.CurrentValue;
 
 			// If the format has nested placeholders, we process those first
 			// instead of formatting the item:
 			if (format != null && format.HasNested)
 			{
-				formatDetails.Formatter.Format(output, format, current, formatDetails);
+				formattingInfo.Write(format, current);
 				return;
 			}
 
@@ -45,21 +44,21 @@ namespace SmartFormat.Extensions
 			//  (The following code was adapted from the built-in String.Format code)
 
 			//  We will try using IFormatProvider, IFormattable, and if all else fails, ToString.
-			var formatter = formatDetails.Formatter;
 			string result = null;
 			ICustomFormatter cFormatter;
 			IFormattable formattable;
 			// Use the provider to see if a CustomFormatter is available:
-			if (formatDetails.Provider != null && (cFormatter = formatDetails.Provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
+			var provider = formattingInfo.FormatDetails.Provider;
+			if (provider != null && (cFormatter = provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
 			{
 				var formatText = format == null ? null : format.GetText();
-				result = cFormatter.Format(formatText, current, formatDetails.Provider);
+				result = cFormatter.Format(formatText, current, provider);
 			}
 			// IFormattable:
 			else if ((formattable = current as IFormattable) != null)
 			{
 				var formatText = format == null ? null : format.ToString();
-				result = formattable.ToString(formatText, formatDetails.Provider);
+				result = formattable.ToString(formatText, provider);
 			}
 			// ToString:
 			else

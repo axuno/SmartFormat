@@ -52,7 +52,6 @@ namespace SmartFormat.Extensions
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
-			var formatDetails = formattingInfo.FormatDetails;
 
 			if (format != null && format.HasNested) return;
 			string options;
@@ -81,7 +80,7 @@ namespace SmartFormat.Extensions
 			{
 				return;
 			}
-			var timeTextInfo = GetTimeTextInfo(formatDetails.Provider);
+			var timeTextInfo = GetTimeTextInfo(formattingInfo.FormatDetails.Provider);
 			if (timeTextInfo == null)
 			{
 				return;

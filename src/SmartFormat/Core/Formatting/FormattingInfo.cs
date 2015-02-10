@@ -1,9 +1,7 @@
-﻿using System;
-using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Output;
+﻿using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 
-namespace SmartFormat.Core.Extensions
+namespace SmartFormat.Core.Formatting
 {
 	public class FormattingInfo : IFormattingInfo, ISelectorInfo
 	{

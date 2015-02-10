@@ -85,8 +85,6 @@ namespace SmartFormat.Extensions
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
-			var formatDetails = formattingInfo.FormatDetails;
-			var output = formattingInfo.FormatDetails.Output;
 
 			// Ignore formats that start with "?" (this can be used to bypass this extension)
 			if (format == null || format.baseString[format.startIndex] == ':')
@@ -129,7 +127,7 @@ namespace SmartFormat.Extensions
 
 			// Output the selected word (allowing for nested formats):
 			var pluralForm = pluralWords[pluralIndex];
-			formatDetails.Formatter.Format(output, pluralForm, current, formatDetails);
+			formattingInfo.Write(pluralForm, current);
 			formattingInfo.Handled = true;
 		}
 

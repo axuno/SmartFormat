@@ -112,9 +112,7 @@ namespace SmartFormat.Extensions
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
-			var formatDetails = formattingInfo.FormatDetails;
-			var output = formattingInfo.FormatDetails.Output;
-
+			
 			// This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
 
 			// This extension requires at least IEnumerable
@@ -193,7 +191,7 @@ namespace SmartFormat.Extensions
 				}
 
 				// Output the nested format for this item:
-				formatDetails.Formatter.Format(output, itemFormat, item, formatDetails);
+				formattingInfo.Write(itemFormat, item);
 			}
 
 			CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex
