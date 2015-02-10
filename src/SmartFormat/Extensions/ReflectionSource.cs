@@ -14,7 +14,7 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void EvaluateSelector(ISelectorInfo selectorInfo)
+		public void TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
 			var selector = selectorInfo.Selector;

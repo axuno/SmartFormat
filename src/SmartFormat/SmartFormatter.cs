@@ -270,7 +270,7 @@ namespace SmartFormat
 			formattingInfo.Handled = false;
 			foreach (var sourceExtension in this.SourceExtensions)
 			{
-				sourceExtension.EvaluateSelector(formattingInfo);
+				sourceExtension.TryEvaluateSelector(formattingInfo);
 				if (formattingInfo.Handled) break;
 			}
 		}

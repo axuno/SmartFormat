@@ -25,7 +25,7 @@ namespace SmartFormat.Extensions
 		/// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
 		/// The ".2" selector is used to reference Dates[2].
 		/// </summary>
-		public void EvaluateSelector(ISelectorInfo selectorInfo)
+		public void TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
 			var selector = selectorInfo.Selector;
