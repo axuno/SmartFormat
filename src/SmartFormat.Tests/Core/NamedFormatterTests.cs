@@ -13,12 +13,12 @@ namespace SmartFormat.Tests.Core
 		#region: Default Extensions :
 
 		[Test]
-		[TestCase("{0:choose:zero|one|two}", 0, "zero")]
-		[TestCase("{0:choose:zero|one|two}", 1, "one")]
-		[TestCase("{0:choose:zero|one|two}", 2, "two")]
-		[TestCase("{0:c:zero|one|two}", 0, "zero")]
-		[TestCase("{0:c:zero|one|two}", 1, "one")]
-		[TestCase("{0:c:zero|one|two}", 2, "two")]
+		[TestCase("{0:conditional:zero|one|two}", 0, "zero")]
+		[TestCase("{0:conditional:zero|one|two}", 1, "one")]
+		[TestCase("{0:conditional:zero|one|two}", 2, "two")]
+		[TestCase("{0:cond:zero|one|two}", 0, "zero")]
+		[TestCase("{0:cond:zero|one|two}", 1, "one")]
+		[TestCase("{0:cond:zero|one|two}", 2, "two")]
 		
 		[TestCase("{0:plural:one|many}", 1, "one")]
 		[TestCase("{0:plural:one|many}", 2, "many")]

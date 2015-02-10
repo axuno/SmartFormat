@@ -72,5 +72,17 @@ namespace SmartFormat.Core.Extensions
 			this.FormatDetails.Output.Write(text, startIndex, length, this);
 		}
 
+		public void Write(Format nestedFormat, object currentValue)
+		{
+			var nestedFormatInfo = this.CreateChild(nestedFormat, currentValue);
+			this.FormatDetails.Formatter.Format(nestedFormatInfo);
+		}
+
+		public FormattingInfo CreateChild(Format format, object currentValue)
+		{
+			return new FormattingInfo(currentValue, format, this.FormatDetails);
+		}
+
+
 	}
 }

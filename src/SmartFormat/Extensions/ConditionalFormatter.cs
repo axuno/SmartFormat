@@ -8,7 +8,7 @@ namespace SmartFormat.Extensions
 {
 	public class ConditionalFormatter : IFormatter
 	{
-		private string[] names = { "choose", "c" };
+		private string[] names = { "conditional", "cond" };
 		public string[] Names { get { return names; } set { names = value; } }
 
 		private static readonly Regex complexConditionPattern
@@ -35,7 +35,7 @@ namespace SmartFormat.Extensions
 			}
 
 			// See if the format string contains un-nested "|":
-			var parameters = format.Split("|");
+			var parameters = format.Split('|');
 			if (parameters.Count == 1) return; // There are no parameters found.
 
 			// See if the value is a number:

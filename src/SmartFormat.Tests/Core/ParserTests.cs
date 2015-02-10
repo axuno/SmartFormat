@@ -171,22 +171,20 @@ namespace SmartFormat.Tests.Core
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
 			var Format = parser.ParseFormat(format);
 
-			Assert.That(Format.IndexOf("|"), Is.EqualTo(2));
-			Assert.That(Format.IndexOf("|", 3), Is.EqualTo(43));
-			Assert.That(Format.IndexOf("|", 44), Is.EqualTo(-1));
-			Assert.That(Format.IndexOf("#"), Is.EqualTo(-1));
-			Assert.That(Format.IndexOf("eee"), Is.EqualTo(-1));
+			Assert.That(Format.IndexOf('|'), Is.EqualTo(2));
+			Assert.That(Format.IndexOf('|', 3), Is.EqualTo(43));
+			Assert.That(Format.IndexOf('|', 44), Is.EqualTo(-1));
+			Assert.That(Format.IndexOf('#'), Is.EqualTo(-1));
 
 			// Test nested formats:
 			var placeholder = (Placeholder) Format.Items[1];
 			Format = placeholder.Format;
 			Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
 
-			Assert.That(Format.IndexOf("|"), Is.EqualTo(7));
-			Assert.That(Format.IndexOf("|", 8), Is.EqualTo(25));
-			Assert.That(Format.IndexOf("|", 26), Is.EqualTo(-1));
-			Assert.That(Format.IndexOf("#"), Is.EqualTo(-1));
-			Assert.That(Format.IndexOf("eee"), Is.EqualTo(-1));
+			Assert.That(Format.IndexOf('|'), Is.EqualTo(7));
+			Assert.That(Format.IndexOf('|', 8), Is.EqualTo(25));
+			Assert.That(Format.IndexOf('|', 26), Is.EqualTo(-1));
+			Assert.That(Format.IndexOf('#'), Is.EqualTo(-1));
 		}
 
 		[Test]
@@ -195,7 +193,7 @@ namespace SmartFormat.Tests.Core
 			var parser = GetRegularParser();
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
 			var Format = parser.ParseFormat(format);
-			var splits = Format.Split("|");
+			var splits = Format.Split('|');
 
 			Assert.That(splits.Count, Is.EqualTo(3));
 			Assert.That(splits[0].ToString(), Is.EqualTo(" a"));
@@ -206,7 +204,7 @@ namespace SmartFormat.Tests.Core
 			var placeholder = (Placeholder) Format.Items[1];
 			Format = placeholder.Format;
 			Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
-			splits = Format.Split("|");
+			splits = Format.Split('|');
 
 			Assert.That(splits.Count, Is.EqualTo(3));
 			Assert.That(splits[0].ToString(), Is.EqualTo(" ccc dd"));

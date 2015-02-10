@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Core\FormatterTests.cs" />
     <Compile Include="Core\NamedFormatterTests.cs" />
+    <Compile Include="Extensions\ChooseFormatterTests.cs" />
     <Compile Include="Extensions\StringBuilderTests.cs" />
     <Compile Include="Extensions\DictionaryFormatterTests.cs">
       <SubType>Code</SubType>

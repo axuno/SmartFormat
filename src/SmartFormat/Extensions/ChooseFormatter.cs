@@ -8,27 +8,28 @@ namespace SmartFormat.Extensions
 	public class ChooseFormatter : IFormatter
 	{
 		private string[] names = { "choose", "c" };
-
 		public string[] Names { get { return names; } set { names = value; } }
+
+		private char splitChar = '|';
+		public char SplitChar { get { return splitChar;  } set { splitChar = value; } }
 
 		public void EvaluateFormat(IFormattingInfo formattingInfo)
 		{
-			var formats = formattingInfo.Format.Split("|");
+			var formats = formattingInfo.Format.Split(splitChar);
 			Format chosenFormat;
 			if (formats.Count == 1) {
 				chosenFormat = formats[0];
 			} else {
-				chosenFormat = DetermineChosenFormat(formattingInfo, formats);
+				var chooseOptions = formattingInfo.FormatterOptions.Split(splitChar);
+				chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
 			}
 
 			// Output the chosenFormat:
-			formattingInfo.Write(chosenFormat);
+			formattingInfo.Write(chosenFormat, formattingInfo.CurrentValue);
 		}
 
-		private static Format DetermineChosenFormat(IFormattingInfo formattingInfo, IList<Format> formats)
+		private static Format DetermineChosenFormat(IFormattingInfo formattingInfo, IList<Format> formats, string[] chooseOptions)
 		{
-			var chooseOptions = formattingInfo.FormatterOptions.Split(',');
-
 			var currentValue = formattingInfo.CurrentValue;
 			var currentValueString = (currentValue == null) ? "null" : currentValue.ToString();
 

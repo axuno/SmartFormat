@@ -95,7 +95,7 @@ namespace SmartFormat.Extensions
 			}
 
 			// Extract the plural words from the format string:
-			var pluralWords = format.Split("|");
+			var pluralWords = format.Split('|');
 			// This extension requires at least two plural words:
 			if (pluralWords.Count == 1) return;
 

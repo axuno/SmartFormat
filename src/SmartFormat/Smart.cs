@@ -83,6 +83,7 @@ namespace SmartFormat
 				new ConditionalFormatter(),
 				new TimeFormatter("en"),
 				new XElementFormatter(),
+				new ChooseFormatter(),
 				new DefaultFormatter()
 				);
 

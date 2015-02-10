@@ -1,0 +1,58 @@
+﻿using NUnit.Framework;
+
+namespace SmartFormat.Tests.Extensions
+{
+	[TestFixture]
+	public class ChooseFormatterTests
+	{
+
+		[TestCase("{0:choose(1|2|3):one|two|three}", 1, "one")]
+		[TestCase("{0:choose(1|2|3):one|two|three}", 2, "two")]
+		[TestCase("{0:choose(1|2|3):one|two|three}", 3, "three")]
+		[TestCase("{0:choose(1|2|3):one|two|three}", 4, "three")]
+		[TestCase("{0:choose(1|2|3):one|two|three}", 0, "three")]
+
+		[TestCase("{0:choose(3|2|1):three|two|one}", 1, "one")]
+		[TestCase("{0:choose(3|2|1):three|two|one}", 2, "two")]
+		[TestCase("{0:choose(3|2|1):three|two|one}", 3, "three")]
+		[TestCase("{0:choose(3|2|1):three|two|one}", 4, "one")]
+		[TestCase("{0:choose(3|2|1):three|two|one}", 0, "one")]
+		[Test]
+		public void Choose_should_work_with_numbers(string format, object arg0, string expectedResult)
+		{
+			Assert.AreEqual(expectedResult, Smart.Format(format, arg0));
+		}
+		
+		[TestCase("{0:choose(1|2|3|4):one|two|three}", 4, "three")]
+		[TestCase("{0:choose(1|2|3|4):one|two|three}", 5, "three")]
+		[TestCase("{0:choose(1|2|3):one|two|three|four}", 4, "four")]
+		[TestCase("{0:choose(1|2|3):one|two|three|four}", 5, "four")]
+		[Test]
+		public void Choose_should_default_to_the_last_item(string format, object arg0, string expectedResult)
+		{
+			Assert.AreEqual(expectedResult, Smart.Format(format, arg0));
+		}
+
+		[TestCase("{0:choose(Male|Female):man|woman}", Gender.Male, "man")]
+		[TestCase("{0:choose(Male|Female):man|woman}", Gender.Female, "woman")]
+		[TestCase("{0:choose(Male):man|woman}", Gender.Male, "man")]
+		[TestCase("{0:choose(Male):man|woman}", Gender.Female, "woman")]
+		[Test]
+		public void Choose_should_work_with_enums(string format, object arg0, string expectedResult)
+		{
+			Assert.AreEqual(expectedResult, Smart.Format(format, arg0));
+		}
+		
+		[TestCase("{0:choose(null):nothing|{} }", null, "nothing")]
+		[TestCase("{0:choose(null):nothing|{} }", 5, "5 ")]
+		[TestCase("{0:choose(null|5):nothing|five|{} }", null, "nothing")]
+		[TestCase("{0:choose(null|5):nothing|five|{} }", 5, "five")]
+		[TestCase("{0:choose(null|5):nothing|five|{} }", 6, "6 ")]
+		[Test]
+		public void Choose_has_a_special_case_for_null(string format, object arg0, string expectedResult)
+		{
+			Assert.AreEqual(expectedResult, Smart.Format(format, arg0));
+		}
+
+	}
+}

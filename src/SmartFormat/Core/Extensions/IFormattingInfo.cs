@@ -51,6 +51,13 @@ namespace SmartFormat.Core.Extensions
 		void Write(string text, int startIndex, int length);
 
 		/// <summary>
+		/// Writes the nested format to the output.
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="value"></param>
+		void Write(Format format, object value);
+
+		/// <summary>
 		/// Infrequently used details, often used for debugging
 		/// </summary>
 		[EditorBrowsable(EditorBrowsableState.Advanced)]

@@ -129,7 +129,7 @@ namespace SmartFormat.Extensions
 
 			// This extension requires a | to specify the spacer:
 			if (format == null) return;
-			var parameters = format.Split("|", 4);
+			var parameters = format.Split('|', 4);
 			if (parameters.Count < 2) return;
 
 			// Grab all formatting options:
@@ -142,7 +142,7 @@ namespace SmartFormat.Extensions
 			var lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : spacer;
 			var twoSpacer = (parameters.Count >= 4) ? parameters[3].Text : lastSpacer;
 
-			// TODO: Deprecate:
+			// TODO: [Obsolete] Not necessary, should remove:
 			if (!itemFormat.HasNested)
 			{
 				// The format is not nested,

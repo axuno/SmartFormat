@@ -94,21 +94,21 @@ namespace SmartFormat.Core.Parsing
 
 		#region: IndexOf :
 		/// <summary>
-		/// Searches the literal text for the search string.
+		/// Searches the literal text for the search char.
 		/// Does not search in nested placeholders.
 		/// </summary>
 		/// <param name="search"></param>
-		public int IndexOf(string search)
+		public int IndexOf(char search)
 		{
 			return IndexOf(search, 0);
 		}
 		/// <summary>
-		/// Searches the literal text for the search string.
+		/// Searches the literal text for the search char.
 		/// Does not search in nested placeholders.
 		/// </summary>
 		/// <param name="search"></param>
-		/// <param name="index"></param>
-		public int IndexOf(string search, int startIndex)
+		/// <param name="startIndex"></param>
+		public int IndexOf(char search, int startIndex)
 		{
 			startIndex = this.startIndex + startIndex;
 			foreach (var item in this.Items)
@@ -128,12 +128,12 @@ namespace SmartFormat.Core.Parsing
 
 		#region: FindAll :
 
-		public IList<int> FindAll(string search)
+		private IList<int> FindAll(char search)
 		{
 			return FindAll(search, -1);
 		}
 
-		public IList<int> FindAll(string search, int maxCount)
+		private IList<int> FindAll(char search, int maxCount)
 		{
 			var results = new List<int>();
 			var index = 0; // this.startIndex;
@@ -142,7 +142,7 @@ namespace SmartFormat.Core.Parsing
 				index = this.IndexOf(search, index);
 				if (index == -1) break;
 				results.Add(index);
-				index += search.Length;
+				index++;
 				maxCount--;
 			}
 			return results;
@@ -152,15 +152,15 @@ namespace SmartFormat.Core.Parsing
 
 		#region: Split :
 
-		public IList<Format> Split(string search)
+		public IList<Format> Split(char search)
 		{
 			return Split(search, -1);
 		}
 
-		public IList<Format> Split(string search, int maxCount)
+		public IList<Format> Split(char search, int maxCount)
 		{
 			var splits = this.FindAll(search, maxCount);
-			return new SplitList(this, splits, search.Length);
+			return new SplitList(this, splits);
 		}
 
 		/// <summary>
@@ -173,12 +173,10 @@ namespace SmartFormat.Core.Parsing
 
 			private readonly Format format;
 			private readonly IList<int> splits;
-			private readonly int searchLength;
-			public SplitList(Format format, IList<int> splits, int searchLength)
+			public SplitList(Format format, IList<int> splits)
 			{
 				this.format = format;
 				this.splits = splits;
-				this.searchLength = searchLength;
 			}
 
 			#endregion
@@ -204,12 +202,12 @@ namespace SmartFormat.Core.Parsing
 					else if (index == splits.Count)
 					{
 						// Return the format after the last split:
-						return format.Substring(splits[index - 1] + searchLength);
+						return format.Substring(splits[index - 1] + 1);
 					}
 					else
 					{
 						// Return the format between the splits:
-						var startIndex = splits[index - 1] + searchLength;
+						var startIndex = splits[index - 1] + 1;
 						return format.Substring(startIndex, splits[index] - startIndex);
 					}
 				}
