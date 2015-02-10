@@ -48,12 +48,12 @@ namespace SmartFormat.Extensions
 			TryEvaluateFormat(formattingInfo);
 		}
 
-		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
 
-			if (format != null && format.HasNested) return;
+			if (format != null && format.HasNested) return false;
 			string options;
 			if (formattingInfo.FormatterOptions != "") 
 				options = formattingInfo.FormatterOptions;
@@ -78,18 +78,17 @@ namespace SmartFormat.Extensions
 			}
 			else
 			{
-				return;
+				return false;
 			}
 			var timeTextInfo = GetTimeTextInfo(formattingInfo.FormatDetails.Provider);
 			if (timeTextInfo == null)
 			{
-				return;
+				return false;
 			}
 			var formattingOptions = TimeSpanFormatOptionsConverter.Parse(options);
 			var timeString = TimeSpanUtility.ToTimeString(fromTime, formattingOptions, timeTextInfo);
 			formattingInfo.Write(timeString);
-			formattingInfo.Handled = true;
-
+			return true;
 		}
 
 		private TimeTextInfo GetTimeTextInfo(IFormatProvider provider)

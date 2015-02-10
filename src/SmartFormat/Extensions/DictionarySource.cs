@@ -16,7 +16,7 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void TryEvaluateSelector(ISelectorInfo selectorInfo)
+		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
 			var selector = selectorInfo.Selector;
@@ -32,8 +32,7 @@ namespace SmartFormat.Extensions
 					if (key.Equals(selector.Text, Smart.Settings.GetCaseSensitivityComparison()))
 					{
 						selectorInfo.Result = entry.Value;
-						selectorInfo.Handled = true;
-						return;
+						return true;
 					}
 				}
 			}
@@ -47,9 +46,11 @@ namespace SmartFormat.Extensions
 				if (val != null)
 				{
 					selectorInfo.Result = val;
-					selectorInfo.Handled = true;
+					return true;
 				}
 			}
+
+			return false;
 		}
 	}
 }

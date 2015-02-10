@@ -52,7 +52,7 @@ namespace SmartFormat.Extensions
 		/// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
 		/// The ".2" selector is used to reference Dates[2].
 		/// </summary>
-		public void TryEvaluateSelector(ISelectorInfo selectorInfo)
+		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
 			var selector = selectorInfo.Selector;
@@ -68,7 +68,7 @@ namespace SmartFormat.Extensions
 				// Example: {People[2].Name}
 				//		   ^List  ^itemIndex
 				selectorInfo.Result = currentList[itemIndex];
-				selectorInfo.Handled = true;
+				return true;
 			}
 
 
@@ -79,17 +79,18 @@ namespace SmartFormat.Extensions
 				if (selector.SelectorIndex == 0)
 				{
 					selectorInfo.Result = CollectionIndex;
-					selectorInfo.Handled = true;
-					return;
+					return true;
 				}
 
 				// Looking for 2 lists to sync: "{List1: {List2[Index]} }"
 				if (currentList != null && 0 <= CollectionIndex && CollectionIndex < currentList.Count)
 				{
 					selectorInfo.Result = currentList[CollectionIndex];
-					selectorInfo.Handled = true;
+					return true;
 				}
 			}
+
+			return false;
 		}
 
 
@@ -108,7 +109,7 @@ namespace SmartFormat.Extensions
 		{
 			TryEvaluateFormat(formattingInfo);
 		}
-		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
@@ -117,18 +118,18 @@ namespace SmartFormat.Extensions
 
 			// This extension requires at least IEnumerable
 			var enumerable = current as IEnumerable;
-			if (enumerable == null) return;
+			if (enumerable == null) return false;
 			// Ignore Strings, because they're IEnumerable.
 			// This issue might actually need a solution
 			// for other objects that are IEnumerable.
-			if (current is string) return;
+			if (current is string) return false;
 			// If the object is IFormattable, ignore it
-			if (current is IFormattable) return;
+			if (current is IFormattable) return false;
 
 			// This extension requires a | to specify the spacer:
-			if (format == null) return;
+			if (format == null) return false;
 			var parameters = format.Split('|', 4);
-			if (parameters.Count < 2) return;
+			if (parameters.Count < 2) return false;
 
 			// Grab all formatting options:
 			// They must be in one of these formats:
@@ -196,7 +197,7 @@ namespace SmartFormat.Extensions
 
 			CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex
 
-			formattingInfo.Handled = true;
+			return true;
 		}
 
 	}

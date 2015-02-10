@@ -94,13 +94,13 @@ namespace SmartFormat.Tests.Core
 			{
 				TryEvaluateFormat(formattingInfo);
 			}
-			public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+			public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 			{
 				var options = formattingInfo.FormatterOptions;
 				var format = formattingInfo.Format;
 				var formatString = format != null ? format.ToString() : "";
 				formattingInfo.Write("TestExtension1 Options: " + options + ", Format: " + formatString);
-				formattingInfo.Handled = true;
+				return true;
 			}
 		}
 		private class TestExtension2 : IFormatter
@@ -112,13 +112,13 @@ namespace SmartFormat.Tests.Core
 			{
 				TryEvaluateFormat(formattingInfo);
 			}
-			public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+			public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 			{
 				var options = formattingInfo.FormatterOptions;
 				var format = formattingInfo.Format;
 				var formatString = format != null ? format.ToString() : "";
 				formattingInfo.Write("TestExtension2 Options: " + options + ", Format: " + formatString);
-				formattingInfo.Handled = true;
+				return true;
 			}
 
 		}

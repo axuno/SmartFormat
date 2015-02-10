@@ -42,9 +42,10 @@ namespace SmartFormat.Extensions
 			return chosenFormat;
 		}
 
-		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			// This extension must be invoked via named formatter.
+			return false;
 		}
 	}
 }

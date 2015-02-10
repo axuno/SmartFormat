@@ -8,9 +8,12 @@ namespace SmartFormat.Core.Extensions
 	public interface ISource
 	{
 		/// <summary>
-		/// Takes the current object and evaluates the selector.
+		/// Evaluates the <see cref="ISelectorInfo.Selector"/> based on the <see cref="ISelectorInfo.CurrentValue"/>.
+		/// 
+		/// If this extension cannot evaluate the Selector, returns False.
+		/// Otherwise, sets the <see cref="ISelectorInfo.Result"/> and returns true.
 		/// </summary>
 		/// <param name="selectorInfo"></param>
-		void TryEvaluateSelector(ISelectorInfo selectorInfo);
+		bool TryEvaluateSelector(ISelectorInfo selectorInfo);
 	}
 }

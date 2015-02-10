@@ -232,9 +232,8 @@ namespace SmartFormat
 			{
 				childFormattingInfo.Selector = selector;
 				childFormattingInfo.Result = null;
-				childFormattingInfo.Handled = false;
-				InvokeSourceExtensions(childFormattingInfo);
-				if (!childFormattingInfo.Handled)
+				var handled = InvokeSourceExtensions(childFormattingInfo);
+				if (!handled)
 				{
 					// The selector wasn't handled, which means it isn't valid
 					FormatError(selector, string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector.startIndex, childFormattingInfo);
@@ -262,16 +261,16 @@ namespace SmartFormat
 			}
 		}
 
-		private void InvokeSourceExtensions(FormattingInfo formattingInfo)
+		private bool InvokeSourceExtensions(FormattingInfo formattingInfo)
 		{
-			formattingInfo.Handled = false;
 			foreach (var sourceExtension in this.SourceExtensions)
 			{
-				sourceExtension.TryEvaluateSelector(formattingInfo);
-				if (formattingInfo.Handled) break;
+				var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
+				if (handled) return true;
 			}
+			return false;
 		}
-		private void InvokeFormatterExtensions(FormattingInfo formattingInfo)
+		private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
 		{
 			var formatterName = formattingInfo.Placeholder.FormatterName;
 			if (formatterName != "")
@@ -280,20 +279,20 @@ namespace SmartFormat
 				foreach (var formatterExtension in this.FormatterExtensions)
 				{
 					if (!formatterExtension.Names.Contains(formatterName)) continue;
-
 					formatterExtension.EvaluateFormat(formattingInfo);
-					break;
+					return true;
 				}
+				return false;
 			}
 			else
 			{
 				// Try all formatters until formatting has been handled:
-				formattingInfo.Handled = false;
 				foreach (var formatterExtension in this.FormatterExtensions)
 				{
-					formatterExtension.TryEvaluateFormat(formattingInfo);
-					if (formattingInfo.Handled) break;
+					var handled = formatterExtension.TryEvaluateFormat(formattingInfo);
+					if (handled) return true;
 				}
+				return false;
 			}
 		}
 

@@ -14,7 +14,7 @@ namespace SmartFormat.Extensions
 		/// <summary>
 		/// Performs the default index-based selector, same as String.Format.
 		/// </summary>
-		public void TryEvaluateSelector(ISelectorInfo selectorInfo)
+		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
 			var selector = selectorInfo.Selector;
@@ -32,18 +32,22 @@ namespace SmartFormat.Extensions
 				{
 					// This selector is an argument index.
 					selectorInfo.Result = formatDetails.OriginalArgs[selectorValue];
-					selectorInfo.Handled = true;
+					return true;
 				}
+
 				// Alignment:
 				// An alignment item should be preceded by a comma
-				else if (selector.Operator == ",")
+				if (selector.Operator == ",")
 				{
 					// This selector is actually an Alignment modifier.
 					selectorInfo.Placeholder.Alignment = selectorValue;
 					selectorInfo.Result = current; // (don't change the current item)
-					selectorInfo.Handled = true;
+					return true;
 				}
+
 			}
+
+			return false;
 		}
 	}
 }

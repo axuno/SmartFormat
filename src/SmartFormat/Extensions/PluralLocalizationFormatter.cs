@@ -81,7 +81,7 @@ namespace SmartFormat.Extensions
 		{
 			TryEvaluateFormat(formattingInfo);
 		}
-		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
@@ -89,20 +89,20 @@ namespace SmartFormat.Extensions
 			// Ignore formats that start with "?" (this can be used to bypass this extension)
 			if (format == null || format.baseString[format.startIndex] == ':')
 			{
-				return;
+				return false;
 			}
 
 			// Extract the plural words from the format string:
 			var pluralWords = format.Split('|');
 			// This extension requires at least two plural words:
-			if (pluralWords.Count == 1) return;
+			if (pluralWords.Count == 1) return false;
 
 			// See if the value is a number:
 			var currentIsNumber =
 				current is byte || current is short || current is int || current is long
 				|| current is float || current is double || current is decimal;
 			// This extension only formats numbers:
-			if (!currentIsNumber) return;
+			if (!currentIsNumber) return false;
 
 			// Normalize the number to decimal:
 			var value = Convert.ToDecimal(current);
@@ -113,7 +113,7 @@ namespace SmartFormat.Extensions
 			if (pluralRule == null)
 			{
 				// Not a supported language.
-				return;
+				return false;
 			}
 
 			var pluralCount = pluralWords.Count;
@@ -128,7 +128,7 @@ namespace SmartFormat.Extensions
 			// Output the selected word (allowing for nested formats):
 			var pluralForm = pluralWords[pluralIndex];
 			formattingInfo.Write(pluralForm, current);
-			formattingInfo.Handled = true;
+			return true;
 		}
 
 	}

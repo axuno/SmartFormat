@@ -6,18 +6,25 @@ namespace SmartFormat.Core.Extensions
 	public interface IFormatter
 	{
 		/// <summary>
-		/// Takes the current object and writes it to the output, using the specified format.
+		/// An extension can be explicitly called by using any of its names.
+		/// 
+		/// For example, "{0:default:N2}" or "{0:d:N2}" will explicitly call the "default" extension.
+		/// </summary>
+		string[] Names { get; set; }
+
+		/// <summary>
+		/// Writes the current value to the output, using the specified format.
+		/// 
+		/// This method is only called when a "named formatter" is used.
 		/// </summary>
 		void EvaluateFormat(IFormattingInfo formattingInfo);
 
 		/// <summary>
-		/// Takes the current object and writes it to the output, using the specified format.
-		/// Set the <see cref="FormattingInfo.Handled"/> flag if successful.
+		/// Writes the current value to the output, using the specified format.
 		/// 
-		/// This is deprecated with named-formatters; use EvaluateFormat instead.
+		/// This method is only called when a "named formatter" is NOT used.
+		/// IF this extension cannot write the value, returns false, otherwise true.
 		/// </summary>
-		void TryEvaluateFormat(IFormattingInfo formattingInfo);
-
-		string[] Names { get; set; }
+		bool TryEvaluateFormat(IFormattingInfo formattingInfo);
 	}
 }

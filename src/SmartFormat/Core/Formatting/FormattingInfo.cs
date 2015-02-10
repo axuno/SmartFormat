@@ -45,11 +45,6 @@ namespace SmartFormat.Core.Formatting
 		/// </example>
 		public object CurrentValue { get; set; }
 
-		/// <summary>
-		/// A flag to indicate that formatting has been handled.
-		/// </summary>
-		public bool Handled { get; set; }
-
 		public Placeholder Placeholder { get; private set; }
 		public int Alignment { get { return this.Placeholder.Alignment; }}
 		public string FormatterOptions { get { return Placeholder.FormatterOptions; } }

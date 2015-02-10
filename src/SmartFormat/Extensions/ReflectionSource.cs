@@ -14,14 +14,14 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void TryEvaluateSelector(ISelectorInfo selectorInfo)
+		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
 			var selector = selectorInfo.Selector;
 
 			if (current == null)
 			{
-				return;
+				return false;
 			}
 
 			// REFLECTION:
@@ -40,8 +40,7 @@ namespace SmartFormat.Extensions
 						//  Selector is a Field; retrieve the value:
 						var field = (FieldInfo) member;
 						selectorInfo.Result = field.GetValue(current);
-						selectorInfo.Handled = true;
-						return;
+						return true;
 					case MemberTypes.Property:
 					case MemberTypes.Method:
 						MethodInfo method;
@@ -80,12 +79,12 @@ namespace SmartFormat.Extensions
 
 						//  Retrieve the Selectors/ParseFormat value:
 						selectorInfo.Result = method.Invoke(current, new object[0]);
-						selectorInfo.Handled = true;
-						return;
+						return true;
 
 				}
 			}
 
+			return false;
 		}
 	}
 }

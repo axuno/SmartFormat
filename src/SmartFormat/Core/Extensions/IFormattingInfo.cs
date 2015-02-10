@@ -33,12 +33,6 @@ namespace SmartFormat.Core.Extensions
 		Format Format { get; }
 
 		/// <summary>
-		/// A flag to indicate that formatting has been handled.
-		/// </summary>
-		[Obsolete("Named formatters has made this flag obsolete. Still available, though, for backwards compatibility.")]
-		bool Handled { get; set; }
-
-		/// <summary>
 		/// Writes a string to the output.
 		/// </summary>
 		/// <param name="text"></param>

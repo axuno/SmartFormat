@@ -21,13 +21,13 @@ namespace SmartFormat.Extensions
 		{
 			TryEvaluateFormat(formattingInfo);
 		}
-		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
 			var formatDetails = formattingInfo.FormatDetails;
 			
-			if (format == null) return;
+			if (format == null) return false;
 			// Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
 			if (format.baseString[format.startIndex] == ':')
 			{
@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
 
 			// See if the format string contains un-nested "|":
 			var parameters = format.Split('|');
-			if (parameters.Count == 1) return; // There are no parameters found.
+			if (parameters.Count == 1) return false; // There are no parameters found.
 
 			// See if the value is a number:
 			var currentIsNumber =
@@ -62,8 +62,7 @@ namespace SmartFormat.Extensions
 					{
 						// We reached the end of our parameters,
 						// so we output nothing
-						formattingInfo.Handled = true;
-						return;
+						return true;
 					}
 					bool conditionWasTrue;
 					Format outputItem;
@@ -85,8 +84,7 @@ namespace SmartFormat.Extensions
 					if (conditionWasTrue)
 					{
 						formattingInfo.Write(outputItem, current);
-						formattingInfo.Handled = true;
-						return;
+						return true;
 					}
 				}
 				// We don't have any "complex conditions",
@@ -180,7 +178,7 @@ namespace SmartFormat.Extensions
 
 			// Output the selectedParameter:
 			formattingInfo.Write(selectedParameter, current);
-			formattingInfo.Handled = true;
+			return true;
 		}
 
 		/// <summary>

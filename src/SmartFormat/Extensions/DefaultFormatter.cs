@@ -18,11 +18,8 @@ namespace SmartFormat.Extensions
 		{
 			TryEvaluateFormat(formattingInfo);
 		}
-		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
-			// This function always handles the method:
-			formattingInfo.Handled = true;
-
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
 
@@ -31,7 +28,7 @@ namespace SmartFormat.Extensions
 			if (format != null && format.HasNested)
 			{
 				formattingInfo.Write(format, current);
-				return;
+				return true;
 			}
 
 			// If the object is null, we shouldn't write anything
@@ -83,7 +80,6 @@ namespace SmartFormat.Extensions
 			// Output the result:
 			formattingInfo.Write(result);
 
-
 			// See if there's a post-alignment to consider:
 			if (formattingInfo.Alignment < 0)
 			{
@@ -93,6 +89,8 @@ namespace SmartFormat.Extensions
 					formattingInfo.Write(new String(' ', spaces));
 				}
 			}
+
+			return true;
 		}
 
 	}

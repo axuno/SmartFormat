@@ -26,15 +26,8 @@ namespace SmartFormat.Core.Extensions
 
 		/// <summary>
 		/// Sets the result of evaluating the selector.
-		/// Be sure to also set Handled to true.
 		/// </summary>
 		object Result { set; }
-
-		/// <summary>
-		/// A flag to indicate that the Selector has been handled.
-		/// </summary>
-		/// TODO: Make this 'automatic', based on setting CurrentValue
-		bool Handled { set; }
 
 		/// <summary>
 		/// Contains all the details about the current placeholder.

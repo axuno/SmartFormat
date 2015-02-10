@@ -15,7 +15,7 @@ namespace SmartFormat.Extensions
 			formatter.Parser.AddOperators(".");
 		}
 
-		public void TryEvaluateSelector(ISelectorInfo selectorInfo)
+		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var element = selectorInfo.CurrentValue as XElement;
 			if (element != null)
@@ -26,9 +26,11 @@ namespace SmartFormat.Extensions
 				if (selectorMatchedElements.Any())
 				{
 					selectorInfo.Result = selectorMatchedElements;
-					selectorInfo.Handled = true;
+					return true;
 				}
 			}
+
+			return false;
 		}
 	}
 }

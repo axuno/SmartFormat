@@ -16,27 +16,28 @@ namespace SmartFormat.Extensions
 			TryEvaluateFormat(formattingInfo);
 		}
 
-		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
 
 			XElement currentXElement = null;
-			if (format != null && format.HasNested) return;
+			if (format != null && format.HasNested) return false;
 			// if we need to format list of XElements then we just take and format first
 			var xElmentsAsList = current as IList<XElement>;
 			if (xElmentsAsList != null && xElmentsAsList.Count > 0)
 			{
 				currentXElement = xElmentsAsList[0];
-				formattingInfo.Handled = true;
 			}
 
 			var currentAsXElement = (currentXElement) ?? current as XElement;
 			if (currentAsXElement != null)
 			{
 				formattingInfo.Write(currentAsXElement.Value);
-				formattingInfo.Handled = true;
+				return true;
 			}
+
+			return false;
 		}
 
 	}
