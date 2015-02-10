@@ -17,6 +17,10 @@ namespace SmartFormat.Extensions
 			RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		{
+			TryEvaluateFormat(formattingInfo);
+		}
 		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

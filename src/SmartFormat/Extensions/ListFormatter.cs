@@ -8,6 +8,33 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
+	/// <summary>
+	/// If the source value is an array (or supports ICollection),
+	/// then each item will be custom formatted.
+	///
+	///
+	/// Syntax:
+	/// #1: "format|spacer"
+	/// #2: "format|spacer|last spacer"
+	/// #3: "format|spacer|last spacer|two spacer"
+	///
+	/// The format will be used for each item in the collection, the spacer will be between all items, and the last spacer will replace the spacer for the last item only.
+	///
+	/// Example:
+	/// CustomFormat("{Dates:D|; |; and }", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "January 1, 2000; December 31, 2999; and September 9, 9999"
+	/// In this example, format = "D", spacer = "; ", and last spacer = "; and "
+	///
+	///
+	///
+	/// Advanced:
+	/// Composite Formatting is allowed in the format by using nested braces.
+	/// If a nested item is detected, Composite formatting will be used.
+	///
+	/// Example:
+	/// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
+	/// In this example, format = "{Width}x{Height}".  Notice the nested braces.
+	///
+	/// </summary>
 	public class ListFormatter : IFormatter, ISource
 	{
 		private string[] names = { "list", "l" };
@@ -77,33 +104,10 @@ namespace SmartFormat.Extensions
 			set { CallContext.LogicalSetData(key, value); }
 		}
 
-		/// <summary>
-		/// If the source value is an array (or supports ICollection),
-		/// then each item will be custom formatted.
-		///
-		///
-		/// Syntax:
-		/// #1: "format|spacer"
-		/// #2: "format|spacer|last spacer"
-		/// #3: "format|spacer|last spacer|two spacer"
-		///
-		/// The format will be used for each item in the collection, the spacer will be between all items, and the last spacer will replace the spacer for the last item only.
-		///
-		/// Example:
-		/// CustomFormat("{Dates:D|; |; and }", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "January 1, 2000; December 31, 2999; and September 9, 9999"
-		/// In this example, format = "D", spacer = "; ", and last spacer = "; and "
-		///
-		///
-		///
-		/// Advanced:
-		/// Composite Formatting is allowed in the format by using nested braces.
-		/// If a nested item is detected, Composite formatting will be used.
-		///
-		/// Example:
-		/// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
-		/// In this example, format = "{Width}x{Height}".  Notice the nested braces.
-		///
-		/// </summary>
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		{
+			TryEvaluateFormat(formattingInfo);
+		}
 		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

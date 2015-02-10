@@ -43,12 +43,16 @@ namespace SmartFormat.Extensions
 
 		#region IFormatter
 
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		{
+			TryEvaluateFormat(formattingInfo);
+		}
+
 		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
 			var formatDetails = formattingInfo.FormatDetails;
-			var output = formattingInfo.FormatDetails.Output;
 
 			if (format != null && format.HasNested) return;
 			string options;

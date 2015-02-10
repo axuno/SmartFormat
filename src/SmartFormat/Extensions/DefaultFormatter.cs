@@ -5,14 +5,18 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
+	/// <summary>
+	/// Do the default formatting, same logic as "String.Format".
+	/// </summary>
 	public class DefaultFormatter : IFormatter
 	{
 		private string[] names = { "default", "d" };
 		public string[] Names { get { return names; } set { names = value; } }
-		
-		/// <summary>
-		/// Do the default formatting, same logic as "String.Format".
-		/// </summary>
+
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		{
+			TryEvaluateFormat(formattingInfo);
+		}
 		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			// This function always handles the method:

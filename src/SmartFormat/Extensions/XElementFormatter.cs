@@ -11,6 +11,11 @@ namespace SmartFormat.Extensions
 		private string[] names = {"xelement", "xml", "x"};
 		public string[] Names { get { return names; } set { names = value; } }
 
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		{
+			TryEvaluateFormat(formattingInfo);
+		}
+
 		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

@@ -77,6 +77,10 @@ namespace SmartFormat.Extensions
 			return null;
 		}
 
+		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		{
+			TryEvaluateFormat(formattingInfo);
+		}
 		public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

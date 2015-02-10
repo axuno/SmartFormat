@@ -90,6 +90,10 @@ namespace SmartFormat.Tests.Core
 			private string[] names = { "test1", "t1" };
 			public string[] Names { get { return names; } set { names = value; } }
 
+			public void EvaluateFormat(IFormattingInfo formattingInfo)
+			{
+				TryEvaluateFormat(formattingInfo);
+			}
 			public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 			{
 				var options = formattingInfo.FormatterOptions;
@@ -104,6 +108,10 @@ namespace SmartFormat.Tests.Core
 			private string[] names = { "test2", "t2" };
 			public string[] Names { get { return names; } set { names = value; } }
 
+			public void EvaluateFormat(IFormattingInfo formattingInfo)
+			{
+				TryEvaluateFormat(formattingInfo);
+			}
 			public void TryEvaluateFormat(IFormattingInfo formattingInfo)
 			{
 				var options = formattingInfo.FormatterOptions;

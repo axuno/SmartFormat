@@ -280,12 +280,12 @@ namespace SmartFormat
 			if (formatterName != "")
 			{
 				// Evaluate JUST the named formatter:
-				formattingInfo.Handled = false;
 				foreach (var formatterExtension in this.FormatterExtensions)
 				{
 					if (!formatterExtension.Names.Contains(formatterName)) continue;
-					formatterExtension.TryEvaluateFormat(formattingInfo);
-					if (formattingInfo.Handled) break;
+
+					formatterExtension.EvaluateFormat(formattingInfo);
+					break;
 				}
 			}
 			else
