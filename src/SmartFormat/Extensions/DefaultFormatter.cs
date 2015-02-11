@@ -8,13 +8,9 @@ namespace SmartFormat.Extensions
 	/// </summary>
 	public class DefaultFormatter : IFormatter
 	{
-		private string[] names = { "default", "d" };
+		private string[] names = { "default", "d", "" };
 		public string[] Names { get { return names; } set { names = value; } }
 
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
-		{
-			TryEvaluateFormat(formattingInfo);
-		}
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

@@ -7,7 +7,7 @@ namespace SmartFormat.Extensions
 {
 	public class TimeFormatter : IFormatter
 	{
-		private string[] names = { "timespan", "time", "t" };
+		private string[] names = { "timespan", "time", "t", "" };
 		public string[] Names { get { return names; } set { names = value; } }
 
 		#region Constructors
@@ -38,11 +38,6 @@ namespace SmartFormat.Extensions
 		#endregion
 
 		#region IFormatter
-
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
-		{
-			TryEvaluateFormat(formattingInfo);
-		}
 
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{

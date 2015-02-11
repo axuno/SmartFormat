@@ -7,7 +7,7 @@ namespace SmartFormat.Extensions
 {
 	public class ConditionalFormatter : IFormatter
 	{
-		private string[] names = { "conditional", "cond" };
+		private string[] names = { "conditional", "cond", "" };
 		public string[] Names { get { return names; } set { names = value; } }
 
 		private static readonly Regex complexConditionPattern
@@ -15,16 +15,10 @@ namespace SmartFormat.Extensions
 			//   Description:	  and/or	comparator	 value
 			RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
-		{
-			TryEvaluateFormat(formattingInfo);
-		}
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
-			var formatDetails = formattingInfo.FormatDetails;
 			
 			if (format == null) return false;
 			// Ignore a leading ":", which is used to bypass the PluralLocalizationExtension

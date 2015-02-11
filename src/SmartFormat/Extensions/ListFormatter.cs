@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
 	/// </summary>
 	public class ListFormatter : IFormatter, ISource
 	{
-		private string[] names = { "list", "l" };
+		private string[] names = { "list", "l", "" };
 		public string[] Names { get { return names; } set { names = value; } }
 
 		public ListFormatter(SmartFormatter formatter)
@@ -92,7 +92,6 @@ namespace SmartFormat.Extensions
 			return false;
 		}
 
-
 		private static string key = "664c3d47-8d00-4825-b4fb-f3dd7c8a9bdf";
 		private static int CollectionIndex
 		{
@@ -104,10 +103,6 @@ namespace SmartFormat.Extensions
 			set { CallContext.LogicalSetData(key, value); }
 		}
 
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
-		{
-			TryEvaluateFormat(formattingInfo);
-		}
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

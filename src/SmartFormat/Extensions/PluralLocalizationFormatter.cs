@@ -9,7 +9,7 @@ namespace SmartFormat.Extensions
 {
 	public class PluralLocalizationFormatter : IFormatter
 	{
-		private string[] names = { "plural", "p" };
+		private string[] names = { "plural", "p", "" };
 		public string[] Names { get { return names; } set { names = value; } }
 		
 		/// <summary>
@@ -75,10 +75,6 @@ namespace SmartFormat.Extensions
 			return null;
 		}
 
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
-		{
-			TryEvaluateFormat(formattingInfo);
-		}
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

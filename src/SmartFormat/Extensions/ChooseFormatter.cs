@@ -13,14 +13,18 @@ namespace SmartFormat.Extensions
 		private char splitChar = '|';
 		public char SplitChar { get { return splitChar;  } set { splitChar = value; } }
 
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
+		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
+			if (formattingInfo.FormatterOptions == "") return false;
 			var chooseOptions = formattingInfo.FormatterOptions.Split(splitChar);
 			var formats = formattingInfo.Format.Split(splitChar);
+			if (formats.Count < 2) return false;
+			
 			var chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
-
-			// Output the chosenFormat:
+			
 			formattingInfo.Write(chosenFormat, formattingInfo.CurrentValue);
+			
+			return true;
 		}
 
 		private static Format DetermineChosenFormat(IFormattingInfo formattingInfo, IList<Format> choiceFormats, string[] chooseOptions)
@@ -52,10 +56,5 @@ namespace SmartFormat.Extensions
 			return chosenFormat;
 		}
 
-		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
-		{
-			// This extension must be invoked via named formatter.
-			return false;
-		}
 	}
 }

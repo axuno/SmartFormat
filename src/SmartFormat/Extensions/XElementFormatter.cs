@@ -6,13 +6,8 @@ namespace SmartFormat.Extensions
 {
 	public class XElementFormatter : IFormatter
 	{
-		private string[] names = {"xelement", "xml", "x"};
+		private string[] names = {"xelement", "xml", "x", ""};
 		public string[] Names { get { return names; } set { names = value; } }
-
-		public void EvaluateFormat(IFormattingInfo formattingInfo)
-		{
-			TryEvaluateFormat(formattingInfo);
-		}
 
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{

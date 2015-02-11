@@ -139,7 +139,7 @@ namespace SmartFormat
 			var formatParsed = Parser.ParseFormat(format);
 			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, formatParsed, args, null, provider, output);
-			Format(output, formatParsed, current, formatDetails);
+			Format(formatDetails, formatParsed, current);
 
 			return output.ToString();
 		}
@@ -149,7 +149,7 @@ namespace SmartFormat
 			var formatParsed = Parser.ParseFormat(format);
 			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, formatParsed, args, null, null, output);
-			Format(output, formatParsed, current, formatDetails);
+			Format(formatDetails, formatParsed, current);
 		}
 
 		public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
@@ -159,7 +159,7 @@ namespace SmartFormat
 			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
 			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
-			Format(output, cache.Format, current, formatDetails);
+			Format(formatDetails, cache.Format, current);
 
 			return output.ToString();
 		}
@@ -169,10 +169,10 @@ namespace SmartFormat
 			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
 			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
-			Format(output, cache.Format, current, formatDetails);
+			Format(formatDetails, cache.Format, current);
 		}
 
-		public void Format(IOutput output, Format format, object current, FormatDetails formatDetails)
+		private void Format(FormatDetails formatDetails, Format format, object current)
 		{
 			var formattingInfo = new FormattingInfo(formatDetails, format, current);
 			Format(formattingInfo);
@@ -224,96 +224,7 @@ namespace SmartFormat
 			}
 
 		}
-
-		private void EvaluateSelectors(FormattingInfo childFormattingInfo)
-		{
-			var placeholder = childFormattingInfo.Placeholder;
-			foreach (var selector in placeholder.Selectors)
-			{
-				childFormattingInfo.Selector = selector;
-				childFormattingInfo.Result = null;
-				var handled = InvokeSourceExtensions(childFormattingInfo);
-				if (!handled)
-				{
-					// The selector wasn't handled, which means it isn't valid
-					FormatError(selector, string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector.startIndex, childFormattingInfo);
-					childFormattingInfo.CurrentValue = null;
-					break;
-				}
-				childFormattingInfo.CurrentValue = childFormattingInfo.Result;
-			}
-		}
-
-		private void EvaluateFormatters(FormattingInfo formattingInfo)
-		{
-			InvokeFormatterExtensions(formattingInfo);
-		}
-
-		private void CheckForExtensions()
-		{
-			if (this.SourceExtensions.Count == 0)
-			{
-				throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
-			}
-			if (this.FormatterExtensions.Count == 0)
-			{
-				throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
-			}
-		}
-
-		private bool InvokeSourceExtensions(FormattingInfo formattingInfo)
-		{
-			foreach (var sourceExtension in this.SourceExtensions)
-			{
-				var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
-				if (handled) return true;
-			}
-			return false;
-		}
-		private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
-		{
-			var formatterName = formattingInfo.Placeholder.FormatterName;
-			if (formatterName != "")
-			{
-				// Evaluate JUST the named formatter:
-				foreach (var formatterExtension in this.FormatterExtensions)
-				{
-					if (!formatterExtension.Names.Contains(formatterName)) continue;
-					formatterExtension.EvaluateFormat(formattingInfo);
-					return true;
-				}
-				return false;
-			}
-			else
-			{
-				// Try all formatters until formatting has been handled:
-				foreach (var formatterExtension in this.FormatterExtensions)
-				{
-					var handled = formatterExtension.TryEvaluateFormat(formattingInfo);
-					if (handled) return true;
-				}
-				return false;
-			}
-		}
-
-		private void FormatError(FormatItem errorItem, string issue, int startIndex, FormattingInfo formattingInfo)
-		{
-			switch (this.ErrorAction)
-			{
-				case ErrorAction.Ignore:
-					return;
-				case ErrorAction.ThrowError:
-					throw new FormattingException(errorItem, issue, startIndex);
-				case ErrorAction.OutputErrorInResult:
-					formattingInfo.FormatDetails.FormattingException = new FormattingException(errorItem, issue, startIndex);
-					formattingInfo.Write(issue);
-					formattingInfo.FormatDetails.FormattingException = null;
-					break;
-				case ErrorAction.MaintainTokens:
-					formattingInfo.Write(formattingInfo.Placeholder.Text);
-					break;
-			}
-		}
+		
 		private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
 		{
 			switch (this.ErrorAction)
@@ -331,6 +242,65 @@ namespace SmartFormat
 					formattingInfo.Write(formattingInfo.Placeholder.Text);
 					break;
 			}
+		}
+
+		private void CheckForExtensions()
+		{
+			if (this.SourceExtensions.Count == 0)
+			{
+				throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
+			}
+			if (this.FormatterExtensions.Count == 0)
+			{
+				throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
+			}
+		}
+
+		private void EvaluateSelectors(FormattingInfo formattingInfo)
+		{
+			var placeholder = formattingInfo.Placeholder;
+			foreach (var selector in placeholder.Selectors)
+			{
+				formattingInfo.Selector = selector;
+				formattingInfo.Result = null;
+				var handled = InvokeSourceExtensions(formattingInfo);
+				if (!handled)
+				{
+					throw formattingInfo.FormattingException(string.Format("Could not evaluate the selector \"{0}\"", selector.Text));
+				}
+				formattingInfo.CurrentValue = formattingInfo.Result;
+			}
+		}
+		private bool InvokeSourceExtensions(FormattingInfo formattingInfo)
+		{
+			foreach (var sourceExtension in this.SourceExtensions)
+			{
+				var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
+				if (handled) return true;
+			}
+			return false;
+		}
+
+		private void EvaluateFormatters(FormattingInfo formattingInfo)
+		{
+			var handled = InvokeFormatterExtensions(formattingInfo);
+			if (!handled)
+			{
+				throw formattingInfo.FormattingException("No suitable Formatter could be found");
+			}
+		}
+		private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
+		{
+			var formatterName = formattingInfo.Placeholder.FormatterName;
+			
+			// Evaluate the named formatter (or, evaluate all "" formatters)
+			foreach (var formatterExtension in this.FormatterExtensions)
+			{
+				if (!formatterExtension.Names.Contains(formatterName)) continue;
+				var handled = formatterExtension.TryEvaluateFormat(formattingInfo);
+				if (handled) return true;
+			}
+			return false;
 		}
 
 		#endregion
