@@ -3,8 +3,6 @@ using System.Globalization;
 using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions

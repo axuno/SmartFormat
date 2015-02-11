@@ -11,7 +11,7 @@ namespace SmartFormat.Utilities
 	/// var textWithLink = String.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
 	/// </code>
 	/// </summary>
-	public class FormatDelegate : System.IFormattable
+	public class FormatDelegate : IFormattable
 	{
 		private readonly Func<string, string> getFormat1;
 		private readonly Func<string, IFormatProvider, string> getFormat2;

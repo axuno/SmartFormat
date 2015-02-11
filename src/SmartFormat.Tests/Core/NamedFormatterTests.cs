@@ -1,8 +1,5 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core

@@ -1,6 +1,5 @@
-﻿using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Parsing;
-using System.Reflection;
+﻿using System.Reflection;
+using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions
 {

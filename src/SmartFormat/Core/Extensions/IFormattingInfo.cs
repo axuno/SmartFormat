@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.ComponentModel;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 

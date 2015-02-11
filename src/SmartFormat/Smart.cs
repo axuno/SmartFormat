@@ -1,6 +1,5 @@
 ﻿using System;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
 namespace SmartFormat

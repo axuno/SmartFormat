@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
@@ -119,7 +118,7 @@ namespace SmartFormat.Extensions
 			}
 			else if (current is DateTime) {
 				// Date: Past|Present|Future   or   Past/Present|Future
-				System.DateTime arg = (DateTime)current;
+				DateTime arg = (DateTime)current;
 				if (paramCount == 3 && arg.Date == DateTime.Today)
 				{
 					paramIndex = 1;

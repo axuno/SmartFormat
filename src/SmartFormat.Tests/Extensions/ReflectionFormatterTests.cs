@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.TestUtils;
-using SmartFormat.Tests.Utilities;
 
 namespace SmartFormat.Tests.Extensions
 {

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-
-
 namespace SmartFormat.Tests
 {
 	[TypeConverter(typeof(ExpandableObjectConverter))]

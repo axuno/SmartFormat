@@ -1,5 +1,4 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 
 namespace SmartFormat.Tests.Extensions

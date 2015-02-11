@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace SmartFormat.Tests.Extensions
 				"ABCDE".ToCharArray(),
 				"One|Two|Three|Four|Five".Split('|'),
 				TestFactory.GetPerson().Friends,
-				"1/1/2000|10/10/2010|5/5/5555".Split('|').Select(s=>DateTime.ParseExact(s,"M/d/yyyy",System.Globalization.CultureInfo.CreateSpecificCulture("en-us"))),
+				"1/1/2000|10/10/2010|5/5/5555".Split('|').Select(s=>DateTime.ParseExact(s,"M/d/yyyy",CultureInfo.CreateSpecificCulture("en-us"))),
 				new []{1,2,3,4,5},
 			};
 			return args;

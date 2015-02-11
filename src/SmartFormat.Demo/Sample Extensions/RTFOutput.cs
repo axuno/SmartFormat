@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using RTF;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Demo.Sample_Extensions
 {

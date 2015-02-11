@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Output
 {

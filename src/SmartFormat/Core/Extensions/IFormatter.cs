@@ -1,6 +1,4 @@
-﻿using SmartFormat.Core.Formatting;
-
-namespace SmartFormat.Core.Extensions
+﻿namespace SmartFormat.Core.Extensions
 {
 	/// <summary> Converts an object to a string. </summary>
 	public interface IFormatter

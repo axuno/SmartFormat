@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {

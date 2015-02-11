@@ -1,6 +1,4 @@
-﻿using SmartFormat.Extensions;
-
-namespace SmartFormat.Utilities
+﻿namespace SmartFormat.Utilities
 {
 	public static class PluralRules_Old
 	{

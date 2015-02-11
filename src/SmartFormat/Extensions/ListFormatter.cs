@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions

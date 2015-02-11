@@ -1,6 +1,4 @@
-﻿using SmartFormat.Core.Parsing;
-
-namespace SmartFormat.Core.Extensions
+﻿namespace SmartFormat.Core.Extensions
 {
 	/// <summary>
 	/// Evaluates a selector.
