@@ -323,9 +323,9 @@ namespace SmartFormat
 				case ErrorAction.Ignore:
 					return;
 				case ErrorAction.ThrowError:
-					throw new FormatException(errorItem, innerException, startIndex);
+					throw (innerException as FormatException) ?? new FormatException(errorItem, innerException, startIndex);
 				case ErrorAction.OutputErrorInResult:
-					formattingInfo.FormatDetails.FormatError = new FormatException(errorItem, innerException, startIndex);
+					formattingInfo.FormatDetails.FormatError = (innerException as FormatException) ?? new FormatException(errorItem, innerException, startIndex);
 					formattingInfo.Write(innerException.Message);
 					formattingInfo.FormatDetails.FormatError = null;
 					break;

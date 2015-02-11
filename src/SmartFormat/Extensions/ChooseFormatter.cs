@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat.Extensions
 {
@@ -15,30 +18,40 @@ namespace SmartFormat.Extensions
 
 		public void EvaluateFormat(IFormattingInfo formattingInfo)
 		{
+			var chooseOptions = formattingInfo.FormatterOptions.Split(splitChar);
 			var formats = formattingInfo.Format.Split(splitChar);
-			Format chosenFormat;
-			if (formats.Count == 1) {
-				chosenFormat = formats[0];
-			} else {
-				var chooseOptions = formattingInfo.FormatterOptions.Split(splitChar);
-				chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
-			}
+			var chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
 
 			// Output the chosenFormat:
 			formattingInfo.Write(chosenFormat, formattingInfo.CurrentValue);
 		}
 
-		private static Format DetermineChosenFormat(IFormattingInfo formattingInfo, IList<Format> formats, string[] chooseOptions)
+		private static Format DetermineChosenFormat(IFormattingInfo formattingInfo, IList<Format> choiceFormats, string[] chooseOptions)
 		{
 			var currentValue = formattingInfo.CurrentValue;
 			var currentValueString = (currentValue == null) ? "null" : currentValue.ToString();
 
 			var chosenIndex = Array.IndexOf(chooseOptions, currentValueString);
-			if (chosenIndex == -1 || chosenIndex >= formats.Count) {
-				chosenIndex = formats.Count - 1;
+			
+			// Validate the number of formats:
+			if (choiceFormats.Count < chooseOptions.Length)
+			{
+				throw formattingInfo.FormattingException("You must specify at least " + chooseOptions.Length + " choices");
+			}
+			else if (choiceFormats.Count > chooseOptions.Length + 1)
+			{
+				throw formattingInfo.FormattingException("You cannot specify more than " + (chooseOptions.Length + 1) + " choices");
+			}
+			else if (chosenIndex == -1 && choiceFormats.Count == chooseOptions.Length)
+			{
+				throw formattingInfo.FormattingException("\"" + currentValueString + "\" is not a valid choice, and a \"default\" choice was not supplied");
 			}
 
-			var chosenFormat = formats[chosenIndex];
+			if (chosenIndex == -1) {
+				chosenIndex = choiceFormats.Count - 1;
+			}
+
+			var chosenFormat = choiceFormats[chosenIndex];
 			return chosenFormat;
 		}
 
