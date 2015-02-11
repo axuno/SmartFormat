@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.OldTests
 {

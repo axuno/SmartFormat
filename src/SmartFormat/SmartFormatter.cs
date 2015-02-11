@@ -122,6 +122,8 @@ namespace SmartFormat
 
 		public Parser Parser { get; set; }
 		public ErrorAction ErrorAction { get; set; }
+		private SmartSettings settings;
+		public SmartSettings Settings { get { return settings ?? (settings = new SmartSettings()); } }
 
 		#endregion
 

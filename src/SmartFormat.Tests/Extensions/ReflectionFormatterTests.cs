@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
+using SmartFormat.Tests.TestUtils;
 using SmartFormat.Tests.Utilities;
 
 namespace SmartFormat.Tests.Extensions
@@ -43,26 +44,23 @@ namespace SmartFormat.Tests.Extensions
 		[Test]
 		public void Test_Properties_CaseInsensitive()
 		{
-			using (
-				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-			{
-				var formats = new string[]
-					{
-						"{0} {0.lenGth} {length}", "{2.YEar} {2.MoNth:00}-{2.daY:00}", "{3.Value} {3.AnoN}",
-						"Chained: {4.fIrstName} {4.Firstname.Length} {4.Address.City} {4.aDdress.StAte}  ",
-						"Nested: {4:{FirstName:{} {Length} }{Address:{City} {StaTe} } }",
-						// Due to double-brace escaping, the spacing in this nested format is irregular
-					};
-				var expected = new string[]
-					{
-						"Zero 4 4", "2222 02-02", "3 True", "Chained: Michael 7 Scranton Pennsylvania  ",
-						"Nested: Michael 7 Scranton Pennsylvania  ",
-					};
-				var args = GetArgs();
-				Smart.Default.Test(formats, args, expected);
-			}
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+			
+			var formats = new string[]
+				{
+					"{0} {0.lenGth} {length}", "{2.YEar} {2.MoNth:00}-{2.daY:00}", "{3.Value} {3.AnoN}",
+					"Chained: {4.fIrstName} {4.Firstname.Length} {4.Address.City} {4.aDdress.StAte}  ",
+					"Nested: {4:{FirstName:{} {Length} }{Address:{City} {StaTe} } }",
+					// Due to double-brace escaping, the spacing in this nested format is irregular
+				};
+			var expected = new string[]
+				{
+					"Zero 4 4", "2222 02-02", "3 True", "Chained: Michael 7 Scranton Pennsylvania  ",
+					"Nested: Michael 7 Scranton Pennsylvania  ",
+				};
+			var args = GetArgs();
+			formatter.Test(formats, args, expected);
 		}
 
 		[Test]
@@ -81,16 +79,13 @@ namespace SmartFormat.Tests.Extensions
 		[Test]
 		public void Test_Methods_CaseInsensitive()
 		{
-			using (
-				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-			{
-				var formats = new string[] { "{0} {0.ToLower} {toloWer} {touPPer}", };
-				var expected = new string[] { "Zero zero zero ZERO", };
-				var args = GetArgs();
-				Smart.Default.Test(formats, args, expected);
-			}
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+			var formats = new string[] { "{0} {0.ToLower} {toloWer} {touPPer}", };
+			var expected = new string[] { "Zero zero zero ZERO", };
+			var args = GetArgs();
+			formatter.Test(formats, args, expected);
 		}
 
 		[Test]
@@ -111,16 +106,13 @@ namespace SmartFormat.Tests.Extensions
 		[Test]
 		public void Test_Fields_CaseInsensitive()
 		{
-			using (
-				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-			{
-				var formats = new string[] { "{field}" };
-				var expected = new string[] { "Field" };
-				var args = new object[] { new MiscObject(), };
-				Smart.Default.Test(formats, args, expected);
-			}
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+			
+			var formats = new string[] { "{field}" };
+			var expected = new string[] { "Field" };
+			var args = new object[] { new MiscObject(), };
+			formatter.Test(formats, args, expected);
 		}
 
 		public class MiscObject

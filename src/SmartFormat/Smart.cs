@@ -92,17 +92,5 @@ namespace SmartFormat
 
 		#endregion
 
-		#region: Settings :
-
-		private static SmartSettings _settings;
-		public static SmartSettings Settings
-		{
-			get
-			{
-				return _settings ?? (_settings = new SmartSettings());
-			}
-		}
-
-		#endregion
 	}
 }

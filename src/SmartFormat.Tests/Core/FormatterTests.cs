@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SmartFormat.Core;
 using SmartFormat.Core.Settings;
+using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 using FormatException = SmartFormat.Core.Formatting.FormatException;
 

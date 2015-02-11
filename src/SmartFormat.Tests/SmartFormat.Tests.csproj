@@ -76,7 +76,6 @@
     <Compile Include="TestUtils\Person.cs" />
     <Compile Include="TestUtils\TestHelpers.cs" />
     <Compile Include="Extensions\TimeFormatterTests.cs" />
-    <Compile Include="Utilities\SmartSettingOverride.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SmartFormat\SmartFormat.csproj">

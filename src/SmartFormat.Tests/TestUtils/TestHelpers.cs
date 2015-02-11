@@ -3,7 +3,7 @@ using System.Diagnostics;
 using NUnit.Framework;
 using SmartFormat.Tests.Common;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.TestUtils
 {
 	[DebuggerNonUserCode]
 	public static class TestHelpers

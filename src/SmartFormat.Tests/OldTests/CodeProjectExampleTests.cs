@@ -129,19 +129,16 @@ namespace SmartFormat.Tests.OldTests
 		[Test]
 		public void DotNotation_CaseInsensitive()
 		{
-			using (
-				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-			{
-				var p1 = MakeQuentin();
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
 
-				var formatString = "{aDDress.ciTy}, {Address.sTate} {Address.ZiP}";
-				var expectedOutput = "Minneapolis, Minnesota 55401";
+			var p1 = MakeQuentin();
 
-				string actualOutput = Smart.Format(formatString, p1);
-				Assert.AreEqual(expectedOutput, actualOutput);
-			}
+			var formatString = "{aDDress.ciTy}, {Address.sTate} {Address.ZiP}";
+			var expectedOutput = "Minneapolis, Minnesota 55401";
+
+			string actualOutput = formatter.Format(formatString, p1);
+			Assert.AreEqual(expectedOutput, actualOutput);
 		}
 
 
@@ -173,19 +170,16 @@ namespace SmartFormat.Tests.OldTests
 		[Test]
 		public void NestingCollection_CaseInsensitive()
 		{
-			using (
-				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-			{
-				Size[] sizes = { new Size(1, 1), new Size(4, 3), new Size(16, 9) };
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
 
-				var formatString = "{0:({widTh} x {hEIght})| and }";
-				var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
+			Size[] sizes = { new Size(1, 1), new Size(4, 3), new Size(16, 9) };
 
-				string actualOutput = Smart.Format(formatString, sizes);
-				Assert.AreEqual(expectedOutput, actualOutput);
-			}
+			var formatString = "{0:({widTh} x {hEIght})| and }";
+			var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
+
+			string actualOutput = formatter.Format(formatString, sizes);
+			Assert.AreEqual(expectedOutput, actualOutput);
 		}
 
 
@@ -381,19 +375,16 @@ namespace SmartFormat.Tests.OldTests
 		[Test]
 		public void ComplexConditionFirstMatchingCase_CaseInsensitive()
 		{
-			using (
-				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-			{
-				var p1 = new Person() { Birthday = DateTime.MinValue };
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
 
-				var formatString = "{aGe::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
-				var expectedOutput = "Senior Citizen";
+			var p1 = new Person() { Birthday = DateTime.MinValue };
 
-				string actualOutput = Smart.Format(formatString, p1);
-				Assert.AreEqual(expectedOutput, actualOutput);
-			}
+			var formatString = "{aGe::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
+			var expectedOutput = "Senior Citizen";
+
+			string actualOutput = formatter.Format(formatString, p1);
+			Assert.AreEqual(expectedOutput, actualOutput);
 		}
 
 

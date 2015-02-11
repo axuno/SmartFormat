@@ -5,6 +5,7 @@ using SmartFormat.Core;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.Common;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Core
 {

@@ -3,6 +3,7 @@ using System.Dynamic;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using SmartFormat.Tests.TestUtils;
 using SmartFormat.Tests.Utilities;
 
 namespace SmartFormat.Tests.Extensions
@@ -87,25 +88,20 @@ namespace SmartFormat.Tests.Extensions
 		[Test]
 		public void Test_Dynamic_CaseInsensitive()
 		{
-			using (
-				new SmartSettingOverride(
-					x => x.CaseSensitivity = CaseSensitivityType.CaseInsensitive,
-					x => x.CaseSensitivity = CaseSensitivityType.CaseSensitive))
-			{
-				var formatter = Smart.CreateDefaultSmartFormat();
-				formatter.AddExtensions(new DictionarySource(formatter));
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+			formatter.AddExtensions(new DictionarySource(formatter));
 
-				var formats = new string[] {
+			var formats = new string[] {
 				"Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.x} ",
 				"Nested: {0:{Numbers:{One} {Two}} } {Letters:{A}} {Object:{Prop1}} {Raw:{x}} ", // Due to double-brace escaping, the spacing in this nested format is irregular
 			};
-				var expected = new string[] {
+			var expected = new string[] {
 				"Chained: 1 2 a a z ",
 				"Nested: 1 2  a a z ",
 			};
-				var args = (object[])GetDynamicArgs();
-				formatter.Test(formats, args, expected);
-			}
+			var args = (object[])GetDynamicArgs();
+			formatter.Test(formats, args, expected);
 		}
 	}
 }

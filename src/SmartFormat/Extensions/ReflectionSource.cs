@@ -29,7 +29,7 @@ namespace SmartFormat.Extensions
 			var sourceType = current.GetType();
 
 			var bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
-			bindingFlags |= Smart.Settings.GetCaseSensitivityBindingFlag();
+			bindingFlags |= selectorInfo.FormatDetails.Settings.GetCaseSensitivityBindingFlag();
 
 			var members = sourceType.GetMember(selector.Text, bindingFlags);
 			foreach (var member in members)

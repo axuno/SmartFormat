@@ -1,6 +1,7 @@
 ﻿using System;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Formatting
 {
@@ -54,5 +55,6 @@ namespace SmartFormat.Core.Formatting
 		/// </summary>
 		public FormatException FormatError { get; set; }
 
+		public SmartSettings Settings { get { return this.Formatter.Settings; } }
 	}
 }
