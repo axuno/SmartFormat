@@ -266,7 +266,7 @@ namespace SmartFormat
 				var handled = InvokeSourceExtensions(formattingInfo);
 				if (!handled)
 				{
-					throw formattingInfo.FormattingException(string.Format("Could not evaluate the selector \"{0}\"", selector.Text));
+					throw formattingInfo.FormattingException(string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector);
 				}
 				formattingInfo.CurrentValue = formattingInfo.Result;
 			}
@@ -286,7 +286,7 @@ namespace SmartFormat
 			var handled = InvokeFormatterExtensions(formattingInfo);
 			if (!handled)
 			{
-				throw formattingInfo.FormattingException("No suitable Formatter could be found");
+				throw formattingInfo.FormattingException("No suitable Formatter could be found", formattingInfo.Format);
 			}
 		}
 		private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)

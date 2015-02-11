@@ -60,8 +60,6 @@ namespace SmartFormat.Core.Extensions
 		/// <summary>
 		/// Creates a <see cref="FormattingException"/> associated with the <see cref="IFormattingInfo.Format"/>.
 		/// </summary>
-		/// <param name="issue"></param>
-		/// <returns></returns>
-		FormattingException FormattingException(string issue);
+		FormattingException FormattingException(string issue, FormatItem problemItem = null, int startIndex = -1);
 	}
 }
