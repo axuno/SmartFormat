@@ -60,9 +60,9 @@ namespace SmartFormat.Core.Formatting
 		}
 
 
-		public FormatException FormattingException(string issue)
+		public FormattingException FormattingException(string issue)
 		{
-			return new FormatException(this.Format, issue, this.Format.endIndex);
+			return new FormattingException(this.Format, issue, this.Format.endIndex);
 		}
 
 	}

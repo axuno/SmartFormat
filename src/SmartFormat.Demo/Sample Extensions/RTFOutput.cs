@@ -38,7 +38,7 @@ namespace SmartFormat.Demo.Sample_Extensions
 		public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
 		{
 			// Depending on the nested level, we will color this item differently:
-			if (formattingInfo.FormatDetails.FormatError != null)
+			if (formattingInfo.FormatDetails.FormattingException != null)
 			{
 				output.BackColor(errorColor).Append(text, startIndex, length);
 			}

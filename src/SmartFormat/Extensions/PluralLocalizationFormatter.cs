@@ -2,10 +2,10 @@
 using System.Globalization;
 using System.Linq;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Utilities;
-using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat.Extensions
 {
@@ -122,7 +122,7 @@ namespace SmartFormat.Extensions
 			if (pluralIndex < 0 || pluralWords.Count <= pluralIndex)
 			{
 				// The plural rule should always return a value in-range!
-				throw new FormatException(format, "Invalid number of plural parameters", pluralWords.Last().endIndex);
+				throw new FormattingException(format, "Invalid number of plural parameters", pluralWords.Last().endIndex);
 			}
 
 			// Output the selected word (allowing for nested formats):

@@ -4,7 +4,6 @@ using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
-using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat.Extensions
 {

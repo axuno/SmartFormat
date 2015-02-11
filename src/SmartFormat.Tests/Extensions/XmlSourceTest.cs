@@ -127,7 +127,7 @@ namespace SmartFormat.Tests.Extensions
 		}
 
 		[Test]
-		[ExpectedException(typeof(FormatException))]
+		[ExpectedException(typeof(FormattingException))]
 		public void Format_TwoLevelXml_InvalidSelectors_Throws()
 		{
 			// arrange

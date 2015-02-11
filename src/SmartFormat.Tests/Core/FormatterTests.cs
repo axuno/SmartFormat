@@ -1,10 +1,10 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
-using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat.Tests.Core
 {
@@ -24,7 +24,7 @@ namespace SmartFormat.Tests.Core
 				formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--");
 				Assert.Fail("Formatter should have thrown an exception, but did not.");
 			}
-			catch (FormatException ex)
+			catch (FormattingException ex)
 			{
 			}
 		}

@@ -50,11 +50,14 @@ namespace SmartFormat.Core.Formatting
 		public IOutput Output { get; private set; }
 
 		/// <summary>
-		/// If ErrorAction is set to OutputErrorsInResult, this contains the exception
-		/// that was caused by either a parsing error or a formatting error.
+		/// If ErrorAction is set to OutputErrorsInResult, this will 
+		/// contain the exception that caused the formatting error.
 		/// </summary>
-		public FormatException FormatError { get; set; }
+		public FormattingException FormattingException { get; set; }
 
+		/// <summary>
+		/// Contains case-sensitivity settings
+		/// </summary>
 		public SmartSettings Settings { get { return this.Formatter.Settings; } }
 	}
 }

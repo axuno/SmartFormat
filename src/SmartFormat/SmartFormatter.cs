@@ -7,7 +7,6 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
-using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat
 {
@@ -305,11 +304,11 @@ namespace SmartFormat
 				case ErrorAction.Ignore:
 					return;
 				case ErrorAction.ThrowError:
-					throw new FormatException(errorItem, issue, startIndex);
+					throw new FormattingException(errorItem, issue, startIndex);
 				case ErrorAction.OutputErrorInResult:
-					formattingInfo.FormatDetails.FormatError = new FormatException(errorItem, issue, startIndex);
+					formattingInfo.FormatDetails.FormattingException = new FormattingException(errorItem, issue, startIndex);
 					formattingInfo.Write(issue);
-					formattingInfo.FormatDetails.FormatError = null;
+					formattingInfo.FormatDetails.FormattingException = null;
 					break;
 				case ErrorAction.MaintainTokens:
 					formattingInfo.Write(formattingInfo.Placeholder.Text);
@@ -323,11 +322,11 @@ namespace SmartFormat
 				case ErrorAction.Ignore:
 					return;
 				case ErrorAction.ThrowError:
-					throw (innerException as FormatException) ?? new FormatException(errorItem, innerException, startIndex);
+					throw (innerException as FormattingException) ?? new FormattingException(errorItem, innerException, startIndex);
 				case ErrorAction.OutputErrorInResult:
-					formattingInfo.FormatDetails.FormatError = (innerException as FormatException) ?? new FormatException(errorItem, innerException, startIndex);
+					formattingInfo.FormatDetails.FormattingException = (innerException as FormattingException) ?? new FormattingException(errorItem, innerException, startIndex);
 					formattingInfo.Write(innerException.Message);
-					formattingInfo.FormatDetails.FormatError = null;
+					formattingInfo.FormatDetails.FormattingException = null;
 					break;
 				case ErrorAction.MaintainTokens:
 					formattingInfo.Write(formattingInfo.Placeholder.Text);

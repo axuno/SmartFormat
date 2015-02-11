@@ -4,30 +4,26 @@ using SmartFormat.Core.Parsing;
 namespace SmartFormat.Core.Formatting
 {
 	/// <summary>
-	/// An exception caused by either a parsing issue
-	/// or an unhandled error in attempting to output the format.
+	/// An exception caused while attempting to output the format.
 	/// </summary>
-	public class FormatException : Exception
+	public class FormattingException : Exception
 	{
-		public FormatException(FormatItem errorItem, Exception formatException, int index)
+		public FormattingException(FormatItem errorItem, Exception formatException, int index)
 		{
 			this.Format = errorItem.baseString;
-			this.FormatSoFar = null;
 			this.ErrorItem = errorItem;
 			this.Issue = formatException.Message;
 			this.Index = index;
 		}
-		public FormatException(FormatItem errorItem, string issue, int index)
+		public FormattingException(FormatItem errorItem, string issue, int index)
 		{
 			this.Format = errorItem.baseString;
-			this.FormatSoFar = null;
 			this.ErrorItem = errorItem;
 			this.Issue = issue;
 			this.Index = index;
 		}
 
 		public string Format { get; private set; }
-		public Format FormatSoFar { get; private set; }
 		public FormatItem ErrorItem { get; private set; }
 		public string Issue { get; private set; }
 		public int Index { get; private set; }

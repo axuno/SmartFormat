@@ -78,7 +78,7 @@
     <Compile Include="SmartExtensions.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
     <Compile Include="Core\Output\StringOutput.cs" />
-    <Compile Include="Core\Formatting\FormatException.cs" />
+    <Compile Include="Core\Formatting\FormattingException.cs" />
     <Compile Include="Core\Output\TextWriterOutput.cs" />
     <Compile Include="Core\Parsing\Selector.cs" />
     <Compile Include="Extensions\DefaultFormatter.cs" />

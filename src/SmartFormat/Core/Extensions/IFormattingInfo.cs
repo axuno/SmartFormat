@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
-using FormatException = SmartFormat.Core.Formatting.FormatException;
 
 namespace SmartFormat.Core.Extensions
 {
@@ -61,10 +60,10 @@ namespace SmartFormat.Core.Extensions
 		FormatDetails FormatDetails { get; }
 
 		/// <summary>
-		/// Creates a <see cref="FormatException"/> associated with the <see cref="IFormattingInfo.Format"/>.
+		/// Creates a <see cref="FormattingException"/> associated with the <see cref="IFormattingInfo.Format"/>.
 		/// </summary>
 		/// <param name="issue"></param>
 		/// <returns></returns>
-		FormatException FormattingException(string issue);
+		FormattingException FormattingException(string issue);
 	}
 }
