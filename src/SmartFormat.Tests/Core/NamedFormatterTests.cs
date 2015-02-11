@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core
@@ -72,6 +73,29 @@ namespace SmartFormat.Tests.Core
 			var smart = GetCustomFormatter();
 			var actualResult = smart.Format(format, arg0);
 			Assert.AreEqual(expectedResult, actualResult);
+		}
+
+		[Test]
+		[TestCase("{0:invalid:}")]
+		[TestCase("{0:invalid():}")]
+		[TestCase("{0:invalid(___):___}")]
+		[ExpectedException(typeof (FormattingException))]
+		public void Unhandled_formats_throw(string format)
+		{
+			var smart = GetCustomFormatter();
+			smart.Format(format, 99999);
+		}
+
+		[Test]
+		[TestCase("{0:test2:}", 5, "TestExtension1 Options: , Format: ")]
+		[TestCase("{0}", 5, "TestExtension2 Options: , Format: ")]
+		[TestCase("{0:N2}", 5, "TestExtension2 Options: , Format: N2")]
+		public void Implicit_formatters_require_an_empty_string(string format, object arg0, string expectedOutput)
+		{
+			var formatter = GetCustomFormatter();
+			formatter.GetFormatterExtension<TestExtension1>().Names = new[] {"test2"};
+			var actual = formatter.Format(format, arg0);
+			Assert.AreEqual(expectedOutput, actual);
 		}
 
 		private SmartFormatter GetCustomFormatter()
