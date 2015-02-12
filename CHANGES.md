@@ -1,6 +1,19 @@
 LATEST CHANGES
 ====
 
+v1.4
+====
+- Massive improvements to the Extension API.  Code is cleaner and easier to use.
+- Breaking changes: Any custom Extensions will need to be updated to match the new API.  
+  Long story short, instead of 5 parameters passed to `IFormatter.EvaluateFormat`, 
+  it now just gets a single `FormatterInfo` argument that contains all parameters.
+- Added the "choose" formatter, to eventually replace the ConditionalFormatter.  
+  Hopefully it's self explanatory with these usage examples:  
+  `"{0:choose(1|2|3):one|two|three|default}"` works like a switch statement
+  `"{0:choose(null):nothing|{something}}"` can do null checking
+  `"{Gender:choose(Male|Female):his|her}"` works great with Enums
+
+
 v1.3
 ====
 - Added "Named Formatters", which allows you to use a
