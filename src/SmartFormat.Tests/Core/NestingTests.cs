@@ -9,23 +9,36 @@ namespace SmartFormat.Tests.Core
 	{
 		public NestingTests()
 		{
-			var data = new {
-				Address1 = new Address("123 Main St", "San Diego", "CA", "92000"),
-				Address2 = new Address("987 Second St", "Los Angeles", "CA", "90210"),
-				Person1 = new Person("Dwight Schrute", Gender.Male, new DateTime(), ""),
-				Person2 = new Person("Michael Scott", Gender.Male, new DateTime(), ""),
+			this.data = new {
+				One = 1,
+				ChildOne = new {
+					Two = 2,
+					ChildTwo = new {
+						Three = 3,
+						ChildThree = new {
+							Four = 4,
+						}
+					}
+				}
 			};
-			data.Person1.Address = data.Address1;
-			data.Person2.Address = data.Address2;
-
-			this.data = data;
 		}
 		private object data;
 
 		[Test]
-		[TestCase("{Address1:{StreetAddress}, {City}, {StateAbbreviation} {Zip}}", "123 Main St, San Diego, CA 92000")]
-		[TestCase("{Address1:{City}, {0.Address2.City}}", "San Diego, Los Angeles")]
-		public void Nesting_can_access_outer_scope_via_number(string format, string expectedOutput)
+		[TestCase("{ChildOne.ChildTwo: {Three} {0.One} }", " 3 1 ")]
+		[TestCase("{ChildOne.ChildTwo.ChildThree: {Four} {0.ChildOne: {Two} {0.One} } }", " 4  2 1  ")]
+		public void Nesting_can_access_root_via_number(string format, string expectedOutput)
+		{
+			var actual = Smart.Format(format, data);
+			Assert.AreEqual(expectedOutput, actual);
+		}
+
+		[Test]
+		[TestCase("{ChildOne.ChildTwo.ChildThree: {Four} {One} }", " 4 1 ")]
+		[TestCase("{ChildOne: {ChildTwo: {ChildThree: {Four} {Three} {Two} {One} } } }", "   4 3 2 1   ")]
+		[TestCase("{ChildOne: {ChildTwo: {ChildThree: {Four} {ChildTwo.Three} {ChildOne.Two} {One} } } }", "   4 3 2 1   ")]
+		[TestCase("{ChildOne: {ChildTwo: {ChildThree: {ChildOne: {ChildTwo: {ChildThree: {Four} } } } } } }", "      4      ")]
+		public void Nesting_can_access_outer_scopes(string format, string expectedOutput)
 		{
 			var actual = Smart.Format(format, data);
 			Assert.AreEqual(expectedOutput, actual);

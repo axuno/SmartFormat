@@ -6,29 +6,37 @@ namespace SmartFormat.Core.Formatting
 	public class FormattingInfo : IFormattingInfo, ISelectorInfo
 	{
 		public FormattingInfo(FormatDetails formatDetails, Format format, object currentValue)
+			: this(null, formatDetails, format, currentValue)
 		{
+		}
+		public FormattingInfo(FormattingInfo parent, FormatDetails formatDetails, Format format, object currentValue)
+		{
+			this.Parent = parent;
 			CurrentValue = currentValue;
 			Format = format;
 			FormatDetails = formatDetails;
 		}
 
-		public FormattingInfo(FormatDetails formatDetails, Placeholder placeholder, object currentValue)
+		public FormattingInfo(FormattingInfo parent, FormatDetails formatDetails, Placeholder placeholder, object currentValue)
 		{
+			this.Parent = parent;
 			this.FormatDetails = formatDetails;
 			this.Placeholder = placeholder;
 			this.Format = placeholder.Format;
 			this.CurrentValue = currentValue;
 		}
 
-		public FormattingInfo CreateChild(Format format, object currentValue)
+		private FormattingInfo CreateChild(Format format, object currentValue)
 		{
-			return new FormattingInfo(this.FormatDetails, format, currentValue);
+			return new FormattingInfo(this, this.FormatDetails, format, currentValue);
 		}
 
 		public FormattingInfo CreateChild(Placeholder placeholder)
 		{
-			return new FormattingInfo(this.FormatDetails, placeholder, this.CurrentValue);
+			return new FormattingInfo(this, this.FormatDetails, placeholder, this.CurrentValue);
 		}
+
+		public FormattingInfo Parent { get; private set; }
 
 		public FormatDetails FormatDetails { get; private set; }
 

@@ -259,16 +259,33 @@ namespace SmartFormat
 		private void EvaluateSelectors(FormattingInfo formattingInfo)
 		{
 			var placeholder = formattingInfo.Placeholder;
+			var firstSelector = true;
 			foreach (var selector in placeholder.Selectors)
 			{
 				formattingInfo.Selector = selector;
 				formattingInfo.Result = null;
 				var handled = InvokeSourceExtensions(formattingInfo);
+				if (handled) formattingInfo.CurrentValue = formattingInfo.Result;				
+				
+				if (firstSelector)
+				{
+					firstSelector = false;
+					// Handle "nested scopes" by traversing the stack:
+					var parentFormattingInfo = formattingInfo;
+					while (!handled && parentFormattingInfo.Parent != null)
+					{
+						parentFormattingInfo = parentFormattingInfo.Parent;
+						parentFormattingInfo.Selector = selector;
+						parentFormattingInfo.Result = null;
+						handled = InvokeSourceExtensions(parentFormattingInfo);
+						if (handled) formattingInfo.CurrentValue = parentFormattingInfo.Result;
+					}
+				}
+				
 				if (!handled)
 				{
 					throw formattingInfo.FormattingException(string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector);
 				}
-				formattingInfo.CurrentValue = formattingInfo.Result;
 			}
 		}
 		private bool InvokeSourceExtensions(FormattingInfo formattingInfo)
