@@ -1,6 +1,16 @@
 LATEST CHANGES
 ====
 
+v1.5
+====
+- Added "Nested Scopes" feature.  This allows a nested template to
+  easily access outer scopes, without tricky workarounds.  
+  For example: in `"{Person: {Address: {City} {FirstName} } }"`, 
+  `{City}` will come from `Address`,
+  but `{FirstName}` will come from `Person`.  
+  This will work especially well with conditional formatting!
+  
+
 v1.4
 ====
 - Massive improvements to the Extension API.  Code is cleaner and easier to use.
