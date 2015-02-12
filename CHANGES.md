@@ -1,6 +1,15 @@
-LATEST
+LATEST CHANGES
 ====
 
+v1.3
+====
+- Added "Named Formatters", which allows you to use a
+  specific formatter by specifying its name.  
+  For example, "{0:plural: ___ }" will use the Plural formatter,
+  and "{0:default: ___ }" will use the default formatter.
+- Added "Formatter Options", which allows you to specify options
+  for a named formatter.  This will be used in the near future.  
+  For example, "{0:name(options): ___ }"
 
 v1.2
 ====
