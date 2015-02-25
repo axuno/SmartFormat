@@ -27,7 +27,12 @@ namespace SmartFormat.Tests.Extensions
 			templates.Register("FIRST", "{First.ToUpper}");
 			templates.Register("last", "{Last.ToLower}");
 
-			templates.Register("FIRSTlast", "{:template:FIRST} {:template:last}");
+			if (smart.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive)
+			{
+				templates.Register("LAST", "{Last.ToUpper}");
+			}
+
+			templates.Register("NESTED", "{:template:FIRST} {:template:last}");
 		}
 		private void TestWithScottRippey(string format, string expected)
 		{
@@ -70,6 +75,7 @@ namespace SmartFormat.Tests.Extensions
 		[TestCase("{:template:lastFirst}", "Rippey, Scott")]
 		[TestCase("{:template:FIRST}", "SCOTT")]
 		[TestCase("{:template:last}", "rippey")]
+		[TestCase("{:template:LAST}", "RIPPEY")]
 		public void Simple_templates_work_as_expected(string format, string expected) { TestWithScottRippey(format, expected); }
 		
 		[Test]
@@ -78,12 +84,12 @@ namespace SmartFormat.Tests.Extensions
 		public void Multiple_templates_can_be_used(string format, string expected) { TestWithScottRippey(format, expected); }
 
 		[Test]
-		[TestCase("{:template:FIRSTlast}", "SCOTT rippey")]
+		[TestCase("{:template:NESTED}", "SCOTT rippey")]
 		public void Templates_can_be_nested(string format, string expected) { TestWithScottRippey(format, expected); }
 
 		[Test]
 		[TestCase("{:{:template:FIRST} {:template:last}|, }", "JIM halpert, PAM beasley, DWIGHT schrute")]
-		[TestCase("{:{:template:FIRSTlast}|, }", "JIM halpert, PAM beasley, DWIGHT schrute")]
+		[TestCase("{:{:template:NESTED}|, }", "JIM halpert, PAM beasley, DWIGHT schrute")]
 		public void Templates_can_be_reused(string format, string expected) { TestWithMultipleUsers(format, expected); }
 
 
@@ -106,7 +112,7 @@ namespace SmartFormat.Tests.Extensions
 		[Test]
 		[TestCase("{:template:first}")]
 		[TestCase("{:template:firstlast}")]
-		[TestCase("{:template:LAST}")]
+		[TestCase("{:template:LaSt}")]
 		[ExpectedException(typeof(FormattingException))]
 		public void Templates_are_case_sensitive(string format)
 		{
@@ -116,10 +122,12 @@ namespace SmartFormat.Tests.Extensions
 		[Test]
 		[TestCase("{:template:first}", "SCOTT")]
 		[TestCase("{:template:FIRST}", "SCOTT")]
-		// Note: FIRSTlast overwrites firstLast:
-		[TestCase("{:template:firstlast}", "SCOTT rippey")] 
-		[TestCase("{:template:FIRSTLAST}", "SCOTT rippey")]
-		[TestCase("{:template:FiRsTlAsT}", "SCOTT rippey")]
+		[TestCase("{:template:last}", "rippey")]
+		[TestCase("{:template:LAST}", "rippey")]
+		[TestCase("{:template:nested}", "SCOTT rippey")] 
+		[TestCase("{:template:NESTED}", "SCOTT rippey")]
+		[TestCase("{:template:NeStEd}", "SCOTT rippey")]
+		[TestCase("{:template:fIrStLaSt}", "Scott Rippey")]
 		public void Templates_can_be_case_insensitive_and_overwrite_each_other(string format, string expected)
 		{
 			this.smart = Smart.CreateDefaultSmartFormat();
