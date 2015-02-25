@@ -280,6 +280,7 @@ namespace SmartFormat.Core.Parsing
 								parentPlaceholder.FormatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
 								parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
 							}
+							current.startIndex = lastI;
 
 							namedFormatterStartIndex = -1;
 						}
