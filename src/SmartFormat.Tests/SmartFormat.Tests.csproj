@@ -57,6 +57,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Extensions\ListFormatterTests.cs" />
+    <Compile Include="Extensions\TemplateFormatterTests.cs" />
     <Compile Include="OldTests\CodeProjectExampleTests.cs" />
     <Compile Include="Extensions\XmlSourceTest.cs" />
     <Compile Include="TestUtils\ArgumentValidator.cs" />
