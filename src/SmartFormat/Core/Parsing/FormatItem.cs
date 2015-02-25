@@ -17,7 +17,7 @@
 		}
 
 		/// <summary>
-		/// Retrieves the substring that this item represents.
+		/// Retrieves the raw text that this item represents.
 		/// </summary>
 		public string Text
 		{
