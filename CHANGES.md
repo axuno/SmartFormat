@@ -1,6 +1,13 @@
 LATEST CHANGES
 ====
 
+v1.6.1
+====
+- Fixed issue with parsing named formatter options (#45)
+- Minor changes to the Extensions API:
+ - Added fields to `ISelectorInfo`
+ - Made `Text` obsolete in favor of `RawText`.
+
 v1.6
 ====
 - Added `TemplateFormatter`.
