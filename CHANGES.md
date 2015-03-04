@@ -1,8 +1,11 @@
 LATEST CHANGES
 ====
-- Added "TemplateFormatter".
-  Allows you to register named templates, to be used within other templates.
-  Note: the TemplateFormatter extension must be manually added.
+
+v1.6
+====
+- Added `TemplateFormatter`.
+  Allows you to register named templates, to be used within other templates.  
+  Note: the TemplateFormatter extension is not a default extension, and must be added manually.
 
 v1.5
 ====
