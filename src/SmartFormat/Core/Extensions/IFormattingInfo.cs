@@ -21,34 +21,48 @@ namespace SmartFormat.Core.Extensions
 		object CurrentValue { get; }
 
 		/// <summary>
+		/// This format specifies how to output the <see cref="CurrentValue"/>.
+		/// </summary>
+		Format Format { get; }
+
+		/// <summary>
 		/// Contains all the details about the current placeholder.
 		/// </summary>
 		[EditorBrowsable(EditorBrowsableState.Advanced)]
 		Placeholder Placeholder { get; }
 
+		/// <summary>
+		/// Alignment inserts spaces into the output to ensure consistent length.
+		/// 
+		/// Positive numbers insert spaces to the left, to right-align the text.
+		/// Negative numbers insert spaces to the right, to left-align the text.
+		/// 
+		/// This should only work with the Default Formatter, but is optional with custom formatters.
+		/// 
+		/// This is primarily for compatibility with String.Format.
+		/// </summary>
 		int Alignment { get; }
-		string FormatterOptions { get; }
-		Format Format { get; }
 
+		/// <summary>
+		/// When a named formatter is used, this will hold the options.
+		/// 
+		/// For example, in "{0:choose(1,2,3):one|two|three}", FormatterOptions is "1,2,3".
+		/// </summary>
+		string FormatterOptions { get; }
+		
 		/// <summary>
 		/// Writes a string to the output.
 		/// </summary>
-		/// <param name="text"></param>
 		void Write(string text);
 
 		/// <summary>
 		/// Writes a substring to the output.
 		/// </summary>
-		/// <param name="text"></param>
-		/// <param name="startIndex"></param>
-		/// <param name="length"></param>
 		void Write(string text, int startIndex, int length);
 
 		/// <summary>
 		/// Writes the nested format to the output.
 		/// </summary>
-		/// <param name="format"></param>
-		/// <param name="value"></param>
 		void Write(Format format, object value);
 
 		/// <summary>

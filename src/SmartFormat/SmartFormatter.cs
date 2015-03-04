@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
@@ -182,6 +183,7 @@ namespace SmartFormat
 
 		#region: Format :
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public void Format(FormattingInfo formattingInfo)
 		{
 			// Before we start, make sure we have at least one source extension and one formatter extension:

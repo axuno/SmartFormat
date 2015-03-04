@@ -22,7 +22,7 @@ namespace SmartFormat.Core.Parsing
 		public string Text { get { return RawText; } }
 
 		/// <summary>
-		/// Retrieves the substring that this item represents.
+		/// Retrieves the raw text that this item represents.
 		/// </summary>
 		public string RawText
 		{
