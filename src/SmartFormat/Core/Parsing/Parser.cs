@@ -247,27 +247,40 @@ namespace SmartFormat.Core.Parsing
 							}
 							namedFormatterOptionsStartIndex = i;
 						}
-						else if (c == ')')
+						else if (c == ')' || c == ':')
 						{
-							var hasOpeningParenthesis = (namedFormatterOptionsStartIndex != -1);
-							if (!hasOpeningParenthesis)
+							if (c == ')')
+							{
+								var hasOpeningParenthesis = (namedFormatterOptionsStartIndex != -1);
+
+								// ensure no trailing chars past ')'
+								var nextI = i + 1;
+								var nextCharIsValid = (nextI < format.Length && (format[nextI] == ':' || format[nextI] == closingBrace));
+
+								if (!hasOpeningParenthesis || !nextCharIsValid)
+								{
+									namedFormatterStartIndex = -1;
+									continue;
+								}
+
+								namedFormatterOptionsEndIndex = i;
+
+								if (format[nextI] == ':')
+								{
+									i++; // Consume the ':'
+								}
+
+							}
+							
+							var nameIsEmpty = (namedFormatterStartIndex == i);
+							var missingClosingParenthesis = (namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex == -1);
+							if (nameIsEmpty || missingClosingParenthesis)
 							{
 								namedFormatterStartIndex = -1;
 								continue;
 							}
-							lastI = i + 1;
-							namedFormatterOptionsEndIndex = i;
-						}
-						else if (c == ':')
-						{
-							var emptyName = (namedFormatterStartIndex == i);
-							// ensure no trailing chars past ')'
-							var invalidClosingParenthesis = (namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex != i - 1);
-							if (emptyName || invalidClosingParenthesis)
-							{
-								namedFormatterStartIndex = -1;
-								continue;
-							}
+
+
 							lastI = i + 1;
 
 							var parentPlaceholder = current.parent;

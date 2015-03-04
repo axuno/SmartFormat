@@ -28,6 +28,8 @@ namespace SmartFormat.Tests.Core
 		
 		[TestCase("{0:default()}", 5, "5")]
 		[TestCase("{0:default:N2}", 5, "5.00")]
+		[TestCase("{0:d()}", 5, "5")]
+		[TestCase("{0:d:N2}", 5, "5.00")]
 
 		public void Invoke_extensions_by_name_or_shortname(string format, object arg0, string expectedResult)
 		{

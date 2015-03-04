@@ -217,13 +217,14 @@ namespace SmartFormat.Tests.Core
 			return GetRegularParser().ParseFormat(format);
 		}
 
-		[Test]
+		[TestCase("{0:name:}", "name", "", "")]
+		[TestCase("{0:name()}", "name", "", "")]
+		[TestCase("{0:name(1|2|3)}", "name", "1|2|3", "")]
 		[TestCase("{0:name:format}", "name", "", "format")]
 		[TestCase("{0:name():format}", "name", "", "format")]
-		[TestCase("{0:name:}", "name", "", "")]
 		[TestCase("{0:name():}", "name", "", "")]
-		[TestCase("{0:name(1,2,3):format}", "name", "1,2,3", "format")]
-		[TestCase("{0:name(1,2,3):}", "name", "1,2,3", "")]
+		[TestCase("{0:name(1|2|3):format}", "name", "1|2|3", "format")]
+		[TestCase("{0:name(1|2|3):}", "name", "1|2|3", "")]
 		public void NamedFormatter_should_be_parsed_correctly(string format, string expectedName, string expectedOptions, string expectedFormat)
 		{
 			var placeholder = (Placeholder) Parse(format).Items[0];
@@ -232,36 +233,57 @@ namespace SmartFormat.Tests.Core
 			Assert.AreEqual(expectedFormat, placeholder.Format.ToString());
 		}
 
-		[Test]
 		// Incomplete:
 		[TestCase(@"{0:format}")]
 		[TestCase(@"{0:format(}")]
 		[TestCase(@"{0:format)}")]
 		[TestCase(@"{0:(format)}")]
+		// Invalid:
+		[TestCase(@"{0:format()stuff}")]
+		[TestCase(@"{0:format() :}")]
+		[TestCase(@"{0:format(s)|stuff}")]
+		[TestCase(@"{0:format(s)stuff:}")]
+		[TestCase(@"{0:format(:}")]
+		[TestCase(@"{0:format):}")]
 		// Escape sequences:
 		[TestCase(@"{0:format\()}")]
 		[TestCase(@"{0:format(\)}")]
 		[TestCase(@"{0:format\:}")]
 		[TestCase(@"{0:hh\:mm\:ss}")]
-		// Has nesting:
-		[TestCase(@"{0:format{}}")]
 		// Empty:
-		[TestCase(@"{0}")]
 		[TestCase(@"{0:}")]
 		[TestCase(@"{0::}")]
 		[TestCase(@"{0:()}")]
 		[TestCase(@"{0:():}")]
-		[TestCase(@"{0:(1,2,3)}")]
-		[TestCase(@"{0:(1,2,3):}")]
+		[TestCase(@"{0:(1|2|3)}")]
+		[TestCase(@"{0:(1|2|3):}")]
 		public void NamedFormatter_should_be_null_when_empty_or_invalid_or_escaped(string format)
+		{
+			var expectedLiteralText = format.Substring(3, format.Length - 3 - 1);
+			AssertNoNamedFormatter(format, expectedLiteralText);
+		}
+
+		[TestCase(@"{0:format{}}", "format")]
+		[TestCase(@"{0:{}}", "")]
+		[TestCase(@"{0:{0:nested():}}", "")]
+		[TestCase(@"{0:for{}mat}", "format")]
+		[TestCase(@"{0:for{}mat()}", "format()")]
+		[TestCase(@"{0:for(){}mat}", "for()mat")]
+		public void NamedFormatter_should_be_null_when_has_nesting(string format, string expectedLiteralText)
+		{
+			AssertNoNamedFormatter(format, expectedLiteralText);
+		}
+
+		private void AssertNoNamedFormatter(string format, string expectedLiteralText)
 		{
 			var parser = GetRegularParser();
 			parser.UseAlternativeEscapeChar('\\');
-			
-			var placeholder = (Placeholder)parser.ParseFormat(format).Items[0];
+
+			var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
 			Assert.IsEmpty(placeholder.FormatterName);
 			Assert.IsEmpty(placeholder.FormatterOptions);
+			var literalText = placeholder.Format.GetText();
+			Assert.AreEqual(expectedLiteralText, literalText);
 		}
-
 	}
 }
