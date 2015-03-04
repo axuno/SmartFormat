@@ -308,7 +308,7 @@ namespace SmartFormat.Core.Parsing
 		/// of placeholders
 		/// </summary>
 		/// <returns></returns>
-		public string GetText()
+		public string GetLiteralText()
 		{
 			var sb = new StringBuilder();
 			foreach (var item in this.Items)

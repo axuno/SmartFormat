@@ -49,7 +49,7 @@ namespace SmartFormat.Extensions
 			if (formattingInfo.FormatterOptions != "") 
 				options = formattingInfo.FormatterOptions;
 			else if (format != null) 
-				options = format.Text;
+				options = format.GetLiteralText();
 			else 
 				options = "";
 			

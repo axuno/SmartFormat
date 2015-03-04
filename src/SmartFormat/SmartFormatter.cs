@@ -239,7 +239,7 @@ namespace SmartFormat
 					formattingInfo.FormatDetails.FormattingException = null;
 					break;
 				case ErrorAction.MaintainTokens:
-					formattingInfo.Write(formattingInfo.Placeholder.Text);
+					formattingInfo.Write(formattingInfo.Placeholder.RawText);
 					break;
 			}
 		}
@@ -284,7 +284,7 @@ namespace SmartFormat
 				
 				if (!handled)
 				{
-					throw formattingInfo.FormattingException(string.Format("Could not evaluate the selector \"{0}\"", selector.Text), selector);
+					throw formattingInfo.FormattingException(string.Format("Could not evaluate the selector \"{0}\"", selector.RawText), selector);
 				}
 			}
 		}

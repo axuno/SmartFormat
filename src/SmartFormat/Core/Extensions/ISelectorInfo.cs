@@ -22,7 +22,19 @@ namespace SmartFormat.Core.Extensions
 		/// <summary>
 		/// The selector to evaluate
 		/// </summary>
-		Selector Selector { get; }
+		string SelectorText { get; }
+
+		/// <summary>
+		/// The index of the selector in a multi-part selector.
+		/// Example: {Person.Birthday.Year} has 3 seletors,
+		/// and Year has a SelectorIndex of 2.
+		/// </summary>
+		int SelectorIndex { get; }
+
+		/// <summary>
+		/// The operator that came before the selector; typically "."
+		/// </summary>
+		string SelectorOperator { get; }
 
 		/// <summary>
 		/// Sets the result of evaluating the selector.

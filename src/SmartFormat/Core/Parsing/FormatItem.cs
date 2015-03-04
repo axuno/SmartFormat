@@ -1,4 +1,6 @@
-﻿namespace SmartFormat.Core.Parsing
+﻿using System;
+
+namespace SmartFormat.Core.Parsing
 {
 	/// <summary>
 	/// Base class that represents a substring
@@ -16,10 +18,13 @@
 			this.endIndex = endIndex;
 		}
 
+		[Obsolete("Please use RawText instead")]
+		public string Text { get { return RawText; } }
+
 		/// <summary>
 		/// Retrieves the substring that this item represents.
 		/// </summary>
-		public string Text
+		public string RawText
 		{
 			get
 			{

@@ -19,9 +19,10 @@ namespace SmartFormat.Extensions
 			var element = selectorInfo.CurrentValue as XElement;
 			if (element != null)
 			{
+				var selector = selectorInfo.SelectorText;
 				// Find elements that match a selector
 				var selectorMatchedElements = element.Elements()
-					.Where(x => x.Name.LocalName == selectorInfo.Selector.Text).ToList();
+					.Where(x => x.Name.LocalName == selector).ToList();
 				if (selectorMatchedElements.Any())
 				{
 					selectorInfo.Result = selectorMatchedElements;

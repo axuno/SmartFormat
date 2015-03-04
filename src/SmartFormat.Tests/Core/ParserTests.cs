@@ -106,12 +106,12 @@ namespace SmartFormat.Tests.Core
 
 			Assert.AreEqual(9, parsed.Items.Count);
 
-			Assert.AreEqual("bbb", ((Placeholder)parsed.Items[1]).Selectors[0].Text);
-			Assert.AreEqual("ccc", ((Placeholder)parsed.Items[3]).Selectors[0].Text);
-			Assert.AreEqual("ddd", ((Placeholder)parsed.Items[3]).Format.Items[0].Text);
-			Assert.AreEqual(" {eee} ", ((LiteralText)parsed.Items[4]).Text);
-			Assert.AreEqual("{ggg}", ((Placeholder)parsed.Items[5]).Format.Items[0].Text);
-			Assert.AreEqual("iii", ((Placeholder)((Placeholder)parsed.Items[7]).Format.Items[0]).Selectors[0].Text);
+			Assert.AreEqual("bbb", ((Placeholder)parsed.Items[1]).Selectors[0].RawText);
+			Assert.AreEqual("ccc", ((Placeholder)parsed.Items[3]).Selectors[0].RawText);
+			Assert.AreEqual("ddd", ((Placeholder)parsed.Items[3]).Format.Items[0].RawText);
+			Assert.AreEqual(" {eee} ", ((LiteralText)parsed.Items[4]).RawText);
+			Assert.AreEqual("{ggg}", ((Placeholder)parsed.Items[5]).Format.Items[0].RawText);
+			Assert.AreEqual("iii", ((Placeholder)((Placeholder)parsed.Items[7]).Format.Items[0]).Selectors[0].RawText);
 
 		}
 
@@ -282,7 +282,7 @@ namespace SmartFormat.Tests.Core
 			var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
 			Assert.IsEmpty(placeholder.FormatterName);
 			Assert.IsEmpty(placeholder.FormatterOptions);
-			var literalText = placeholder.Format.GetText();
+			var literalText = placeholder.Format.GetLiteralText();
 			Assert.AreEqual(expectedLiteralText, literalText);
 		}
 	}

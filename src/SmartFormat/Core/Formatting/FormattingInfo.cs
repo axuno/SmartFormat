@@ -41,6 +41,10 @@ namespace SmartFormat.Core.Formatting
 		public FormatDetails FormatDetails { get; private set; }
 
 		public Selector Selector { get; set; }
+		public string SelectorText { get { return this.Selector.RawText; }}
+		public int SelectorIndex { get { return this.Selector.SelectorIndex; }}
+		public string SelectorOperator { get { return this.Selector.Operator; }}
+
 		public object Result { get; set; }
 
 		public object CurrentValue { get; set; }

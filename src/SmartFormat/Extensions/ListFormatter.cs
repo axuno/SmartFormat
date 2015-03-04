@@ -54,13 +54,13 @@ namespace SmartFormat.Extensions
 		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
-			var selector = selectorInfo.Selector;
+			var selector = selectorInfo.SelectorText;
 
 			// See if we're trying to access a specific index:
 			int itemIndex;
 			var currentList = current as IList;
-			var isAbsolute = (selector.SelectorIndex == 0 && selector.Operator.Length == 0);
-			if (!isAbsolute && currentList != null && int.TryParse(selector.Text, out itemIndex) && itemIndex < currentList.Count)
+			var isAbsolute = (selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0);
+			if (!isAbsolute && currentList != null && int.TryParse(selector, out itemIndex) && itemIndex < currentList.Count)
 			{
 				// The current is a List, and the selector is a number;
 				// let's return the List item:
@@ -72,10 +72,10 @@ namespace SmartFormat.Extensions
 
 
 			// We want to see if there is an "Index" property that was supplied.
-			if (selector.Text.Equals("index", StringComparison.OrdinalIgnoreCase))
+			if (selector.Equals("index", StringComparison.OrdinalIgnoreCase))
 			{
 				// Looking for "{Index}"
-				if (selector.SelectorIndex == 0)
+				if (selectorInfo.SelectorIndex == 0)
 				{
 					selectorInfo.Result = CollectionIndex;
 					return true;
@@ -131,9 +131,9 @@ namespace SmartFormat.Extensions
 			// itemFormat|spacer|lastSpacer
 			// itemFormat|spacer|lastSpacer|twoSpacer
 			var itemFormat = parameters[0];
-			var spacer = (parameters.Count >= 2) ? parameters[1].Text : "";
-			var lastSpacer = (parameters.Count >= 3) ? parameters[2].Text : spacer;
-			var twoSpacer = (parameters.Count >= 4) ? parameters[3].Text : lastSpacer;
+			var spacer = (parameters.Count >= 2) ? parameters[1].GetLiteralText() : "";
+			var lastSpacer = (parameters.Count >= 3) ? parameters[2].GetLiteralText() : spacer;
+			var twoSpacer = (parameters.Count >= 4) ? parameters[3].GetLiteralText() : lastSpacer;
 
 			// TODO: [Obsolete] Not necessary, should remove:
 			if (!itemFormat.HasNested)

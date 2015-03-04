@@ -18,7 +18,7 @@ namespace SmartFormat.Extensions
 		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
-			var selector = selectorInfo.Selector;
+			var selector = selectorInfo.SelectorText;
 
 			// See if current is a IDictionary and contains the selector:
 			var rawDict = current as IDictionary;
@@ -28,7 +28,7 @@ namespace SmartFormat.Extensions
 				{
 					var key = (entry.Key as string) ?? entry.Key.ToString();
 
-					if (key.Equals(selector.Text, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
+					if (key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
 					{
 						selectorInfo.Result = entry.Value;
 						return true;
@@ -41,7 +41,7 @@ namespace SmartFormat.Extensions
 
 			if (dict != null)
 			{
-				var val = dict.FirstOrDefault(x => x.Key.Equals(selector.Text, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison())).Value;
+				var val = dict.FirstOrDefault(x => x.Key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison())).Value;
 				if (val != null)
 				{
 					selectorInfo.Result = val;

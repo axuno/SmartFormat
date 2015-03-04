@@ -41,7 +41,7 @@ namespace SmartFormat.Extensions
 			var provider = formattingInfo.FormatDetails.Provider;
 			if (provider != null && (cFormatter = provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
 			{
-				var formatText = format == null ? null : format.GetText();
+				var formatText = format == null ? null : format.GetLiteralText();
 				result = cFormatter.Format(formatText, current, provider);
 			}
 			// IFormattable:

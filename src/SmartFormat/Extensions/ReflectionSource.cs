@@ -16,7 +16,7 @@ namespace SmartFormat.Extensions
 		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
-			var selector = selectorInfo.Selector;
+			var selector = selectorInfo.SelectorText;
 
 			if (current == null)
 			{
@@ -30,7 +30,7 @@ namespace SmartFormat.Extensions
 			var bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 			bindingFlags |= selectorInfo.FormatDetails.Settings.GetCaseSensitivityBindingFlag();
 
-			var members = sourceType.GetMember(selector.Text, bindingFlags);
+			var members = sourceType.GetMember(selector, bindingFlags);
 			foreach (var member in members)
 			{
 				switch (member.MemberType)

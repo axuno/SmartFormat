@@ -16,18 +16,18 @@ namespace SmartFormat.Extensions
 		public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
 		{
 			var current = selectorInfo.CurrentValue;
-			var selector = selectorInfo.Selector;
+			var selector = selectorInfo.SelectorText;
 			var formatDetails = selectorInfo.FormatDetails;
 
 			int selectorValue;
-			if (int.TryParse(selector.Text, out selectorValue))
+			if (int.TryParse(selector, out selectorValue))
 			{
 				// Argument Index:
 				// Just like String.Format, the arg index must be in-range,
 				// should be the first item, and shouldn't have any operator:
-				if (selector.SelectorIndex == 0
+				if (selectorInfo.SelectorIndex == 0
 					&& selectorValue < formatDetails.OriginalArgs.Length
-					&& selector.Operator == "")
+					&& selectorInfo.SelectorOperator == "")
 				{
 					// This selector is an argument index.
 					selectorInfo.Result = formatDetails.OriginalArgs[selectorValue];
@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
 
 				// Alignment:
 				// An alignment item should be preceded by a comma
-				if (selector.Operator == ",")
+				if (selectorInfo.SelectorOperator == ",")
 				{
 					// This selector is actually an Alignment modifier.
 					selectorInfo.Placeholder.Alignment = selectorValue;
