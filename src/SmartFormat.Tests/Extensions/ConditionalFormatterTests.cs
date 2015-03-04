@@ -166,5 +166,12 @@ namespace SmartFormat.Tests.Extensions
 			Smart.Default.Test(formats, args, expected);
 		}
 
+		[TestCase("{0:part(s)|car}", true, "part(s)")]
+		[TestCase("{0:part(s)|car}", false, "car")]
+		public void Syntax_should_not_be_confused_with_named_formatters(string format, object arg0, string expectedOutput)
+		{
+			var actualOutput = Smart.Format(format, arg0);
+			Assert.AreEqual(expectedOutput, actualOutput);
+		}
 	}
 }
