@@ -62,10 +62,10 @@ namespace SmartFormat.Tests.Extensions
 		public void Sanity_test(string format, string expected) { TestWithScottRippey(format, expected); }
 
 		[Test]
-		[TestCase("{:template(firstLast):}", "Scott Rippey")]
+		[TestCase("{:template(firstLast)}", "Scott Rippey")]
 		[TestCase("{:template:firstLast}", "Scott Rippey")]
 		[TestCase("{:template():firstLast}", "Scott Rippey")]
-		[TestCase("{:t(firstLast):}", "Scott Rippey")]
+		[TestCase("{:t(firstLast)}", "Scott Rippey")]
 		[TestCase("{:t:firstLast}", "Scott Rippey")]
 		[TestCase("{:t(firstLast):IGNORED}", "Scott Rippey")]
 		[TestCase("{:t:firstLast}", "Scott Rippey")]
@@ -100,7 +100,7 @@ namespace SmartFormat.Tests.Extensions
 		[TestCase("{:template:FIRST_}")]
 		[TestCase("{:template:_last}")]
 		[TestCase("{:template:}")]
-		[TestCase("{:template():}")]
+		[TestCase("{:template()}")]
 		[TestCase("{:template(AAAA):}")]
 		[TestCase("{:template():AAAA}")]
 		[ExpectedException(typeof(FormattingException))]
