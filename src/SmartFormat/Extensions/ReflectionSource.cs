@@ -33,53 +33,51 @@ namespace SmartFormat.Extensions
 			var members = sourceType.GetMember(selector, bindingFlags);
 			foreach (var member in members)
 			{
-				switch (member.MemberType)
+				if (member is FieldInfo)
 				{
-					case MemberTypes.Field:
-						//  Selector is a Field; retrieve the value:
-						var field = (FieldInfo) member;
-						selectorInfo.Result = field.GetValue(current);
-						return true;
-					case MemberTypes.Property:
-					case MemberTypes.Method:
-						MethodInfo method;
-						if (member.MemberType == MemberTypes.Property)
-						{
-							//  Selector is a Property
-							var prop = (PropertyInfo) member;
-							//  Make sure the property is not WriteOnly:
-							if (prop.CanRead)
-							{
-								method = prop.GetGetMethod();
-							}
-							else
-							{
-								continue;
-							}
-						}
-						else
-						{
-							//  Selector is a method
-							method = (MethodInfo) member;
-						}
+					//  Selector is a Field; retrieve the value:
+					var field = (FieldInfo)member;
+					selectorInfo.Result = field.GetValue(current);
+					return true;
+				}
 
-						//  Check that this method is valid -- it needs to return a value and has to be parameterless:
-						//  We are only looking for a parameterless Function/Property:
-						if (method.GetParameters().Length > 0)
-						{
-							continue;
-						}
+				var propertyInfo = member as PropertyInfo;
+				MethodInfo methodInfo;
 
-						//  Make sure that this method is not void!  It has to be a Function!
-						if (method.ReturnType == typeof(void))
-						{
-							continue;
-						}
+				if (propertyInfo != null)
+				{
+					if (propertyInfo.CanRead)
+					{
+						methodInfo = propertyInfo.GetGetMethod();
+					}
+					else
+					{
+						continue;
+					}
+				}
+				else
+				{
+					methodInfo = member as MethodInfo;
+				}
 
-						//  Retrieve the Selectors/ParseFormat value:
-						selectorInfo.Result = method.Invoke(current, new object[0]);
-						return true;
+				if (methodInfo != null)
+				{
+					//  Check that this method is valid -- it needs to return a value and has to be parameterless:
+					//  We are only looking for a parameterless Function/Property:
+					if (methodInfo.GetParameters().Length > 0)
+					{
+						continue;
+					}
 
+					//  Make sure that this method is not void!  It has to be a Function!
+					if (methodInfo.ReturnType == typeof(void))
+					{
+						continue;
+					}
+
+					//  Retrieve the Selectors/ParseFormat value:
+					selectorInfo.Result = methodInfo.Invoke(current, new object[0]);
+					return true;
 				}
 			}
 
