@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 
@@ -93,16 +92,7 @@ namespace SmartFormat.Extensions
 		}
 
 		private static string key = "664c3d47-8d00-4825-b4fb-f3dd7c8a9bdf";
-		private static int CollectionIndex
-		{
-			get
-			{
-				object val = CallContext.LogicalGetData(key);
-				return val != null ? (int)val : -1;
-			}
-			set { CallContext.LogicalSetData(key, value); }
-		}
-
+		private static int CollectionIndex = -1;
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;

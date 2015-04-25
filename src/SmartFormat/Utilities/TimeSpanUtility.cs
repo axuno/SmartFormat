@@ -88,7 +88,7 @@ namespace SmartFormat.Utilities
 			var result = new StringBuilder();
 			for (var i = rangeMax; i >= rangeMin; i=(TimeSpanFormatOptions)((int)i>>1)) {
 				// Determine the value and title:
-				int value;
+				int value = 0;
 				switch (i) {
 					case TimeSpanFormatOptions.RangeWeeks:
 						value = (int)Math.Floor(FromTime.TotalDays / 7);
@@ -114,9 +114,6 @@ namespace SmartFormat.Utilities
 						value = (int)Math.Floor(FromTime.TotalMilliseconds);
 						FromTime -= TimeSpan.FromMilliseconds(value);
 						break;
-					default:
-						// This code is unreachable, but it prevents compile-errors.
-						throw new InvalidEnumArgumentException();
 				}
 
 
@@ -349,7 +346,7 @@ namespace SmartFormat.Utilities
 			}
 		}
 
-		private static readonly Regex parser = new Regex(@"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex parser = new Regex(@"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b", RegexOptions.IgnoreCase);
 		public static TimeSpanFormatOptions Parse(string formatOptionsString)
 		{
 			formatOptionsString = formatOptionsString.ToLower();

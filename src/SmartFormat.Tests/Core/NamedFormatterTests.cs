@@ -11,6 +11,7 @@ namespace SmartFormat.Tests.Core
 		#region: Default Extensions :
 
 		[Test]
+		[SetCulture("en")]
 		[TestCase("{0:conditional:zero|one|two}", 0, "zero")]
 		[TestCase("{0:conditional:zero|one|two}", 1, "one")]
 		[TestCase("{0:conditional:zero|one|two}", 2, "two")]
@@ -52,6 +53,7 @@ namespace SmartFormat.Tests.Core
 		}
 
 		[Test]
+		[SetCulture("en")]
 		[TestCase("{0:test1:}", 5, "TestExtension1 Options: , Format: ")]
 		[TestCase("{0:test1():}", 5, "TestExtension1 Options: , Format: ")]
 		[TestCase("{0:test1:N2}", 5, "TestExtension1 Options: , Format: N2")]

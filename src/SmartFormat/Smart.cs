@@ -72,7 +72,7 @@ namespace SmartFormat
 				(ISource)listFormatter,
 				new ReflectionSource(result),
 				new DictionarySource(result),
-				new XmlSource(result),
+				//new XmlSource(result),
 				// These default extensions reproduce the String.Format behavior:
 				new DefaultSource(result)
 				);
@@ -81,7 +81,7 @@ namespace SmartFormat
 				new PluralLocalizationFormatter("en"),
 				new ConditionalFormatter(),
 				new TimeFormatter("en"),
-				new XElementFormatter(),
+				//new XElementFormatter(),
 				new ChooseFormatter(),
 				new DefaultFormatter()
 				);

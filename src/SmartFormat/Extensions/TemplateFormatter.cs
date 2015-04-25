@@ -14,7 +14,7 @@ namespace SmartFormat.Extensions
 		{
 			this.formatter = formatter;
 
-			var stringComparer = (formatter.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive) ? StringComparer.InvariantCulture : StringComparer.InvariantCultureIgnoreCase;
+			var stringComparer = (formatter.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
 			this.templates = new Dictionary<string, Format>(stringComparer);
 		}
 		public void Register(string templateName, string template)
