@@ -156,6 +156,15 @@ namespace SmartFormat.Tests.Extensions
 			Assert.AreEqual(expectedResult, actualResult);
 		}
 
-
+		[Test]
+		[TestCase("{0:plural:zero|one|many}", new string[0], "zero")]
+		[TestCase("{0:plural:zero|one|many}", new[] { "alice" }, "one")]
+		[TestCase("{0:plural:zero|one|many}", new[] { "alice", "bob" }, "many")]
+		public void Test_should_allow_ienumerable_parameter(string format, object arg0, string expectedResult)
+		{
+			var culture = CultureInfo.CreateSpecificCulture("en-us");
+			var actualResult = Smart.Format(culture, format, arg0);
+			Assert.AreEqual(expectedResult, actualResult);
+		}
 	}
 }

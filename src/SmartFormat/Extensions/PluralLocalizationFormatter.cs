@@ -4,6 +4,7 @@ using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Utilities;
+using System.Collections.Generic;
 
 namespace SmartFormat.Extensions
 {
@@ -91,15 +92,28 @@ namespace SmartFormat.Extensions
 			// This extension requires at least two plural words:
 			if (pluralWords.Count == 1) return false;
 
-			// See if the value is a number:
-			var currentIsNumber =
-				current is byte || current is short || current is int || current is long
-				|| current is float || current is double || current is decimal;
-			// This extension only formats numbers:
-			if (!currentIsNumber) return false;
+			decimal value;
 
-			// Normalize the number to decimal:
-			var value = Convert.ToDecimal(current);
+			// We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
+			// in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
+			// 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
+			if (current is byte || current is short || current is int || current is long
+				|| current is float || current is double || current is decimal)
+			{
+				// Normalize the number to decimal:
+				value = Convert.ToDecimal(current);
+			}
+			else if (current is IEnumerable<object>)
+			{
+				// Relay on IEnumerable covariance, but don't care about non-generic IEnumerable
+				value = ((IEnumerable<object>)current).Count();
+			}
+			else
+			{
+				// This extension only permits numbers and IEnumerables
+				return false;
+			}
+
 
 			// Get the plural rule:
 			var pluralRule = GetPluralRule(formattingInfo);
