@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
@@ -59,7 +60,11 @@ namespace SmartFormat.Extensions
 			// See if we're trying to access a specific index:
 			int itemIndex;
 			var currentList = current as IList;
-			var isAbsolute = (selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0);
+            if (currentList == null && current is IEnumerable)
+            {
+                currentList = (current as IEnumerable).Cast<object>().ToList();
+            }
+            var isAbsolute = (selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0);
 			if (!isAbsolute && currentList != null && int.TryParse(selector, out itemIndex) && itemIndex < currentList.Count)
 			{
 				// The current is a List, and the selector is a number;
