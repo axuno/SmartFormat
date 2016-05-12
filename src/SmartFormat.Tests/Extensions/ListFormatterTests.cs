@@ -132,5 +132,30 @@ namespace SmartFormat.Tests.Extensions
 			var args = GetArgs();
 			Smart.Default.Test(formats, args, expected);
 		}
+
+        [Test]
+        public void EnumerableTest()
+        {
+            var data = new[]{
+				new {
+					Name = "Person A",
+					Gender = "M"
+				},
+				new {
+					Name = "Person B",
+					Gender = "F"
+				},
+				new {
+					Name = "Person C",
+					Gender = "M"
+				}
+		    };
+            var model = new
+            {
+                Persons = data.Where(p => p.Gender == "M")  // Persons's type is System.Linq.Enumerable+WhereArrayIterator`1[<>f__AnonymousType0`2[System.String,System.String]]
+            };
+
+            Assert.That(Smart.Format("{Persons.0.Name}", model), Is.EqualTo("Person A")); 
+        }
 	}
 }
