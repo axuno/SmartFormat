@@ -11,7 +11,7 @@ namespace SmartFormat.Extensions
 	{
 		private string[] names = { "plural", "p", "" };
 		public string[] Names { get { return names; } set { names = value; } }
-		
+
 		/// <summary>
 		/// Initializes the plugin with rules for many common languages.
 		/// If no CultureInfo is supplied to the formatter, the
@@ -90,6 +90,11 @@ namespace SmartFormat.Extensions
 			var pluralWords = format.Split('|');
 			// This extension requires at least two plural words:
 			if (pluralWords.Count == 1) return false;
+
+            // In order to support dictionary<string,string>()
+            long parsedString;
+            if ((current is string) && (Int64.TryParse(Convert.ToString(current), out parsedString)))
+                current = parsedString;
 
 			// See if the value is a number:
 			var currentIsNumber =
