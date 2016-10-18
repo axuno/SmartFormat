@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Globalization;
+using NUnit.Framework;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
@@ -33,7 +34,7 @@ namespace SmartFormat.Tests.Core
 
 		public void Invoke_extensions_by_name_or_shortname(string format, object arg0, string expectedResult)
 		{
-			var actualResult = Smart.Format(format, arg0);
+			var actualResult = Smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
 			Assert.AreEqual(expectedResult, actualResult);
 		}
 
@@ -73,7 +74,7 @@ namespace SmartFormat.Tests.Core
 		public void NamedFormatter_invokes_a_specific_formatter(string format, object arg0, string expectedResult)
 		{
 			var smart = GetCustomFormatter();
-			var actualResult = smart.Format(format, arg0);
+			var actualResult = smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
 			Assert.AreEqual(expectedResult, actualResult);
 		}
 

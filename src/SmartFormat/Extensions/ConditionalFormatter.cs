@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
@@ -36,13 +37,16 @@ namespace SmartFormat.Extensions
 				current is byte || current is short || current is int || current is long
 				|| current is float || current is double || current is decimal;
 			// An Enum is a number too:
+#if NET_STANDARD
+			if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
+#else
 			if (currentIsNumber == false && current != null && current.GetType().IsEnum)
+#endif
 			{
 				currentIsNumber = true;
 			}
 			var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
-
-
+			
 			int paramIndex; // Determines which parameter to use for output
 
 			// First, we'll see if we are using "complex conditions":

@@ -116,7 +116,7 @@ namespace SmartFormat.Utilities
 						break;
 					default:
 						// This code is unreachable, but it prevents compile-errors.
-						throw new InvalidEnumArgumentException();
+						throw new ArgumentException("TimeSpanUtility");
 				}
 
 

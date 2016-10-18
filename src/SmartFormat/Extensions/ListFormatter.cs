@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
+//using System.Runtime.Remoting.Messaging;   // Not supported by .Net Core
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 
@@ -91,6 +91,12 @@ namespace SmartFormat.Extensions
 
 			return false;
 		}
+		
+		[ThreadStatic] private static int CollectionIndex = -1;
+
+		/*
+
+		// Not supported by .Net Core
 
 		private static string key = "664c3d47-8d00-4825-b4fb-f3dd7c8a9bdf";
 		private static int CollectionIndex
@@ -102,6 +108,8 @@ namespace SmartFormat.Extensions
 			}
 			set { CallContext.LogicalSetData(key, value); }
 		}
+		*/
+
 
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
