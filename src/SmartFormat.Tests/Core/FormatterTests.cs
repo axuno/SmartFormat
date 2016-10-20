@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
@@ -70,6 +72,19 @@ namespace SmartFormat.Tests.Core
 			var obj = new { name = name };
 			var str2 = Smart.Format("Name: {name,-10}| Column 2", obj);
 			Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
+		}
+
+		[Test]
+		public void Formatter_NotifyFormattingError()
+		{
+			var obj = new { Name = "some name" };
+			var badPlaceholder = new List<string>();
+
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.ErrorAction = ErrorAction.Ignore;
+			formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args.Placeholder);
+			var res = formatter.Format("{NoName}", obj);
+			Assert.That(badPlaceholder.Count == 1 && badPlaceholder[0] == "{NoName}");
 		}
 	}
 }
