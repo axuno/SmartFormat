@@ -1,10 +1,23 @@
 *.suo
-bin
-debug
-obj
-src/packages/*
-!src/packages/repositories.config
+[Bb]in/
+[Dd]ebug/
+[Oo]bj/
+[Ll]og/
+.vs/
 *.user
 *.ncrunch*
 *.cache
 *.nupkg
+*.project.lock.json
+
+# NuGet Packages
+*.nupkg
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+# except build/, which is used as an MSBuild target.
+!**/packages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/packages/repositories.config
+# NuGet v3's project.json files produces more ignoreable files
+*.nuget.props
+*.nuget.targets

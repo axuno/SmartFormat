@@ -295,9 +295,9 @@ namespace SmartFormat.Tests.Core
 			formatter.ErrorAction = ErrorAction.Ignore;
 			formatter.Parser.ErrorAction = ErrorAction.Ignore;
 			formatter.Parser.OnParsingFailure += (o, args) => parseError.Add(args.ParsingError);
-			var res = formatter.Format("{NoName", default(object));
-			Assert.That(parseError.Count == 1);
-			Assert.That(parseError[0] == Parser.ParsingError.MissingClosingBrace);
+			var res = formatter.Format("{NoName {Other} {Same", default(object));
+			Assert.That(parseError.Count == 3);
+			Assert.That(parseError[2] == Parser.ParsingError.MissingClosingBrace);
 		}
 	}
 }

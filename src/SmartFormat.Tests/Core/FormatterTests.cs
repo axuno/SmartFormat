@@ -83,8 +83,8 @@ namespace SmartFormat.Tests.Core
 			var formatter = Smart.CreateDefaultSmartFormat();
 			formatter.ErrorAction = ErrorAction.Ignore;
 			formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args.Placeholder);
-			var res = formatter.Format("{NoName}", obj);
-			Assert.That(badPlaceholder.Count == 1 && badPlaceholder[0] == "{NoName}");
+			var res = formatter.Format("{NoName} {Name} {OtherMissing}", obj);
+			Assert.That(badPlaceholder.Count == 2 && badPlaceholder[0] == "{NoName}" && badPlaceholder[1] == "{OtherMissing}");
 		}
 	}
 }
