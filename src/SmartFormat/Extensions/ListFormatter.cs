@@ -125,18 +125,19 @@ namespace SmartFormat.Extensions
 		/// <remarks>
 		/// Wrap, so that CollectionIndex can be used without code changes.
 		/// </remarks>
-		private static readonly AsyncLocal<int> _collectionIndex = new AsyncLocal<int> {Value = -1};
+		private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
 
 		/// <remarks>
 		/// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
 		/// not supported by .Net Core. Instead .Net Core provides AsyncLocal&lt;T&gt;
-		/// Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
+		/// Good examples are: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
+		/// and https://github.com/StephenCleary/AsyncLocal/blob/master/src/UnitTests/UnitTests.cs
 		/// </remarks>
 		private static int CollectionIndex
 		{
-			get { return _collectionIndex.Value; }
+			get { return _collectionIndex.Value ?? -1; }
 			set { _collectionIndex.Value = value; }
-		}		
+		}	
 #endif
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
