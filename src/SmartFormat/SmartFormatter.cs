@@ -181,6 +181,15 @@ namespace SmartFormat
 
 		#endregion
 
+		#region : EventHandlers :
+
+		/// <summary>
+		/// Event raising, if an error occurs during formatting.
+		/// </summary>
+		public event EventHandler<FormattingErrorEventArgs> OnFormattingFailure;
+
+		#endregion
+
 		#region: Format :
 
 		[EditorBrowsable(EditorBrowsableState.Never)]
@@ -208,6 +217,7 @@ namespace SmartFormat
 				{
 					// An error occurred while formatting.
 					var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
+					OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(item.RawText, errorIndex, ErrorAction != ErrorAction.ThrowError));
 					FormatError(item, ex, errorIndex, childFormattingInfo);
 					continue;
 				}
@@ -224,7 +234,6 @@ namespace SmartFormat
 					continue;
 				}
 			}
-
 		}
 		
 		private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
@@ -323,6 +332,5 @@ namespace SmartFormat
 		}
 
 		#endregion
-
 	}
 }

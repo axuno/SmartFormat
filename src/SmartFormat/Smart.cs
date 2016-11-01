@@ -36,7 +36,7 @@ namespace SmartFormat
 		}
 		public static string Format(string format, object arg0)
 		{
-			return Format(format, new object[] { arg0 });
+			return Default.Format(format, new object[] { arg0 }); // call Default.Format in order to avoid infinite recursive method call
 		}
 
 		#endregion

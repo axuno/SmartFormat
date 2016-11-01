@@ -85,16 +85,16 @@ namespace SmartFormat.Tests.Extensions
 			Smart.Default.Test(formats, args, expected);
 		}
 
-		[Test]
-		/* added due to problems with [ThreadStatic] see: https://github.com/scottrippey/SmartFormat.NET/pull/23,
-		 * if this test doesn't fail with usage of [ThreadStatic], run it again, because this test depends on the underlying ThreadPool */
+		[Test] /* added due to problems with [ThreadStatic] see: https://github.com/scottrippey/SmartFormat.NET/pull/23 */
 		public void WithThreadPool_ShouldNotMixupCollectionIndex()
 		{
-			const string format = "{wheres.Count::>0? where |}{wheres:{}| and }";
+			// Old test did not show wrong Index value - it ALWAYS passed even when using ThreadLocal<int> or [ThreadStatic] respectively:
+			// const string format = "{wheres.Count::>0? where |}{wheres:{}| and }";
+			const string format = "Wheres-Index={Index}.";
 
-			List<string> wheres = new List<string>(){"test = @test"};
-
-			List<Task<string>> tasks = new List<Task<string>>();
+			var wheres = new List<string>(){"test = @test"};
+			
+			var tasks = new List<Task<string>>();
 			for (int i = 0; i < 10; ++i)
 			{
 				tasks.Add(Task.Factory.StartNew(val =>
@@ -105,10 +105,17 @@ namespace SmartFormat.Tests.Extensions
 					return ret;
 				}, i));
 			}
-
-			foreach (Task<string> t in tasks)
+			
+			foreach (var t in tasks)
 			{
-				Assert.AreEqual(" where test = @test", t.Result);
+				// Old test did not show wrong Index value:
+				// Assert.AreEqual(" where test = @test", t.Result);
+
+				// Note: Using "[ThreadStatic] private static int CollectionIndex", the result will be as expected only with the first task
+				if ("Wheres-Index=-1." == t.Result)
+					Console.WriteLine("Task {0} passed.", t.AsyncState);
+				
+				Assert.AreEqual("Wheres-Index=-1.", t.Result);
 			}
 		}
 

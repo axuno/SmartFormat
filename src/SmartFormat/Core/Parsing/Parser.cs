@@ -1,4 +1,7 @@
-﻿using SmartFormat.Core.Settings;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -7,7 +10,6 @@ namespace SmartFormat.Core.Parsing
 	/// </summary>
 	public class Parser
 	{
-
 		#region: Constructor :
 
 		public Parser(ErrorAction errorAction)
@@ -126,7 +128,16 @@ namespace SmartFormat.Core.Parsing
 			openingBrace = opening;
 			closingBrace = closing;
 		}
-		
+
+		#endregion
+
+		#region : EventHandlers :
+
+		/// <summary>
+		/// Event raising, if an error occurs during parsing.
+		/// </summary>
+		public event EventHandler<ParsingErrorEventArgs> OnParsingFailure;
+
 		#endregion
 
 		#region: Parsing :
@@ -142,6 +153,7 @@ namespace SmartFormat.Core.Parsing
 
 			// Store parsing errors until the end:
 			var parsingErrors = new ParsingErrors(result);
+			var parsingErrorText = new ParsingErrorText();
 
 			// Cache properties:
 			var openingBrace = this.openingBrace;
@@ -207,7 +219,8 @@ namespace SmartFormat.Core.Parsing
 						// Make sure that this is a nested placeholder before we un-nest it:
 						if (current.parent == null)
 						{
-							parsingErrors.AddIssue(current, "Format string has too many closing braces", i, i + 1);
+							parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i, i + 1);
+							OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, i, i+1, ParsingError.TooManyClosingBraces, ErrorAction != ErrorAction.ThrowError));
 							continue;
 						}
 						// End of the placeholder's Format:
@@ -324,8 +337,9 @@ namespace SmartFormat.Core.Parsing
 						}
 						else if (operatorIndex != i)
 						{
-							// There are trailing operators.  For now, this is an error.
-							parsingErrors.AddIssue(current, "There are trailing operators in the selector", operatorIndex, i);
+							// There are trailing operators. For now, this is an error.
+							parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector], operatorIndex, i);
+							OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, operatorIndex, i + 1, ParsingError.TrailingOperatorsInSelector, ErrorAction != ErrorAction.ThrowError));
 						}
 						lastI = i + 1;
 
@@ -345,7 +359,8 @@ namespace SmartFormat.Core.Parsing
 						else if (operatorIndex != i)
 						{
 							// There are trailing operators.  For now, this is an error.
-							parsingErrors.AddIssue(current, "There are trailing operators in the selector", operatorIndex, i);
+							parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector], operatorIndex, i);
+							OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, operatorIndex, i, ParsingError.TrailingOperatorsInSelector, ErrorAction != ErrorAction.ThrowError));
 						}
 						lastI = i + 1;
 
@@ -366,7 +381,8 @@ namespace SmartFormat.Core.Parsing
 						if (!isValidSelectorChar)
 						{
 							// Invalid character in the selector.
-							parsingErrors.AddIssue(current, "Invalid character in the selector", i, i + 1);
+							parsingErrors.AddIssue(current, parsingErrorText[ParsingError.InvalidCharactersInSelector], i, i + 1);
+							OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, i, i + 1, ParsingError.InvalidCharactersInSelector, ErrorAction != ErrorAction.ThrowError));
 						}
 					}
 				}
@@ -379,7 +395,8 @@ namespace SmartFormat.Core.Parsing
 			// Check that the format is finished:
 			if (current.parent != null || currentPlaceholder != null)
 			{
-				parsingErrors.AddIssue(current, "Format string is missing a closing brace", format.Length, format.Length);
+				parsingErrors.AddIssue(current, parsingErrorText[ParsingError.MissingClosingBrace], format.Length, format.Length);
+				OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, format.Length, format.Length, ParsingError.MissingClosingBrace, ErrorAction != ErrorAction.ThrowError));
 				current.endIndex = format.Length;
 				while (current.parent != null)
 				{
@@ -400,7 +417,39 @@ namespace SmartFormat.Core.Parsing
 
 		public ErrorAction ErrorAction { get; set; }
 
-		#endregion
+		public enum ParsingError
+		{
+			TooManyClosingBraces = 1,
+			TrailingOperatorsInSelector,
+			InvalidCharactersInSelector,
+			MissingClosingBrace
+		}
 
+		public class ParsingErrorText
+		{
+			private readonly Dictionary<ParsingError, string> _errors = new Dictionary<ParsingError, string>()
+			{
+				{ParsingError.TooManyClosingBraces, "Format string has too many closing braces"},
+				{ParsingError.TrailingOperatorsInSelector, "There are trailing operators in the selector" },
+				{ParsingError.InvalidCharactersInSelector, "Invalid character in the selector" },
+				{ParsingError.MissingClosingBrace, "Format string is missing a closing brace" }
+			};
+
+			/// <summary>
+			/// CTOR.
+			/// </summary>
+			public ParsingErrorText()
+			{}
+
+			/// <summary>
+			/// Gets the string representation of the ParsingError enum.
+			/// </summary>
+			/// <param name="parsingErrorKey"></param>
+			/// <returns>The string representation of the ParsingError enum</returns>
+			public string this[ParsingError parsingErrorKey] { get { return _errors[parsingErrorKey]; }
+			}
+		}
+
+		#endregion
 	}
 }

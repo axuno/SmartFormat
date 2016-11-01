@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Parsing;
@@ -284,6 +285,19 @@ namespace SmartFormat.Tests.Core
 			Assert.IsEmpty(placeholder.FormatterOptions);
 			var literalText = placeholder.Format.GetLiteralText();
 			Assert.AreEqual(expectedLiteralText, literalText);
+		}
+
+		[Test]
+		public void Parser_NotifyParsingError()
+		{
+			var parseError = new List<Parser.ParsingError>();
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.ErrorAction = ErrorAction.Ignore;
+			formatter.Parser.ErrorAction = ErrorAction.Ignore;
+			formatter.Parser.OnParsingFailure += (o, args) => parseError.Add(args.ParsingError);
+			var res = formatter.Format("{NoName {Other} {Same", default(object));
+			Assert.That(parseError.Count == 3);
+			Assert.That(parseError[2] == Parser.ParsingError.MissingClosingBrace);
 		}
 	}
 }
