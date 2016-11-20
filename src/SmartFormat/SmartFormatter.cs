@@ -217,7 +217,6 @@ namespace SmartFormat
 				{
 					// An error occurred while formatting.
 					var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
-					OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(item.RawText, errorIndex, ErrorAction != ErrorAction.ThrowError));
 					FormatError(item, ex, errorIndex, childFormattingInfo);
 					continue;
 				}
@@ -238,6 +237,7 @@ namespace SmartFormat
 		
 		private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
 		{
+			OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(errorItem.RawText, startIndex, ErrorAction != ErrorAction.ThrowError));
 			switch (this.ErrorAction)
 			{
 				case ErrorAction.Ignore:
