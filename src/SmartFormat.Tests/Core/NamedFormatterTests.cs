@@ -82,11 +82,10 @@ namespace SmartFormat.Tests.Core
 		[TestCase("{0:invalid:}")]
 		[TestCase("{0:invalid():}")]
 		[TestCase("{0:invalid(___):___}")]
-		[ExpectedException(typeof (FormattingException))]
 		public void Unhandled_formats_throw(string format)
 		{
 			var smart = GetCustomFormatter();
-			smart.Format(format, 99999);
+			Assert.Throws<FormattingException>(() => smart.Format(format, 99999));
 		}
 
 		[Test]

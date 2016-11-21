@@ -126,13 +126,12 @@ namespace SmartFormat.Tests.Extensions
 		}
 
 		[Test]
-		[ExpectedException(typeof(FormattingException))]
 		public void Format_TwoLevelXml_InvalidSelectors_Throws()
 		{
 			// arrange
 			var xmlEl = XElement.Parse(TwoLevelXml);
 			// act
-			Smart.Format("{SomethingNonExisting}{EvenMore}", xmlEl);
+			Assert.Throws<FormattingException>(() => Smart.Format("{SomethingNonExisting}{EvenMore}", xmlEl));
 		}
 	}
 }
