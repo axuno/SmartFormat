@@ -60,15 +60,7 @@ namespace SmartFormat.Tests.Core
 			};
 			foreach (var format in invalidFormats)
 			{
-				try
-				{
-					formatter.Test(format, args, "Error");
-					// Make sure that EVERY item has an error:
-					Assert.Fail("Parsing \"{0}\" should have failed but did not.", format);
-				}
-				catch (ParsingErrors ex)
-				{
-				}
+				Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
 			}
 
 		}

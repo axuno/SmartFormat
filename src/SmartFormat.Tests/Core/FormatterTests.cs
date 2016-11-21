@@ -20,14 +20,7 @@ namespace SmartFormat.Tests.Core
 			var formatter = Smart.CreateDefaultSmartFormat();
 			formatter.ErrorAction = ErrorAction.ThrowError;
 
-			try
-			{
-				formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--");
-				Assert.Fail("Formatter should have thrown an exception, but did not.");
-			}
-			catch (FormattingException ex)
-			{
-			}
+			Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--"));
 		}
 
 		[Test]
