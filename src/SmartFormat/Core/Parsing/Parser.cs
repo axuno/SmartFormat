@@ -13,7 +13,7 @@ namespace SmartFormat.Core.Parsing
 	{
 		#region: Constructor :
 
-		public Parser(ErrorAction errorAction)
+		public Parser(ErrorAction errorAction = ErrorAction.Ignore)
 		{
 			ErrorAction = errorAction;
 		}
