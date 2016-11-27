@@ -1,6 +1,7 @@
 ﻿using System.Xml.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -128,6 +129,7 @@ namespace SmartFormat.Tests.Extensions
 		[Test]
 		public void Format_TwoLevelXml_InvalidSelectors_Throws()
 		{
+			Smart.Default.ErrorAction = ErrorAction.ThrowError;
 			// arrange
 			var xmlEl = XElement.Parse(TwoLevelXml);
 			// act

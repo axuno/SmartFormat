@@ -1,7 +1,9 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core
@@ -39,6 +41,17 @@ namespace SmartFormat.Tests.Core
 		}
 
 		#endregion
+
+		[Test]
+		[TestCase(true, "yes (probably)")]
+		[TestCase(false, "no (possibly)")]
+		public void Conditional_Formatter_With_Parenthesis(bool value, string expected)
+		{
+			// explicit conditional formatter
+			Assert.AreEqual(expected, Smart.Format("{value:conditional:yes (probably)|no (possibly)}", new { value }));
+			// implicit
+			Assert.AreEqual(expected, Smart.Format("{value:yes (probably)|no (possibly)}", new { value }));
+		}
 
 		#region: Custom Extensions :
 
@@ -78,6 +91,9 @@ namespace SmartFormat.Tests.Core
 			Assert.AreEqual(expectedResult, actualResult);
 		}
 
+		/*
+		 * Since version 1.7.0.0 the parser treats names of formatters which are not registered, just as format string for the DefaultFormatter.
+		 * This makes SmartFormat compatible to string.Format again, especially in case of time formats like "HH:mm:ss".
 		[Test]
 		[TestCase("{0:invalid:}")]
 		[TestCase("{0:invalid():}")]
@@ -87,6 +103,7 @@ namespace SmartFormat.Tests.Core
 			var smart = GetCustomFormatter();
 			Assert.Throws<FormattingException>(() => smart.Format(format, 99999));
 		}
+		*/
 
 		[Test]
 		[TestCase("{0:test2:}", 5, "TestExtension1 Options: , Format: ")]
@@ -105,6 +122,7 @@ namespace SmartFormat.Tests.Core
 			var testFormatter = new SmartFormatter();
 			testFormatter.AddExtensions(new TestExtension1(), new TestExtension2(), new DefaultFormatter());
 			testFormatter.AddExtensions(new DefaultSource(testFormatter));
+			testFormatter.ErrorAction = ErrorAction.ThrowError;
 			return testFormatter;
 		}
 

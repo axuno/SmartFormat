@@ -18,16 +18,7 @@ namespace SmartFormat
 	{
 		#region: Constructor :
 
-		public SmartFormatter()
-			#if DEBUG
-			: this(ErrorAction.ThrowError)
-			#else
-			: this(ErrorAction.Ignore)
-			#endif
-		{
-		}
-
-		public SmartFormatter(ErrorAction errorAction)
+		public SmartFormatter(ErrorAction errorAction = ErrorAction.Ignore)
 		{
 			this.Parser = new Parser(errorAction);
 			this.ErrorAction = errorAction;
@@ -39,36 +30,8 @@ namespace SmartFormat
 
 		#region: Extension Registry :
 
-		public List<ISource> SourceExtensions { get; private set; }
-		public List<IFormatter> FormatterExtensions { get; private set; }
-
-
-		/// <summary>
-		/// Adds each extensions to this formatter.
-		/// Each extension must implement ISource, IFormatter, or both.
-		/// 
-		/// An exception will be thrown if the extension doesn't implement those interfaces.
-		/// </summary>
-		/// <param name="extensions"></param>
-		[Obsolete("Please use the specific overloads of AddExtensions().")]
-		public void AddExtensions(params object[] extensions)
-		{
-			foreach (var extension in extensions.Reverse())
-			{
-				// We need to filter each extension to the correct list:
-				var source = extension as ISource;
-				var formatter = extension as IFormatter;
-
-				// If this object ISN'T a extension, throw an exception:
-				if (source == null && formatter == null)
-					throw new ArgumentException(string.Format("{0} does not implement ISource nor IFormatter.", extension.GetType().FullName), "extensions");
-
-				if (source != null)
-					SourceExtensions.Insert(0, source);
-				if (formatter != null)
-					FormatterExtensions.Insert(0, formatter);
-			}
-		}
+		public List<ISource> SourceExtensions { get; }
+		public List<IFormatter> FormatterExtensions { get; }
 
 		/// <summary>
 		/// Adds each extensions to this formatter.
@@ -119,25 +82,46 @@ namespace SmartFormat
 
 		#region: Properties :
 
+		/// <summary>
+		/// Gets or set the instance of the <see cref="Core.Parsing.Parser"/>
+		/// </summary>
 		public Parser Parser { get; set; }
+		/// <summary>
+		/// Gets or set the <see cref="Core.Settings.ErrorAction"/> for the formatter.
+		/// </summary>
 		public ErrorAction ErrorAction { get; set; }
-		private SmartSettings settings;
-		public SmartSettings Settings { get { return settings ?? (settings = new SmartSettings()); } }
+		private SmartSettings _settings;
+		/// <summary>
+		/// Get the <seealso cref="Core.Settings.SmartSettings"/> for the formatter.
+		/// </summary>
+		public SmartSettings Settings => _settings ?? (_settings = new SmartSettings());
 
 		#endregion
 
 		#region: Format Overloads :
 
+		/// <summary>
+		/// Replaces one or more format items in as specified string with the string representation of a specific object.
+		/// </summary>
+		/// <param name="format">A composite format string.</param>
+		/// <param name="args">The object to format.</param>
+		/// <returns>Returns the formated input with items replaced with their string representation.</returns>
 		public string Format(string format, params object[] args)
 		{
 			return Format(null, format, args);
 		}
 
+		/// <summary>
+		/// Replaces one or more format items in as specified string with the string representation of a specific object.
+		/// </summary>
+		/// <param name="provider">The <see cref="IFormatProvider"/> to use.</param>
+		/// <param name="format">A composite format string.</param>
+		/// <param name="args">The object to format.</param>
+		/// <returns>Returns the formated input with items replaced with their string representation.</returns>
 		public string Format(IFormatProvider provider, string format, params object[] args)
 		{
 			var output = new StringOutput(format.Length + args.Length * 8);
-
-			var formatParsed = Parser.ParseFormat(format);
+			var formatParsed = Parser.ParseFormat(format, FormatterExtensions);
 			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, formatParsed, args, null, provider, output);
 			Format(formatDetails, formatParsed, current);
@@ -147,7 +131,7 @@ namespace SmartFormat
 
 		public void FormatInto(IOutput output, string format, params object[] args)
 		{
-			var formatParsed = Parser.ParseFormat(format);
+			var formatParsed = Parser.ParseFormat(format, FormatterExtensions);
 			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, formatParsed, args, null, null, output);
 			Format(formatDetails, formatParsed, current);
@@ -157,8 +141,8 @@ namespace SmartFormat
 		{
 			var output = new StringOutput(format.Length + args.Length * 8);
 
-			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
-			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format, FormatterExtensions));
+			var current = args.Length > 0 ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
 			Format(formatDetails, cache.Format, current);
 
@@ -167,8 +151,8 @@ namespace SmartFormat
 
 		public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
 		{
-			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format));
-			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format, FormatterExtensions));
+			var current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
 			Format(formatDetails, cache.Format, current);
 		}
@@ -192,7 +176,10 @@ namespace SmartFormat
 
 		#region: Format :
 
-		[EditorBrowsable(EditorBrowsableState.Never)]
+		/// <summary>
+		/// Format the input given in parameter <see cref="FormattingInfo"/>.
+		/// </summary>
+		/// <param name="formattingInfo"></param>
 		public void Format(FormattingInfo formattingInfo)
 		{
 			// Before we start, make sure we have at least one source extension and one formatter extension:
@@ -215,8 +202,8 @@ namespace SmartFormat
 				}
 				catch (Exception ex)
 				{
-					// An error occurred while formatting.
-					var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
+					// An error occurred while evalation selectors
+					var errorIndex = placeholder.Format?.startIndex ?? placeholder.Selectors.Last().endIndex;
 					FormatError(item, ex, errorIndex, childFormattingInfo);
 					continue;
 				}
@@ -227,10 +214,9 @@ namespace SmartFormat
 				}
 				catch (Exception ex)
 				{
-					// An error occurred while formatting.
-					var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
+					// An error occurred while evaluating formatters
+					var errorIndex = placeholder.Format?.startIndex ?? placeholder.Selectors.Last().endIndex;
 					FormatError(item, ex, errorIndex, childFormattingInfo);
-					continue;
 				}
 			}
 		}
@@ -259,11 +245,11 @@ namespace SmartFormat
 		{
 			if (this.SourceExtensions.Count == 0)
 			{
-				throw new InvalidOperationException("No source extensions are available.  Please add at least one source extension, such as the DefaultSource.");
+				throw new InvalidOperationException("No source extensions are available. Please add at least one source extension, such as the DefaultSource.");
 			}
 			if (this.FormatterExtensions.Count == 0)
 			{
-				throw new InvalidOperationException("No formatter extensions are available.  Please add at least one formatter extension, such as the DefaultFormatter.");
+				throw new InvalidOperationException("No formatter extensions are available. Please add at least one formatter extension, such as the DefaultFormatter.");
 			}
 		}
 
@@ -295,7 +281,7 @@ namespace SmartFormat
 				
 				if (!handled)
 				{
-					throw formattingInfo.FormattingException(string.Format("Could not evaluate the selector \"{0}\"", selector.RawText), selector);
+					throw formattingInfo.FormattingException($"Could not evaluate the selector \"{selector.RawText}\"", selector);
 				}
 			}
 		}
@@ -309,6 +295,11 @@ namespace SmartFormat
 			return false;
 		}
 
+		/// <summary>
+		/// Try to get a suitable formatter.
+		/// </summary>
+		/// <param name="formattingInfo"></param>
+		/// <exception cref="FormattingException"></exception>
 		private void EvaluateFormatters(FormattingInfo formattingInfo)
 		{
 			var handled = InvokeFormatterExtensions(formattingInfo);
@@ -317,6 +308,12 @@ namespace SmartFormat
 				throw formattingInfo.FormattingException("No suitable Formatter could be found", formattingInfo.Format);
 			}
 		}
+		/// <summary>
+		/// First check whether the named formatter name exist in of the <see cref="FormatterExtensions"/>,
+		/// next check whether the named formatter is able to process the format.
+		/// </summary>
+		/// <param name="formattingInfo"></param>
+		/// <returns>True if an FormatterExtension was found, else False.</returns>
 		private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
 		{
 			var formatterName = formattingInfo.Placeholder.FormatterName;

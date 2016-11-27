@@ -19,7 +19,7 @@ namespace SmartFormat.Extensions
 		}
 		public void Register(string templateName, string template)
 		{
-			var parsed = this.formatter.Parser.ParseFormat(template);
+			var parsed = this.formatter.Parser.ParseFormat(template, formatter.FormatterExtensions);
 			this.templates.Add(templateName, parsed);
 		}
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
@@ -142,7 +143,7 @@ namespace SmartFormat.Core.Parsing
 
 		#region: Parsing :
 
-		public Format ParseFormat(string format)
+		public Format ParseFormat(string format, List<Extensions.IFormatter> formatterExtensions)
 		{
 			var result = new Format(format);
 			var current = result;
@@ -297,14 +298,34 @@ namespace SmartFormat.Core.Parsing
 							lastI = i + 1;
 
 							var parentPlaceholder = current.parent;
+
 							if (namedFormatterOptionsStartIndex == -1)
 							{
-								parentPlaceholder.FormatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
+								var formatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
+								
+								if (FormatterNameExists(formatterName, formatterExtensions))
+								{
+									parentPlaceholder.FormatterName = formatterName;
+								}
+								else
+								{
+									lastI = current.startIndex;
+								}
+
 							}
 							else
 							{
-								parentPlaceholder.FormatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
-								parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+								var formatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
+
+								if (FormatterNameExists(formatterName, formatterExtensions))
+								{
+									parentPlaceholder.FormatterName = formatterName;
+									parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+								}
+								else
+								{
+									lastI = current.startIndex;
+								}
 							}
 							current.startIndex = lastI;
 
@@ -410,6 +431,18 @@ namespace SmartFormat.Core.Parsing
 
 			return result;
 		}
+
+		private bool FormatterNameExists(string name, IList<Extensions.IFormatter> formatterExtensions)
+		{
+			foreach (var extension in formatterExtensions)
+			{
+				if (extension.Names.Any(n => n != string.Empty && n == name))
+					return true;
+			}
+
+			return false;
+		}
+
 
 		#endregion
 

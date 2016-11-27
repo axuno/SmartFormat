@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -78,6 +79,7 @@ namespace SmartFormat.Tests.Extensions
 		[TestCase("{0:choose(1):1}", 99)]
 		public void Choose_throws_when_choice_is_invalid(string format, object arg0)
 		{
+			Smart.Default.ErrorAction = ErrorAction.ThrowError;
 			Assert.Throws<FormattingException>(() => Smart.Format(format, arg0));
 		}
 
@@ -89,6 +91,7 @@ namespace SmartFormat.Tests.Extensions
 		[TestCase("{0:choose(1|2):1|2|3|4}", 1)]
 		public void Choose_throws_when_choices_are_too_few_or_too_many(string format, object arg0)
 		{
+			Smart.Default.ErrorAction = ErrorAction.ThrowError;
 			Assert.Throws<FormattingException>(() => Smart.Format(format, arg0));
 		}
 

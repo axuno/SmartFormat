@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.Common;
 using SmartFormat.Tests.TestUtils;
 
@@ -28,7 +30,7 @@ namespace SmartFormat.Tests.Core
 				"{a}",
 				" aaa {bbb_bbb.CCC} ddd ",
 			};
-			var results = formats.Select(f => new { format = f, parsed = parser.ParseFormat(f) }).ToArray();
+			var results = formats.Select(f => new { format = f, parsed = parser.ParseFormat(f, new List<IFormatter>()) }).ToArray();
 
 			// Verify that the reconstructed formats
 			// match the original ones:
@@ -85,7 +87,7 @@ namespace SmartFormat.Tests.Core
 			};
 			foreach (var format in invalidFormats)
 			{
-				var discard = parser.ParseFormat(format);
+				var discard = parser.ParseFormat(format, new List<IFormatter>());
 			}
 		}
 
@@ -95,7 +97,7 @@ namespace SmartFormat.Tests.Core
 			var parser = GetRegularParser();
 			parser.UseAlternativeBraces('[', ']');
 			var format = "aaa [bbb] [ccc:ddd] {eee} [fff:{ggg}] [hhh:[iii:[] ] ] jjj";
-			var parsed = parser.ParseFormat(format);
+			var parsed = parser.ParseFormat(format, new List<IFormatter>());
 
 			Assert.AreEqual(9, parsed.Items.Count);
 
@@ -124,7 +126,7 @@ namespace SmartFormat.Tests.Core
 			var parser = GetRegularParser();
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
 
-			var Format = parser.ParseFormat(format);
+			var Format = parser.ParseFormat(format, new List<IFormatter>());
 
 			// Extract the substrings of literal text:
 			Assert.That(Format.Substring( 1, 3).ToString(), Is.EqualTo("a|a"));
@@ -162,7 +164,7 @@ namespace SmartFormat.Tests.Core
 		{
 			var parser = GetRegularParser();
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-			var Format = parser.ParseFormat(format);
+			var Format = parser.ParseFormat(format, new List<IFormatter>());
 
 			Assert.That(Format.IndexOf('|'), Is.EqualTo(2));
 			Assert.That(Format.IndexOf('|', 3), Is.EqualTo(43));
@@ -185,7 +187,7 @@ namespace SmartFormat.Tests.Core
 		{
 			var parser = GetRegularParser();
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-			var Format = parser.ParseFormat(format);
+			var Format = parser.ParseFormat(format, new List<IFormatter>());
 			var splits = Format.Split('|');
 
 			Assert.That(splits.Count, Is.EqualTo(3));
@@ -205,9 +207,9 @@ namespace SmartFormat.Tests.Core
 			Assert.That(splits[2].ToString(), Is.EqualTo("f "));
 		}
 
-		private Format Parse(string format)
+		private Format Parse(string format, List<IFormatter> formatterExentions )
 		{
-			return GetRegularParser().ParseFormat(format);
+			return GetRegularParser().ParseFormat(format, formatterExentions);
 		}
 
 		[TestCase("{0:name:}", "name", "", "")]
@@ -218,12 +220,27 @@ namespace SmartFormat.Tests.Core
 		[TestCase("{0:name():}", "name", "", "")]
 		[TestCase("{0:name(1|2|3):format}", "name", "1|2|3", "format")]
 		[TestCase("{0:name(1|2|3):}", "name", "1|2|3", "")]
-		public void NamedFormatter_should_be_parsed_correctly(string format, string expectedName, string expectedOptions, string expectedFormat)
+		public void Name_of_registered_NamedFormatter_will_be_parsed(string format, string expectedName, string expectedOptions, string expectedFormat)
 		{
-			var placeholder = (Placeholder) Parse(format).Items[0];
+			var formatterExtensions = new List<IFormatter>();
+			// Give the default formatter another name to run the tests.
+			// The parser will only find named formatter which are registered. Names are case-sensitive.
+			var df = new DefaultFormatter { Names = new[] { "name" } };
+			formatterExtensions.Add(df);
+			
+			// Named formatters will only be recognized by the parser, if their name occurs in one of FormatterExtensions.
+			// If the name of the formatter does not exists, the string is treaded as format for the DefaultFormatter.
+			var placeholder = (Placeholder) Parse(format, formatterExtensions).Items[0];
 			Assert.AreEqual(expectedName, placeholder.FormatterName);
 			Assert.AreEqual(expectedOptions, placeholder.FormatterOptions);
 			Assert.AreEqual(expectedFormat, placeholder.Format.ToString());
+		}
+
+		[Test]
+		public void Name_of_unregistered_NamedFormatter_will_not_be_parsed()
+		{
+			var placeholderWithNonExistingName = (Placeholder)Parse("{0:name:}", new List<IFormatter>()).Items[0];
+			Assert.AreEqual("name:", placeholderWithNonExistingName.Format.ToString()); // name is only treaded as a literal
 		}
 
 		// Incomplete:
@@ -272,7 +289,7 @@ namespace SmartFormat.Tests.Core
 			var parser = GetRegularParser();
 			parser.UseAlternativeEscapeChar('\\');
 
-			var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
+			var placeholder = (Placeholder) parser.ParseFormat(format, new List<IFormatter>()).Items[0];
 			Assert.IsEmpty(placeholder.FormatterName);
 			Assert.IsEmpty(placeholder.FormatterOptions);
 			var literalText = placeholder.Format.GetLiteralText();
