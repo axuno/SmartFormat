@@ -143,7 +143,7 @@ namespace SmartFormat.Core.Parsing
 
 		#region: Parsing :
 
-		public Format ParseFormat(string format, List<Extensions.IFormatter> formatterExtensions)
+		public Format ParseFormat(string format, string[] formatterExtensionNames)
 		{
 			var result = new Format(format);
 			var current = result;
@@ -303,7 +303,7 @@ namespace SmartFormat.Core.Parsing
 							{
 								var formatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
 								
-								if (FormatterNameExists(formatterName, formatterExtensions))
+								if (FormatterNameExists(formatterName, formatterExtensionNames))
 								{
 									parentPlaceholder.FormatterName = formatterName;
 								}
@@ -317,7 +317,7 @@ namespace SmartFormat.Core.Parsing
 							{
 								var formatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
 
-								if (FormatterNameExists(formatterName, formatterExtensions))
+								if (FormatterNameExists(formatterName, formatterExtensionNames))
 								{
 									parentPlaceholder.FormatterName = formatterName;
 									parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
@@ -432,15 +432,9 @@ namespace SmartFormat.Core.Parsing
 			return result;
 		}
 
-		private bool FormatterNameExists(string name, IList<Extensions.IFormatter> formatterExtensions)
+		private bool FormatterNameExists(string name, string[] formatterExtensionNames)
 		{
-			foreach (var extension in formatterExtensions)
-			{
-				if (extension.Names.Any(n => n != string.Empty && n == name))
-					return true;
-			}
-
-			return false;
+			return formatterExtensionNames.Any(n => n == name);
 		}
 
 

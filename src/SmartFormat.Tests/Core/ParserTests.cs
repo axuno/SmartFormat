@@ -30,7 +30,7 @@ namespace SmartFormat.Tests.Core
 				"{a}",
 				" aaa {bbb_bbb.CCC} ddd ",
 			};
-			var results = formats.Select(f => new { format = f, parsed = parser.ParseFormat(f, new List<IFormatter>()) }).ToArray();
+			var results = formats.Select(f => new { format = f, parsed = parser.ParseFormat(f, new[] { Guid.NewGuid().ToString("N") }) }).ToArray();
 
 			// Verify that the reconstructed formats
 			// match the original ones:
@@ -87,7 +87,7 @@ namespace SmartFormat.Tests.Core
 			};
 			foreach (var format in invalidFormats)
 			{
-				var discard = parser.ParseFormat(format, new List<IFormatter>());
+				var discard = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
 			}
 		}
 
@@ -97,7 +97,7 @@ namespace SmartFormat.Tests.Core
 			var parser = GetRegularParser();
 			parser.UseAlternativeBraces('[', ']');
 			var format = "aaa [bbb] [ccc:ddd] {eee} [fff:{ggg}] [hhh:[iii:[] ] ] jjj";
-			var parsed = parser.ParseFormat(format, new List<IFormatter>());
+			var parsed = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
 
 			Assert.AreEqual(9, parsed.Items.Count);
 
@@ -126,7 +126,7 @@ namespace SmartFormat.Tests.Core
 			var parser = GetRegularParser();
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
 
-			var Format = parser.ParseFormat(format, new List<IFormatter>());
+			var Format = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
 
 			// Extract the substrings of literal text:
 			Assert.That(Format.Substring( 1, 3).ToString(), Is.EqualTo("a|a"));
@@ -164,7 +164,7 @@ namespace SmartFormat.Tests.Core
 		{
 			var parser = GetRegularParser();
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-			var Format = parser.ParseFormat(format, new List<IFormatter>());
+			var Format = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
 
 			Assert.That(Format.IndexOf('|'), Is.EqualTo(2));
 			Assert.That(Format.IndexOf('|', 3), Is.EqualTo(43));
@@ -187,7 +187,7 @@ namespace SmartFormat.Tests.Core
 		{
 			var parser = GetRegularParser();
 			var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-			var Format = parser.ParseFormat(format, new List<IFormatter>());
+			var Format = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
 			var splits = Format.Split('|');
 
 			Assert.That(splits.Count, Is.EqualTo(3));
@@ -209,7 +209,7 @@ namespace SmartFormat.Tests.Core
 
 		private Format Parse(string format, List<IFormatter> formatterExentions )
 		{
-			return GetRegularParser().ParseFormat(format, formatterExentions);
+			return GetRegularParser().ParseFormat(format, SmartFormat.Utilities.Helper.GetNotEmptyFormatterExtensionNames(formatterExentions));
 		}
 
 		[TestCase("{0:name:}", "name", "", "")]
@@ -289,7 +289,7 @@ namespace SmartFormat.Tests.Core
 			var parser = GetRegularParser();
 			parser.UseAlternativeEscapeChar('\\');
 
-			var placeholder = (Placeholder) parser.ParseFormat(format, new List<IFormatter>()).Items[0];
+			var placeholder = (Placeholder) parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") }).Items[0];
 			Assert.IsEmpty(placeholder.FormatterName);
 			Assert.IsEmpty(placeholder.FormatterOptions);
 			var literalText = placeholder.Format.GetLiteralText();

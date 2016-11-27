@@ -121,8 +121,9 @@ namespace SmartFormat
 		public string Format(IFormatProvider provider, string format, params object[] args)
 		{
 			var output = new StringOutput(format.Length + args.Length * 8);
-			var formatParsed = Parser.ParseFormat(format, FormatterExtensions);
-			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
+			var formatterExtensionNames = Utilities.Helper.GetNotEmptyFormatterExtensionNames(FormatterExtensions);
+			var formatParsed = Parser.ParseFormat(format, formatterExtensionNames);
+			object current = (args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, formatParsed, args, null, provider, output);
 			Format(formatDetails, formatParsed, current);
 
@@ -131,7 +132,8 @@ namespace SmartFormat
 
 		public void FormatInto(IOutput output, string format, params object[] args)
 		{
-			var formatParsed = Parser.ParseFormat(format, FormatterExtensions);
+			var formatterExtensionNames = Utilities.Helper.GetNotEmptyFormatterExtensionNames(FormatterExtensions);
+			var formatParsed = Parser.ParseFormat(format, formatterExtensionNames);
 			object current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, formatParsed, args, null, null, output);
 			Format(formatDetails, formatParsed, current);
@@ -141,7 +143,8 @@ namespace SmartFormat
 		{
 			var output = new StringOutput(format.Length + args.Length * 8);
 
-			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format, FormatterExtensions));
+			var formatterExtensionNames = Utilities.Helper.GetNotEmptyFormatterExtensionNames(FormatterExtensions);
+			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format, formatterExtensionNames));
 			var current = args.Length > 0 ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
 			Format(formatDetails, cache.Format, current);
@@ -151,7 +154,8 @@ namespace SmartFormat
 
 		public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
 		{
-			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format, FormatterExtensions));
+			var formatterExtensionNames = Utilities.Helper.GetNotEmptyFormatterExtensionNames(FormatterExtensions);
+			if (cache == null) cache = new FormatCache(this.Parser.ParseFormat(format, formatterExtensionNames));
 			var current = (args != null && args.Length > 0) ? args[0] : args; // The first item is the default.
 			var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
 			Format(formatDetails, cache.Format, current);
