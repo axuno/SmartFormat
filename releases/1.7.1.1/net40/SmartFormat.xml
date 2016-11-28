@@ -1,0 +1,1001 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SmartFormat</name>
+    </assembly>
+    <members>
+        <member name="T:SmartFormat.Core.Formatting.FormatCache">
+            <summary>
+            Caches information about a format operation
+            so that repeat calls can be optimized to run faster.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatCache.Format">
+            <summary>
+            Caches the parsed format.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatCache.CachedObjects">
+            <summary>
+            Storage for any misc objects.
+            This can be used by extensions that want to cache data,
+            such as reflection information.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Formatting.FormatDetails">
+            <summary>
+            Contains extra information about the item currently being formatted.
+            These objects are not often used, so they are all wrapped up here.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatDetails.Formatter">
+            <summary>
+            The original formatter responsible for formatting this item.
+            It can be used for evaluating nested formats.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatDetails.OriginalArgs">
+            <summary>
+            The original set of arguments passed to the format function.
+            These provide global-access to the original arguments.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatDetails.FormatCache">
+            <summary>
+            This object can be used to cache resources between formatting calls.
+            It will be null unless FormatWithCache is called.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatDetails.Provider">
+            <summary>
+            The Format Provider that can be used to determine how to
+            format items such as numbers, dates, and anything else that
+            might be culture-specific.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatDetails.FormattingException">
+            <summary>
+            If ErrorAction is set to OutputErrorsInResult, this will 
+            contain the exception that caused the formatting error.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Formatting.FormatDetails.Settings">
+            <summary>
+            Contains case-sensitivity settings
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Formatting.FormattingException">
+            <summary>
+            An exception caused while attempting to output the format.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Extensions.IFormattingInfo">
+            <summary>
+            Contains all necessary info for formatting a value
+            </summary>
+            <example>
+            In "{Items.Length:choose(1,2,3):one|two|three}",
+            the <see cref="P:SmartFormat.Core.Extensions.IFormattingInfo.CurrentValue"/> would be the value of "Items.Length",
+            the <see cref="P:SmartFormat.Core.Extensions.IFormattingInfo.FormatterOptions"/> would be "1,2,3",
+            and the <see cref="P:SmartFormat.Core.Extensions.IFormattingInfo.Format"/> would be "one|two|three".
+            </example>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.IFormattingInfo.CurrentValue">
+            <summary>
+            The current value that is to be formatted.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.IFormattingInfo.Format">
+            <summary>
+            This format specifies how to output the <see cref="P:SmartFormat.Core.Extensions.IFormattingInfo.CurrentValue"/>.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.IFormattingInfo.Placeholder">
+            <summary>
+            Contains all the details about the current placeholder.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.IFormattingInfo.Alignment">
+            <summary>
+            Alignment inserts spaces into the output to ensure consistent length.
+            
+            Positive numbers insert spaces to the left, to right-align the text.
+            Negative numbers insert spaces to the right, to left-align the text.
+            
+            This should only work with the Default Formatter, but is optional with custom formatters.
+            
+            This is primarily for compatibility with String.Format.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.IFormattingInfo.FormatterOptions">
+            <summary>
+            When a named formatter is used, this will hold the options.
+            
+            For example, in "{0:choose(1,2,3):one|two|three}", FormatterOptions is "1,2,3".
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Extensions.IFormattingInfo.Write(System.String)">
+            <summary>
+            Writes a string to the output.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Extensions.IFormattingInfo.Write(System.String,System.Int32,System.Int32)">
+            <summary>
+            Writes a substring to the output.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Extensions.IFormattingInfo.Write(SmartFormat.Core.Parsing.Format,System.Object)">
+            <summary>
+            Writes the nested format to the output.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.IFormattingInfo.FormatDetails">
+            <summary>
+            Infrequently used details, often used for debugging
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Extensions.IFormattingInfo.FormattingException(System.String,SmartFormat.Core.Parsing.FormatItem,System.Int32)">
+            <summary>
+            Creates a <see cref="M:SmartFormat.Core.Extensions.IFormattingInfo.FormattingException(System.String,SmartFormat.Core.Parsing.FormatItem,System.Int32)"/> associated with the <see cref="P:SmartFormat.Core.Extensions.IFormattingInfo.Format"/>.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Extensions.ISelectorInfo">
+            <summary>
+            Contains all the necessary information for evaluating a selector.
+            </summary>
+            <example>
+            When evaluating "{Items.Length}", 
+            the CurrentValue might be Items, and the Selector would be "Length".
+            The job of an ISource is to set CurrentValue to Items.Length.
+            </example>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.ISelectorInfo.CurrentValue">
+            <summary>
+            The current value to evaluate.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.ISelectorInfo.SelectorText">
+            <summary>
+            The selector to evaluate
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.ISelectorInfo.SelectorIndex">
+            <summary>
+            The index of the selector in a multi-part selector.
+            Example: {Person.Birthday.Year} has 3 seletors,
+            and Year has a SelectorIndex of 2.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.ISelectorInfo.SelectorOperator">
+            <summary>
+            The operator that came before the selector; typically "."
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.ISelectorInfo.Result">
+            <summary>
+            Sets the result of evaluating the selector.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.ISelectorInfo.Placeholder">
+            <summary>
+            Contains all the details about the current placeholder.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.ISelectorInfo.FormatDetails">
+            <summary>
+            Infrequently used details, often used for debugging
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Extensions.IFormatter">
+            <summary> Converts an object to a string. </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Extensions.IFormatter.Names">
+            <summary>
+            An extension can be explicitly called by using any of its names.
+            
+            Any extensions with "" names will be called implicitly (when no named formatter is specified).
+            
+            For example, "{0:default:N2}" or "{0:d:N2}" will explicitly call the "default" extension.
+            "{0:N2}" will implicitly call the "default" extension (and other extensions, too).
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Extensions.IFormatter.TryEvaluateFormat(SmartFormat.Core.Extensions.IFormattingInfo)">
+            <summary>
+            Writes the current value to the output, using the specified format.
+            
+            IF this extension cannot write the value, returns false, otherwise true.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Extensions.ISource">
+            <summary>
+            Evaluates a selector.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Extensions.ISource.TryEvaluateSelector(SmartFormat.Core.Extensions.ISelectorInfo)">
+            <summary>
+            Evaluates the <see cref="!:ISelectorInfo.Selector"/> based on the <see cref="P:SmartFormat.Core.Extensions.ISelectorInfo.CurrentValue"/>.
+            
+            If this extension cannot evaluate the Selector, returns False.
+            Otherwise, sets the <see cref="P:SmartFormat.Core.Extensions.ISelectorInfo.Result"/> and returns true.
+            </summary>
+            <param name="selectorInfo"></param>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.ParsingErrorEventArgs">
+            <summary>
+            Supplies information about parsing errors.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.ParsingErrorEventArgs.RawText">
+            <summary>
+            Raw ext part which caused an error.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.ParsingErrorEventArgs.StartIndex">
+            <summary>
+            Location where the error started.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.ParsingErrorEventArgs.EndIndex">
+            <summary>
+            Location where the error ended.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.ParsingErrorEventArgs.ParsingError">
+            <summary>
+            ParseError category.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.ParsingErrorEventArgs.IgnoreError">
+            <summary>
+            Information whether error will throw an exception.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.ParsingErrorEventArgs.GetParsingErrorText">
+            <summary>
+            Gets the string representation of the ParsingError enum.
+            </summary>
+            <returns>The string representation of the ParsingError enum.</returns>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.ParsingErrors">
+            <summary>
+            Represents parsing errors in a Format string.
+            This exception only gets thrown when Parser.ErrorAction is set to ThrowError.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.Selector">
+            <summary>
+            Represents a single selector
+            in the text in a <see cref="T:SmartFormat.Core.Parsing.Placeholder"/>
+            that comes before the colon.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.Selector.SelectorIndex">
+            <summary>
+            The index of the selector in a multi-part selector.
+            Example: {Person.Birthday.Year} has 3 seletors,
+            and Year has a SelectorIndex of 2.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Core.Parsing.Selector.operatorStart">
+            <summary>
+            Keeps track of where the "operators" started for this item.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.Selector.Operator">
+            <summary>
+            The operator that came before the selector; typically "."
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.LiteralText">
+            <summary>
+            Represents the literal text that is found
+            in a parsed format string.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.Format">
+            <summary>
+            Represents a parsed format string.
+            Contains a list of <see cref="T:SmartFormat.Core.Parsing.FormatItem"/>s,
+            including <see cref="T:SmartFormat.Core.Parsing.LiteralText"/>s
+            and <see cref="T:SmartFormat.Core.Parsing.Placeholder"/>s.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Format.Substring(System.Int32)">
+            <summary>Returns a substring of the current Format.</summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Format.Substring(System.Int32,System.Int32)">
+            <summary>Returns a substring of the current Format.</summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Format.IndexOf(System.Char)">
+            <summary>
+            Searches the literal text for the search char.
+            Does not search in nested placeholders.
+            </summary>
+            <param name="search"></param>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Format.IndexOf(System.Char,System.Int32)">
+            <summary>
+            Searches the literal text for the search char.
+            Does not search in nested placeholders.
+            </summary>
+            <param name="search"></param>
+            <param name="startIndex"></param>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.Format.SplitList">
+            <summary>
+            Contains the results of a Split operation.
+            This allows deferred splitting of items.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Format.GetLiteralText">
+            <summary>
+            Retrieves the literal text contained in this format.
+            Excludes escaped chars, and does not include the text
+            of placeholders
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Format.ToString">
+            <summary>
+            Reconstructs the format string, but doesn't include escaped chars
+            and tries to reconstruct placeholders.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.FormatItem">
+            <summary>
+            Base class that represents a substring
+            of text from a parsed format string.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.FormatItem.RawText">
+            <summary>
+            Retrieves the raw text that this item represents.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.Parser">
+            <summary>
+            Parses a format string.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Core.Parsing.Parser.alphanumericSelectors">
+            <summary>
+            If false, only digits are allowed as selectors.
+            If true, selectors can be alpha-numeric.
+            This allows optimized alpha-character detection.
+            Specify any additional selector chars in AllowedSelectorChars.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Core.Parsing.Parser.allowedSelectorChars">
+            <summary>
+            A list of allowable selector characters,
+            to support additional selector syntaxes such as math.
+            Digits are always included, and letters can be included 
+            with AlphanumericSelectors.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Core.Parsing.Parser.operators">
+            <summary>
+            A list of characters that come between selectors.
+            This can be "." for dot-notation, "[]" for arrays,
+            or even math symbols.
+            By default, there are no operators.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Core.Parsing.Parser.alternativeEscaping">
+            <summary>
+            If false, double-curly braces are escaped.
+            If true, the AlternativeEscapeChar is used for escaping braces.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Core.Parsing.Parser.alternativeEscapeChar">
+            <summary>
+            If AlternativeEscaping is true, then this character is
+            used to escape curly braces.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Parser.AddAlphanumericSelectors">
+            <summary>
+            Includes a-z and A-Z in the list of allowed selector chars.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Parser.AddAdditionalSelectorChars(System.String)">
+            <summary>
+            Adds specific characters to the allowed selector chars.
+            </summary>
+            <param name="chars"></param>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Parser.AddOperators(System.String)">
+            <summary>
+            Adds specific characters to the allowed operator chars.
+            An operator is a character that is in the selector string
+            that splits the selectors.
+            </summary>
+            <param name="chars"></param>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Parser.UseAlternativeEscapeChar(System.Char)">
+            <summary>
+            Sets the AlternativeEscaping option to True 
+            so that braces will only be escaped after the
+            specified character.
+            </summary>
+            <param name="alternativeEscapeChar"></param>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Parser.UseBraceEscaping">
+            <summary>
+            [Default] 
+            Uses {{ and }} for escaping braces for compatibility with String.Format.  
+            However, this does not work very well with nested placeholders,
+            so it is recommended to use an alternative escape char.
+            </summary>
+        </member>
+        <member name="E:SmartFormat.Core.Parsing.Parser.OnParsingFailure">
+            <summary>
+            Event raising, if an error occurs during parsing.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Parsing.Parser.ParsingErrorText.#ctor">
+            <summary>
+            CTOR.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Core.Parsing.Parser.ParsingErrorText.Item(SmartFormat.Core.Parsing.Parser.ParsingError)">
+            <summary>
+            Gets the string representation of the ParsingError enum.
+            </summary>
+            <param name="parsingErrorKey"></param>
+            <returns>The string representation of the ParsingError enum</returns>
+        </member>
+        <member name="T:SmartFormat.Core.Parsing.Placeholder">
+            <summary>
+            A placeholder is the part of a format string between the { braces }.
+            </summary>
+            <example>
+            For example, in "{Items.Length,10:choose(1,2,3):one|two|three}",
+            the <see cref="P:SmartFormat.Core.Parsing.Placeholder.Alignment"/>s is "10", 
+            the <see cref="T:SmartFormat.Core.Parsing.Selector"/>s are "Items" and "Length", 
+            the <see cref="P:SmartFormat.Core.Parsing.Placeholder.FormatterName" /> is "choose",
+            the <see cref="P:SmartFormat.Core.Parsing.Placeholder.FormatterOptions"/> is "1,2,3",
+            and the <see cref="P:SmartFormat.Core.Parsing.Placeholder.Format"/> is "one|two|three".
+            </example>
+        </member>
+        <member name="P:SmartFormat.Core.Settings.SmartSettings.CaseSensitivity">
+            <summary>
+            Determines whether placeholders are case-sensitive or not.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Settings.ErrorAction">
+            <summary>
+            Determines how format errors are handled.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Core.Settings.ErrorAction.ThrowError">
+            <summary>Throws an exception.  This is only recommended for debugging, so that formatting errors can be easily found.</summary>
+        </member>
+        <member name="F:SmartFormat.Core.Settings.ErrorAction.OutputErrorInResult">
+            <summary>Includes an issue message in the output</summary>
+        </member>
+        <member name="F:SmartFormat.Core.Settings.ErrorAction.Ignore">
+            <summary>Ignores errors and tries to output the data anyway</summary>
+        </member>
+        <member name="F:SmartFormat.Core.Settings.ErrorAction.MaintainTokens">
+            <summary>Leaves invalid tokens unmodified in the text.</summary>
+        </member>
+        <member name="T:SmartFormat.Core.Output.IOutput">
+            <summary>
+            Writes a string to the output.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Output.IOutput.Write(System.String,SmartFormat.Core.Extensions.IFormattingInfo)">
+            <summary>
+            Writes a string to the output.
+            </summary>
+            <param name="text"></param>
+            <param name="formattingInfo"></param>
+        </member>
+        <member name="M:SmartFormat.Core.Output.IOutput.Write(System.String,System.Int32,System.Int32,SmartFormat.Core.Extensions.IFormattingInfo)">
+            <summary>
+            Writes a substring to the output.
+            </summary>
+            <param name="text"></param>
+            <param name="startIndex"></param>
+            <param name="length"></param>
+            <param name="formattingInfo"></param>
+        </member>
+        <member name="T:SmartFormat.Core.Output.StringOutput">
+            <summary>
+            Wraps a StringBuilder so it can be used for output.
+            This is used for the default output.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Core.Output.StringOutput.ToString">
+            <summary>
+            Returns the results of the StringBuilder.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Core.Output.TextWriterOutput">
+            <summary>
+            Wraps a TextWriter so that it can be used for output.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.FormattingErrorEventArgs">
+            <summary>
+            Supplies information about formatting errors.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.FormattingErrorEventArgs.Placeholder">
+            <summary>
+            Placeholder which caused an error.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.FormattingErrorEventArgs.ErrorIndex">
+            <summary>
+            Location where the error occurred.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.FormattingErrorEventArgs.IgnoreError">
+            <summary>
+            Information whether error will throw an exception.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Extensions.PluralLocalizationFormatter.#ctor(System.String)">
+            <summary>
+            Initializes the plugin with rules for many common languages.
+            If no CultureInfo is supplied to the formatter, the
+            default language rules will be used by default.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Extensions.CustomPluralRuleProvider">
+            <summary>
+            Use this class to provide custom plural rules to Smart.Format
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Extensions.TimeFormatter.#ctor">
+            <summary>
+            Initializes the extension with no default TimeTextInfo.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Extensions.TimeFormatter.#ctor(System.String)">
+            <summary>
+            Initializes the extension with a default TimeTextInfo.
+            </summary>
+            <param name="defaultTwoLetterLanguageName">This will be used when no CultureInfo is supplied.  Can be null.</param>
+        </member>
+        <member name="T:SmartFormat.Extensions.DefaultFormatter">
+            <summary>
+            Do the default formatting, same logic as "String.Format".
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Extensions.DefaultSource.TryEvaluateSelector(SmartFormat.Core.Extensions.ISelectorInfo)">
+            <summary>
+            Performs the default index-based selector, same as String.Format.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Extensions.ListFormatter">
+             <summary>
+             If the source value is an array (or supports ICollection),
+             then each item will be custom formatted.
+            
+            
+             Syntax:
+             #1: "format|spacer"
+             #2: "format|spacer|last spacer"
+             #3: "format|spacer|last spacer|two spacer"
+            
+             The format will be used for each item in the collection, the spacer will be between all items, and the last spacer will replace the spacer for the last item only.
+            
+             Example:
+             CustomFormat("{Dates:D|; |; and }", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "January 1, 2000; December 31, 2999; and September 9, 9999"
+             In this example, format = "D", spacer = "; ", and last spacer = "; and "
+            
+            
+            
+             Advanced:
+             Composite Formatting is allowed in the format by using nested braces.
+             If a nested item is detected, Composite formatting will be used.
+            
+             Example:
+             CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
+             In this example, format = "{Width}x{Height}".  Notice the nested braces.
+            
+             </summary>
+        </member>
+        <member name="M:SmartFormat.Extensions.ListFormatter.TryEvaluateSelector(SmartFormat.Core.Extensions.ISelectorInfo)">
+             <summary>
+             This allows an integer to be used as a selector to index an array (or list).
+            
+             This is better described using an example:
+             CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
+             The ".2" selector is used to reference Dates[2].
+             </summary>
+        </member>
+        <member name="F:SmartFormat.Extensions.ListFormatter.key">
+            <summary>
+            The key for CallContext.Logical[Get|Set]Data().
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Extensions.ListFormatter.CollectionIndex">
+            <remarks>
+            System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
+            not supported by .Net Core. Instead .Net Core provides AsyncLocal&lt;T&gt;
+            </remarks>
+        </member>
+        <member name="M:SmartFormat.Extensions.ConditionalFormatter.TryEvaluateCondition(SmartFormat.Core.Parsing.Format,System.Decimal,System.Boolean@,SmartFormat.Core.Parsing.Format@)">
+             <summary>
+             Evaluates a conditional format.
+            
+             Each condition must start with a comparor: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
+             Conditions must be separated by either "&amp;" (AND) or "/" (OR).
+             The conditional statement must end with a "?".
+            
+             Examples:
+             &gt;=21&amp;&lt;30&amp;!=25/=40?
+             </summary>
+        </member>
+        <member name="T:SmartFormat.Utilities.PluralRules.PluralRuleDelegate">
+             <summary>
+             This delegate determines which singular or plural word
+             should be chosen for the given quantity.
+            
+             This allows each language to define its own behavior
+             for singular or plural words.
+            
+             It should return the index of the correct parameter.
+             </summary>
+             <param name="value">The value that is being referenced by the singular or plural words</param>
+             <param name="pluralCount"></param>
+             <returns></returns>
+        </member>
+        <member name="M:SmartFormat.Utilities.PluralRules.GetPluralRule(System.String)">
+            <summary>Construct a ruleset for the language code.</summary>
+            <param name="twoLetterISOLanguageName">The language code in two-letter ISO-639 format.</param>
+            <remarks>The pluralization rules are taken from <see cref="!:http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/language_plural_rules.html"/>.</remarks>
+        </member>
+        <member name="M:SmartFormat.Utilities.PluralRules.Between(System.Decimal,System.Decimal,System.Decimal)">
+            <summary>
+            Returns True if the value is inclusively between the min and max and has no fraction.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.Utilities.FormatDelegate">
+             <summary>
+             This class wraps a delegate, allowing it to be used as a parameter
+             to any string-formatting method (such as <see cref="M:System.String.Format(System.String,System.Object)"/>).
+            
+             For example:
+             <code>
+             var textWithLink = String.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
+             </code>
+             </summary>
+        </member>
+        <member name="M:SmartFormat.Utilities.FormatDelegate.ToString(System.String,System.IFormatProvider)">
+            <summary>
+            Implements System.IFormattable
+            </summary>
+            <param name="format"></param>
+            <param name="formatProvider"></param>
+            <returns></returns>
+        </member>
+        <member name="P:SmartFormat.Utilities.TimeSpanUtility.DefaultFormatOptions">
+            <summary>
+            These are the default options that will be used when no option is specified.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.Utilities.TimeSpanUtility.AbsoluteDefaults">
+            <summary>
+            These are the absolute default options that will be used as
+            a safeguard, just in case DefaultFormatOptions is missing a value.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.Utilities.TimeSpanUtility.ToTimeString(System.TimeSpan,SmartFormat.Utilities.TimeSpanFormatOptions,SmartFormat.Utilities.TimeTextInfo)">
+            <summary>
+              <para>Turns a TimeSpan into a human-readable text.</para>
+              <para>Uses the specified timeSpanFormatOptions.</para>
+              <para>For example: "31.23:59:00.555" = "31 days 23 hours 59 minutes 0 seconds 555 milliseconds"</para>
+            </summary>
+            <param name="FromTime"></param>
+            <param name="options">
+              <para>A combination of flags that determine the formatting options.</para>
+              <para>These will be combined with the default timeSpanFormatOptions.</para>
+            </param>
+            <param name="timeTextInfo">An object that supplies the text to use for output</param>
+        </member>
+        <member name="M:SmartFormat.Utilities.TimeSpanUtility.Floor(System.TimeSpan,System.Int64)">
+            <summary>
+              <para>Returns the largest <c>TimeSpan</c> less than or equal to the specified interval.</para>
+              <para>For example: <c>Floor("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "00:55:00"</c></para>
+            </summary>
+            <param name="FromTime">A <c>TimeSpan</c> to be rounded.</param>
+            <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
+        </member>
+        <member name="M:SmartFormat.Utilities.TimeSpanUtility.Ceiling(System.TimeSpan,System.Int64)">
+            <summary>
+              <para>Returns the smallest <c>TimeSpan</c> greater than or equal to the specified interval.</para>
+              <para>For example: <c>Ceiling("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "01:00:00"</c></para>
+            </summary>
+            <param name="FromTime">A <c>TimeSpan</c> to be rounded.</param>
+            <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
+        </member>
+        <member name="M:SmartFormat.Utilities.TimeSpanUtility.Round(System.TimeSpan,System.Int64)">
+            <summary>
+              <para>Returns the <c>TimeSpan</c> closest to the specified interval.</para>
+              <para>For example: <c>Round("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "00:55:00"</c></para>
+            </summary>
+            <param name="FromTime">A <c>TimeSpan</c> to be rounded.</param>
+            <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
+        </member>
+        <member name="T:SmartFormat.Utilities.TimeSpanFormatOptions">
+            <summary>
+              <para>Determines all options for time formatting.</para>
+              <para>This one value actually contains 4 settings:</para>
+              <para><c>Abbreviate</c> / <c>AbbreviateOff</c></para>
+              <para><c>LessThan</c> / <c>LessThanOff</c></para>
+              <para><c>Truncate</c> &#160; <c>Auto</c> / <c>Shortest</c> / <c>Fill</c> / <c>Full</c></para>
+              <para><c>Range</c> &#160; <c>MilliSeconds</c> / <c>Seconds</c> / <c>Minutes</c> / <c>Hours</c> / <c>Days</c> / <c>Weeks</c> (Min / Max) </para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.InheritDefaults">
+            <summary>
+            Specifies that all <c>timeSpanFormatOptions</c> should be inherited from <c>TimeSpanUtility.DefaultTimeFormatOptions</c>.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.Abbreviate">
+            <summary>
+            Abbreviates units.
+            Example: "1d 2h 3m 4s 5ms"
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.AbbreviateOff">
+            <summary>
+            Does not abbreviate units.
+            Example: "1 day 2 hours 3 minutes 4 seconds 5 milliseconds"
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.LessThan">
+            <summary>
+            Displays "less than 1 (unit)" when the TimeSpan is smaller than the minimum range.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.LessThanOff">
+            <summary>
+            Displays "0 (units)" when the TimeSpan is smaller than the minimum range.
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.TruncateShortest">
+            <summary>
+              <para>Displays the highest non-zero value within the range.</para>
+              <para>Example: "00.23:00:59.000" = "23 hours"</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.TruncateAuto">
+            <summary>
+              <para>Displays all non-zero values within the range.</para>
+              <para>Example: "00.23:00:59.000" = "23 hours 59 minutes"</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.TruncateFill">
+            <summary>
+              <para>Displays the highest non-zero value and all lesser values within the range.</para>
+              <para>Example: "00.23:00:59.000" = "23 hours 0 minutes 59 seconds 0 milliseconds"</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.TruncateFull">
+            <summary>
+              <para>Displays all values within the range.</para>
+              <para>Example: "00.23:00:59.000" = "0 days 23 hours 0 minutes 59 seconds 0 milliseconds"</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.RangeMilliSeconds">
+            <summary>
+              <para>Determines the range of units to display.</para>
+              <para>You may combine two values to form the minimum and maximum for the range.</para>
+              <para>Example: (RangeMinutes) defines a range of Minutes only; (RangeHours | RangeSeconds) defines a range of Hours to Seconds.</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.RangeSeconds">
+            <summary>
+              <para>Determines the range of units to display.</para>
+              <para>You may combine two values to form the minimum and maximum for the range.</para>
+              <para>Example: (RangeMinutes) defines a range of Minutes only; (RangeHours | RangeSeconds) defines a range of Hours to Seconds.</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.RangeMinutes">
+            <summary>
+              <para>Determines the range of units to display.</para>
+              <para>You may combine two values to form the minimum and maximum for the range.</para>
+              <para>Example: (RangeMinutes) defines a range of Minutes only; (RangeHours | RangeSeconds) defines a range of Hours to Seconds.</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.RangeHours">
+            <summary>
+              <para>Determines the range of units to display.</para>
+              <para>You may combine two values to form the minimum and maximum for the range.</para>
+              <para>Example: (RangeMinutes) defines a range of Minutes only; (RangeHours | RangeSeconds) defines a range of Hours to Seconds.</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.RangeDays">
+            <summary>
+              <para>Determines the range of units to display.</para>
+              <para>You may combine two values to form the minimum and maximum for the range.</para>
+              <para>Example: (RangeMinutes) defines a range of Minutes only; (RangeHours | RangeSeconds) defines a range of Hours to Seconds.</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions.RangeWeeks">
+            <summary>
+              <para>Determines the range of units to display.</para>
+              <para>You may combine two values to form the minimum and maximum for the range.</para>
+              <para>Example: (RangeMinutes) defines a range of Minutes only; (RangeHours | RangeSeconds) defines a range of Hours to Seconds.</para>
+            </summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions._Abbreviate">
+            <summary>(for internal use only)</summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions._LessThan">
+            <summary>(for internal use only)</summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions._Truncate">
+            <summary>(for internal use only)</summary>
+        </member>
+        <member name="F:SmartFormat.Utilities.TimeSpanFormatOptions._Range">
+            <summary>(for internal use only)</summary>
+        </member>
+        <member name="T:SmartFormat.Utilities.TimeTextInfo">
+            <summary>
+            Supplies the localized text used for TimeSpan formatting.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.SmartExtensions.AppendSmart(System.Text.StringBuilder,System.String,System.Object[])">
+            <summary> Appends a formatted string, using the same semantics as Smart.Format. </summary>
+            <param name="sb">The StringBuilder that will be used for output</param>
+            <param name="format">The template that defines how the arguments are formatted</param>
+            <param name="args">A list of arguments to be used in formatting</param>
+        </member>
+        <member name="M:SmartFormat.SmartExtensions.AppendLineSmart(System.Text.StringBuilder,System.String,System.Object[])">
+            <summary> AppendLines a formatted string, using the same semantics as Smart.Format. </summary>
+            <param name="sb">The StringBuilder that will be used for output</param>
+            <param name="format">The template that defines how the arguments are formatted</param>
+            <param name="args">A list of arguments to be used in formatting</param>
+        </member>
+        <member name="M:SmartFormat.SmartExtensions.WriteSmart(System.IO.TextWriter,System.String,System.Object[])">
+            <summary> Writes out a formatted string, using the same semantics as Smart.Format. </summary>
+            <param name="writer">The TextWriter that will be used for output</param>
+            <param name="format">The template that defines how the arguments are formatted</param>
+            <param name="args">A list of arguments to be used in formatting</param>
+        </member>
+        <member name="M:SmartFormat.SmartExtensions.WriteLineSmart(System.IO.TextWriter,System.String,System.Object[])">
+            <summary> Writes out a formatted string, using the same semantics as Smart.Format. </summary>
+            <param name="writer">The TextWriter that will be used for output</param>
+            <param name="format">The template that defines how the arguments are formatted</param>
+            <param name="args">A list of arguments to be used in formatting</param>
+        </member>
+        <member name="M:SmartFormat.SmartExtensions.FormatSmart(System.String,System.Object[])">
+            <summary> Formats the specified arguments using this string as a template. </summary>
+            <param name="format">The template that defines how the arguments are formatted</param>
+            <param name="args">A list of arguments to be used in formatting</param>
+        </member>
+        <member name="M:SmartFormat.SmartExtensions.FormatSmart(System.String,SmartFormat.Core.Formatting.FormatCache@,System.Object[])">
+            <summary> Formats the specified arguments using this string as a template.
+            Caches the parsing results for increased performance.
+            </summary>
+            <param name="format">The template that defines how the arguments are formatted</param>
+            <param name="args">A list of arguments to be used in formatting</param>
+            <param name="cache">Outputs an object that increases performance if the same format string is used repeatedly.</param>
+        </member>
+        <member name="T:SmartFormat.Smart">
+            <summary>
+            This class holds a Default instance of the SmartFormatter.
+            The default instance has all extensions registered.
+            </summary>
+        </member>
+        <member name="T:SmartFormat.SmartFormatter">
+            <summary>
+            This class contains the Format method that constructs
+            the composite string by invoking each extension.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.SmartFormatter.SourceExtensions">
+            <summary>
+            Gets the list of <see cref="T:SmartFormat.Core.Extensions.ISource"/> source extensions.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.SmartFormatter.FormatterExtensions">
+            <summary>
+            Gets the list of <see cref="T:SmartFormat.Core.Extensions.IFormatter"/> formatter extensions.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.GetNotEmptyFormatterExtensionNames">
+            <summary>
+            Gets all names of registered formatter extensions which are not empty.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.AddExtensions(SmartFormat.Core.Extensions.ISource[])">
+            <summary>
+            Adds each extensions to this formatter.
+            Each extension must implement ISource.
+            </summary>
+            <param name="sourceExtensions"></param>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.AddExtensions(SmartFormat.Core.Extensions.IFormatter[])">
+            <summary>
+            Adds each extensions to this formatter.
+            Each extension must implement IFormatter.
+            </summary>
+            <param name="formatterExtensions"></param>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.GetSourceExtension``1">
+            <summary>
+            Searches for a Source Extension of the given type, and returns it.
+            This can be used to easily find and configure extensions.
+            Returns null if the type cannot be found.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.GetFormatterExtension``1">
+            <summary>
+            Searches for a Formatter Extension of the given type, and returns it.
+            This can be used to easily find and configure extensions.
+            Returns null if the type cannot be found.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="P:SmartFormat.SmartFormatter.Parser">
+            <summary>
+            Gets or set the instance of the <see cref="T:SmartFormat.Core.Parsing.Parser"/>
+            </summary>
+        </member>
+        <member name="P:SmartFormat.SmartFormatter.ErrorAction">
+            <summary>
+            Gets or set the <see cref="T:SmartFormat.Core.Settings.ErrorAction"/> for the formatter.
+            </summary>
+        </member>
+        <member name="P:SmartFormat.SmartFormatter.Settings">
+            <summary>
+            Get the <seealso cref="T:SmartFormat.Core.Settings.SmartSettings"/> for the formatter.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.Format(System.String,System.Object[])">
+            <summary>
+            Replaces one or more format items in as specified string with the string representation of a specific object.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="args">The object to format.</param>
+            <returns>Returns the formated input with items replaced with their string representation.</returns>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.Format(System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Replaces one or more format items in as specified string with the string representation of a specific object.
+            </summary>
+            <param name="provider">The <see cref="T:System.IFormatProvider"/> to use.</param>
+            <param name="format">A composite format string.</param>
+            <param name="args">The object to format.</param>
+            <returns>Returns the formated input with items replaced with their string representation.</returns>
+        </member>
+        <member name="E:SmartFormat.SmartFormatter.OnFormattingFailure">
+            <summary>
+            Event raising, if an error occurs during formatting.
+            </summary>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.Format(SmartFormat.Core.Formatting.FormattingInfo)">
+            <summary>
+            Format the input given in parameter <see cref="T:SmartFormat.Core.Formatting.FormattingInfo"/>.
+            </summary>
+            <param name="formattingInfo"></param>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.EvaluateFormatters(SmartFormat.Core.Formatting.FormattingInfo)">
+            <summary>
+            Try to get a suitable formatter.
+            </summary>
+            <param name="formattingInfo"></param>
+            <exception cref="T:SmartFormat.Core.Formatting.FormattingException"></exception>
+        </member>
+        <member name="M:SmartFormat.SmartFormatter.InvokeFormatterExtensions(SmartFormat.Core.Formatting.FormattingInfo)">
+            <summary>
+            First check whether the named formatter name exist in of the <see cref="P:SmartFormat.SmartFormatter.FormatterExtensions"/>,
+            next check whether the named formatter is able to process the format.
+            </summary>
+            <param name="formattingInfo"></param>
+            <returns>True if an FormatterExtension was found, else False.</returns>
+        </member>
+    </members>
+</doc>
