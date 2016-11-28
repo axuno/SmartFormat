@@ -135,15 +135,14 @@ namespace SmartFormat.Tests.Core
 			{
 				var options = formattingInfo.FormatterOptions;
 				var format = formattingInfo.Format;
-				var formatString = format != null ? format.Text : "";
+				var formatString = format != null ? format.RawText : "";
 				formattingInfo.Write("TestExtension1 Options: " + options + ", Format: " + formatString);
 				return true;
 			}
 		}
 		private class TestExtension2 : IFormatter
 		{
-			private string[] names = { "test2", "t2", "" };
-			public string[] Names { get { return names; } set { names = value; } }
+			public string[] Names { get; set; } = { "test2", "t2", "" };
 
 			public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 			{

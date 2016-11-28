@@ -40,8 +40,7 @@ namespace SmartFormat.Extensions
 	/// </summary>
 	public class ListFormatter : IFormatter, ISource
 	{
-		private string[] names = { "list", "l", "" };
-		public string[] Names { get { return names; } set { names = value; } }
+		public string[] Names { get; set; } = { "list", "l", "" };
 
 		public ListFormatter(SmartFormatter formatter)
 		{
@@ -117,7 +116,7 @@ namespace SmartFormat.Extensions
 			get
 			{
 				var val = CallContext.LogicalGetData(key);
-				return val != null ? (int)val : -1;
+				return (int?) val ?? -1;
 			}
 			set { CallContext.LogicalSetData(key, value); }
 		}
@@ -171,24 +170,27 @@ namespace SmartFormat.Extensions
 			var lastSpacer = (parameters.Count >= 3) ? parameters[2].GetLiteralText() : spacer;
 			var twoSpacer = (parameters.Count >= 4) ? parameters[3].GetLiteralText() : lastSpacer;
 
-			// TODO: [Obsolete] Not necessary, should remove:
 			if (!itemFormat.HasNested)
 			{
 				// The format is not nested,
 				// so we will treat it as an itemFormat:
-				var newItemFormat = new Format(itemFormat.baseString);
-				newItemFormat.startIndex = itemFormat.startIndex;
-				newItemFormat.endIndex = itemFormat.endIndex;
-				newItemFormat.HasNested = true;
-				var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, 0);
-				newPlaceholder.Format = itemFormat;
-				newPlaceholder.endIndex = itemFormat.endIndex;
+				var newItemFormat = new Format(itemFormat.baseString)
+				{
+					startIndex = itemFormat.startIndex,
+					endIndex = itemFormat.endIndex,
+					HasNested = true
+				};
+				var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, 0)
+				{
+					Format = itemFormat,
+					endIndex = itemFormat.endIndex
+				};
 				newItemFormat.Items.Add(newPlaceholder);
 				itemFormat = newItemFormat;
 			}
 
 			// Let's buffer all items from the enumerable (to ensure the Count without double-enumeration):
-			ICollection items = current as ICollection;
+			var items = current as ICollection;
 			if (items == null)
 			{
 				var allItems = new List<object>();
@@ -199,7 +201,7 @@ namespace SmartFormat.Extensions
 				items = allItems;
 			}
 
-			int oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
+			var oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
 			CollectionIndex = -1;
 			foreach (object item in items) {
 				CollectionIndex += 1; // Keep track of the index

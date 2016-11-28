@@ -7,17 +7,16 @@ namespace SmartFormat.Extensions
 {
 	public class ChooseFormatter : IFormatter
 	{
-		private string[] names = { "choose", "c" };
-		public string[] Names { get { return names; } set { names = value; } }
+		public string[] Names { get; set; } = { "choose", "c" };
 
-		private char splitChar = '|';
-		public char SplitChar { get { return splitChar;  } set { splitChar = value; } }
+		private char _splitChar = '|';
+		public char SplitChar { get { return _splitChar;  } set { _splitChar = value; } }
 
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			if (formattingInfo.FormatterOptions == "") return false;
-			var chooseOptions = formattingInfo.FormatterOptions.Split(splitChar);
-			var formats = formattingInfo.Format.Split(splitChar);
+			var chooseOptions = formattingInfo.FormatterOptions.Split(_splitChar);
+			var formats = formattingInfo.Format.Split(_splitChar);
 			if (formats.Count < 2) return false;
 			
 			var chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);

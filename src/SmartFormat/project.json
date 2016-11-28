@@ -1,9 +1,9 @@
 {
-    "copyright": "Copyright 2015 Scott Rippey",
+    "copyright": "Copyright 2011-2016 Scott Rippey, Bernhard Millauer, Norbert Bietsch and other contributors.",
     "title": "SmartFormat",
-    "description": "A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.",
-    "authors": [ "Scott.Rippey,SeriousM" ],
-    "version": "1.6.2.0-net-core-preview",
+    "description": "A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/scottrippey/SmartFormat.NET",
+    "authors": [ "Scott Rippey, Bernhard Millauer, Norbert Bietsch and other contributors." ],
+    "version": "1.7.1.1",
 
     "dependencies": {
         "NETStandard.Library": "1.6.0",
@@ -23,6 +23,7 @@
             "excludeFiles": [ ],
             "exclude": [ "Properties", "project.*.json" ]
         },
+        "keyFile": "SmartFormat.snk",
         "xmlDoc": true
     }
 }

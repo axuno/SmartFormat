@@ -7,8 +7,7 @@ namespace SmartFormat.Extensions
 {
 	public class TimeFormatter : IFormatter
 	{
-		private string[] names = { "timespan", "time", "t", "" };
-		public string[] Names { get { return names; } set { names = value; } }
+		public string[] Names { get; set; } = { "timespan", "time", "t", "" };
 
 		#region Constructors
 

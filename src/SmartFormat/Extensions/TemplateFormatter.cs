@@ -8,25 +8,24 @@ namespace SmartFormat.Extensions
 {
 	public class TemplateFormatter : IFormatter
 	{
-		private readonly SmartFormatter formatter;
-		private readonly IDictionary<string, Format> templates;
+		private readonly SmartFormatter _formatter;
+		private readonly IDictionary<string, Format> _templates;
 		public TemplateFormatter(SmartFormatter formatter)
 		{
-			this.formatter = formatter;
+			_formatter = formatter;
 
 			var stringComparer = (formatter.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
-			this.templates = new Dictionary<string, Format>(stringComparer);
+			_templates = new Dictionary<string, Format>(stringComparer);
 		}
 		public void Register(string templateName, string template)
 		{
-			var formatterExtensionNames = Utilities.Helper.GetNotEmptyFormatterExtensionNames(formatter.FormatterExtensions);
-			var parsed = this.formatter.Parser.ParseFormat(template, formatterExtensionNames);
-			this.templates.Add(templateName, parsed);
+			var parsed = _formatter.Parser.ParseFormat(template, _formatter.GetNotEmptyFormatterExtensionNames());
+			_templates.Add(templateName, parsed);
 		}
 
 		public bool Remove(string templateName)
 		{
-			return this.templates.Remove(templateName);
+			return _templates.Remove(templateName);
 		}
 
 		private string[] names = { "template", "t" };
@@ -45,7 +44,7 @@ namespace SmartFormat.Extensions
 			}
 			
 			Format template;
-			if (!this.templates.TryGetValue(templateName, out template))
+			if (!_templates.TryGetValue(templateName, out template))
 			{
 				return false;
 			}

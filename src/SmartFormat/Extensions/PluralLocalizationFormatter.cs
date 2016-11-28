@@ -10,9 +10,8 @@ namespace SmartFormat.Extensions
 {
 	public class PluralLocalizationFormatter : IFormatter
 	{
-		private string[] names = { "plural", "p", "" };
-		public string[] Names { get { return names; } set { names = value; } }
-		
+		public string[] Names { get; set; } = { "plural", "p", "" };
+
 		/// <summary>
 		/// Initializes the plugin with rules for many common languages.
 		/// If no CultureInfo is supplied to the formatter, the
@@ -20,7 +19,7 @@ namespace SmartFormat.Extensions
 		/// </summary>
 		public PluralLocalizationFormatter(string defaultTwoLetterISOLanguageName)
 		{
-			this.DefaultTwoLetterISOLanguageName = defaultTwoLetterISOLanguageName;
+			DefaultTwoLetterISOLanguageName = defaultTwoLetterISOLanguageName;
 		}
 
 		private PluralRules.PluralRuleDelegate defaultPluralRule;
@@ -29,12 +28,12 @@ namespace SmartFormat.Extensions
 		{
 			get
 			{
-				return this.defaultTwoLetterISOLanguageName;
+				return defaultTwoLetterISOLanguageName;
 			}
 			set
 			{
-				this.defaultTwoLetterISOLanguageName = value;
-				this.defaultPluralRule = PluralRules.GetPluralRule(value);
+				defaultTwoLetterISOLanguageName = value;
+				defaultPluralRule = PluralRules.GetPluralRule(value);
 			}
 		}
 
@@ -68,9 +67,9 @@ namespace SmartFormat.Extensions
 
 
 			// Use the default, if provided:
-			if (this.defaultPluralRule != null)
+			if (defaultPluralRule != null)
 			{
-				return this.defaultPluralRule;
+				return defaultPluralRule;
 			}
 
 			return null;
@@ -151,15 +150,15 @@ namespace SmartFormat.Extensions
 			return (formatType == typeof(CustomPluralRuleProvider)) ? this : null;
 		}
 
-		private readonly PluralRules.PluralRuleDelegate pluralRule;
+		private readonly PluralRules.PluralRuleDelegate _pluralRule;
 		public CustomPluralRuleProvider(PluralRules.PluralRuleDelegate pluralRule)
 		{
-			this.pluralRule = pluralRule;
+			_pluralRule = pluralRule;
 		}
 
 		public PluralRules.PluralRuleDelegate GetPluralRule()
 		{
-			return pluralRule;
+			return _pluralRule;
 		}
 	}
 

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
-using SmartFormat.Extensions;
 using SmartFormat.Tests.Common;
 using SmartFormat.Tests.TestUtils;
 
@@ -207,9 +205,9 @@ namespace SmartFormat.Tests.Core
 			Assert.That(splits[2].ToString(), Is.EqualTo("f "));
 		}
 
-		private Format Parse(string format, List<IFormatter> formatterExentions )
+		private Format Parse(string format, string[] formatterExentionNames )
 		{
-			return GetRegularParser().ParseFormat(format, SmartFormat.Utilities.Helper.GetNotEmptyFormatterExtensionNames(formatterExentions));
+			return GetRegularParser().ParseFormat(format, formatterExentionNames);
 		}
 
 		[TestCase("{0:name:}", "name", "", "")]
@@ -222,11 +220,8 @@ namespace SmartFormat.Tests.Core
 		[TestCase("{0:name(1|2|3):}", "name", "1|2|3", "")]
 		public void Name_of_registered_NamedFormatter_will_be_parsed(string format, string expectedName, string expectedOptions, string expectedFormat)
 		{
-			var formatterExtensions = new List<IFormatter>();
-			// Give the default formatter another name to run the tests.
-			// The parser will only find named formatter which are registered. Names are case-sensitive.
-			var df = new DefaultFormatter { Names = new[] { "name" } };
-			formatterExtensions.Add(df);
+			// The parser will only find names of named formatters which are registered. Names are case-sensitive.
+			var formatterExtensions = new[] { "name" };
 			
 			// Named formatters will only be recognized by the parser, if their name occurs in one of FormatterExtensions.
 			// If the name of the formatter does not exists, the string is treaded as format for the DefaultFormatter.
@@ -239,8 +234,9 @@ namespace SmartFormat.Tests.Core
 		[Test]
 		public void Name_of_unregistered_NamedFormatter_will_not_be_parsed()
 		{
-			var placeholderWithNonExistingName = (Placeholder)Parse("{0:name:}", new List<IFormatter>()).Items[0];
-			Assert.AreEqual("name:", placeholderWithNonExistingName.Format.ToString()); // name is only treaded as a literal
+			// find formatter formattername, which does not exist in the (empty) list of formatter extensions
+			var placeholderWithNonExistingName = (Placeholder)Parse("{0:formattername:}", new string[] {} ).Items[0];
+			Assert.AreEqual("formattername:", placeholderWithNonExistingName.Format.ToString()); // name is only treaded as a literal
 		}
 
 		// Incomplete:
