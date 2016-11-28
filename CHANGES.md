@@ -1,6 +1,17 @@
 LATEST CHANGES
 ====
 
+v1.7.1.1
+====
+* No more ambiguity between named formatters and string.Format formatting arguments: The parser checks whether the parsed name exists in one of the formatter extensions. 
+* SmartFormatter and Parser default to ErrorAction = ErrorAction.Ignore in release AND debug mode
+* SmartFormatter has EventHandler OnFormattingFailure
+* Parser has EventHandler OnParsingFailure
+* Obsolete FormatItem.Text property removed (was replaced by RawText property some time ago)
+* Assemblies are signed with a strong name key file
+* Supported frameworks are .Net 4.0, .Net 4.5, .Net Core - dropped .Net 3.5 and earlier
+* Added an icon to the nuget package
+
 v1.6.1
 ====
 - Fixed issue with parsing named formatter options (#45)
