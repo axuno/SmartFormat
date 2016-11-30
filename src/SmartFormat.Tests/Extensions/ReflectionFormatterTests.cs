@@ -114,6 +114,16 @@ namespace SmartFormat.Tests.Extensions
 			formatter.Test(formats, args, expected);
 		}
 
+		[Test]
+		public void Test_Get_Property_From_Base_Class()
+		{
+			var derived = new DerivedMiscObject();
+			var formatter = Smart.CreateDefaultSmartFormat();
+			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+			Assert.AreEqual(string.Format($"{derived.Property}"), formatter.Format("{Property}", derived));
+		}
+
 		public class MiscObject
 		{
 			public MiscObject()
@@ -124,10 +134,17 @@ namespace SmartFormat.Tests.Extensions
 			}
 			public string Field;
 			public string ReadonlyProperty { get; private set; }
-			public string Property { get; set; }
+			public virtual string Property { get; set; }
 			public string Method()
 			{
 				return "Method";
+			}
+		}
+
+		public class DerivedMiscObject : MiscObject
+		{
+			public override string Property {
+				set { } // only a dummy setter, getter from base class
 			}
 		}
 	}

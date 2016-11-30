@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("SmartFormat")]
 [assembly: AssemblyCopyright("Copyright 2011-2016 Scott Rippey, Bernhard Millauer, Norbert Bietsch and other contributors.")]
 [assembly: AssemblyDescription("A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/scottrippey/SmartFormat.NET")]
-[assembly: AssemblyVersion("1.7.1.1")]
+[assembly: AssemblyVersion("1.7.1.2")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
