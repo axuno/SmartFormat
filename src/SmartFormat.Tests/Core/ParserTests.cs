@@ -107,9 +107,7 @@ namespace SmartFormat.Tests.Core
 			Assert.AreEqual("iii", ((Placeholder)((Placeholder)parsed.Items[7]).Format.Items[0]).Selectors[0].RawText);
 
 		}
-
 		
-
 		private static Parser GetRegularParser()
 		{
 			var parser = new Parser(ErrorAction.ThrowError);
@@ -303,6 +301,22 @@ namespace SmartFormat.Tests.Core
 			var res = formatter.Format("{NoName {Other} {Same", default(object));
 			Assert.That(parseError.Count == 3);
 			Assert.That(parseError[2] == Parser.ParsingError.MissingClosingBrace);
+		}
+
+		[Test]
+		public void Nested_format_with_alternative_escaping()
+		{
+			var parser = GetRegularParser();
+			// necessary because of the consecutive }}}, which would otherwise be escaped as }} and lead to "missing brace" exception:
+			parser.UseAlternativeEscapeChar('\\'); 
+			var placeholders = parser.ParseFormat("{c1:{c2:{c3}}}", new[] {Guid.NewGuid().ToString("N")});
+
+			var c1 = (Placeholder) placeholders.Items[0];
+			var c2 = (Placeholder) c1.Format.Items[0];
+			var c3 = (Placeholder) c2.Format.Items[0];
+			Assert.AreEqual("c1", c1.Selectors[0].RawText);
+			Assert.AreEqual("c2", c2.Selectors[0].RawText);
+			Assert.AreEqual("c3", c3.Selectors[0].RawText);
 		}
 	}
 }

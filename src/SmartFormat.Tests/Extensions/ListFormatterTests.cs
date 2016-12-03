@@ -25,6 +25,44 @@ namespace SmartFormat.Tests.Extensions
 		}
 
 		[Test]
+		public void Simple_List()
+		{
+			var items = new[] { "one", "two", "three" };
+			var result = Smart.Default.Format("{0:list:{}|, |, and }", new object[] { items }); // important: not only "items" as the parameter
+			Assert.AreEqual("one, two, and three", result);
+		}
+
+		[Test]
+		public void List_of_anonymous_types_and_enumerables()
+		{
+			var data = new[]
+			{
+				new { Name = "Person A", Gender = "M" },
+				new { Name = "Person B", Gender = "F" },
+				new { Name = "Person C", Gender = "M" }
+			};
+
+			var model = new
+			{
+				Persons = data.Where(p => p.Gender == "M")
+			};
+
+			Smart.Default.Parser.UseAlternativeEscapeChar('\\'); // mandatory for this test case because of consecutive curly braces
+			Smart.Default.ErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
+			Smart.Default.Parser.ErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
+
+			// Note: it's faster to add the named formatter, than finding it implicitly by "trial and error".
+			var result = Smart.Default.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C
+			Assert.AreEqual("Person A, Person B, and Person C", result);
+			result = Smart.Default.Format("{0:list:{Name}|, |, and }", model.Persons);  // Person A, and Person C
+			Assert.AreEqual("Person A, and Person C", result);
+			result = Smart.Default.Format("{0:list:{Name}|, |, and }", data.Where(p => p.Gender == "F"));  // Person B
+			Assert.AreEqual("Person B", result);
+			result = Smart.Default.Format("{0:{Persons:{Name}|, }}", model); // Person A, and Person C
+			Assert.AreEqual("Person A, Person C", result);
+		}
+
+		[Test]
 		public void FormatTest()
 		{
 			var formats = new string[] {

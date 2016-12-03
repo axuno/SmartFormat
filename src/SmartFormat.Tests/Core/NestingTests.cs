@@ -43,5 +43,19 @@ namespace SmartFormat.Tests.Core
 			var actual = Smart.Format(format, data);
 			Assert.AreEqual(expectedOutput, actual);
 		}
+
+		[Test]
+		[TestCase("{ChildOne.ChildTwo.ChildThree:{Four}{One}}","41")]
+		[TestCase("{ChildOne:{ChildTwo:{ChildThree:{Four}{Three}{Two}{One}}}}","4321")]
+		[TestCase("{ChildOne:{ChildTwo:{ChildThree:{Four}{ChildTwo.Three}{ChildOne.Two}{One}}}}","4321")]
+		[TestCase("{ChildOne:{ChildTwo:{ChildThree:{ChildOne:{ChildTwo:{ChildThree:{Four}}}}}}}","4")]
+		public void Nesting_can_access_outer_scopes_no_blanks(string format, string expectedOutput)
+		{
+			// Removing the spaces from Nesting_can_access_outer_scopes requires alternative escaping of { and }!
+			var sf = Smart.CreateDefaultSmartFormat();
+			sf.Parser.UseAlternativeEscapeChar('\\');
+			var actual = sf.Format(format, data);
+			Assert.AreEqual(expectedOutput, actual);
+		}
 	}
 }

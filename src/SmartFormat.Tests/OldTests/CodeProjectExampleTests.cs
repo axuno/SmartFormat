@@ -440,7 +440,7 @@ namespace SmartFormat.Tests.OldTests
 			var format = "{0} {{0}} {{{0}}}";
 			var expected = "Zero {0} {Zero}";
 
-			var actual = Smart.Format(format, args);
+			var actual = Smart.CreateDefaultSmartFormat().Format(format, args);
 			Assert.AreEqual(expected, actual);
 		}
 
