@@ -1,6 +1,13 @@
 LATEST CHANGES
 ====
 
+v2.0.0
+* ReflectionSource now also gets members from base classes
+* Added nesting and list tests
+* Added coding samples
+* Improved source xml docs
+* Extended Wiki documentation for error handling and common pitfalls
+
 v1.7.1.1
 ====
 * No more ambiguity between named formatters and string.Format formatting arguments: The parser checks whether the parsed name exists in one of the formatter extensions. 
