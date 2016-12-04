@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyCompany("Scott Rippey, Bernhard Millauer, Norbert Bietsch and other contributors.")]
+[assembly: AssemblyCompany("Scott Rippey, axuno gGmbH, Bernhard Millauer and other contributors.")]
 [assembly: AssemblyTitle("SmartFormat")]
 [assembly: AssemblyProduct("SmartFormat")]
-[assembly: AssemblyCopyright("Copyright 2011-2016 Scott Rippey, Bernhard Millauer, Norbert Bietsch and other contributors.")]
+[assembly: AssemblyCopyright("Copyright 2011-2016 Scott Rippey, axuno gGmbH, Bernhard Millauer and other contributors.")]
 [assembly: AssemblyDescription("A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/scottrippey/SmartFormat.NET")]
-[assembly: AssemblyVersion("1.7.1.2")]
+[assembly: AssemblyVersion("2.0.0.0")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
