@@ -2,6 +2,7 @@ LATEST CHANGES
 ====
 
 v2.0.0
+====
 * ReflectionSource now also gets members from base classes
 * Added nesting and list tests
 * Added coding samples
