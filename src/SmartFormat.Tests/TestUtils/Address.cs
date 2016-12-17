@@ -8,7 +8,6 @@ namespace SmartFormat.Tests
 	/// <summary>
 	/// Generic class that can be used for United States addresses
 	/// </summary>
-	[TypeConverter(typeof(ExpandableObjectConverter))]
 	public class Address
 	{
 		public Address(string NewStreetAddress, string NewCity, States NewState, string NewZip)

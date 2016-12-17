@@ -4,7 +4,6 @@ using System.ComponentModel;
 
 namespace SmartFormat.Tests
 {
-	[TypeConverter(typeof(ExpandableObjectConverter))]
 	public class Person
 	{
 		public Person()

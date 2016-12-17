@@ -25,7 +25,7 @@ namespace SmartFormat.Tests.Extensions
 		public void Test_Default()
 		{
 			TestAllResults(
-				CultureInfo.CreateSpecificCulture("en-us"),
+				new CultureInfo("en-US"),
 				"There {0:is|are} {0} {0:item|items} remaining",
 				new ExpectedResults {
 					{  -1, "There are -1 items remaining"},
@@ -42,7 +42,7 @@ namespace SmartFormat.Tests.Extensions
 		public void Test_English()
 		{
 			TestAllResults(
-				CultureInfo.GetCultureInfo("en-US"),
+				new CultureInfo("en-US"),
 				"There {0:is|are} {0} {0:item|items} remaining",
 				new ExpectedResults {
 					{  -1, "There are -1 items remaining"},
@@ -59,7 +59,7 @@ namespace SmartFormat.Tests.Extensions
 		public void Test_Turkish()
 		{
 			TestAllResults(
-				CultureInfo.GetCultureInfo("tr-TR"),
+				new CultureInfo("tr-TR"),
 				"{0} nesne kaldı.",
 				new ExpectedResults {
 					{   0, "0 nesne kaldı."},
@@ -68,7 +68,7 @@ namespace SmartFormat.Tests.Extensions
 				});
 
 			TestAllResults(
-				CultureInfo.GetCultureInfo("tr"),
+				new CultureInfo("tr"),
 				"Seçili {0:nesneyi|nesneleri} silmek istiyor musunuz?",
 				new ExpectedResults {
 					{  -1, "Seçili nesneleri silmek istiyor musunuz?"},
@@ -85,7 +85,7 @@ namespace SmartFormat.Tests.Extensions
 		public void Test_Russian()
 		{
 			TestAllResults(
-				CultureInfo.GetCultureInfo("ru-RU"),
+				new CultureInfo("ru-RU"),
 				"Я купил {0} {0:банан|банана|бананов}.",
 				new ExpectedResults {
 					{   0, "Я купил 0 бананов."},
@@ -107,7 +107,7 @@ namespace SmartFormat.Tests.Extensions
 		public void Test_Polish()
 		{
 			TestAllResults(
-				CultureInfo.GetCultureInfo("pl"),
+				new CultureInfo("pl"),
 				"{0} {0:miesiąc|miesiące|miesięcy} temu",
 				new ExpectedResults {
 					{   0, "0 miesięcy temu"},
@@ -162,7 +162,7 @@ namespace SmartFormat.Tests.Extensions
 		[TestCase("{0:plural:zero|one|many}", new[] { "alice", "bob" }, "many")]
 		public void Test_should_allow_ienumerable_parameter(string format, object arg0, string expectedResult)
 		{
-			var culture = CultureInfo.CreateSpecificCulture("en-us");
+			var culture = new CultureInfo("en-US");
 			var actualResult = Smart.Format(culture, format, arg0);
 			Assert.AreEqual(expectedResult, actualResult);
 		}

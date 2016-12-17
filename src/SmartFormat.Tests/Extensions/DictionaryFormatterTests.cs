@@ -40,7 +40,7 @@ namespace SmartFormat.Tests.Extensions
 			dynamic d = new ExpandoObject();
 			d.Numbers = new Dictionary<string, object> { { "One", 1 }, { "Two", 2 }, { "Three", 3 }, };
 			d.Letters = new Dictionary<string, object> { { "A", "a" }, { "B", "b" }, { "C", "c" }, };
-			d.Raw = new System.Collections.Hashtable { { "X", "z" } };
+			d.Raw = new Dictionary<string, string>() { { "X", "z" } };
 			d.Object = new { Prop1 = "a", Prop2 = "b", Prop3 = "c", };
 
 			return new object[] {
