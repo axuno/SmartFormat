@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
 				current is byte || current is short || current is int || current is long
 				|| current is float || current is double || current is decimal;
 			// An Enum is a number too:
-#if NET_STANDARD
+#if FXCORE
 			if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
 #else
 			if (currentIsNumber == false && current != null && current.GetType().IsEnum)

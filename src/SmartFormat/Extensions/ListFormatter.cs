@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-#if !NET_STANDARD
+#if !FXCORE
 // Not supported by .Net Core
 using System.Runtime.Remoting.Messaging;
 #endif
@@ -101,7 +101,7 @@ namespace SmartFormat.Extensions
 		// same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
 		// Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
 
-#if !NET_STANDARD
+#if !FXCORE
 		/// <summary>
 		/// The key for CallContext.Logical[Get|Set]Data().
 		/// </summary>
