@@ -10,7 +10,7 @@ namespace SmartFormat.Tests.Extensions
 	{
 		private SmartFormatter smart;
 		
-		[TestFixtureSetUp]
+		[OneTimeSetUp]
 		public void SetupSmart()
 		{
 			this.smart = Smart.CreateDefaultSmartFormat();
