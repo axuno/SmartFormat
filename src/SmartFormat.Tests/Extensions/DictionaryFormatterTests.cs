@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
+#if !FXCORE
 using System.Runtime.Remoting.Messaging;
+#endif
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
