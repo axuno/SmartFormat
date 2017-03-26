@@ -14,47 +14,47 @@ using SmartFormat.Tests.Extensions;
 
 namespace SmartFormat.Demo
 {
-	public partial class SmartFormatDemo : Form
-	{
-		public SmartFormatDemo()
-		{
-			InitializeComponent();
-		}
+    public partial class SmartFormatDemo : Form
+    {
+        public SmartFormatDemo()
+        {
+            InitializeComponent();
+        }
 
-		private RTFOutput rtfOutput;
+        private RTFOutput rtfOutput;
 
-		private PropertyGridObject args;
+        private PropertyGridObject args;
 
-		private void SmartFormatDemo_Load(object sender, EventArgs e)
-		{
-			this.args = new PropertyGridObject();
-			var nestedColors = new Color[] {
-				Color.Orange,
-				Color.LightYellow,
-				Color.LightGreen,
-				Color.LightCyan,
-				Color.LightSkyBlue,
-				Color.Lavender,
-			};
-			rtfOutput = new RTFOutput(nestedColors, Color.LightPink);
+        private void SmartFormatDemo_Load(object sender, EventArgs e)
+        {
+            this.args = new PropertyGridObject();
+            var nestedColors = new Color[] {
+                Color.Orange,
+                Color.LightYellow,
+                Color.LightGreen,
+                Color.LightCyan,
+                Color.LightSkyBlue,
+                Color.Lavender,
+            };
+            rtfOutput = new RTFOutput(nestedColors, Color.LightPink);
 
-			args.Person = TestFactory.GetPerson();
-			args.Date = DateTime.Now;
-			args.Inventory = TestFactory.GetItems();
-			args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
-			propertyGrid1.SelectedObject = args;
+            args.Person = TestFactory.GetPerson();
+            args.Date = DateTime.Now;
+            args.Inventory = TestFactory.GetItems();
+            args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
+            propertyGrid1.SelectedObject = args;
 
 
-			Smart.Default.ErrorAction = ErrorAction.OutputErrorInResult;
-			Smart.Default.Parser.ErrorAction = ErrorAction.ThrowError;
+            Smart.Default.ErrorAction = ErrorAction.OutputErrorInResult;
+            Smart.Default.Parser.ErrorAction = ErrorAction.ThrowError;
 
-			LoadExamples();
-		}
-		private void LoadExamples()
-		{
-			this.lstExamples.DisplayMember = "Key";
-			//this.lstExamples.ValueMember = "Value";
-			var examples = new Dictionary<string, string> {
+            LoadExamples();
+        }
+        private void LoadExamples()
+        {
+            this.lstExamples.DisplayMember = "Key";
+            //this.lstExamples.ValueMember = "Value";
+            var examples = new Dictionary<string, string> {
 {"Basics of SmartFormat", 
 @"Basics of SmartFormat
 Similar to String.Format, SmartFormat uses curly braces to identify a placeholder:  The arguments on the right side of this window can be referenced in a template as follows:
@@ -94,11 +94,11 @@ There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remainin
 @"<!-- Pay attention to the ending |}} token -->
 <Items count=""{Inventory.Count}"">
 {Inventory:
-	<Item name=""{Name}"" price=""{Price:c}"" index=""{Index}"" components=""{Components.Count}"">
-	{Components:
-		<Component name=""{Name}"" count=""{Count}"" />
-	|}
-	</Item>
+    <Item name=""{Name}"" price=""{Price:c}"" index=""{Index}"" components=""{Components.Count}"">
+    {Components:
+        <Component name=""{Name}"" count=""{Count}"" />
+    |}
+    </Item>
 |}
 </Items>
 "},
@@ -109,76 +109,76 @@ Example:
   #1:  {Xml.Person.0: {FirstName}'s phone number is {Phone}}
   #2:  {Xml.Person.1: {FirstName}'s phone number is {Phone}}
 "},
-			};
+            };
 
-			var listObjects = examples.Cast<object>().ToArray();
-			this.lstExamples.Items.AddRange(listObjects);
-			this.lstExamples.SelectedIndex = 0;
-		}
+            var listObjects = examples.Cast<object>().ToArray();
+            this.lstExamples.Items.AddRange(listObjects);
+            this.lstExamples.SelectedIndex = 0;
+        }
 
-		public class PropertyGridObject
-		{
-			// We want the items in the Property Grid to be expandable,
-			// so we need each property to have a TypeConverterAttribute:
-			[TypeConverter(typeof(ExpandableObjectConverter))]
-			public object Person { get; set; }
-			[TypeConverter(typeof(ExpandableObjectConverter))]
-			public object Date { get; set; }
-			[TypeConverter(typeof(ArrayConverter))]
-			public object Inventory { get; set; }
+        public class PropertyGridObject
+        {
+            // We want the items in the Property Grid to be expandable,
+            // so we need each property to have a TypeConverterAttribute:
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            public object Person { get; set; }
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            public object Date { get; set; }
+            [TypeConverter(typeof(ArrayConverter))]
+            public object Inventory { get; set; }
 
-			[TypeConverter(typeof(ExpandableObjectConverter))]
-			public object Xml { get; set; }
-		}
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            public object Xml { get; set; }
+        }
 
-		private void txtInput_TextChanged(object sender, EventArgs e)
-		{
-			groupBox1.ResetForeColor();
-			groupBox1.Text = "Format";
-			var format = txtInput.Text;
+        private void txtInput_TextChanged(object sender, EventArgs e)
+        {
+            groupBox1.ResetForeColor();
+            groupBox1.Text = "Format";
+            var format = txtInput.Text;
 
-			rtfOutput.Clear();
-			// Save selection:
-			var s = txtInput.SelectionStart;
-			var l = txtInput.SelectionLength;
-			try
-			{
-				Smart.Default.FormatInto(rtfOutput, format, args);
+            rtfOutput.Clear();
+            // Save selection:
+            var s = txtInput.SelectionStart;
+            var l = txtInput.SelectionLength;
+            try
+            {
+                Smart.Default.FormatInto(rtfOutput, format, args);
 
-				txtInput.SelectAll();
-				txtInput.SelectionBackColor = txtInput.BackColor;
-			}
-			catch (ParsingErrors ex)
-			{
-				var errorBG = Color.LightPink;
-				var errorFG = Color.DarkRed;
-				groupBox1.ForeColor = errorFG;
+                txtInput.SelectAll();
+                txtInput.SelectionBackColor = txtInput.BackColor;
+            }
+            catch (ParsingErrors ex)
+            {
+                var errorBG = Color.LightPink;
+                var errorFG = Color.DarkRed;
+                groupBox1.ForeColor = errorFG;
 
-				groupBox1.Text = string.Format("Format has {0} issue{1}: {2}",
-											   ex.Issues.Count,
-											   (ex.Issues.Count == 1) ? "" : "s",
-											   ex.Issues.Select(i=>i.Issue).JoinStrings(" ", " ", " (and {0} more)", 1)
-											   );
-				// Highlight errors:
-				foreach (var issue in ex.Issues)
-				{
-					txtInput.Select(issue.Index, issue.Length);
-					txtInput.SelectionBackColor = errorBG;
-				}
-			}
-			txtInput.SelectionStart = s;
-			txtInput.SelectionLength = l;
+                groupBox1.Text = string.Format("Format has {0} issue{1}: {2}",
+                                               ex.Issues.Count,
+                                               (ex.Issues.Count == 1) ? "" : "s",
+                                               ex.Issues.Select(i=>i.Issue).JoinStrings(" ", " ", " (and {0} more)", 1)
+                                               );
+                // Highlight errors:
+                foreach (var issue in ex.Issues)
+                {
+                    txtInput.Select(issue.Index, issue.Length);
+                    txtInput.SelectionBackColor = errorBG;
+                }
+            }
+            txtInput.SelectionStart = s;
+            txtInput.SelectionLength = l;
 
-			txtOutput.Rtf = rtfOutput.ToString();
-		}
+            txtOutput.Rtf = rtfOutput.ToString();
+        }
 
-		private void lstExamples_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			var example = (KeyValuePair<string, string>) lstExamples.SelectedItem;
-			if (example.Value == null) return;
-			this.txtInput.Text = example.Value;
-		}
+        private void lstExamples_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var example = (KeyValuePair<string, string>) lstExamples.SelectedItem;
+            if (example.Value == null) return;
+            this.txtInput.Text = example.Value;
+        }
 
 
-	}
+    }
 }

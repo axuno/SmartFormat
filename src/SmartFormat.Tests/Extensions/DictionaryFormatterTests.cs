@@ -12,130 +12,130 @@ using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
 {
-	[TestFixture]
-	public class DictionaryFormatterTests
-	{
-		public object[] GetArgs()
-		{
-			var d = new Dictionary<string, object>() {
-				{"Numbers", new Dictionary<string, object>() {
-					{"One", 1},
-					{"Two", 2},
-					{"Three", 3},
-				}},
-				{"Letters", new Dictionary<string, object>() {
-					{"A", "a"},
-					{"B", "b"},
-					{"C", "c"},
-				}},
-				{"Object", new {
-					Prop1 = "a",
-					Prop2 = "b",
-					Prop3 = "c",
-				}},
-			};
+    [TestFixture]
+    public class DictionaryFormatterTests
+    {
+        public object[] GetArgs()
+        {
+            var d = new Dictionary<string, object>() {
+                {"Numbers", new Dictionary<string, object>() {
+                    {"One", 1},
+                    {"Two", 2},
+                    {"Three", 3},
+                }},
+                {"Letters", new Dictionary<string, object>() {
+                    {"A", "a"},
+                    {"B", "b"},
+                    {"C", "c"},
+                }},
+                {"Object", new {
+                    Prop1 = "a",
+                    Prop2 = "b",
+                    Prop3 = "c",
+                }},
+            };
 
-			return new object[] {
-				d,
-			};
-		}
+            return new object[] {
+                d,
+            };
+        }
 
-		public dynamic GetDynamicArgs()
-		{
-			dynamic d = new ExpandoObject();
-			d.Numbers = new Dictionary<string, object> { { "One", 1 }, { "Two", 2 }, { "Three", 3 }, };
-			d.Letters = new Dictionary<string, object> { { "A", "a" }, { "B", "b" }, { "C", "c" }, };
-			d.Raw = new Dictionary<string, string>() { { "X", "z" } };
-			d.Object = new { Prop1 = "a", Prop2 = "b", Prop3 = "c", };
+        public dynamic GetDynamicArgs()
+        {
+            dynamic d = new ExpandoObject();
+            d.Numbers = new Dictionary<string, object> { { "One", 1 }, { "Two", 2 }, { "Three", 3 }, };
+            d.Letters = new Dictionary<string, object> { { "A", "a" }, { "B", "b" }, { "C", "c" }, };
+            d.Raw = new Dictionary<string, string>() { { "X", "z" } };
+            d.Object = new { Prop1 = "a", Prop2 = "b", Prop3 = "c", };
 
-			return new object[] {
-				d,
-			};
-		}
+            return new object[] {
+                d,
+            };
+        }
 
-		[Test]
-		public void Test_Dictionary()
-		{
-			var formatter = Smart.CreateDefaultSmartFormat();
-			formatter.AddExtensions(new DictionarySource(formatter));
+        [Test]
+        public void Test_Dictionary()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.AddExtensions(new DictionarySource(formatter));
             formatter.Parser.UseAlternativeEscapeChar(); // curly braces MUST be escaped with \{ and \} instead of {{ and }} for this complex test
 
             var formats = new string[] {
-				"Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1}",
-				"Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}}" 
-			};
-			var expected = new string[] {
-				"Chained: 1 2 a a",
-				"Nested: 1 2 a a"
-			};
-			var args = GetArgs();
-			formatter.Test(formats, args, expected);
-
-            formatter.Parser.UseBraceEscaping(); // reset to string.Format brace escaping
-		}
-
-		[Test]
-		public void Test_Dynamic()
-		{
-			var formatter = Smart.CreateDefaultSmartFormat();
-			formatter.AddExtensions(new DictionarySource(formatter));
-            formatter.Parser.UseAlternativeEscapeChar(); // curly braces MUST be escaped with \{ and \} instead of {{ and }} for this complex test
-
-            var formats = new string[] {
-				"Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.X}",
-				"Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{X}}"
-			};
-			var expected = new string[] {
-				"Chained: 1 2 a a z",
-				"Nested: 1 2 a a z"
-			};
-			var args = (object[])GetDynamicArgs();
-			formatter.Test(formats, args, expected);
+                "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1}",
+                "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}}" 
+            };
+            var expected = new string[] {
+                "Chained: 1 2 a a",
+                "Nested: 1 2 a a"
+            };
+            var args = GetArgs();
+            formatter.Test(formats, args, expected);
 
             formatter.Parser.UseBraceEscaping(); // reset to string.Format brace escaping
         }
 
-		[Test]
-		public void Test_Dynamic_CaseInsensitive()
-		{
-			var formatter = Smart.CreateDefaultSmartFormat();
-			formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-			formatter.AddExtensions(new DictionarySource(formatter));
+        [Test]
+        public void Test_Dynamic()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.AddExtensions(new DictionarySource(formatter));
             formatter.Parser.UseAlternativeEscapeChar(); // curly braces MUST be escaped with \{ and \} instead of {{ and }} for this complex test
 
             var formats = new string[] {
-				"Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.x}",
-				"Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{x}}"
-			};
-			var expected = new string[] {
-				"Chained: 1 2 a a z",
-				"Nested: 1 2 a a z"
-			};
-			var args = (object[])GetDynamicArgs();
-			formatter.Test(formats, args, expected);
+                "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.X}",
+                "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{X}}"
+            };
+            var expected = new string[] {
+                "Chained: 1 2 a a z",
+                "Nested: 1 2 a a z"
+            };
+            var args = (object[])GetDynamicArgs();
+            formatter.Test(formats, args, expected);
 
             formatter.Parser.UseBraceEscaping(); // reset to string.Format brace escaping
         }
 
-	    [Test]
-	    public void Dictionary_Dot_Notation()
-	    {
+        [Test]
+        public void Test_Dynamic_CaseInsensitive()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            formatter.AddExtensions(new DictionarySource(formatter));
+            formatter.Parser.UseAlternativeEscapeChar(); // curly braces MUST be escaped with \{ and \} instead of {{ and }} for this complex test
+
+            var formats = new string[] {
+                "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.x}",
+                "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{x}}"
+            };
+            var expected = new string[] {
+                "Chained: 1 2 a a z",
+                "Nested: 1 2 a a z"
+            };
+            var args = (object[])GetDynamicArgs();
+            formatter.Test(formats, args, expected);
+
+            formatter.Parser.UseBraceEscaping(); // reset to string.Format brace escaping
+        }
+
+        [Test]
+        public void Dictionary_Dot_Notation()
+        {
             // Process properties of a class instance type-safe and without the need for reflection
             // and with dot notation for dictionaries
 
             var addr = new Address();
 
-	        const string format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
-	                              "Name: {Person.FirstName} {Person.LastName}";
+            const string format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
+                                  "Name: {Person.FirstName} {Person.LastName}";
 
             var expected = $"Address: {addr.City.ZipCode} {addr.City.Name}, {addr.City.AreaCode}\n" +
                          $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
 
             var formatter = Smart.CreateDefaultSmartFormat();
-	        var result = formatter.Format(format, addr.ToDictionary());
+            var result = formatter.Format(format, addr.ToDictionary());
 
             Assert.AreEqual(expected, result);
-	    }
+        }
 
         [Test, Explicit("Performance tests should be run explicitly. This test will take about 4 seconds.")]
         public void Dictionary_Performance()

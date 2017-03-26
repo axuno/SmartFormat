@@ -94,29 +94,29 @@ namespace RTF
                 //Pad();
 
 
-                // \trhdr	Table row header. This row should appear at the top of every page on which the current table appears.
-                // \trkeep	Keep table row together. This row cannot be split by a page break. This property is assumed to be off unless the control word is present.
-                //\trleftN	Position in twips of the leftmost edge of the table with respect to the left edge of its column.
-                //\trqc	Centers a table row with respect to its containing column.
-                //\trql	Left-justifies a table row with respect to its containing column.
-                //\trqr	Right-justifies a table row with respect to its containing column.
-                //\trrhN	Height of a table row in twips. When 0, the height is sufficient for all the text in the line; when positive, the height is guaranteed to be at least the specified height; when negative, the absolute value of the height is used, regardless of the height of the text in the line.
-                //\trpaddbN	Default bottom cell margin or padding for the row.
-                //\trpaddlN	Default left cell margin or padding for the row.
-                //\trpaddrN	Default right cell margin or padding for the row.
-                //\trpaddtN	Default top cell margin or padding for the row.
-                //\trpaddfbN	Units for \trpaddbN:
-                //0	Null. Ignore \trpaddbN in favor of \trgaphN (Word 97 style padding).
-                //3	Twips.
-                //\trpaddflN	Units for \trpaddlN:
-                //0	Null. Ignore \trpaddlN in favor of \trgaphN (Word 97 style padding).
-                //3	Twips.
-                //\trpaddfrN	Units for \trpaddrN:
-                //0	Null. Ignore \trpaddrN in favor of \trgaphN (Word 97 style padding).
-                //3	Twips.
-                //\trpaddftN	Units for \trpaddtN:
-                //0	Null. Ignore \trpaddtN in favor of \trgaphN (Word 97 style padding).
-                //3	Twips.
+                // \trhdr    Table row header. This row should appear at the top of every page on which the current table appears.
+                // \trkeep    Keep table row together. This row cannot be split by a page break. This property is assumed to be off unless the control word is present.
+                //\trleftN    Position in twips of the leftmost edge of the table with respect to the left edge of its column.
+                //\trqc    Centers a table row with respect to its containing column.
+                //\trql    Left-justifies a table row with respect to its containing column.
+                //\trqr    Right-justifies a table row with respect to its containing column.
+                //\trrhN    Height of a table row in twips. When 0, the height is sufficient for all the text in the line; when positive, the height is guaranteed to be at least the specified height; when negative, the absolute value of the height is used, regardless of the height of the text in the line.
+                //\trpaddbN    Default bottom cell margin or padding for the row.
+                //\trpaddlN    Default left cell margin or padding for the row.
+                //\trpaddrN    Default right cell margin or padding for the row.
+                //\trpaddtN    Default top cell margin or padding for the row.
+                //\trpaddfbN    Units for \trpaddbN:
+                //0    Null. Ignore \trpaddbN in favor of \trgaphN (Word 97 style padding).
+                //3    Twips.
+                //\trpaddflN    Units for \trpaddlN:
+                //0    Null. Ignore \trpaddlN in favor of \trgaphN (Word 97 style padding).
+                //3    Twips.
+                //\trpaddfrN    Units for \trpaddrN:
+                //0    Null. Ignore \trpaddrN in favor of \trgaphN (Word 97 style padding).
+                //3    Twips.
+                //\trpaddftN    Units for \trpaddtN:
+                //0    Null. Ignore \trpaddtN in favor of \trgaphN (Word 97 style padding).
+                //3    Twips.
 
 
                 this._cells = new List <RTFCellDefinitionBuilder>();
