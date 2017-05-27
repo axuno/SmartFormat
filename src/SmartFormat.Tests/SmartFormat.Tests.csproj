@@ -66,6 +66,7 @@
     <Compile Include="Extensions\TemplateFormatterTests.cs" />
     <Compile Include="OldTests\CodeProjectExampleTests.cs" />
     <Compile Include="Extensions\XmlSourceTest.cs" />
+    <Compile Include="Core\SmartObjectsTests.cs" />
     <Compile Include="TestUtils\ArgumentValidator.cs" />
     <Compile Include="TestUtils\EnumerableExtensions.cs" />
     <Compile Include="TestUtils\ExceptionCollection.cs" />

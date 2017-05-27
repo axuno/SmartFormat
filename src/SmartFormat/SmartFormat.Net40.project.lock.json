@@ -1,5 +1,4 @@
 {
-  "locked": false,
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.0": {},
@@ -12,5 +11,8 @@
     ".NETFramework,Version=v4.0": []
   },
   "tools": {},
-  "projectFileToolGroups": {}
+  "projectFileToolGroups": {},
+  "packageFolders": {
+    "C:\\Users\\nb\\.nuget\\packages\\": {}
+  }
 }

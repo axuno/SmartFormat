@@ -211,8 +211,8 @@ namespace SmartFormat
                 {
                     formattingInfo.Write(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
                     continue;
-                } 
-                
+                }
+
                 // Otherwise, the item must be a placeholder.
                 var placeholder = (Placeholder)item;
                 var childFormattingInfo = formattingInfo.CreateChild(placeholder);
@@ -240,7 +240,7 @@ namespace SmartFormat
                 }
             }
         }
-        
+
         private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
         {
             OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(errorItem.RawText, startIndex, ErrorAction != ErrorAction.ThrowError));
@@ -282,8 +282,8 @@ namespace SmartFormat
                 formattingInfo.Selector = selector;
                 formattingInfo.Result = null;
                 var handled = InvokeSourceExtensions(formattingInfo);
-                if (handled) formattingInfo.CurrentValue = formattingInfo.Result;                
-                
+                if (handled) formattingInfo.CurrentValue = formattingInfo.Result;
+
                 if (firstSelector)
                 {
                     firstSelector = false;
@@ -298,7 +298,7 @@ namespace SmartFormat
                         if (handled) formattingInfo.CurrentValue = parentFormattingInfo.Result;
                     }
                 }
-                
+
                 if (!handled)
                 {
                     throw formattingInfo.FormattingException($"Could not evaluate the selector \"{selector.RawText}\"", selector);
@@ -309,8 +309,27 @@ namespace SmartFormat
         {
             foreach (var sourceExtension in SourceExtensions)
             {
-                var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
-                if (handled) return true;
+                // if the current value is of type SmartObjects
+                // then try to find the right source extension for each of the objects in SmartObjects
+                // Note: SmartObjects cannot be nested, so this can be the case only once. 
+                var smartObjects = formattingInfo.CurrentValue as SmartObjects;
+                if (smartObjects != null)
+                {
+                    var savedCurrentValue = formattingInfo.CurrentValue;
+                    foreach (var obj in smartObjects)
+                    {
+                        formattingInfo.CurrentValue = obj;
+                        var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
+                        if (handled) return true;
+                    }
+                    formattingInfo.CurrentValue = savedCurrentValue;
+                }
+                else
+                {
+                    // other object - default handling
+                    var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
+                    if (handled) return true;
+                }
             }
             return false;
         }
@@ -337,7 +356,7 @@ namespace SmartFormat
         private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
         {
             var formatterName = formattingInfo.Placeholder.FormatterName;
-            
+
             // Evaluate the named formatter (or, evaluate all "" formatters)
             foreach (var formatterExtension in FormatterExtensions)
             {
