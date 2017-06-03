@@ -6,10 +6,18 @@ using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// Template Formatter allows for registering reusable templates, and use them by name.
+    /// </summary>
     public class TemplateFormatter : IFormatter
     {
         private readonly SmartFormatter _formatter;
         private readonly IDictionary<string, Format> _templates;
+
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
         public TemplateFormatter(SmartFormatter formatter)
         {
             _formatter = formatter;
@@ -17,20 +25,46 @@ namespace SmartFormat.Extensions
             var stringComparer = (formatter.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
             _templates = new Dictionary<string, Format>(stringComparer);
         }
+
+        /// <summary>
+        /// Register a new template.
+        /// </summary>
+        /// <param name="templateName">A name for the template, which is not already registered.</param>
+        /// <param name="template">The string to be used as a template.</param>
         public void Register(string templateName, string template)
         {
             var parsed = _formatter.Parser.ParseFormat(template, _formatter.GetNotEmptyFormatterExtensionNames());
             _templates.Add(templateName, parsed);
         }
 
+        /// <summary>
+        /// Remove a template by its name.
+        /// </summary>
+        /// <param name="templateName"></param>
+        /// <returns></returns>
         public bool Remove(string templateName)
         {
             return _templates.Remove(templateName);
         }
 
-        private string[] names = { "template", "t" };
-        public string[] Names { get { return names; } set { names = value; } }
+        /// <summary>
+        /// Remove all templates.
+        /// </summary>
+        public void Clear()
+        {
+            _templates.Clear();
+        }
 
+        /// <summary>
+        /// Gets or sets the name of the extension.
+        /// </summary>
+        public string[] Names { get; set; } = { "template", "t" };
+
+        /// <summary>
+        /// This method is called by the <see cref="SmartFormatter"/> to obtain the formatting result of this extension.
+        /// </summary>
+        /// <param name="formattingInfo"></param>
+        /// <returns>Returns true if successful, else false.</returns>
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var templateName = formattingInfo.FormatterOptions;
@@ -52,6 +86,5 @@ namespace SmartFormat.Extensions
             formattingInfo.Write(template, formattingInfo.CurrentValue);
             return true;
         }
-
     }
 }
