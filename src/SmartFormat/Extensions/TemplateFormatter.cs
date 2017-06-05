@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using MailMergeLib.SmartFormatMail.Core.Extensions;
-using MailMergeLib.SmartFormatMail.Core.Parsing;
+using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 
-namespace MailMergeLib.SmartFormatMail.Extensions
+namespace SmartFormat.Extensions
 {
     /// <summary>
     /// Template Formatter allows for registering reusable templates, and use them by name.
@@ -22,7 +22,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
         {
             _formatter = formatter;
 
-            var stringComparer = formatter.Settings.GetCaseSensitivityComparer();
+            var stringComparer = (formatter.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
             _templates = new Dictionary<string, Format>(stringComparer);
         }
 
@@ -80,13 +80,6 @@ namespace MailMergeLib.SmartFormatMail.Extensions
             Format template;
             if (!_templates.TryGetValue(templateName, out template))
             {
-                if (Names.Contains(formattingInfo.Placeholder.FormatterName))
-                {
-                    // if the format contains the named formatter, we care for a more precise exception message
-                    // instead of the generic "no formatter found"
-                    throw new FormatException($"Formatter '{formattingInfo.Placeholder.FormatterName}' found no registered template named '{templateName}'");
-                }
-
                 return false;
             }
 
