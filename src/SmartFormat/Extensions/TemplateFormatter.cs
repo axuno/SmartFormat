@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
@@ -22,7 +22,7 @@ namespace SmartFormat.Extensions
         {
             _formatter = formatter;
 
-            var stringComparer = (formatter.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            var stringComparer = formatter.Settings.GetCaseSensitivityComparer();
             _templates = new Dictionary<string, Format>(stringComparer);
         }
 
@@ -76,10 +76,17 @@ namespace SmartFormat.Extensions
                 }
                 templateName = formattingInfo.Format.RawText;
             }
-            
+
             Format template;
             if (!_templates.TryGetValue(templateName, out template))
             {
+                if (Names.Contains(formattingInfo.Placeholder.FormatterName))
+                {
+                    // if the format contains the named formatter, we care for a more precise exception message
+                    // instead of the generic "no formatter found"
+                    throw new FormatException($"Formatter '{formattingInfo.Placeholder.FormatterName}' found no registered template named '{templateName}'");
+                }
+
                 return false;
             }
 
