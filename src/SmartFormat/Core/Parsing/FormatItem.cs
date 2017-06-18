@@ -1,4 +1,6 @@
-﻿namespace SmartFormat.Core.Parsing
+﻿using SmartFormat.Core.Settings;
+
+namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Base class that represents a substring
@@ -6,11 +8,14 @@
     /// </summary>
     public abstract class FormatItem
     {
-        protected FormatItem(FormatItem parent, int startIndex) : this(parent.baseString, startIndex, parent.baseString.Length)
+        protected SmartSettings SmartSettings;
+
+        protected FormatItem(SmartSettings smartSettings, FormatItem parent, int startIndex) : this(smartSettings, parent.baseString, startIndex, parent.baseString.Length)
         { }
 
-        protected FormatItem(string baseString, int startIndex, int endIndex)
+        protected FormatItem(SmartSettings smartSettings, string baseString, int startIndex, int endIndex)
         {
+            SmartSettings = smartSettings;
             this.baseString = baseString;
             this.startIndex = startIndex;
             this.endIndex = endIndex;

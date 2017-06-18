@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -16,12 +17,12 @@ namespace SmartFormat.Core.Parsing
 
         #region: Constructors :
 
-        public Format(string baseString) : base(baseString, 0, baseString.Length)
+        public Format(SmartSettings smartSettings, string baseString) : base(smartSettings, baseString, 0, baseString.Length)
         {
             this.parent = null;
             Items = new List<FormatItem>();
         }
-        public Format(Placeholder parent, int startIndex) : base(parent, startIndex)
+        public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent, startIndex)
         {
             this.parent = parent;
             Items = new List<FormatItem>();
@@ -63,7 +64,7 @@ namespace SmartFormat.Core.Parsing
                 return this;
             }
 
-            var substring = new Format(this.baseString) { startIndex = startIndex, endIndex = endIndex };
+            var substring = new Format(SmartSettings, this.baseString) { startIndex = startIndex, endIndex = endIndex };
             foreach (var item in this.Items)
             {
                 if (item.endIndex <= startIndex)
@@ -76,7 +77,7 @@ namespace SmartFormat.Core.Parsing
                 {
                     if (startIndex > item.startIndex || item.endIndex > endIndex)
                     {
-                        newItem = new LiteralText(substring) {
+                        newItem = new LiteralText(SmartSettings, substring) {
                             startIndex = Math.Max(startIndex, item.startIndex),
                             endIndex = Math.Min(endIndex, item.endIndex)
                         };
@@ -316,7 +317,7 @@ namespace SmartFormat.Core.Parsing
                 var literalItem = item as LiteralText;
                 if (literalItem != null)
                 {
-                    sb.Append(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
+                    sb.Append(literalItem.ToString());
                 }
             }
             return sb.ToString();

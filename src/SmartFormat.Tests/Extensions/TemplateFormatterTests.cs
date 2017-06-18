@@ -105,7 +105,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{:template():AAAA}")]
         public void Templates_must_be_defined(string format)
         {
-            smart.ErrorAction = ErrorAction.ThrowError;
+            smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
             Assert.Throws<FormattingException>(() => smart.Format(format, 5));
         }
 
@@ -115,7 +115,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{:template:LaSt}")]
         public void Templates_are_case_sensitive(string format)
         {
-            smart.ErrorAction = ErrorAction.ThrowError;
+            smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
             Assert.Throws<FormattingException>(() => smart.Format(format, 5));
         }
 

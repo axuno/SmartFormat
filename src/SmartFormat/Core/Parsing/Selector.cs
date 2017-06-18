@@ -1,4 +1,6 @@
-﻿namespace SmartFormat.Core.Parsing
+﻿using SmartFormat.Core.Settings;
+
+namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Represents a single selector
@@ -7,8 +9,8 @@
     /// </summary>
     public class Selector : FormatItem
     {
-        public Selector(string baseString, int startIndex, int endIndex, int operatorStart, int selectorIndex)
-            : base(baseString, startIndex, endIndex)
+        public Selector(SmartSettings smartSettings, string baseString, int startIndex, int endIndex, int operatorStart, int selectorIndex)
+            : base(smartSettings, baseString, startIndex, endIndex)
         {
             this.SelectorIndex = selectorIndex;
             this.operatorStart = operatorStart;

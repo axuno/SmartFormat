@@ -15,7 +15,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void TestParser()
         {
-            var parser = new Parser(ErrorAction.ThrowError);
+            var parser = new SmartFormatter() {Settings = { ParseErrorAction = ErrorAction.ThrowError}}.Parser;
             parser.AddAlphanumericSelectors();
             parser.AddAdditionalSelectorChars("_");
             parser.AddOperators(".");
@@ -41,7 +41,7 @@ namespace SmartFormat.Tests.Core
         {
             // Let's set the "ErrorAction" to "Throw":
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Parser.ErrorAction = ErrorAction.ThrowError;
+            formatter.Settings.ParseErrorAction = ErrorAction.ThrowError;
 
             var args = new object[] { TestFactory.GetPerson() };
             var invalidFormats = new[] {
@@ -68,7 +68,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Parser_Ignores_Exceptions()
         {
-            var parser = new Parser(ErrorAction.Ignore);
+            var parser = new SmartFormatter() { Settings = { ParseErrorAction = ErrorAction.Ignore } }.Parser;
             var invalidFormats = new[] {
                 "{",
                 "{0",
@@ -110,7 +110,7 @@ namespace SmartFormat.Tests.Core
         
         private static Parser GetRegularParser()
         {
-            var parser = new Parser(ErrorAction.ThrowError);
+            var parser = new SmartFormatter() { Settings = { ParseErrorAction = ErrorAction.ThrowError } }.Parser;
             parser.AddAlphanumericSelectors();
             parser.AddOperators(".");
             return parser;
@@ -282,6 +282,7 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             parser.UseAlternativeEscapeChar('\\');
+            parser.Settings.ConvertCharacterStringLiterals = false;
 
             var placeholder = (Placeholder) parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") }).Items[0];
             Assert.IsEmpty(placeholder.FormatterName);
@@ -295,8 +296,8 @@ namespace SmartFormat.Tests.Core
         {
             var parseError = new List<Parser.ParsingError>();
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.ErrorAction = ErrorAction.Ignore;
-            formatter.Parser.ErrorAction = ErrorAction.Ignore;
+            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
+            formatter.Settings.ParseErrorAction = ErrorAction.Ignore;
             formatter.Parser.OnParsingFailure += (o, args) => parseError.Add(args.ParsingError);
             var res = formatter.Format("{NoName {Other} {Same", default(object));
             Assert.That(parseError.Count == 3);

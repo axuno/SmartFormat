@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
@@ -40,11 +41,14 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class ListFormatter : IFormatter, ISource
     {
+        private SmartSettings _smartSettings;
+
         public string[] Names { get; set; } = { "list", "l", "" };
 
         public ListFormatter(SmartFormatter formatter)
         {
             formatter.Parser.AddOperators("[]()");
+            _smartSettings = formatter.Settings;
         }
 
         /// <summary>
@@ -174,13 +178,13 @@ namespace SmartFormat.Extensions
             {
                 // The format is not nested,
                 // so we will treat it as an itemFormat:
-                var newItemFormat = new Format(itemFormat.baseString)
+                var newItemFormat = new Format(_smartSettings, itemFormat.baseString)
                 {
                     startIndex = itemFormat.startIndex,
                     endIndex = itemFormat.endIndex,
                     HasNested = true
                 };
-                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.startIndex, 0)
+                var newPlaceholder = new Placeholder(_smartSettings, newItemFormat, itemFormat.startIndex, 0)
                 {
                     Format = itemFormat,
                     endIndex = itemFormat.endIndex

@@ -17,12 +17,18 @@ namespace SmartFormat
     {
         #region: Constructor :
 
-        public SmartFormatter(ErrorAction errorAction = ErrorAction.Ignore)
+        public SmartFormatter()
         {
-            Parser = new Parser(errorAction);
-            ErrorAction = errorAction;
+            Settings = new SmartSettings();
+            Parser = new Parser(Settings);
             SourceExtensions = new List<ISource>();
             FormatterExtensions = new List<IFormatter>();
+        }
+
+        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
+        public SmartFormatter(ErrorAction errorAction = ErrorAction.Ignore) : this()
+        {
+            Settings.FormatErrorAction = errorAction;
         }
 
         #endregion
@@ -105,16 +111,22 @@ namespace SmartFormat
         /// <summary>
         /// Gets or set the instance of the <see cref="Core.Parsing.Parser"/>
         /// </summary>
-        public Parser Parser { get; set; }
+        public Parser Parser { get; private set; }
+
         /// <summary>
         /// Gets or set the <see cref="Core.Settings.ErrorAction"/> for the formatter.
         /// </summary>
-        public ErrorAction ErrorAction { get; set; }
-        private SmartSettings _settings;
+        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
+        public ErrorAction ErrorAction
+        {
+            get { return Settings.FormatErrorAction; }
+            set { Settings.FormatErrorAction = value; }
+        }
+
         /// <summary>
-        /// Get the <seealso cref="Core.Settings.SmartSettings"/> for the formatter.
+        /// Get the <see cref="Core.Settings.SmartSettings"/> for Smart.Format
         /// </summary>
-        public SmartSettings Settings => _settings ?? (_settings = new SmartSettings());
+        public SmartSettings Settings { get; }
 
         #endregion
 
@@ -209,7 +221,7 @@ namespace SmartFormat
                 var literalItem = item as LiteralText;
                 if (literalItem != null)
                 {
-                    formattingInfo.Write(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
+                    formattingInfo.Write(literalItem.ToString());
                     continue;
                 }
 

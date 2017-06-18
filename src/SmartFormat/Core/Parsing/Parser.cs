@@ -12,15 +12,30 @@ namespace SmartFormat.Core.Parsing
     {
         #region: Constructor :
 
+        [Obsolete("Depreciated. Parser should be created by SmartFormatter only.", false)]
         public Parser(ErrorAction errorAction = ErrorAction.Ignore)
         {
-            ErrorAction = errorAction;
+            Settings.ParseErrorAction = errorAction;
+        }
+
+        internal Parser(SmartSettings smartSettings)
+        {
+            Settings = smartSettings;
         }
 
         #endregion
 
+        #region: Settings :
+
+        /// <summary>
+        /// Gets or sets the <seealso cref="Core.Settings.SmartSettings"/> for Smart.Format
+        /// </summary>
+        internal SmartSettings Settings { get; set; } = new SmartSettings();
+
+        #endregion
+
         #region: Special Chars :
-        
+
         // The following fields are points of extensibility
 
         /// <summary>
@@ -144,7 +159,7 @@ namespace SmartFormat.Core.Parsing
 
         public Format ParseFormat(string format, string[] formatterExtensionNames)
         {
-            var result = new Format(format);
+            var result = new Format(Settings, format);
             var current = result;
             Placeholder currentPlaceholder = null;
             var namedFormatterStartIndex = -1;
@@ -174,7 +189,7 @@ namespace SmartFormat.Core.Parsing
                         // Finish the last text item:
                         if (i != lastI)
                         {
-                            current.Items.Add(new LiteralText(current, lastI) { endIndex = i });
+                            current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
                         }
                         lastI = i + 1;
 
@@ -191,7 +206,7 @@ namespace SmartFormat.Core.Parsing
 
                         // New placeholder:
                         nestedDepth++;
-                        currentPlaceholder = new Placeholder(current, i, nestedDepth);
+                        currentPlaceholder = new Placeholder(Settings, current, i, nestedDepth);
                         current.Items.Add(currentPlaceholder);
                         current.HasNested = true;
                         operatorIndex = i+1;
@@ -202,7 +217,7 @@ namespace SmartFormat.Core.Parsing
                     {
                         // Finish the last text item:
                         if (i != lastI)
-                            current.Items.Add(new LiteralText(current, lastI) { endIndex = i });
+                            current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
                         lastI = i + 1;
 
                         // See if this brace should be escaped:
@@ -240,7 +255,7 @@ namespace SmartFormat.Core.Parsing
                             // Finish the last text item:
                             if (i != lastI)
                             {
-                                current.Items.Add(new LiteralText(current, lastI) { endIndex = i });
+                                current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
                             }
                             lastI = i + 1;
 
@@ -341,7 +356,7 @@ namespace SmartFormat.Core.Parsing
                         // Add the selector:
                         if (i != lastI)
                         {   
-                            currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
+                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
                             selectorIndex++;
                             operatorIndex = i;
                         }
@@ -353,7 +368,7 @@ namespace SmartFormat.Core.Parsing
                         // Add the selector:
                         if (i != lastI)
                         {
-                            currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
+                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
                         }
                         else if (operatorIndex != i)
                         {
@@ -364,7 +379,7 @@ namespace SmartFormat.Core.Parsing
                         lastI = i + 1;
 
                         // Start the format:
-                        currentPlaceholder.Format = new Format(currentPlaceholder, i + 1);
+                        currentPlaceholder.Format = new Format(Settings, currentPlaceholder, i + 1);
                         current = currentPlaceholder.Format;
                         currentPlaceholder = null;
                         namedFormatterStartIndex = lastI;
@@ -375,7 +390,7 @@ namespace SmartFormat.Core.Parsing
                     {
                         // Add the selector:
                         if (i != lastI)
-                            currentPlaceholder.Selectors.Add(new Selector(format, lastI, i, operatorIndex, selectorIndex));
+                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
                         else if (operatorIndex != i)
                         {
                             // There are trailing operators.  For now, this is an error.
@@ -410,7 +425,7 @@ namespace SmartFormat.Core.Parsing
 
             // finish the last text item:
             if (lastI != format.Length)
-                current.Items.Add(new LiteralText(current, lastI) { endIndex = format.Length });
+                current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = format.Length });
 
             // Check that the format is finished:
             if (current.parent != null || currentPlaceholder != null)
@@ -441,7 +456,12 @@ namespace SmartFormat.Core.Parsing
 
         #region: Errors :
 
-        public ErrorAction ErrorAction { get; set; }
+        [Obsolete("Depreciated. Use the ParserErrorAction in Settings instead.", false)]
+        public ErrorAction ErrorAction
+        {
+            get { return Settings.ParseErrorAction; }
+            set { Settings.ParseErrorAction = value; }
+        }
 
         public enum ParsingError
         {

@@ -130,7 +130,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Format_TwoLevelXml_InvalidSelectors_Throws()
         {
-            Smart.Default.ErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.FormatErrorAction = ErrorAction.ThrowError;
             // arrange
             var xmlEl = XElement.Parse(TwoLevelXml);
             // act

@@ -48,8 +48,8 @@ namespace SmartFormat.Tests.Extensions
             };
 
             Smart.Default.Parser.UseAlternativeEscapeChar('\\'); // mandatory for this test case because of consecutive curly braces
-            Smart.Default.ErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
-            Smart.Default.Parser.ErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
+            Smart.Default.Settings.FormatErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
+            Smart.Default.Settings.ParseErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
 
             // Note: it's faster to add the named formatter, than finding it implicitly by "trial and error".
             var result = Smart.Default.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C

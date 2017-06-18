@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
@@ -18,7 +17,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Throws_Exceptions()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.ErrorAction = ErrorAction.ThrowError;
+            formatter.Settings.FormatErrorAction = ErrorAction.ThrowError;
 
             Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--"));
         }
@@ -27,7 +26,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Outputs_Exceptions()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.ErrorAction = ErrorAction.OutputErrorInResult;
+            formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
 
             formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--ERROR!--ERROR!--");
         }
@@ -36,7 +35,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Ignores_Exceptions()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.ErrorAction = ErrorAction.Ignore;
+            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
 
             formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "------");
         }
@@ -45,7 +44,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Maintains_Tokens()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.ErrorAction = ErrorAction.MaintainTokens;
+            formatter.Settings.FormatErrorAction = ErrorAction.MaintainTokens;
 
             formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--{0}--{0:ZZZZ}--");
         }
@@ -54,7 +53,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Maintains_Object_Tokens()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.ErrorAction = ErrorAction.MaintainTokens;
+            formatter.Settings.FormatErrorAction = ErrorAction.MaintainTokens;
             formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
         }
 
@@ -74,7 +73,7 @@ namespace SmartFormat.Tests.Core
             var badPlaceholder = new List<string>();
 
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.ErrorAction = ErrorAction.Ignore;
+            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
             formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args.Placeholder);
             var res = formatter.Format("{NoName} {Name} {OtherMissing}", obj);
             Assert.That(badPlaceholder.Count == 2 && badPlaceholder[0] == "{NoName}" && badPlaceholder[1] == "{OtherMissing}");
