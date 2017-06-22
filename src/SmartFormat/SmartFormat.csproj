@@ -1,128 +1,89 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == '' ">
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFrameworkProfile)' == '' ">
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v4.5' ">
-    <DefineConstants>NET45</DefineConstants>
-    <OutputPath>bin\$(Configuration)\net45</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{83A94F48-8529-4A41-B5E1-1684827180DF}</ProjectGuid>
+    <ProjectGuid>{4B496273-D820-46FE-B9B6-C03010F46E0E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SmartFormat</RootNamespace>
     <AssemblyName>SmartFormat</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\net45\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>bin\Release\net45\</OutputPath>
+    <DefineConstants>TRACE;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Release\net45\SmartFormat.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Formatting\FormattingInfo.cs" />
+    <Compile Include="Core\Extensions\IFormatter.cs" />
     <Compile Include="Core\Extensions\IFormattingInfo.cs" />
     <Compile Include="Core\Extensions\ISelectorInfo.cs" />
-    <Compile Include="Core\Parsing\ParsingErrorEventArgs.cs" />
-    <Compile Include="Core\Settings\CaseSensitivityType.cs" />
+    <Compile Include="Core\Extensions\ISource.cs" />
     <Compile Include="Core\Formatting\FormatCache.cs" />
-    <Compile Include="Core\Parsing\ParsingErrors.cs" />
     <Compile Include="Core\Formatting\FormatDetails.cs" />
-    <Compile Include="FormattingErrorEventArgs.cs" />
-    <Compile Include="Extensions\ChooseFormatter.cs" />
-    <Compile Include="Extensions\TemplateFormatter.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SmartObjects.cs" />
-    <Compile Include="Utilities\PluralRules.cs" />
-    <Compile Include="Utilities\PluralRules_Old.cs" />
-    <Compile Include="Extensions\XElementFormatter.cs" />
-    <Compile Include="Extensions\XmlSource.cs" />
-    <Compile Include="Extensions\DictionarySource.cs" />
-    <Compile Include="Extensions\PluralLocalizationFormatter.cs" />
-    <Compile Include="Extensions\TimeFormatter.cs" />
-    <Compile Include="Core\Settings\SmartSettings.cs" />
-    <Compile Include="Utilities\FormatDelegate.cs" />
-    <Compile Include="Utilities\TimeSpanUtility.cs" />
-    <Compile Include="SmartExtensions.cs" />
+    <Compile Include="Core\Formatting\FormattingException.cs" />
+    <Compile Include="Core\Formatting\FormattingInfo.cs" />
     <Compile Include="Core\Output\IOutput.cs" />
     <Compile Include="Core\Output\StringOutput.cs" />
-    <Compile Include="Core\Formatting\FormattingException.cs" />
     <Compile Include="Core\Output\TextWriterOutput.cs" />
-    <Compile Include="Core\Parsing\Selector.cs" />
-    <Compile Include="Extensions\DefaultFormatter.cs" />
-    <Compile Include="Extensions\DefaultSource.cs" />
-    <Compile Include="Core\Extensions\IFormatter.cs" />
-    <Compile Include="Core\Extensions\ISource.cs" />
-    <Compile Include="Smart.cs" />
-    <Compile Include="Core\Settings\ErrorAction.cs" />
-    <Compile Include="Core\Parsing\LiteralText.cs" />
     <Compile Include="Core\Parsing\Format.cs" />
     <Compile Include="Core\Parsing\FormatItem.cs" />
+    <Compile Include="Core\Parsing\LiteralText.cs" />
     <Compile Include="Core\Parsing\Parser.cs" />
+    <Compile Include="Core\Parsing\ParsingErrorEventArgs.cs" />
+    <Compile Include="Core\Parsing\ParsingErrors.cs" />
     <Compile Include="Core\Parsing\Placeholder.cs" />
-    <Compile Include="Extensions\ReflectionSource.cs" />
-    <Compile Include="Extensions\ListFormatter.cs" />
+    <Compile Include="Core\Parsing\Selector.cs" />
+    <Compile Include="Core\Settings\CaseSensitivityType.cs" />
+    <Compile Include="Core\Settings\ErrorAction.cs" />
+    <Compile Include="Core\Settings\SmartSettings.cs" />
+    <Compile Include="Extensions\ChooseFormatter.cs" />
     <Compile Include="Extensions\ConditionalFormatter.cs" />
+    <Compile Include="Extensions\DefaultFormatter.cs" />
+    <Compile Include="Extensions\DefaultSource.cs" />
+    <Compile Include="Extensions\DictionarySource.cs" />
+    <Compile Include="Extensions\ListFormatter.cs" />
+    <Compile Include="Extensions\PluralLocalizationFormatter.cs" />
+    <Compile Include="Extensions\ReflectionSource.cs" />
+    <Compile Include="Extensions\TemplateFormatter.cs" />
+    <Compile Include="Extensions\TimeFormatter.cs" />
+    <Compile Include="Extensions\XElementFormatter.cs" />
+    <Compile Include="Extensions\XmlSource.cs" />
+    <Compile Include="FormattingErrorEventArgs.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Smart.cs" />
+    <Compile Include="SmartExtensions.cs" />
     <Compile Include="SmartFormatter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SmartFormat.snk" />
+    <Compile Include="SmartObjects.cs" />
+    <Compile Include="Utilities\FormatDelegate.cs" />
+    <Compile Include="Utilities\PluralRules.cs" />
+    <Compile Include="Utilities\PluralRules_Old.cs" />
+    <Compile Include="Utilities\TimeSpanUtility.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Target Name="AfterBuild">
-    <!-- Build net20 -->
-    <!-- (Disabled, due to Linq references)
-    <MSBuild Condition=" '$(TargetFrameworkVersion)' == 'v4.0' "
-      Projects="$(MSBuildProjectFile)"
-      Properties="TargetFrameworkVersion=v2.0"
-      RunEachTargetSeparately="true"  />
-      -->
-    <!-- Build net35 -->
-    <MSBuild Condition=" '$(TargetFrameworkVersion)' == 'v4.0' " Projects="$(MSBuildProjectFile)" Properties="TargetFrameworkVersion=v3.5" RunEachTargetSeparately="true" />
-  </Target>
 </Project>

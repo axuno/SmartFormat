@@ -30,7 +30,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Gets or sets the <seealso cref="Core.Settings.SmartSettings"/> for Smart.Format
         /// </summary>
-        internal SmartSettings Settings { get; set; } = new SmartSettings();
+        public SmartSettings Settings { get; internal set; } = new SmartSettings();
 
         #endregion
 

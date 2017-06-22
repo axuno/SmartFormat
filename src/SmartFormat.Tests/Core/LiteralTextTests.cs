@@ -13,6 +13,15 @@ namespace SmartFormat.Tests.Core
     public class LiteralTextTests
     {
         [Test]
+        public void AHowTo()
+        {
+            Smart.Default.Settings.ConvertCharacterStringLiterals = false;
+            Smart.Default.Parser.UseAlternativeEscapeChar();
+            var result = Smart.Format(@"a\ {b}c");
+            var x = result;
+        }
+
+        [Test]
         public void FormatCharacterLiteralsAsString()
         {
             const string formatWithFileBehavior = @"No carriage return\r, no line feed\n";
