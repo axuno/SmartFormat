@@ -16,6 +16,12 @@
     <PackageId>SmartFormat</PackageId>
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <PackageReleaseNotes>See the change log with links to the Wiki for new features:
+https://github.com/scottrippey/SmartFormat.NET/blob/master/CHANGES.md</PackageReleaseNotes>
+    <PackageLicenseUrl>https://github.com/scottrippey/SmartFormat.NET/wiki/License</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/scottrippey/SmartFormat.NET</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/scottrippey/SmartFormat.NET/master/SmartFormat_365x365.png</PackageIconUrl>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
