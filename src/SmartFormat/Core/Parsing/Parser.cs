@@ -74,6 +74,13 @@ namespace SmartFormat.Core.Parsing
         private char _alternativeEscapeChar = '\\';
 
         /// <summary>
+        /// The character literal escape character e.g. for \t (TAB) and others.
+        /// This is kind of overlapping functionality with <see cref="UseAlternativeEscapeChar"/>.
+        /// Note: In a future release escape characters for placeholders and character literals should become the same.
+        /// </summary>
+        internal const char CharLiteralEscapeChar = '\\';
+
+        /// <summary>
         /// Includes a-z and A-Z in the list of allowed selector chars.
         /// </summary>
         public void AddAlphanumericSelectors()
@@ -245,19 +252,41 @@ namespace SmartFormat.Core.Parsing
                         current = current.parent.parent;
                         namedFormatterStartIndex = -1;
                     }
-                    else if (_alternativeEscaping && c == _alternativeEscapeChar)
+                    else if (c == CharLiteralEscapeChar || c ==_alternativeEscapeChar)
                     {
-                        namedFormatterStartIndex = -1;
-                        // See if the next char is a brace that should be escaped:
+                        // See that is the next character
                         var nextI = i + 1;
-                        if (nextI < length && (format[nextI] == openingBrace || format[nextI] == closingBrace))
+
+                        // **** Alternative brace escaping with { or } following the escape character ****
+                        if (_alternativeEscaping && nextI < length &&
+                            (format[nextI] == openingBrace || format[nextI] == closingBrace))
                         {
+                            namedFormatterStartIndex = -1;
+
                             // Finish the last text item:
                             if (i != lastI)
                             {
                                 current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
                             }
                             lastI = i + 1;
+
+                            i++;
+                            continue;
+                        }
+                        else
+                        {
+                            // **** Escaping of charater literals like \t, \n, \v etc. ****
+
+                            // Finish the last text item:
+                            if (i != lastI)
+                            {
+                                current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
+                            }
+                            lastI = i + 2;
+                            if (lastI > length) lastI = length;
+
+                            // Next add the character literal INCLUDING the escape character, which LiteralText will expect
+                            current.Items.Add(new LiteralText(Settings, current, i) { endIndex = lastI });
 
                             i++;
                             continue;

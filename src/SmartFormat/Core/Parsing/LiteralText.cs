@@ -26,62 +26,58 @@ namespace SmartFormat.Core.Parsing
         private string ConvertCharacterLiteralsToUnicode()
         {
             var source = this.baseString.Substring(startIndex, endIndex - startIndex);
-            var target = new StringBuilder(source.Length);
-            var sourcePos = 0;
 
-            while (sourcePos < source.Length)
+            // No character literal escaping - nothing to do
+            if (source[0] != Parser.CharLiteralEscapeChar)
+                return source;
+
+            // The string length should be 2: espace character \ and literal character
+            if (source.Length < 2)
             {
-                var c = source[sourcePos];
-                if (c == '\\')
-                {
-                    sourcePos++; // move to the character after the escape character
-
-                    if (sourcePos >= source.Length)
-                        throw new ArgumentException($"Missing escape sequence in literal: \"{source}\"");
-
-                    switch (source[sourcePos])
-                    {
-                        case '\'':
-                            c = '\'';
-                            break;
-                        case '\"':
-                            c = '\"';
-                            break;
-                        case '\\':
-                            c = '\\';
-                            break;
-                        case '0':
-                            c = '\0';
-                            break;
-                        case 'a':
-                            c = '\a';
-                            break;
-                        case 'b':
-                            c = '\b';
-                            break;
-                        case 'f':
-                            c = '\f';
-                            break;
-                        case 'n':
-                            c = '\n';
-                            break;
-                        case 'r':
-                            c = '\r';
-                            break;
-                        case 't':
-                            c = '\t';
-                            break;
-                        case 'v':
-                            c = '\v';
-                            break;
-                        default:
-                            throw new ArgumentException($"Unrecognized escape sequence in literal: \"{source}\"");
-                    }
-                }
-                sourcePos++;
-                target.Append(c);
+                throw new ArgumentException($"Missing escape sequence in literal: \"{source}\"");
             }
-            return target.ToString();
+
+            char c;
+            switch (source[1])
+            {
+                case '\'':
+                    c = '\'';
+                    break;
+                case '\"':
+                    c = '\"';
+                    break;
+                case '\\':
+                    c = '\\';
+                    break;
+                case '0':
+                    c = '\0';
+                    break;
+                case 'a':
+                    c = '\a';
+                    break;
+                case 'b':
+                    c = '\b';
+                    break;
+                case 'f':
+                    c = '\f';
+                    break;
+                case 'n':
+                    c = '\n';
+                    break;
+                case 'r':
+                    c = '\r';
+                    break;
+                case 't':
+                    c = '\t';
+                    break;
+                case 'v':
+                    c = '\v';
+                    break;
+                default:
+                    throw new ArgumentException($"Unrecognized escape sequence in literal: \"{source}\"");
+            }
+
+            return c.ToString();
         }
     }
 }

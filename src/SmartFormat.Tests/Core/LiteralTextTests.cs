@@ -13,15 +13,6 @@ namespace SmartFormat.Tests.Core
     public class LiteralTextTests
     {
         [Test]
-        public void AHowTo()
-        {
-            Smart.Default.Settings.ConvertCharacterStringLiterals = false;
-            Smart.Default.Parser.UseAlternativeEscapeChar();
-            var result = Smart.Format(@"a\ {b}c");
-            var x = result;
-        }
-
-        [Test]
         public void FormatCharacterLiteralsAsString()
         {
             const string formatWithFileBehavior = @"No carriage return\r, no line feed\n";
@@ -68,10 +59,15 @@ namespace SmartFormat.Tests.Core
             Smart.Default.Settings.ConvertCharacterStringLiterals = true;
 
             Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequences = \z");
+                Smart.Default.Format(@"Illegal excape sequence at end of line = \z");
             });
+
             Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequences = \");
+                Smart.Default.Format(@"Illegal excape sequence \z somewhere in text");
+            });
+
+            Assert.Throws<ArgumentException>(() => {
+                Smart.Default.Format(@"Illegal excape sequences at end of line = \");
             });
 
             Smart.Default.Settings.ConvertCharacterStringLiterals = false;
