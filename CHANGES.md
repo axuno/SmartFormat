@@ -4,7 +4,7 @@ Latest Changes
 v2.1.0
 ===
 
-* [Literal Characters in Format Strings](https://github.com/scottrippey/SmartFormat.NET/wiki/Character-Literals-in-Format-Strings)
+* [Characters Literals in Format Strings](https://github.com/scottrippey/SmartFormat.NET/wiki/Character-Literals-in-Format-Strings)
 * [Improved working with several data sources](https://github.com/scottrippey/SmartFormat.NET/wiki/Several-Data-Sources): SmartObjects
 * [Changes in SmartSettings](https://github.com/scottrippey/SmartFormat.NET/wiki/SmartSettings)
 
