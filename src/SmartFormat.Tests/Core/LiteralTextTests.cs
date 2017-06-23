@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace SmartFormat.Tests.Core
@@ -29,16 +31,18 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void FormatCharacterLiteralsAsUnicode()
+        public void AllSupportedCharacterLiteralsAsUnicode()
         {
-            const string formatWithFileBehavior = @"With line feed,\n and now\twith a TAB";
-            const string formatWithCodeBahavior = "With line feed,\n and now\twith a TAB";
+            var data = new Dictionary<string, string> { { "key", "value" } };
+
+            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v {key}\0!";
+            const string formatWithCodeBahavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v {key}\0!";
             
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.ConvertCharacterStringLiterals = true;
 
-            var result = formatter.Format(formatWithFileBehavior);
-            Assert.AreEqual(string.Format(formatWithCodeBahavior), result);
+            var result = formatter.Format(formatWithFileBehavior, data);
+            Assert.AreEqual(string.Format(formatWithCodeBahavior.Replace("{"+ data.First().Key +"}", data.First().Value)), result);
         }
 
         [Test]
