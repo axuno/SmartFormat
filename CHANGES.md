@@ -1,12 +1,13 @@
 Latest Changes
 ====
 
-v2.1.0
+v2.1.0.1
 ===
 
 * [Characters Literals in Format Strings](https://github.com/scottrippey/SmartFormat.NET/wiki/Character-Literals-in-Format-Strings)
 * [Improved working with several data sources](https://github.com/scottrippey/SmartFormat.NET/wiki/Several-Data-Sources): SmartObjects
 * [Changes in SmartSettings](https://github.com/scottrippey/SmartFormat.NET/wiki/SmartSettings)
+* Fixed signing assemblies
 
 v2.0.0
 ====
