@@ -4,7 +4,7 @@
     <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/scottrippey/SmartFormat.NET</Description>
     <Copyright>Copyright 2011-2017 Scott Rippey, axuno gGmbH, Bernhard Millauer and other contributors.</Copyright>
     <AssemblyTitle>SmartFormat</AssemblyTitle>
-    <VersionPrefix>2.1.0.0</VersionPrefix>
+    <VersionPrefix>2.1.0.1</VersionPrefix>
     <Authors>Scott Rippey, axuno gGmbH, Bernhard Millauer and other contributors.</Authors>
     <TargetFramework>netstandard1.6</TargetFramework>
     <DefineConstants>$(DefineConstants);FXCORE</DefineConstants>
@@ -22,6 +22,7 @@ https://github.com/scottrippey/SmartFormat.NET/blob/master/CHANGES.md</PackageRe
     <PackageProjectUrl>https://github.com/scottrippey/SmartFormat.NET</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/scottrippey/SmartFormat.NET/master/SmartFormat_365x365.png</PackageIconUrl>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Version>2.1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
