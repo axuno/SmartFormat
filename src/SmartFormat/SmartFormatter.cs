@@ -255,8 +255,8 @@ namespace SmartFormat
 
         private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
         {
-            OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(errorItem.RawText, startIndex, ErrorAction != ErrorAction.ThrowError));
-            switch (ErrorAction)
+            OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(errorItem.RawText, startIndex, Settings.FormatErrorAction != ErrorAction.ThrowError));
+            switch (Settings.FormatErrorAction)
             {
                 case ErrorAction.Ignore:
                     return;

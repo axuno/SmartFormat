@@ -45,8 +45,8 @@ namespace SmartFormat.Demo
             propertyGrid1.SelectedObject = args;
 
 
-            Smart.Default.ErrorAction = ErrorAction.OutputErrorInResult;
-            Smart.Default.Parser.ErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
+            Smart.Default.Settings.ParseErrorAction = ErrorAction.ThrowError;
 
             LoadExamples();
         }
