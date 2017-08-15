@@ -78,5 +78,22 @@ namespace SmartFormat.Tests.Core
             var res = formatter.Format("{NoName} {Name} {OtherMissing}", obj);
             Assert.That(badPlaceholder.Count == 2 && badPlaceholder[0] == "{NoName}" && badPlaceholder[1] == "{OtherMissing}");
         }
+
+        [Test]
+        public void LeadingBackslashMustNotEscapeBraces()
+        {
+            var smart = Smart.CreateDefaultSmartFormat(); ;
+            smart.Settings.ConvertCharacterStringLiterals = false;
+
+            var expected = "\\Hello";
+            var actual = smart.Format("\\{Test}", new { Test = "Hello" });
+            Assert.AreEqual(expected, actual);
+
+            smart.Settings.ConvertCharacterStringLiterals = true;
+
+            expected = @"\Hello";
+            actual = smart.Format(@"\\{Test}", new { Test = "Hello" }); // double backslash means escaping the backslash
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

@@ -459,19 +459,18 @@ namespace SmartFormat.Tests.OldTests
         [Test]
         public void EscapingSlashBraces()
         {
-            var Smart = new SmartFormatter();
-            Smart.Parser.UseAlternativeEscapeChar('\\');
-            Smart.AddExtensions(new DefaultFormatter());
-            Smart.AddExtensions(new DefaultSource(Smart));
+            var smart = new SmartFormatter();
+            smart.Parser.UseAlternativeEscapeChar('\\');
+            smart.AddExtensions(new DefaultFormatter());
+            smart.AddExtensions(new DefaultSource(smart));
 
             var args = new object[] { "Zero", "One", "Two", 3 };
 
             var format = @"{0} \{0\} \{{0}\} {3:00\}} {3:00}\}";
             var expected = "Zero {0} {Zero} 03} 03}";
 
-            var actual = Smart.Format(format, args);
+            var actual = smart.Format(format, args);
             Assert.AreEqual(expected, actual);
         }
-
     }
 }

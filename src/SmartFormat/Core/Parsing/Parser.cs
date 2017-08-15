@@ -252,17 +252,16 @@ namespace SmartFormat.Core.Parsing
                         current = current.parent.parent;
                         namedFormatterStartIndex = -1;
                     }
-                    else if (c == CharLiteralEscapeChar || c ==_alternativeEscapeChar)
+                    else if ((c == CharLiteralEscapeChar && Settings.ConvertCharacterStringLiterals) || (_alternativeEscaping && c ==_alternativeEscapeChar))
                     {
+                        namedFormatterStartIndex = -1;
+
                         // See that is the next character
                         var nextI = i + 1;
 
                         // **** Alternative brace escaping with { or } following the escape character ****
-                        if (_alternativeEscaping && nextI < length &&
-                            (format[nextI] == openingBrace || format[nextI] == closingBrace))
+                        if (nextI < length && (format[nextI] == openingBrace || format[nextI] == closingBrace))
                         {
-                            namedFormatterStartIndex = -1;
-
                             // Finish the last text item:
                             if (i != lastI)
                             {
