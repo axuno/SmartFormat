@@ -82,7 +82,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void LeadingBackslashMustNotEscapeBraces()
         {
-            var smart = Smart.CreateDefaultSmartFormat(); ;
+            var smart = Smart.CreateDefaultSmartFormat();
             smart.Settings.ConvertCharacterStringLiterals = false;
 
             var expected = "\\Hello";
@@ -94,6 +94,15 @@ namespace SmartFormat.Tests.Core
             expected = @"\Hello";
             actual = smart.Format(@"\\{Test}", new { Test = "Hello" }); // double backslash means escaping the backslash
             Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void NullAndBoxedNullBehaveTheSame()
+        {
+            // see issue https://github.com/scottrippey/SmartFormat.NET/issues/101
+            var smart = Smart.CreateDefaultSmartFormat();
+            object boxedNull = null;
+            Assert.AreEqual(smart.Format("{dummy}", null), smart.Format("{dummy}", boxedNull));
         }
     }
 }
