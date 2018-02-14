@@ -1,6 +1,10 @@
 Latest Changes
 ====
 
+v2.1.0.2
+===
+* Fixes issue [#94](https://github.com/scottrippey/SmartFormat.NET/issues/94)
+
 v2.1.0.1
 ===
 
