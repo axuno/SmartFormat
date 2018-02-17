@@ -1,51 +1,26 @@
-﻿namespace SmartFormat.Core.Parsing
+﻿using SmartFormat.Core.Settings;
+
+namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Supplies information about parsing errors.
     /// </summary>
     public class ParsingErrorEventArgs : System.EventArgs
     {
-        internal ParsingErrorEventArgs(string rawText, int startIndex, int endIndex, Parser.ParsingError parsingError, bool ignoreError)
+        internal ParsingErrorEventArgs(ParsingErrors errors, bool throwsException)
         {
-            RawText = rawText;
-            StartIndex = startIndex;
-            EndIndex = endIndex;
-            ParsingError = parsingError;
-            IgnoreError = ignoreError;
+            Errors = errors;
+            ThrowsException = throwsException;
         }
 
         /// <summary>
-        /// Raw ext part which caused an error.
+        /// All parsing errors which occurred during parsing.
         /// </summary>
-        public string RawText { get; internal set; }
+        public ParsingErrors Errors { get; internal set; }
 
         /// <summary>
-        /// Location where the error started.
+        /// If true, the errors will throw an exception.
         /// </summary>
-        public int StartIndex { get; internal set; }
-
-        /// <summary>
-        /// Location where the error ended.
-        /// </summary>
-        public int EndIndex { get; internal set; }
-
-        /// <summary>
-        /// ParseError category.
-        /// </summary>
-        public Parser.ParsingError ParsingError { get; internal set; }
-
-        /// <summary>
-        /// Information whether error will throw an exception.
-        /// </summary>
-        public bool IgnoreError { get; internal set; }
-
-        /// <summary>
-        /// Gets the string representation of the ParsingError enum.
-        /// </summary>
-        /// <returns>The string representation of the ParsingError enum.</returns>
-        public string GetParsingErrorText()
-        {
-            return new Parser.ParsingErrorText()[ParsingError];
-        }
+        public bool ThrowsException { get; internal set; }
     }
 }

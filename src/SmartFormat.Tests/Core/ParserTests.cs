@@ -294,14 +294,14 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Parser_NotifyParsingError()
         {
-            var parseError = new List<Parser.ParsingError>();
+            ParsingErrors parsingError = null;
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
             formatter.Settings.ParseErrorAction = ErrorAction.Ignore;
-            formatter.Parser.OnParsingFailure += (o, args) => parseError.Add(args.ParsingError);
+            formatter.Parser.OnParsingFailure += (o, args) => parsingError = args.Errors;
             var res = formatter.Format("{NoName {Other} {Same", default(object));
-            Assert.That(parseError.Count == 3);
-            Assert.That(parseError[2] == Parser.ParsingError.MissingClosingBrace);
+            Assert.That(parsingError.Issues.Count == 3);
+            Assert.That(parsingError.Issues[2].Issue == new Parser.ParsingErrorText()[Parser.ParsingError.MissingClosingBrace]);
         }
 
         [Test]
