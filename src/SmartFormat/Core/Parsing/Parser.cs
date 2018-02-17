@@ -463,9 +463,15 @@ namespace SmartFormat.Core.Parsing
                 }
             }
 
-            // Check if there were any parsing errors:
-            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(parsingErrors, Settings.ParseErrorAction == ErrorAction.ThrowError));
-            if (parsingErrors.HasIssues && Settings.ParseErrorAction == ErrorAction.ThrowError) throw parsingErrors;
+            // Check for any parsing errors:
+            if (parsingErrors.HasIssues)
+            {
+                OnParsingFailure?.Invoke(this,
+                    new ParsingErrorEventArgs(parsingErrors, Settings.ParseErrorAction == ErrorAction.ThrowError));
+
+                if (Settings.ParseErrorAction == ErrorAction.ThrowError)
+                    throw parsingErrors;
+            }
 
             return result;
         }
