@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
                 current is byte || current is short || current is int || current is long
                 || current is float || current is double || current is decimal;
             // An Enum is a number too:
-#if FXCORE
+#if NETSTANDARD1_6
             if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
 #else
             if (currentIsNumber == false && current != null && current.GetType().IsEnum)
@@ -60,9 +60,8 @@ namespace SmartFormat.Extensions
                         // so we output nothing
                         return true;
                     }
-                    bool conditionWasTrue;
-                    Format outputItem;
-                    if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out conditionWasTrue, out outputItem))
+
+                    if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out var conditionWasTrue, out Format outputItem))
                     {
                         // This parameter doesn't have a
                         // complex condition (making it a "else" condition)

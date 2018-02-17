@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
-#if !FXCORE
+#if !NETCOREAPP1_0
 using System.Runtime.Remoting.Messaging;
 #endif
 using NUnit.Framework;
