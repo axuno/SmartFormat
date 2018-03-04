@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using RTF;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Demo.Sample_Extensions
 {
@@ -30,26 +26,26 @@ namespace SmartFormat.Demo.Sample_Extensions
             output = new RTFBuilder();
         }
 
-        public void Write(string text, FormatDetails formatDetails)
+        public void Write(string text, IFormattingInfo formattingInfo)
         {
-            Write(text, 0, text.Length, formatDetails);
+            Write(text, 0, text.Length, formattingInfo);
         }
 
-        public void Write(string text, int startIndex, int length, FormatDetails formatDetails)
+        public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
         {
             // Depending on the nested level, we will color this item differently:
-            if (formatDetails.FormatError != null)
+            if (formattingInfo.FormatDetails.FormattingException != null)
             {
                 output.BackColor(errorColor).Append(text, startIndex, length);
             }
-            else if (formatDetails.Placeholder == null)
+            else if (formattingInfo.Placeholder == null)
             {
                 // There is no "nesting" so just output plain text:
                 output.Append(text, startIndex, length);
             }
             else
             {
-                var nestedDepth = formatDetails.Placeholder.NestedDepth;
+                var nestedDepth = formattingInfo.Placeholder.NestedDepth;
                 var backcolor = this.nestedColors[nestedDepth % nestedColors.Length];
                 output.BackColor(backcolor).Append(text, startIndex, length);
             }

@@ -13,7 +13,7 @@ namespace SmartFormat.Tests.Common
     /// Useful for deferring the throwing of exceptions.
     /// </summary>
     [DebuggerNonUserCode] // (Steps over all methods)
-    public class ExceptionCollection<TException> : Exception, IList<TException> where TException : Exception 
+    public class ExceptionCollection<TException> : Exception, IList<TException> where TException : Exception
     {
         #region: Private Fields :
 
@@ -32,7 +32,7 @@ namespace SmartFormat.Tests.Common
         {
             this.innerExceptions.AddRange(exceptions);
         }
-        
+
         #endregion
 
         #region: Public Methods :
@@ -70,11 +70,11 @@ namespace SmartFormat.Tests.Common
             catch (TException ex)
             {
                 this.Add(ex);
-            }            
+            }
         }
 
         #endregion
-        
+
         #region: IList Implementation :
 
         public void Add(TException exception)
@@ -149,7 +149,7 @@ namespace SmartFormat.Tests.Common
                 this.innerExceptions[index] = value;
             }
         }
-        
+
         #endregion
 
         #region: Exception Overrides :

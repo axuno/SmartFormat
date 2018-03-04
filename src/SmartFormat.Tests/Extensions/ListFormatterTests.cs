@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using SmartFormat.Tests.Common;
+using SmartFormat.Tests.TestUtils;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
     public class ListFormatterTests
@@ -16,12 +18,50 @@ namespace SmartFormat.Tests
                 "ABCDE".ToCharArray(),
                 "One|Two|Three|Four|Five".Split('|'),
                 TestFactory.GetPerson().Friends,
-                "1/1/2000|10/10/2010|5/5/5555".Split('|').Select(s=>DateTime.ParseExact(s,"M/d/yyyy",null)),
+                "1/1/2000|10/10/2010|5/5/5555".Split('|').Select(s=>DateTime.ParseExact(s,"M/d/yyyy", new CultureInfo("en-US"))),
                 new []{1,2,3,4,5},
             };
             return args;
         }
-        
+
+        [Test]
+        public void Simple_List()
+        {
+            var items = new[] { "one", "two", "three" };
+            var result = Smart.Default.Format("{0:list:{}|, |, and }", new object[] { items }); // important: not only "items" as the parameter
+            Assert.AreEqual("one, two, and three", result);
+        }
+
+        [Test]
+        public void List_of_anonymous_types_and_enumerables()
+        {
+            var data = new[]
+            {
+                new { Name = "Person A", Gender = "M" },
+                new { Name = "Person B", Gender = "F" },
+                new { Name = "Person C", Gender = "M" }
+            };
+
+            var model = new
+            {
+                Persons = data.Where(p => p.Gender == "M")
+            };
+
+            Smart.Default.Parser.UseAlternativeEscapeChar('\\'); // mandatory for this test case because of consecutive curly braces
+            Smart.Default.Settings.FormatErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
+            Smart.Default.Settings.ParseErrorAction = SmartFormat.Core.Settings.ErrorAction.ThrowError;
+
+            // Note: it's faster to add the named formatter, than finding it implicitly by "trial and error".
+            var result = Smart.Default.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C
+            Assert.AreEqual("Person A, Person B, and Person C", result);
+            result = Smart.Default.Format("{0:list:{Name}|, |, and }", model.Persons);  // Person A, and Person C
+            Assert.AreEqual("Person A, and Person C", result);
+            result = Smart.Default.Format("{0:list:{Name}|, |, and }", data.Where(p => p.Gender == "F"));  // Person B
+            Assert.AreEqual("Person B", result);
+            result = Smart.Default.Format("{0:{Persons:{Name}|, }}", model); // Person A, and Person C
+            Assert.AreEqual("Person A, Person C", result);
+        }
+
         [Test]
         public void FormatTest()
         {
@@ -61,7 +101,7 @@ namespace SmartFormat.Tests
                 "A-B-C-D+E",
                 "(A), (B), (C), (D), and (E)",
             };
-            
+
             var args = GetArgs();
             Smart.Default.Test(formats, args, expected);
         }
@@ -82,6 +122,42 @@ namespace SmartFormat.Tests
             var args = GetArgs();
             Smart.Default.Test(formats, args, expected);
         }
+
+        [Test] /* added due to problems with [ThreadStatic] see: https://github.com/scottrippey/SmartFormat.NET/pull/23 */
+        public void WithThreadPool_ShouldNotMixupCollectionIndex()
+        {
+            // Old test did not show wrong Index value - it ALWAYS passed even when using ThreadLocal<int> or [ThreadStatic] respectively:
+            // const string format = "{wheres.Count::>0? where |}{wheres:{}| and }";
+            const string format = "Wheres-Index={Index}.";
+
+            var wheres = new List<string>(){"test = @test"};
+            
+            var tasks = new List<Task<string>>();
+            for (int i = 0; i < 10; ++i)
+            {
+                tasks.Add(Task.Factory.StartNew(val =>
+                {
+                    Thread.Sleep(5 * (int)val);
+                    string ret = Smart.Default.Format(format, new {wheres});
+                    Thread.Sleep(5 * (int)val); /* add some delay to force ThreadPool swapping */
+                    return ret;
+                }, i));
+            }
+            
+            foreach (var t in tasks)
+            {
+                // Old test did not show wrong Index value:
+                // Assert.AreEqual(" where test = @test", t.Result);
+
+                // Note: Using "[ThreadStatic] private static int CollectionIndex", the result will be as expected only with the first task
+                if ("Wheres-Index=-1." == t.Result)
+                    Console.WriteLine("Task {0} passed.", t.AsyncState);
+                
+                Assert.AreEqual("Wheres-Index=-1.", t.Result);
+            }
+        }
+
+
         [Test]
         public void TestIndex()
         {

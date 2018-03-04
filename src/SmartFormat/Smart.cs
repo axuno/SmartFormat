@@ -36,7 +36,7 @@ namespace SmartFormat
         }
         public static string Format(string format, object arg0)
         {
-            return Format(format, new object[] { arg0 });
+            return Default.Format(format, new object[] { arg0 }); // call Default.Format in order to avoid infinite recursive method call
         }
 
         #endregion
@@ -65,15 +65,24 @@ namespace SmartFormat
             // Add all extensions:
             // Note, the order is important; the extensions
             // will be executed in this order:
+
+            var listFormatter = new ListFormatter(result);
+            
             result.AddExtensions(
-                new ListFormatter(result),
+                (ISource)listFormatter,
+                new ReflectionSource(result),
+                new DictionarySource(result),
+                new XmlSource(result),
+                // These default extensions reproduce the String.Format behavior:
+                new DefaultSource(result)
+                );
+            result.AddExtensions(
+                (IFormatter)listFormatter,
                 new PluralLocalizationFormatter("en"),
                 new ConditionalFormatter(),
                 new TimeFormatter("en"),
-                new ReflectionSource(result),
-                new DictionarySource(result),
-                // These default extensions reproduce the String.Format behavior:
-                new DefaultSource(result),
+                new XElementFormatter(),
+                new ChooseFormatter(),
                 new DefaultFormatter()
                 );
 
@@ -81,5 +90,6 @@ namespace SmartFormat
         }
 
         #endregion
+
     }
 }

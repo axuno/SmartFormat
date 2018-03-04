@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Output
 {
@@ -25,11 +24,11 @@ namespace SmartFormat.Core.Output
         }
 
 
-        public void Write(string text, FormatDetails formatDetails)
+        public void Write(string text, IFormattingInfo formattingInfo)
         {
             output.Append(text);
         }
-        public void Write(string text, int startIndex, int length, FormatDetails formatDetails)
+        public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
         {
             output.Append(text, startIndex, length);
         }

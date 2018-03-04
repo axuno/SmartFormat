@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using SmartFormat.Core;
-using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
+using SmartFormat.Tests.TestUtils;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.OldTests
 {
     [TestFixture, Explicit]
     public class PerformanceTests
@@ -19,7 +16,7 @@ namespace SmartFormat.Tests
             // Create the most basic formatter:
             //var Smart = new SmartFormatter();
             //Smart.AddExtensions(
-            //    new DefaultFormatter(), 
+            //    new DefaultFormatter(),
             //    new DefaultSource()
             //);
 
@@ -56,7 +53,8 @@ namespace SmartFormat.Tests
             FormatCache cache = null;
             FormatCache cache2 = null;
             var NoExtensions = new SmartFormatter();
-            NoExtensions.AddExtensions(new DefaultFormatter(), new DefaultSource(NoExtensions));
+            NoExtensions.AddExtensions(new DefaultSource(NoExtensions));
+            NoExtensions.AddExtensions(new DefaultFormatter());
 
             var formatters = new[] {
                 new {

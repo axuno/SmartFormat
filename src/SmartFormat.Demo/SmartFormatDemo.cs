@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using SmartFormat.Core;
+using System.Xml.Linq;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 using SmartFormat.Demo.Sample_Extensions;
 using SmartFormat.Tests;
 using SmartFormat.Tests.Common;
+using SmartFormat.Tests.Extensions;
 
 namespace SmartFormat.Demo
 {
@@ -37,15 +37,16 @@ namespace SmartFormat.Demo
                 Color.Lavender,
             };
             rtfOutput = new RTFOutput(nestedColors, Color.LightPink);
-            
-            args.arg0 = TestFactory.GetPerson();
-            args.arg1 = DateTime.Now;
 
+            args.Person = TestFactory.GetPerson();
+            args.Date = DateTime.Now;
+            args.Inventory = TestFactory.GetItems();
+            args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
             propertyGrid1.SelectedObject = args;
 
 
-            Smart.Default.ErrorAction = ErrorAction.OutputErrorInResult;
-            Smart.Default.Parser.ErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
+            Smart.Default.Settings.ParseErrorAction = ErrorAction.ThrowError;
 
             LoadExamples();
         }
@@ -53,19 +54,16 @@ namespace SmartFormat.Demo
         {
             this.lstExamples.DisplayMember = "Key";
             //this.lstExamples.ValueMember = "Value";
-            var examples = new Dictionary<string, string>() {
-{"", null},
-
+            var examples = new Dictionary<string, string> {
 {"Basics of SmartFormat", 
 @"Basics of SmartFormat
 Similar to String.Format, SmartFormat uses curly braces to identify a placeholder:  The arguments on the right side of this window can be referenced in a template as follows:
-arg0 = {0}
-arg1 = {1}
+{Person}, {Date}, {Inventory}
 
 Many .NET objects can be formatted in a specific or custom way by using a ""format string"", which is any text that comes after a colon : in a placeholder:
-Long date format: {1:D}
-Short date format: {1:d}
-Custom format: {1:""today is"" dddd, ""the"" d ""of"" MMMM}
+Long date format: {Date:D}
+Short date format: {Date:d}
+Custom format: {Date:""today is"" dddd, ""the"" d ""of"" MMMM}
 
 For more information on Composite Formatting and standard formatting strings, please visit http://msdn.microsoft.com/en-us/library/txafckwd.aspx
 "},
@@ -73,12 +71,12 @@ For more information on Composite Formatting and standard formatting strings, pl
 {"Named Placeholders", 
 @"Named Placeholders
 Placeholders can use the name of any property, method, or field:
-{Name.ToUpper} is {Age} years old and he has {Friends.Count} friends.
+{Person.Name.ToUpper} is {Person.Age} years old and he has {Person.Friends.Count} friends.
 
 Nested properties can use: 
-- dot-notation: {Address.State}
-- nested notation: {Address:{State}}
-- any mixture of the two: {Address:{State.ToString:{ToUpper}} }
+- dot-notation: {Person.Address.State}
+- nested notation: {Person.Address:{State}}
+- any mixture of the two: {Person.Address:{State.ToString:{ToUpper}} }
 "},
 
 {"Pluralization, Grammatical Numbers, and Gender Conjugation", 
@@ -86,19 +84,36 @@ Nested properties can use:
 Many languages have specific and complex rules for pluralization and gender conjugation.  It is typically difficult to use templates and still use correct conjugation.  However, SmartFormat has a library of rules for hundreds of languages, and has an extremely simple syntax for choosing the correct word based on a value!
 
 In English, there are only 2 plural forms: singular and plural.  You can specify a format string with both words, and the correct word will be chosen:
-{Random}: {Random:singular|plural}
+{Person.Random}: {Person.Random:singular|plural}
 
 Example:
-There {Random:is|are} {Random} {Random:item|items} remaining.
+There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remaining.
 "},
 
 {"List Formatting", 
-@"To do... sorry!
+@"<!-- Pay attention to the ending |}} token -->
+<Items count=""{Inventory.Count}"">
+{Inventory:
+    <Item name=""{Name}"" price=""{Price:c}"" index=""{Index}"" components=""{Components.Count}"">
+    {Components:
+        <Component name=""{Name}"" count=""{Count}"" />
+    |}
+    </Item>
+|}
+</Items>
 "},
-
+ {"Xml Source", 
+@"It is possible to format Xml as input argument
+Example:
+  There are {Xml.Person.Count} people: {Xml.Person: {FirstName}|,|, and}
+  #1:  {Xml.Person.0: {FirstName}'s phone number is {Phone}}
+  #2:  {Xml.Person.1: {FirstName}'s phone number is {Phone}}
+"},
             };
 
-            this.lstExamples.Items.AddRange(examples.Cast<object>().ToArray());
+            var listObjects = examples.Cast<object>().ToArray();
+            this.lstExamples.Items.AddRange(listObjects);
+            this.lstExamples.SelectedIndex = 0;
         }
 
         public class PropertyGridObject
@@ -106,9 +121,14 @@ There {Random:is|are} {Random} {Random:item|items} remaining.
             // We want the items in the Property Grid to be expandable,
             // so we need each property to have a TypeConverterAttribute:
             [TypeConverter(typeof(ExpandableObjectConverter))]
-            public object arg0 { get; set; }
+            public object Person { get; set; }
             [TypeConverter(typeof(ExpandableObjectConverter))]
-            public object arg1 { get; set; }
+            public object Date { get; set; }
+            [TypeConverter(typeof(ArrayConverter))]
+            public object Inventory { get; set; }
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            public object Xml { get; set; }
         }
 
         private void txtInput_TextChanged(object sender, EventArgs e)
@@ -123,8 +143,8 @@ There {Random:is|are} {Random} {Random:item|items} remaining.
             var l = txtInput.SelectionLength;
             try
             {
-                Smart.Default.FormatInto(rtfOutput, format, args.arg0, args.arg1);
-                
+                Smart.Default.FormatInto(rtfOutput, format, args);
+
                 txtInput.SelectAll();
                 txtInput.SelectionBackColor = txtInput.BackColor;
             }
@@ -134,7 +154,7 @@ There {Random:is|are} {Random} {Random:item|items} remaining.
                 var errorFG = Color.DarkRed;
                 groupBox1.ForeColor = errorFG;
 
-                groupBox1.Text = string.Format("Format has {0} issue{1}: {2}", 
+                groupBox1.Text = string.Format("Format has {0} issue{1}: {2}",
                                                ex.Issues.Count,
                                                (ex.Issues.Count == 1) ? "" : "s",
                                                ex.Issues.Select(i=>i.Issue).JoinStrings(" ", " ", " (and {0} more)", 1)

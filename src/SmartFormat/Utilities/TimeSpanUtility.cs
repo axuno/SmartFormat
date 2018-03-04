@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using SmartFormat.Extensions;
 
 namespace SmartFormat.Utilities
 {
@@ -17,7 +15,7 @@ namespace SmartFormat.Utilities
         static TimeSpanUtility()
         {
             // Create our defaults:
-            DefaultFormatOptions = 
+            DefaultFormatOptions =
                 TimeSpanFormatOptions.AbbreviateOff
                 |TimeSpanFormatOptions.LessThan
                 |TimeSpanFormatOptions.TruncateAuto
@@ -26,13 +24,13 @@ namespace SmartFormat.Utilities
             AbsoluteDefaults = DefaultFormatOptions;
         }
 
-        /// <summary> 
+        /// <summary>
         /// These are the default options that will be used when no option is specified.
         /// </summary>
         public static TimeSpanFormatOptions DefaultFormatOptions { get; set; }
-        /// <summary> 
+        /// <summary>
         /// These are the absolute default options that will be used as
-        /// a safeguard, just in case DefaultFormatOptions is missing a value. 
+        /// a safeguard, just in case DefaultFormatOptions is missing a value.
         /// </summary>
         public static TimeSpanFormatOptions AbsoluteDefaults { get; private set; }
 
@@ -40,7 +38,7 @@ namespace SmartFormat.Utilities
 
         #region: ToTimeString :
 
-        /// <summary> 
+        /// <summary>
         ///   <para>Turns a TimeSpan into a human-readable text.</para>
         ///   <para>Uses the specified timeSpanFormatOptions.</para>
         ///   <para>For example: "31.23:59:00.555" = "31 days 23 hours 59 minutes 0 seconds 555 milliseconds"</para>
@@ -118,7 +116,7 @@ namespace SmartFormat.Utilities
                         break;
                     default:
                         // This code is unreachable, but it prevents compile-errors.
-                        throw new InvalidEnumArgumentException();
+                        throw new ArgumentException("TimeSpanUtility");
                 }
 
 
@@ -130,7 +128,7 @@ namespace SmartFormat.Utilities
                     case TimeSpanFormatOptions.TruncateShortest:
                         if (textStarted)
                         {
-                            breakFor = true; 
+                            breakFor = true;
                             break;
                         }
                         if (value > 0) displayThisValue = true;
@@ -232,7 +230,7 @@ namespace SmartFormat.Utilities
         /// </summary>
         InheritDefaults = 0x0,
         /// <summary>
-        /// Abbreviates units. 
+        /// Abbreviates units.
         /// Example: "1d 2h 3m 4s 5ms"
         /// </summary>
         Abbreviate = 0x1,
@@ -323,9 +321,9 @@ namespace SmartFormat.Utilities
         public static TimeSpanFormatOptions Merge(this TimeSpanFormatOptions left, TimeSpanFormatOptions right)
         {
             var masks = new[]{
-                    TimeSpanFormatOptions._Abbreviate, 
-                    TimeSpanFormatOptions._LessThan, 
-                    TimeSpanFormatOptions._Range, 
+                    TimeSpanFormatOptions._Abbreviate,
+                    TimeSpanFormatOptions._LessThan,
+                    TimeSpanFormatOptions._Range,
                     TimeSpanFormatOptions._Truncate,
                 };
             foreach (var mask in masks)
@@ -438,7 +436,7 @@ namespace SmartFormat.Utilities
     /// </summary>
     public class TimeTextInfo
     {
-        private PluralFormatInfo.PluralRuleDelegate PluralRule;
+        private PluralRules.PluralRuleDelegate PluralRule;
         private string[] week;
         private string[] day;
         private string[] hour;
@@ -453,10 +451,10 @@ namespace SmartFormat.Utilities
         private string[] ms;
         private string lessThan;
 
-        public TimeTextInfo(PluralFormatInfo.PluralRuleDelegate pluralRule, string[] week, string[] day, string[] hour, string[] minute, string[] second, string[] millisecond, string[] w, string[] d, string[] h, string[] m, string[] s, string[] ms, string lessThan)
+        public TimeTextInfo(PluralRules.PluralRuleDelegate pluralRule, string[] week, string[] day, string[] hour, string[] minute, string[] second, string[] millisecond, string[] w, string[] d, string[] h, string[] m, string[] s, string[] ms, string lessThan)
         {
             this.PluralRule = pluralRule;
-            
+
             this.week = week;
             this.day = day;
             this.hour = hour;
@@ -487,7 +485,7 @@ namespace SmartFormat.Utilities
             this.lessThan = lessThan;
         }
 
-        private static string getValue(PluralFormatInfo.PluralRuleDelegate pluralRule, int value, string[] units)
+        private static string getValue(PluralRules.PluralRuleDelegate pluralRule, int value, string[] units)
         {
             // Get the plural index from the plural rule,
             // unless there's only 1 unit in the first place:
@@ -540,9 +538,9 @@ namespace SmartFormat.Utilities
             get
             {
                 return new TimeTextInfo(
-                    CommonLanguageRules.GetPluralRule("en"),
-                    new[] { "{0} week", "{0} weeks" }, 
-                    new[] { "{0} day", "{0} days" }, 
+                    PluralRules.GetPluralRule("en"),
+                    new[] { "{0} week", "{0} weeks" },
+                    new[] { "{0} day", "{0} days" },
                     new[] { "{0} hour", "{0} hours" },
                     new[] { "{0} minute", "{0} minutes" },
                     new[] { "{0} second", "{0} seconds" },
@@ -552,7 +550,7 @@ namespace SmartFormat.Utilities
                     new[] { "{0}h" },
                     new[] { "{0}m" },
                     new[] { "{0}s" },
-                    new[] { "{0}ms" }, 
+                    new[] { "{0}ms" },
                     "less than {0}"
                     );
             }

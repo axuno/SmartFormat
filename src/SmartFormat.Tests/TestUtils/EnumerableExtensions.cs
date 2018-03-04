@@ -13,7 +13,7 @@ namespace SmartFormat.Tests.Common
         /// <summary>Uses String.Format to format each item in the collection using the specified format.</summary>
         /// <param name="source"></param>
         /// <param name="format">
-        /// A composite format string; same as String.Format. 
+        /// A composite format string; same as String.Format.
         /// {0} refers to the source object, {1} refers to the index.
         /// </param>
         public static IEnumerable<string> FormatEach<T>(this IEnumerable<T> source, string format)
@@ -50,7 +50,7 @@ namespace SmartFormat.Tests.Common
         {
             return JoinStrings(source, separator, lastSeparator, null, -1);
         }
-        
+
         /// <summary>
         /// Joins all strings together into a single string, separating each item with the separator,
         /// and separating the last item with an alternate separator.
@@ -100,7 +100,7 @@ namespace SmartFormat.Tests.Common
         #region: Random Item Selector :
 
         /// <summary>Chooses one of the items at random.
-        /// 
+        ///
         /// Throws an exception if there are no items.
         /// </summary>
         public static T Random<T>(this IEnumerable<T> source)
@@ -109,7 +109,7 @@ namespace SmartFormat.Tests.Common
             return RandomIterator(source);
         }
         /// <summary>Chooses one of the items at random.
-        /// 
+        ///
         /// Returns default if there are no items.
         /// </summary>
         public static T RandomOrDefault<T>(this IEnumerable<T> source)
@@ -117,10 +117,10 @@ namespace SmartFormat.Tests.Common
             ArgumentValidator.CheckForNullReference(source, "source");
             return RandomIterator(source);
         }
-        
+
         private static T RandomIterator<T>(this IEnumerable<T> source)
         {
-            // We need to know the count. We don't want to enumerate twice, 
+            // We need to know the count. We don't want to enumerate twice,
             // so if the source isn't a collection, let's create one:
             var sc = source as ICollection<T> ?? source.ToList();
             var itemCount = sc.Count;
@@ -137,7 +137,7 @@ namespace SmartFormat.Tests.Common
 
         #region: Split :
 
-        /// <summary>Splits the enumeration into segments, 
+        /// <summary>Splits the enumeration into segments,
         /// each segment containing [count] items, and the last segment containing the remainder.
         /// </summary>
         /// <param name="source"></param>
@@ -171,7 +171,7 @@ namespace SmartFormat.Tests.Common
                         index = -1;
                     }
                 }
-                
+
                 // See if there is a partial final section:
                 if (0 <= index)
                 {
@@ -184,7 +184,7 @@ namespace SmartFormat.Tests.Common
             }
         }
 
-        /// <summary>Splits the enumeration into segments, 
+        /// <summary>Splits the enumeration into segments,
         /// each segment containing the portion between predicate matches.
         /// </summary>
         /// <param name="source"></param>
@@ -197,7 +197,7 @@ namespace SmartFormat.Tests.Common
             ArgumentValidator.CheckForNullReference(splitPredicate, "splitPredicate");
             return SplitIterator(source, splitPredicate, null, false);
         }
-        /// <summary>Splits the enumeration into segments, 
+        /// <summary>Splits the enumeration into segments,
         /// each segment containing the portion between predicate matches.
         /// </summary>
         /// <param name="source"></param>
@@ -210,7 +210,7 @@ namespace SmartFormat.Tests.Common
             ArgumentValidator.CheckForNullReference(splitPredicate, "splitPredicate");
             return SplitIterator(source, splitPredicate, null, true);
         }
-        /// <summary>Splits the enumeration into segments, 
+        /// <summary>Splits the enumeration into segments,
         /// each segment containing the portion between predicate matches.
         /// </summary>
         /// <param name="source"></param>
@@ -224,7 +224,7 @@ namespace SmartFormat.Tests.Common
             ArgumentValidator.CheckForNullReference(splitPredicate, "splitPredicate");
             return SplitIterator(source, null, splitPredicate, false);
         }
-        /// <summary>Splits the enumeration into segments, 
+        /// <summary>Splits the enumeration into segments,
         /// each segment containing the portion between predicate matches.
         /// </summary>
         /// <param name="source"></param>
@@ -262,7 +262,7 @@ namespace SmartFormat.Tests.Common
                     if (splitAfterPredicate) section.Add(current);
 
                     // Evaluate the predicate:
-                    var shouldSplit = (splitPredicateWithIndex == null) 
+                    var shouldSplit = (splitPredicateWithIndex == null)
                         ? splitPredicate(current)
                         : splitPredicateWithIndex(current, index);
                     if (shouldSplit && section.Count > 0)
@@ -298,7 +298,7 @@ namespace SmartFormat.Tests.Common
         {
             ArgumentValidator.CheckForNullReference(source, "source");
             ArgumentValidator.CheckForNullReference(action, "action");
-            
+
             // If the item is a List, we can optimize by using a for loop:
             var list = source as IList<TSource>;
             if (list != null)
@@ -330,7 +330,7 @@ namespace SmartFormat.Tests.Common
 
             // If the item is a List, we can optimize by using a for loop:
             var list = source as IList<TSource>;
-            if (list != null) 
+            if (list != null)
             {
                 // Perform the action on each item:
                 for (int i = 0, count = list.Count; i < count; i++)
@@ -352,7 +352,7 @@ namespace SmartFormat.Tests.Common
         #region: Overloads for extensions in System.Linq.Enumerable :
 
         /// <summary>Concatenates the first sequence with the specified items.
-        /// 
+        ///
         /// This method is an overload for Concat that uses the params argument to provide
         /// a better syntax when used with a known set of items.
         /// </summary>
@@ -361,7 +361,7 @@ namespace SmartFormat.Tests.Common
             return first.Concat((IEnumerable<T>) secondItems);
         }
         /// <summary>Produces the set union of the first sequence and the specified items by using the default equality comparer.
-        /// 
+        ///
         /// This method is an overload for Union that uses the params argument to provide
         /// a better syntax when used with a known set of items.
         /// </summary>

@@ -1,6 +1,8 @@
-﻿using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Parsing;
+﻿using System;
+using System.Linq;
 using System.Reflection;
+using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
@@ -14,17 +16,27 @@ namespace SmartFormat.Extensions
             formatter.Parser.AddOperators(".");
         }
 
-        public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
+        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
+            const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
+
+            var current = selectorInfo.CurrentValue;
+            var selector = selectorInfo.SelectorText;
+
             if (current == null)
             {
-                return;
+                return false;
             }
 
             // REFLECTION:
             // Let's see if the argSelector is a Selectors/Field/ParseFormat:
             var sourceType = current.GetType();
-            var members = sourceType.GetMember(selector.Text);
+            
+            // Important:
+            // GetMembers (opposite to GetMember!) returns all members, 
+            // both those defined by the type represented by the current T:System.Type object 
+            // AS WELL AS those inherited from its base types.
+            var members = sourceType.GetMembers(bindingFlags).Where(m => string.Equals(m.Name, selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()));
             foreach (var member in members)
             {
                 switch (member.MemberType)
@@ -32,9 +44,8 @@ namespace SmartFormat.Extensions
                     case MemberTypes.Field:
                         //  Selector is a Field; retrieve the value:
                         var field = (FieldInfo) member;
-                        result = field.GetValue(current);
-                        handled = true;
-                        return;
+                        selectorInfo.Result = field.GetValue(current);
+                        return true;
                     case MemberTypes.Property:
                     case MemberTypes.Method:
                         MethodInfo method;
@@ -72,13 +83,12 @@ namespace SmartFormat.Extensions
                         }
 
                         //  Retrieve the Selectors/ParseFormat value:
-                        result = method.Invoke(current, new object[0]);
-                        handled = true;
-                        return;
-                        
+                        selectorInfo.Result = method.Invoke(current, new object[0]);
+                        return true;
                 }
             }
-
+            
+            return false;
         }
     }
 }

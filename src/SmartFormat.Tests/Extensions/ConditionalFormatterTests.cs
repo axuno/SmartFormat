@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
+using SmartFormat.Tests.TestUtils;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
     public class ConditionalFormatterTests
@@ -168,5 +166,12 @@ namespace SmartFormat.Tests
             Smart.Default.Test(formats, args, expected);
         }
 
+        [TestCase("{0:part(s)|car}", true, "part(s)")]
+        [TestCase("{0:part(s)|car}", false, "car")]
+        public void Syntax_should_not_be_confused_with_named_formatters(string format, object arg0, string expectedOutput)
+        {
+            var actualOutput = Smart.Format(format, arg0);
+            Assert.AreEqual(expectedOutput, actualOutput);
+        }
     }
 }

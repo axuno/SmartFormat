@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using System.Globalization;
 using NUnit.Framework;
-using SmartFormat.Core;
 using SmartFormat.Tests.Common;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.TestUtils
 {
     [DebuggerNonUserCode]
     public static class TestHelpers
@@ -32,7 +29,7 @@ namespace SmartFormat.Tests
         public static void Test(this SmartFormatter formatter, string format, object[][] bunchOfArgs, string[] bunchOfExpected)
         {
             var allErrors = new ExceptionCollection(); // We will defer all errors until the end.
-            
+
             var numberOfTests = Math.Max(bunchOfArgs.Length, bunchOfExpected.Length);
             for (int i = 0; i < numberOfTests; i++)
             {
@@ -69,7 +66,8 @@ namespace SmartFormat.Tests
                 string actual = null;
                 try
                 {
-                    actual = formatter.Format(format, args);
+                    var specificCulture = new CultureInfo("en-us");
+                    actual = formatter.Format(specificCulture, format, args);
                     Assert.AreEqual(expected, actual);
                     Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
                 }

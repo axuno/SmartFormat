@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Represents a parsed format string.
-    /// Contains a list of <see cref="FormatItem"/>s, 
-    /// including <see cref="LiteralText"/>s 
+    /// Contains a list of <see cref="FormatItem"/>s,
+    /// including <see cref="LiteralText"/>s
     /// and <see cref="Placeholder"/>s.
     /// </summary>
     public class Format : FormatItem
@@ -15,12 +17,12 @@ namespace SmartFormat.Core.Parsing
 
         #region: Constructors :
 
-        public Format(string baseString) : base(baseString, 0, baseString.Length)
+        public Format(SmartSettings smartSettings, string baseString) : base(smartSettings, baseString, 0, baseString.Length)
         {
             this.parent = null;
             Items = new List<FormatItem>();
         }
-        public Format(Placeholder parent, int startIndex) : base(parent, startIndex)
+        public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent, startIndex)
         {
             this.parent = parent;
             Items = new List<FormatItem>();
@@ -62,7 +64,7 @@ namespace SmartFormat.Core.Parsing
                 return this;
             }
 
-            var substring = new Format(this.baseString) { startIndex = startIndex, endIndex = endIndex };
+            var substring = new Format(SmartSettings, this.baseString) { startIndex = startIndex, endIndex = endIndex };
             foreach (var item in this.Items)
             {
                 if (item.endIndex <= startIndex)
@@ -75,7 +77,7 @@ namespace SmartFormat.Core.Parsing
                 {
                     if (startIndex > item.startIndex || item.endIndex > endIndex)
                     {
-                        newItem = new LiteralText(substring) {
+                        newItem = new LiteralText(SmartSettings, substring) {
                             startIndex = Math.Max(startIndex, item.startIndex),
                             endIndex = Math.Min(endIndex, item.endIndex)
                         };
@@ -94,21 +96,21 @@ namespace SmartFormat.Core.Parsing
 
         #region: IndexOf :
         /// <summary>
-        /// Searches the literal text for the search string.
+        /// Searches the literal text for the search char.
         /// Does not search in nested placeholders.
         /// </summary>
         /// <param name="search"></param>
-        public int IndexOf(string search)
+        public int IndexOf(char search)
         {
             return IndexOf(search, 0);
         }
         /// <summary>
-        /// Searches the literal text for the search string.
+        /// Searches the literal text for the search char.
         /// Does not search in nested placeholders.
         /// </summary>
         /// <param name="search"></param>
-        /// <param name="index"></param>
-        public int IndexOf(string search, int startIndex)
+        /// <param name="startIndex"></param>
+        public int IndexOf(char search, int startIndex)
         {
             startIndex = this.startIndex + startIndex;
             foreach (var item in this.Items)
@@ -128,12 +130,12 @@ namespace SmartFormat.Core.Parsing
 
         #region: FindAll :
 
-        public IList<int> FindAll(string search)
+        private IList<int> FindAll(char search)
         {
             return FindAll(search, -1);
         }
 
-        public IList<int> FindAll(string search, int maxCount)
+        private IList<int> FindAll(char search, int maxCount)
         {
             var results = new List<int>();
             var index = 0; // this.startIndex;
@@ -142,25 +144,32 @@ namespace SmartFormat.Core.Parsing
                 index = this.IndexOf(search, index);
                 if (index == -1) break;
                 results.Add(index);
-                index += search.Length;
+                index++;
                 maxCount--;
             }
             return results;
         }
-        
+
         #endregion
 
         #region: Split :
 
-        public IList<Format> Split(string search)
+        private char splitCacheChar;
+        private IList<Format> splitCache;
+        public IList<Format> Split(char search)
         {
-            return Split(search, -1);
+            if (this.splitCache == null || this.splitCacheChar != search)
+            {
+                this.splitCacheChar = search;
+                this.splitCache = Split(search, -1);
+            }
+            return this.splitCache;
         }
 
-        public IList<Format> Split(string search, int maxCount)
+        public IList<Format> Split(char search, int maxCount)
         {
             var splits = this.FindAll(search, maxCount);
-            return new SplitList(this, splits, search.Length);
+            return new SplitList(this, splits);
         }
 
         /// <summary>
@@ -173,12 +182,10 @@ namespace SmartFormat.Core.Parsing
 
             private readonly Format format;
             private readonly IList<int> splits;
-            private readonly int searchLength;
-            public SplitList(Format format, IList<int> splits, int searchLength)
+            public SplitList(Format format, IList<int> splits)
             {
                 this.format = format;
                 this.splits = splits;
-                this.searchLength = searchLength;
             }
 
             #endregion
@@ -204,12 +211,12 @@ namespace SmartFormat.Core.Parsing
                     else if (index == splits.Count)
                     {
                         // Return the format after the last split:
-                        return format.Substring(splits[index - 1] + searchLength);
+                        return format.Substring(splits[index - 1] + 1);
                     }
                     else
                     {
                         // Return the format between the splits:
-                        var startIndex = splits[index - 1] + searchLength;
+                        var startIndex = splits[index - 1] + 1;
                         return format.Substring(startIndex, splits[index] - startIndex);
                     }
                 }
@@ -282,7 +289,7 @@ namespace SmartFormat.Core.Parsing
                 throw new NotSupportedException();
             }
 
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            IEnumerator IEnumerable.GetEnumerator()
             {
                 throw new NotSupportedException();
             }
@@ -302,7 +309,7 @@ namespace SmartFormat.Core.Parsing
         /// of placeholders
         /// </summary>
         /// <returns></returns>
-        public string GetText()
+        public string GetLiteralText()
         {
             var sb = new StringBuilder();
             foreach (var item in this.Items)
@@ -310,7 +317,7 @@ namespace SmartFormat.Core.Parsing
                 var literalItem = item as LiteralText;
                 if (literalItem != null)
                 {
-                    sb.Append(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
+                    sb.Append(literalItem.ToString());
                 }
             }
             return sb.ToString();
@@ -331,6 +338,6 @@ namespace SmartFormat.Core.Parsing
         }
 
         #endregion
-    
+
     }
 }

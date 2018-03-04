@@ -1,31 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Globalization;
 using NUnit.Framework;
-using SmartFormat.Core;
-using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
-
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.OldTests
 {
+    public struct Size
+    {
+        public Size(int width, int height)
+        {
+            Width = width;
+            Height = height;
+        }
+
+        public int Width;
+        public int Height;
+    }
+
+
     [TestFixture]
     public class CodeProjectExampleTests
     {
         private Person MakeQuentin()
         {
-            var p = new Person() {
-                                    FullName = "Quentin Starin",
-                                    Birthday = DateTime.Today.AddYears(-30),
-                                    Address = new Address("101 1st Ave", "Minneapolis", States.Minnesota, "55401"),
-                                    Friends = new List<Person> {
-                                                                new Person() { FullName = "John Smith", Birthday = new DateTime(1978, 1, 1) },
-                                                                new Person() { FullName = "Bob Johnson", Birthday = new DateTime(1957, 1, 1) },
-                                                                new Person() { FullName = "Mary Meyer", Birthday = new DateTime(1990, 1, 1) },
-                                                                new Person() { FullName = "Dr. Jamal Cornucopia", Birthday = new DateTime(1973, 1, 1) }
-                                                            }
+            var p = new Person()
+            {
+                FullName = "Quentin Starin",
+                Birthday = DateTime.Today.AddYears(-30),
+                Address = new Address("101 1st Ave", "Minneapolis", States.Minnesota, "55401"),
+                Friends = new List<Person>
+                    {
+                        new Person() { FullName = "John Smith", Birthday = new DateTime(1978, 1, 1) },
+                        new Person() { FullName = "Bob Johnson", Birthday = new DateTime(1957, 1, 1) },
+                        new Person() { FullName = "Mary Meyer", Birthday = new DateTime(1990, 1, 1) },
+                        new Person() { FullName = "Dr. Jamal Cornucopia", Birthday = new DateTime(1973, 1, 1) }
+                    }
             };
 
             return p;
@@ -49,7 +60,8 @@ namespace SmartFormat.Tests
             var formatString = "{0} is {1} years old and has {2:N2} friends.";
             var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
-            string actualOutput = Smart.Format(formatString, p.FirstName, p.Age, p.Friends.Count);
+            var specificCulture = new CultureInfo("en-us");
+            string actualOutput = Smart.Format(specificCulture, formatString, p.FirstName, p.Age, p.Friends.Count);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -62,7 +74,8 @@ namespace SmartFormat.Tests
             var formatString = "{FirstName} is {Age} years old and has {Friends.Count:N2} friends.";
             var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
-            string actualOutput = Smart.Format(formatString, p);
+            var specificCulture = new CultureInfo("en-us");
+            string actualOutput = Smart.Format(specificCulture, formatString, p);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -82,16 +95,18 @@ namespace SmartFormat.Tests
         [Test]
         public void BasicArray()
         {
-            var data = new DateTime[] {
-                                          new DateTime(1999, 12, 31),
-                                          new DateTime(2010, 10, 10),
-                                          new DateTime(3000, 1, 1),
-                                      };
+            var data = new DateTime[]
+                {
+                    new DateTime(1999, 12, 31),
+                    new DateTime(2010, 10, 10),
+                    new DateTime(3000, 1, 1),
+                };
 
             var formatString = "All dates: {0:{:M/d/yyyy}| and }.";
             var expectedOutput = "All dates: 12/31/1999 and 10/10/2010 and 1/1/3000.";
 
-            string actualOutput = Smart.Format(formatString, data);
+            var specificCulture = new CultureInfo("en-us");
+            string actualOutput = Smart.Format(specificCulture, formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -124,6 +139,22 @@ namespace SmartFormat.Tests
 
 
         [Test]
+        public void DotNotation_CaseInsensitive()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+            var p1 = MakeQuentin();
+
+            var formatString = "{aDDress.ciTy}, {Address.sTate} {Address.ZiP}";
+            var expectedOutput = "Minneapolis, Minnesota 55401";
+
+            string actualOutput = formatter.Format(formatString, p1);
+            Assert.AreEqual(expectedOutput, actualOutput);
+        }
+
+
+        [Test]
         public void Nesting()
         {
             var p1 = MakeQuentin();
@@ -145,6 +176,21 @@ namespace SmartFormat.Tests
             var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
 
             string actualOutput = Smart.Format(formatString, sizes);
+            Assert.AreEqual(expectedOutput, actualOutput);
+        }
+
+        [Test]
+        public void NestingCollection_CaseInsensitive()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+            Size[] sizes = { new Size(1, 1), new Size(4, 3), new Size(16, 9) };
+
+            var formatString = "{0:({widTh} x {hEIght})| and }";
+            var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
+
+            string actualOutput = formatter.Format(formatString, sizes);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -339,6 +385,22 @@ namespace SmartFormat.Tests
 
 
         [Test]
+        public void ComplexConditionFirstMatchingCase_CaseInsensitive()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+            var p1 = new Person() { Birthday = DateTime.MinValue };
+
+            var formatString = "{aGe::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
+            var expectedOutput = "Senior Citizen";
+
+            string actualOutput = formatter.Format(formatString, p1);
+            Assert.AreEqual(expectedOutput, actualOutput);
+        }
+
+
+        [Test]
         public void ComplexConditionFallThroughCase()
         {
             var p1 = new Person() { Birthday = DateTime.Today };
@@ -363,7 +425,8 @@ namespace SmartFormat.Tests
             var formatString = "{0:{:M/d/yyyy}|, |, and }.";
             var expectedOutput = "12/31/1999, 10/10/2010, and 1/1/3000.";
 
-            string actualOutput = Smart.Format(formatString, data);
+            var specificCulture = new CultureInfo("en-us");
+            string actualOutput = Smart.Format(specificCulture, formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -389,27 +452,25 @@ namespace SmartFormat.Tests
             var format = "{0} {{0}} {{{0}}}";
             var expected = "Zero {0} {Zero}";
 
-            var actual = Smart.Format(format, args);
+            var actual = Smart.CreateDefaultSmartFormat().Format(format, args);
             Assert.AreEqual(expected, actual);
         }
 
         [Test]
         public void EscapingSlashBraces()
         {
-            var Smart = new SmartFormatter();
-            Smart.Parser.UseAlternativeEscapeChar('\\');
-            Smart.AddExtensions(
-                new DefaultFormatter(), 
-                new DefaultSource(Smart));
+            var smart = new SmartFormatter();
+            smart.Parser.UseAlternativeEscapeChar('\\');
+            smart.AddExtensions(new DefaultFormatter());
+            smart.AddExtensions(new DefaultSource(smart));
 
             var args = new object[] { "Zero", "One", "Two", 3 };
 
             var format = @"{0} \{0\} \{{0}\} {3:00\}} {3:00}\}";
             var expected = "Zero {0} {Zero} 03} 03}";
 
-            var actual = Smart.Format(format, args);
+            var actual = smart.Format(format, args);
             Assert.AreEqual(expected, actual);
         }
-
     }
 }

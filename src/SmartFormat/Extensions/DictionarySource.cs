@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
@@ -15,25 +15,41 @@ namespace SmartFormat.Extensions
             formatter.Parser.AddOperators(".");
         }
 
-        public void EvaluateSelector(object current, Selector selector, ref bool handled, ref object result, FormatDetails formatDetails)
+        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
-            // See if current is a IDictionary and contains the selector
-            var dict = current as IDictionary;
-            if (dict != null && dict.Contains(selector.Text))
+            var current = selectorInfo.CurrentValue;
+            var selector = selectorInfo.SelectorText;
+
+            // See if current is a IDictionary and contains the selector:
+            var rawDict = current as IDictionary;
+            if (rawDict != null)
             {
-                result = dict[selector.Text];
-                handled = true;
-                return;
+                foreach (DictionaryEntry entry in rawDict)
+                {
+                    var key = (entry.Key as string) ?? entry.Key.ToString();
+
+                    if (key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
+                    {
+                        selectorInfo.Result = entry.Value;
+                        return true;
+                    }
+                }
             }
 
-            // See if current is an IDictionary<string, object> (also an "expando" object) 
-            // and contains the selector.
-            var genericDictionary = current as IDictionary<string, object>;
-            if (genericDictionary != null && genericDictionary.ContainsKey(selector.Text))
+            // this check is for dynamics and generic dictionaries
+            var dict = current as IDictionary<string, object>;
+
+            if (dict != null)
             {
-                result = genericDictionary[selector.Text];
-                handled = true;
+                var val = dict.FirstOrDefault(x => x.Key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison())).Value;
+                if (val != null)
+                {
+                    selectorInfo.Result = val;
+                    return true;
+                }
             }
+
+            return false;
         }
     }
 }

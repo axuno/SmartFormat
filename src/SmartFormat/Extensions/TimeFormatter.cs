@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {
     public class TimeFormatter : IFormatter
     {
+        public string[] Names { get; set; } = { "timespan", "time", "t", "" };
 
         #region Constructors
 
@@ -27,48 +24,61 @@ namespace SmartFormat.Extensions
         public TimeFormatter(string defaultTwoLetterLanguageName)
         {
             this.DefaultFormatOptions = TimeSpanUtility.DefaultFormatOptions;
-            this.defaultTwoLetterISOLanguageName = defaultTwoLetterLanguageName;
+            this.DefaultTwoLetterISOLanguageName = defaultTwoLetterLanguageName;
         }
 
         #endregion
-        
+
         #region Defaults
 
         public TimeSpanFormatOptions DefaultFormatOptions { get; set; }
-        private string defaultTwoLetterISOLanguageName;
+        public string DefaultTwoLetterISOLanguageName { get; set; }
 
         #endregion
 
         #region IFormatter
 
-        public void EvaluateFormat(object current, Format format, ref bool handled, IOutput output, FormatDetails formatDetails)
+        public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            if (format != null && format.HasNested) return;
-            var formatText = format != null ? format.Text : "";
+            var format = formattingInfo.Format;
+            var current = formattingInfo.CurrentValue;
+
+            if (format != null && format.HasNested) return false;
+            string options;
+            if (formattingInfo.FormatterOptions != "") 
+                options = formattingInfo.FormatterOptions;
+            else if (format != null) 
+                options = format.GetLiteralText();
+            else 
+                options = "";
+            
             TimeSpan fromTime;
             if (current is TimeSpan)
             {
                 fromTime = (TimeSpan)current;
             }
-            else if (current is DateTime && formatText.StartsWith("timestring"))
+            else if (current is DateTime && formattingInfo.FormatterOptions != "")
             {
-                formatText = formatText.Substring(10);
+                fromTime = DateTime.Now.Subtract((DateTime)current);
+            }
+            else if (current is DateTime && options.StartsWith("timestring"))
+            {
+                options = options.Substring(10);
                 fromTime = DateTime.Now.Subtract((DateTime)current);
             }
             else
             {
-                return;
+                return false;
             }
-            var timeTextInfo = GetTimeTextInfo(formatDetails.Provider);
+            var timeTextInfo = GetTimeTextInfo(formattingInfo.FormatDetails.Provider);
             if (timeTextInfo == null)
             {
-                return;
+                return false;
             }
-            var formattingOptions = TimeSpanFormatOptionsConverter.Parse(formatText);
+            var formattingOptions = TimeSpanFormatOptionsConverter.Parse(options);
             var timeString = TimeSpanUtility.ToTimeString(fromTime, formattingOptions, timeTextInfo);
-            output.Write(timeString, formatDetails);
-            handled = true;
-
+            formattingInfo.Write(timeString);
+            return true;
         }
 
         private TimeTextInfo GetTimeTextInfo(IFormatProvider provider)
@@ -87,14 +97,14 @@ namespace SmartFormat.Extensions
                 if (cultureInfo != null)
                 {
                     timeTextInfo = CommonLanguagesTimeTextInfo.GetTimeTextInfo(cultureInfo.TwoLetterISOLanguageName);
-                    // If cultureInfo was supplied, 
+                    // If cultureInfo was supplied,
                     // we will always return, even if null:
                     return timeTextInfo;
                 }
             }
 
             // Return the default if the provider couldn't provide:
-            return CommonLanguagesTimeTextInfo.GetTimeTextInfo(defaultTwoLetterISOLanguageName);
+            return CommonLanguagesTimeTextInfo.GetTimeTextInfo(DefaultTwoLetterISOLanguageName);
         }
 
         #endregion

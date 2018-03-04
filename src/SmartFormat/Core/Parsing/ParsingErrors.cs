@@ -26,14 +26,14 @@ namespace SmartFormat.Core.Parsing
 
         public string MessageShort
         {
-	        get 
-	        {
-	            return string.Format("The format string has {0} issue{1}: {2}",
-	                                 Issues.Count,
-	                                 Issues.Count == 1 ? "" : "s",
-	                                 string.Join(", ", Issues.Select(i => i.Issue).ToArray())
+            get
+            {
+                return string.Format("The format string has {0} issue{1}: {2}",
+                                     Issues.Count,
+                                     Issues.Count == 1 ? "" : "s",
+                                     string.Join(", ", Issues.Select(i => i.Issue).ToArray())
                                      );
-	        }
+            }
         }
 
         public override string Message

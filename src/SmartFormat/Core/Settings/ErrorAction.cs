@@ -1,4 +1,4 @@
-﻿namespace SmartFormat.Core
+﻿namespace SmartFormat.Core.Settings
 {
     /// <summary>
     /// Determines how format errors are handled.
@@ -6,14 +6,14 @@
     public enum ErrorAction
     {
         /// <summary>Throws an exception.  This is only recommended for debugging, so that formatting errors can be easily found.</summary>
-        ThrowError, 
-        
+        ThrowError,
+
         /// <summary>Includes an issue message in the output</summary>
-        OutputErrorInResult, 
-        
+        OutputErrorInResult,
+
         /// <summary>Ignores errors and tries to output the data anyway</summary>
         Ignore,
-        
+
         /// <summary>Leaves invalid tokens unmodified in the text.</summary>
         MaintainTokens
     }

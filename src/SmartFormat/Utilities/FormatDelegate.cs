@@ -5,13 +5,13 @@ namespace SmartFormat.Utilities
     /// <summary>
     /// This class wraps a delegate, allowing it to be used as a parameter
     /// to any string-formatting method (such as <see cref="string.Format(string, object)"/>).
-    /// 
+    ///
     /// For example:
     /// <code>
     /// var textWithLink = String.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
     /// </code>
     /// </summary>
-    public class FormatDelegate : System.IFormattable
+    public class FormatDelegate : IFormattable
     {
         private readonly Func<string, string> getFormat1;
         private readonly Func<string, IFormatProvider, string> getFormat2;
