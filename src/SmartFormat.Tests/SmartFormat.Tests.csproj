@@ -61,6 +61,7 @@
     <Compile Include="Extensions\ChooseFormatterTests.cs" />
     <Compile Include="Extensions\ConditionalFormatterTests.cs" />
     <Compile Include="Extensions\DictionaryFormatterTests.cs" />
+    <Compile Include="Extensions\IsMatchFormatterTests.cs" />
     <Compile Include="Extensions\ListFormatterTests.cs" />
     <Compile Include="Extensions\PluralLocalizationFormatterTests.cs" />
     <Compile Include="Extensions\ReflectionFormatterTests.cs" />

@@ -74,6 +74,7 @@
     <Compile Include="Extensions\DefaultFormatter.cs" />
     <Compile Include="Extensions\DefaultSource.cs" />
     <Compile Include="Extensions\DictionarySource.cs" />
+    <Compile Include="Extensions\IsMatchFormatter.cs" />
     <Compile Include="Extensions\ListFormatter.cs" />
     <Compile Include="Extensions\PluralLocalizationFormatter.cs" />
     <Compile Include="Extensions\ReflectionSource.cs" />
