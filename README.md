@@ -10,3 +10,8 @@ See [further information on the wiki](https://github.com/scottrippey/SmartFormat
 
 See [changelog](CHANGES.md) for changes.
 
+**Projects, where SmartFormat.Net is used**:
+(let us know if you'd like to be listed here):
+
+[<img src="https://raw.githubusercontent.com/axuno/MailMergeLib/master/MailMergeLlib.png" width="300" alt="Logo">](https://github.com/axuno/MailMergeLib)<br/>
+[MailMergeLib](https://github.com/axuno/MailMergeLib) is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.

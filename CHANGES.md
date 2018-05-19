@@ -1,6 +1,15 @@
 Latest Changes
 ====
 
+v2.2.0.0
+===
+* Fixes issue [#101](https://github.com/scottrippey/SmartFormat.NET/issues/101)
+* This version includes a breaking change:
+   * Before: ```OnParsingFailure``` event was invoked after each parsing error
+   * **Now**: ```OnParsingFailure``` event is invoked after parsing is completed
+```ParsingErrorEventArgs``` has a different signature. It now includes **all** ```ParsingErrors``` **with all details** that would be supplied during a parser exception. This also includes messages indicating where there the parse error occurred.
+
+
 v2.1.0.2
 ===
 * Fixes issue [#94](https://github.com/scottrippey/SmartFormat.NET/issues/94)
