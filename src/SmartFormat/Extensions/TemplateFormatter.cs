@@ -27,6 +27,39 @@ namespace SmartFormat.Extensions
         }
 
         /// <summary>
+        /// Gets or sets the name of the extension.
+        /// </summary>
+        public string[] Names { get; set; } = {"template", "t"};
+
+        /// <summary>
+        /// This method is called by the <see cref="SmartFormatter" /> to obtain the formatting result of this extension.
+        /// </summary>
+        /// <param name="formattingInfo"></param>
+        /// <returns>Returns true if successful, else false.</returns>
+        public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
+        {
+            var templateName = formattingInfo.FormatterOptions;
+            if (templateName == "")
+            {
+                if (formattingInfo.Format.HasNested) return false;
+                templateName = formattingInfo.Format.RawText;
+            }
+
+            Format template;
+            if (!_templates.TryGetValue(templateName, out template))
+            {
+                if (Names.Contains(formattingInfo.Placeholder.FormatterName))
+                    throw new FormatException(
+                        $"Formatter '{formattingInfo.Placeholder.FormatterName}' found no registered template named '{templateName}'");
+
+                return false;
+            }
+
+            formattingInfo.Write(template, formattingInfo.CurrentValue);
+            return true;
+        }
+
+        /// <summary>
         /// Register a new template.
         /// </summary>
         /// <param name="templateName">A name for the template, which is not already registered.</param>
@@ -53,45 +86,6 @@ namespace SmartFormat.Extensions
         public void Clear()
         {
             _templates.Clear();
-        }
-
-        /// <summary>
-        /// Gets or sets the name of the extension.
-        /// </summary>
-        public string[] Names { get; set; } = { "template", "t" };
-
-        /// <summary>
-        /// This method is called by the <see cref="SmartFormatter"/> to obtain the formatting result of this extension.
-        /// </summary>
-        /// <param name="formattingInfo"></param>
-        /// <returns>Returns true if successful, else false.</returns>
-        public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
-        {
-            var templateName = formattingInfo.FormatterOptions;
-            if (templateName == "")
-            {
-                if (formattingInfo.Format.HasNested)
-                {
-                    return false;
-                }
-                templateName = formattingInfo.Format.RawText;
-            }
-
-            Format template;
-            if (!_templates.TryGetValue(templateName, out template))
-            {
-                if (Names.Contains(formattingInfo.Placeholder.FormatterName))
-                {
-                    // if the format contains the named formatter, we care for a more precise exception message
-                    // instead of the generic "no formatter found"
-                    throw new FormatException($"Formatter '{formattingInfo.Placeholder.FormatterName}' found no registered template named '{templateName}'");
-                }
-
-                return false;
-            }
-
-            formattingInfo.Write(template, formattingInfo.CurrentValue);
-            return true;
         }
     }
 }

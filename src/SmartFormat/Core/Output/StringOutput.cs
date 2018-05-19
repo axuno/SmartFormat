@@ -10,14 +10,17 @@ namespace SmartFormat.Core.Output
     public class StringOutput : IOutput
     {
         private readonly StringBuilder output;
+
         public StringOutput()
         {
-            this.output = new StringBuilder();
+            output = new StringBuilder();
         }
+
         public StringOutput(int capacity)
         {
-            this.output = new StringBuilder(capacity);
+            output = new StringBuilder(capacity);
         }
+
         public StringOutput(StringBuilder output)
         {
             this.output = output;
@@ -28,6 +31,7 @@ namespace SmartFormat.Core.Output
         {
             output.Append(text);
         }
+
         public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
         {
             output.Append(text, startIndex, length);

@@ -132,24 +132,24 @@ namespace RTF
             /// where ...
             /// 
             /// A    = current width of the metafile in hundredths of millimeters (0.01mm)
-            ///        = Image Width in Inches * Number of (0.01mm) per inch
-            ///        = (Image Width in Pixels / Graphics Context's Horizontal Resolution) * 2540
-            ///        = (Image Width in Pixels / Graphics.DpiX) * 2540
+            ///    = Image Width in Inches * Number of (0.01mm) per inch
+            ///    = (Image Width in Pixels / Graphics Context's Horizontal Resolution) * 2540
+            ///    = (Image Width in Pixels / Graphics.DpiX) * 2540
             /// 
             /// B    = current height of the metafile in hundredths of millimeters (0.01mm)
-            ///        = Image Height in Inches * Number of (0.01mm) per inch
-            ///        = (Image Height in Pixels / Graphics Context's Vertical Resolution) * 2540
-            ///        = (Image Height in Pixels / Graphics.DpiX) * 2540
+            ///    = Image Height in Inches * Number of (0.01mm) per inch
+            ///    = (Image Height in Pixels / Graphics Context's Vertical Resolution) * 2540
+            ///    = (Image Height in Pixels / Graphics.DpiX) * 2540
             /// 
             /// C    = target width of the metafile in twips
-            ///        = Image Width in Inches * Number of twips per inch
-            ///        = (Image Width in Pixels / Graphics Context's Horizontal Resolution) * 1440
-            ///        = (Image Width in Pixels / Graphics.DpiX) * 1440
+            ///    = Image Width in Inches * Number of twips per inch
+            ///    = (Image Width in Pixels / Graphics Context's Horizontal Resolution) * 1440
+            ///    = (Image Width in Pixels / Graphics.DpiX) * 1440
             /// 
             /// D    = target height of the metafile in twips
-            ///        = Image Height in Inches * Number of twips per inch
-            ///        = (Image Height in Pixels / Graphics Context's Horizontal Resolution) * 1440
-            ///        = (Image Height in Pixels / Graphics.DpiX) * 1440
+            ///    = Image Height in Inches * Number of twips per inch
+            ///    = (Image Height in Pixels / Graphics Context's Horizontal Resolution) * 1440
+            ///    = (Image Height in Pixels / Graphics.DpiX) * 1440
             ///    
             /// </summary>
             /// <remarks>

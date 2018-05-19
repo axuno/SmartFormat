@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace SmartFormat.Core.Settings
 {
     /// <summary>
-    /// <see cref="SmartFormat"/> settings to be applied for parsing and formatting.
+    /// <see cref="SmartFormat" /> settings to be applied for parsing and formatting.
     /// </summary>
     public class SmartSettings
     {
@@ -17,12 +17,12 @@ namespace SmartFormat.Core.Settings
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ErrorAction"/> to apply for the <see cref="SmartFormatter"/>.
+        /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
         /// </summary>
         public ErrorAction FormatErrorAction { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ErrorAction"/> to apply for the <see cref="SmartFormat.Core.Parsing.Parser"/>.
+        /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormat.Core.Parsing.Parser" />.
         /// </summary>
         public ErrorAction ParseErrorAction { get; set; }
 
@@ -32,11 +32,11 @@ namespace SmartFormat.Core.Settings
         public CaseSensitivityType CaseSensitivity { get; set; }
 
         /// <summary>
-        /// This setting is relevant for the <see cref="Parsing.LiteralText"/>.
+        /// This setting is relevant for the <see cref="Parsing.LiteralText" />.
         /// If true (the default), character string literals are treated like in "normal" string.Format:
-        ///    string.Format("\t")   will return a "TAB" character
+        /// string.Format("\t")   will return a "TAB" character
         /// If false, character string literals are not converted, just like with this string.Format:
-        ///    string.Format(@"\t")  will return the 2 characters "\" and "t"
+        /// string.Format(@"\t")  will return the 2 characters "\" and "t"
         /// </summary>
         public bool ConvertCharacterStringLiterals { get; set; }
 
@@ -50,7 +50,8 @@ namespace SmartFormat.Core.Settings
                     case CaseSensitivityType.CaseInsensitive:
                         return StringComparer.CurrentCultureIgnoreCase;
                     default:
-                        throw new InvalidOperationException($"The case sensitivity type [{CaseSensitivity}] is unknown.");
+                        throw new InvalidOperationException(
+                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
                 }
             }
         }
@@ -65,7 +66,8 @@ namespace SmartFormat.Core.Settings
                     case CaseSensitivityType.CaseInsensitive:
                         return StringComparison.CurrentCultureIgnoreCase;
                     default:
-                        throw new InvalidOperationException($"The case sensitivity type [{CaseSensitivity}] is unknown.");
+                        throw new InvalidOperationException(
+                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
                 }
             }
         }

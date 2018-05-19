@@ -6,10 +6,9 @@
     public interface ISource
     {
         /// <summary>
-        /// Evaluates the <see cref="ISelectorInfo.Selector"/> based on the <see cref="ISelectorInfo.CurrentValue"/>.
-        /// 
+        /// Evaluates the <see cref="ISelectorInfo.Selector" /> based on the <see cref="ISelectorInfo.CurrentValue" />.
         /// If this extension cannot evaluate the Selector, returns False.
-        /// Otherwise, sets the <see cref="ISelectorInfo.Result"/> and returns true.
+        /// Otherwise, sets the <see cref="ISelectorInfo.Result" /> and returns true.
         /// </summary>
         /// <param name="selectorInfo"></param>
         bool TryEvaluateSelector(ISelectorInfo selectorInfo);

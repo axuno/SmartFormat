@@ -10,6 +10,24 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class Parser
     {
+        #region: Settings :
+
+        /// <summary>
+        /// Gets or sets the <seealso cref="Core.Settings.SmartSettings" /> for Smart.Format
+        /// </summary>
+        public SmartSettings Settings { get; internal set; } = new SmartSettings();
+
+        #endregion
+
+        #region : EventHandlers :
+
+        /// <summary>
+        /// Event raising, if an error occurs during parsing.
+        /// </summary>
+        public event EventHandler<ParsingErrorEventArgs> OnParsingFailure;
+
+        #endregion
+
         #region: Constructor :
 
         [Obsolete("Depreciated. Parser should be created by SmartFormatter only.", false)]
@@ -25,15 +43,6 @@ namespace SmartFormat.Core.Parsing
 
         #endregion
 
-        #region: Settings :
-
-        /// <summary>
-        /// Gets or sets the <seealso cref="Core.Settings.SmartSettings"/> for Smart.Format
-        /// </summary>
-        public SmartSettings Settings { get; internal set; } = new SmartSettings();
-
-        #endregion
-
         #region: Special Chars :
 
         // The following fields are points of extensibility
@@ -44,11 +53,12 @@ namespace SmartFormat.Core.Parsing
         /// This allows optimized alpha-character detection.
         /// Specify any additional selector chars in AllowedSelectorChars.
         /// </summary>
-        private bool _alphanumericSelectors = false;
+        private bool _alphanumericSelectors;
+
         /// <summary>
         /// A list of allowable selector characters,
         /// to support additional selector syntaxes such as math.
-        /// Digits are always included, and letters can be included 
+        /// Digits are always included, and letters can be included
         /// with AlphanumericSelectors.
         /// </summary>
         private string _allowedSelectorChars = "";
@@ -65,7 +75,7 @@ namespace SmartFormat.Core.Parsing
         /// If false, double-curly braces are escaped.
         /// If true, the AlternativeEscapeChar is used for escaping braces.
         /// </summary>
-        private bool _alternativeEscaping = false;
+        private bool _alternativeEscaping;
 
         /// <summary>
         /// If AlternativeEscaping is true, then this character is
@@ -75,7 +85,7 @@ namespace SmartFormat.Core.Parsing
 
         /// <summary>
         /// The character literal escape character e.g. for \t (TAB) and others.
-        /// This is kind of overlapping functionality with <see cref="UseAlternativeEscapeChar"/>.
+        /// This is kind of overlapping functionality with <see cref="UseAlternativeEscapeChar" />.
         /// Note: In a future release escape characters for placeholders and character literals should become the same.
         /// </summary>
         internal const char CharLiteralEscapeChar = '\\';
@@ -87,6 +97,7 @@ namespace SmartFormat.Core.Parsing
         {
             _alphanumericSelectors = true;
         }
+
         /// <summary>
         /// Adds specific characters to the allowed selector chars.
         /// </summary>
@@ -94,14 +105,10 @@ namespace SmartFormat.Core.Parsing
         public void AddAdditionalSelectorChars(string chars)
         {
             foreach (var c in chars)
-            {
                 if (_allowedSelectorChars.IndexOf(c) == -1)
-                {
                     _allowedSelectorChars += c;
-                }
-            }
-
         }
+
         /// <summary>
         /// Adds specific characters to the allowed operator chars.
         /// An operator is a character that is in the selector string
@@ -111,16 +118,12 @@ namespace SmartFormat.Core.Parsing
         public void AddOperators(string chars)
         {
             foreach (var c in chars)
-            {
                 if (_operators.IndexOf(c) == -1)
-                {
                     _operators += c;
-                }
-            }
         }
 
         /// <summary>
-        /// Sets the AlternativeEscaping option to True 
+        /// Sets the AlternativeEscaping option to True
         /// so that braces will only be escaped after the
         /// specified character.
         /// </summary>
@@ -130,9 +133,10 @@ namespace SmartFormat.Core.Parsing
             _alternativeEscapeChar = alternativeEscapeChar;
             _alternativeEscaping = true;
         }
+
         /// <summary>
-        /// [Default] 
-        /// Uses {{ and }} for escaping braces for compatibility with String.Format.  
+        /// [Default]
+        /// Uses {{ and }} for escaping braces for compatibility with String.Format.
         /// However, this does not work very well with nested placeholders,
         /// so it is recommended to use an alternative escape char.
         /// </summary>
@@ -150,15 +154,6 @@ namespace SmartFormat.Core.Parsing
             _openingBrace = opening;
             _closingBrace = closing;
         }
-
-        #endregion
-
-        #region : EventHandlers :
-
-        /// <summary>
-        /// Event raising, if an error occurs during parsing.
-        /// </summary>
-        public event EventHandler<ParsingErrorEventArgs> OnParsingFailure;
 
         #endregion
 
@@ -194,10 +189,7 @@ namespace SmartFormat.Core.Parsing
                     if (c == openingBrace)
                     {
                         // Finish the last text item:
-                        if (i != lastI)
-                        {
-                            current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
-                        }
+                        if (i != lastI) current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
                         lastI = i + 1;
 
                         // See if this brace should be escaped:
@@ -216,7 +208,7 @@ namespace SmartFormat.Core.Parsing
                         currentPlaceholder = new Placeholder(Settings, current, i, nestedDepth);
                         current.Items.Add(currentPlaceholder);
                         current.HasNested = true;
-                        operatorIndex = i+1;
+                        operatorIndex = i + 1;
                         selectorIndex = 0;
                         namedFormatterStartIndex = -1;
                     }
@@ -224,7 +216,7 @@ namespace SmartFormat.Core.Parsing
                     {
                         // Finish the last text item:
                         if (i != lastI)
-                            current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
+                            current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
                         lastI = i + 1;
 
                         // See if this brace should be escaped:
@@ -241,9 +233,11 @@ namespace SmartFormat.Core.Parsing
                         // Make sure that this is a nested placeholder before we un-nest it:
                         if (current.parent == null)
                         {
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i, i + 1);
+                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i,
+                                i + 1);
                             continue;
                         }
+
                         // End of the placeholder's Format:
                         nestedDepth--;
                         current.endIndex = i;
@@ -251,7 +245,8 @@ namespace SmartFormat.Core.Parsing
                         current = current.parent.parent;
                         namedFormatterStartIndex = -1;
                     }
-                    else if ((c == CharLiteralEscapeChar && Settings.ConvertCharacterStringLiterals) || (_alternativeEscaping && c ==_alternativeEscapeChar))
+                    else if (c == CharLiteralEscapeChar && Settings.ConvertCharacterStringLiterals ||
+                             _alternativeEscaping && c == _alternativeEscapeChar)
                     {
                         namedFormatterStartIndex = -1;
 
@@ -262,55 +257,49 @@ namespace SmartFormat.Core.Parsing
                         if (nextI < length && (format[nextI] == openingBrace || format[nextI] == closingBrace))
                         {
                             // Finish the last text item:
-                            if (i != lastI)
-                            {
-                                current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
-                            }
+                            if (i != lastI) current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
                             lastI = i + 1;
 
                             i++;
-                            continue;
                         }
                         else
                         {
                             // **** Escaping of charater literals like \t, \n, \v etc. ****
 
                             // Finish the last text item:
-                            if (i != lastI)
-                            {
-                                current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = i });
-                            }
+                            if (i != lastI) current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
                             lastI = i + 2;
                             if (lastI > length) lastI = length;
 
                             // Next add the character literal INCLUDING the escape character, which LiteralText will expect
-                            current.Items.Add(new LiteralText(Settings, current, i) { endIndex = lastI });
+                            current.Items.Add(new LiteralText(Settings, current, i) {endIndex = lastI});
 
                             i++;
-                            continue;
                         }
                     }
                     else if (namedFormatterStartIndex != -1)
                     {
                         if (c == '(')
                         {
-                            var emptyName = (namedFormatterStartIndex == i);
+                            var emptyName = namedFormatterStartIndex == i;
                             if (emptyName)
                             {
                                 namedFormatterStartIndex = -1;
                                 continue;
                             }
+
                             namedFormatterOptionsStartIndex = i;
                         }
                         else if (c == ')' || c == ':')
                         {
                             if (c == ')')
                             {
-                                var hasOpeningParenthesis = (namedFormatterOptionsStartIndex != -1);
+                                var hasOpeningParenthesis = namedFormatterOptionsStartIndex != -1;
 
                                 // ensure no trailing chars past ')'
                                 var nextI = i + 1;
-                                var nextCharIsValid = (nextI < format.Length && (format[nextI] == ':' || format[nextI] == closingBrace));
+                                var nextCharIsValid = nextI < format.Length &&
+                                                      (format[nextI] == ':' || format[nextI] == closingBrace);
 
                                 if (!hasOpeningParenthesis || !nextCharIsValid)
                                 {
@@ -320,15 +309,12 @@ namespace SmartFormat.Core.Parsing
 
                                 namedFormatterOptionsEndIndex = i;
 
-                                if (format[nextI] == ':')
-                                {
-                                    i++; // Consume the ':'
-                                }
-
+                                if (format[nextI] == ':') i++; // Consume the ':'
                             }
-                            
-                            var nameIsEmpty = (namedFormatterStartIndex == i);
-                            var missingClosingParenthesis = (namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex == -1);
+
+                            var nameIsEmpty = namedFormatterStartIndex == i;
+                            var missingClosingParenthesis =
+                                namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex == -1;
                             if (nameIsEmpty || missingClosingParenthesis)
                             {
                                 namedFormatterStartIndex = -1;
@@ -342,32 +328,32 @@ namespace SmartFormat.Core.Parsing
 
                             if (namedFormatterOptionsStartIndex == -1)
                             {
-                                var formatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
-                                
-                                if (FormatterNameExists(formatterName, formatterExtensionNames))
-                                {
-                                    parentPlaceholder.FormatterName = formatterName;
-                                }
-                                else
-                                {
-                                    lastI = current.startIndex;
-                                }
+                                var formatterName = format.Substring(namedFormatterStartIndex,
+                                    i - namedFormatterStartIndex);
 
+                                if (FormatterNameExists(formatterName, formatterExtensionNames))
+                                    parentPlaceholder.FormatterName = formatterName;
+                                else
+                                    lastI = current.startIndex;
                             }
                             else
                             {
-                                var formatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
+                                var formatterName = format.Substring(namedFormatterStartIndex,
+                                    namedFormatterOptionsStartIndex - namedFormatterStartIndex);
 
                                 if (FormatterNameExists(formatterName, formatterExtensionNames))
                                 {
                                     parentPlaceholder.FormatterName = formatterName;
-                                    parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+                                    parentPlaceholder.FormatterOptions = format.Substring(
+                                        namedFormatterOptionsStartIndex + 1,
+                                        namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
                                 }
                                 else
                                 {
                                     lastI = current.startIndex;
                                 }
                             }
+
                             current.startIndex = lastI;
 
                             namedFormatterStartIndex = -1;
@@ -382,8 +368,9 @@ namespace SmartFormat.Core.Parsing
                     {
                         // Add the selector:
                         if (i != lastI)
-                        {   
-                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
+                        {
+                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
+                                selectorIndex));
                             selectorIndex++;
                             operatorIndex = i;
                         }
@@ -394,14 +381,11 @@ namespace SmartFormat.Core.Parsing
                     {
                         // Add the selector:
                         if (i != lastI)
-                        {
-                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
-                        }
+                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
+                                selectorIndex));
                         else if (operatorIndex != i)
-                        {
-                            // There are trailing operators. For now, this is an error.
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector], operatorIndex, i);
-                        }
+                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                                operatorIndex, i);
                         lastI = i + 1;
 
                         // Start the format:
@@ -416,12 +400,11 @@ namespace SmartFormat.Core.Parsing
                     {
                         // Add the selector:
                         if (i != lastI)
-                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
+                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
+                                selectorIndex));
                         else if (operatorIndex != i)
-                        {
-                            // There are trailing operators.  For now, this is an error.
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector], operatorIndex, i);
-                        }
+                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                                operatorIndex, i);
                         lastI = i + 1;
 
                         // End the placeholder with no format:
@@ -435,26 +418,25 @@ namespace SmartFormat.Core.Parsing
                         // Let's make sure the selector characters are valid:
                         // Make sure it's alphanumeric:
                         var isValidSelectorChar =
-                            ('0' <= c && c <= '9')
-                            || (_alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'))
-                            || (_allowedSelectorChars.IndexOf(c) != -1);
+                            '0' <= c && c <= '9'
+                            || _alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')
+                            || _allowedSelectorChars.IndexOf(c) != -1;
                         if (!isValidSelectorChar)
-                        {
-                            // Invalid character in the selector.
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.InvalidCharactersInSelector], i, i + 1);
-                        }
+                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                                i, i + 1);
                     }
                 }
             }
 
             // finish the last text item:
             if (lastI != format.Length)
-                current.Items.Add(new LiteralText(Settings, current, lastI) { endIndex = format.Length });
+                current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = format.Length});
 
             // Check that the format is finished:
             if (current.parent != null || currentPlaceholder != null)
             {
-                parsingErrors.AddIssue(current, parsingErrorText[ParsingError.MissingClosingBrace], format.Length, format.Length);
+                parsingErrors.AddIssue(current, parsingErrorText[ParsingError.MissingClosingBrace], format.Length,
+                    format.Length);
                 current.endIndex = format.Length;
                 while (current.parent != null)
                 {
@@ -481,7 +463,6 @@ namespace SmartFormat.Core.Parsing
             return formatterExtensionNames.Any(n => n == name);
         }
 
-
         #endregion
 
         #region: Errors :
@@ -489,8 +470,8 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Depreciated. Use the ParserErrorAction in Settings instead.", false)]
         public ErrorAction ErrorAction
         {
-            get { return Settings.ParseErrorAction; }
-            set { Settings.ParseErrorAction = value; }
+            get => Settings.ParseErrorAction;
+            set => Settings.ParseErrorAction = value;
         }
 
         public enum ParsingError
@@ -503,27 +484,27 @@ namespace SmartFormat.Core.Parsing
 
         public class ParsingErrorText
         {
-            private readonly Dictionary<ParsingError, string> _errors = new Dictionary<ParsingError, string>()
+            private readonly Dictionary<ParsingError, string> _errors = new Dictionary<ParsingError, string>
             {
                 {ParsingError.TooManyClosingBraces, "Format string has too many closing braces"},
-                {ParsingError.TrailingOperatorsInSelector, "There are trailing operators in the selector" },
-                {ParsingError.InvalidCharactersInSelector, "Invalid character in the selector" },
-                {ParsingError.MissingClosingBrace, "Format string is missing a closing brace" }
+                {ParsingError.TrailingOperatorsInSelector, "There are trailing operators in the selector"},
+                {ParsingError.InvalidCharactersInSelector, "Invalid character in the selector"},
+                {ParsingError.MissingClosingBrace, "Format string is missing a closing brace"}
             };
 
             /// <summary>
             /// CTOR.
             /// </summary>
             internal ParsingErrorText()
-            {}
+            {
+            }
 
             /// <summary>
             /// Gets the string representation of the ParsingError enum.
             /// </summary>
             /// <param name="parsingErrorKey"></param>
             /// <returns>The string representation of the ParsingError enum</returns>
-            public string this[ParsingError parsingErrorKey] { get { return _errors[parsingErrorKey]; }
-            }
+            public string this[ParsingError parsingErrorKey] => _errors[parsingErrorKey];
         }
 
         #endregion

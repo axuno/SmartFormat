@@ -17,5 +17,4 @@
         /// <summary>Leaves invalid tokens unmodified in the text.</summary>
         MaintainTokens
     }
-
 }

@@ -4,12 +4,11 @@ namespace SmartFormat.Utilities
 {
     /// <summary>
     /// This class wraps a delegate, allowing it to be used as a parameter
-    /// to any string-formatting method (such as <see cref="string.Format(string, object)"/>).
-    ///
+    /// to any string-formatting method (such as <see cref="string.Format(string, object)" />).
     /// For example:
     /// <code>
-    /// var textWithLink = String.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
-    /// </code>
+    ///  var textWithLink = String.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
+    ///  </code>
     /// </summary>
     public class FormatDelegate : IFormattable
     {
@@ -18,11 +17,12 @@ namespace SmartFormat.Utilities
 
         public FormatDelegate(Func<string, string> getFormat)
         {
-            this.getFormat1 = getFormat;
+            getFormat1 = getFormat;
         }
+
         public FormatDelegate(Func<string, IFormatProvider, string> getFormat)
         {
-            this.getFormat2 = getFormat;
+            getFormat2 = getFormat;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace SmartFormat.Utilities
         /// <returns></returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            return (getFormat1 != null) ? getFormat1(format) : getFormat2(format, formatProvider);
+            return getFormat1 != null ? getFormat1(format) : getFormat2(format, formatProvider);
         }
     }
 }

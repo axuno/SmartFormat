@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
@@ -10,11 +9,14 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class LiteralText : FormatItem
     {
-        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex) : base(smartSettings, parent, startIndex)
-        { }
+        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex) : base(smartSettings, parent,
+            startIndex)
+        {
+        }
 
         public LiteralText(SmartSettings smartSettings, Format parent) : base(smartSettings, parent, parent.startIndex)
-        { }
+        {
+        }
 
         public override string ToString()
         {
@@ -25,17 +27,14 @@ namespace SmartFormat.Core.Parsing
 
         private string ConvertCharacterLiteralsToUnicode()
         {
-            var source = this.baseString.Substring(startIndex, endIndex - startIndex);
+            var source = baseString.Substring(startIndex, endIndex - startIndex);
 
             // No character literal escaping - nothing to do
             if (source[0] != Parser.CharLiteralEscapeChar)
                 return source;
 
             // The string length should be 2: espace character \ and literal character
-            if (source.Length < 2)
-            {
-                throw new ArgumentException($"Missing escape sequence in literal: \"{source}\"");
-            }
+            if (source.Length < 2) throw new ArgumentException($"Missing escape sequence in literal: \"{source}\"");
 
             char c;
             switch (source[1])

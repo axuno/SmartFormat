@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Utilities;
-using System.Collections.Generic;
 
 namespace SmartFormat.Extensions
 {
     public class PluralLocalizationFormatter : IFormatter
     {
-        public string[] Names { get; set; } = { "plural", "p", "" };
+        private PluralRules.PluralRuleDelegate defaultPluralRule;
+        private string defaultTwoLetterISOLanguageName;
 
         /// <summary>
         /// Initializes the plugin with rules for many common languages.
@@ -22,14 +23,9 @@ namespace SmartFormat.Extensions
             DefaultTwoLetterISOLanguageName = defaultTwoLetterISOLanguageName;
         }
 
-        private PluralRules.PluralRuleDelegate defaultPluralRule;
-        private string defaultTwoLetterISOLanguageName;
         public string DefaultTwoLetterISOLanguageName
         {
-            get
-            {
-                return defaultTwoLetterISOLanguageName;
-            }
+            get => defaultTwoLetterISOLanguageName;
             set
             {
                 defaultTwoLetterISOLanguageName = value;
@@ -37,43 +33,7 @@ namespace SmartFormat.Extensions
             }
         }
 
-        private PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
-        {
-            // See if the language was explicitly passed:
-            var pluralOptions = formattingInfo.FormatterOptions;
-            if (pluralOptions.Length != 0)
-            {
-                return PluralRules.GetPluralRule(pluralOptions);
-            }
-
-            // See if a CustomPluralRuleProvider is available from the FormatProvider:
-            var provider = formattingInfo.FormatDetails.Provider;
-            if (provider != null)
-            {
-                var pluralRuleProvider = (CustomPluralRuleProvider) provider.GetFormat(typeof (CustomPluralRuleProvider));
-                if (pluralRuleProvider != null)
-                {
-                    return pluralRuleProvider.GetPluralRule();
-                }
-            }
-
-            // Use the CultureInfo, if provided:
-            var cultureInfo = provider as CultureInfo;
-            if (cultureInfo != null)
-            {
-                var culturePluralRule = PluralRules.GetPluralRule(cultureInfo.TwoLetterISOLanguageName);
-                return culturePluralRule;
-            }
-
-
-            // Use the default, if provided:
-            if (defaultPluralRule != null)
-            {
-                return defaultPluralRule;
-            }
-
-            return null;
-        }
+        public string[] Names { get; set; } = {"plural", "p", ""};
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
@@ -81,10 +41,7 @@ namespace SmartFormat.Extensions
             var current = formattingInfo.CurrentValue;
 
             // Ignore formats that start with "?" (this can be used to bypass this extension)
-            if (format == null || format.baseString[format.startIndex] == ':')
-            {
-                return false;
-            }
+            if (format == null || format.baseString[format.startIndex] == ':') return false;
 
             // Extract the plural words from the format string:
             var pluralWords = format.Split('|');
@@ -98,39 +55,24 @@ namespace SmartFormat.Extensions
             // 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
             if (current is byte || current is short || current is int || current is long
                 || current is float || current is double || current is decimal)
-            {
-                // Normalize the number to decimal:
                 value = Convert.ToDecimal(current);
-            }
             else if (current is IEnumerable<object>)
-            {
-                // Relay on IEnumerable covariance, but don't care about non-generic IEnumerable
-                value = ((IEnumerable<object>)current).Count();
-            }
+                value = ((IEnumerable<object>) current).Count();
             else
-            {
-                // This extension only permits numbers and IEnumerables
                 return false;
-            }
 
 
             // Get the plural rule:
             var pluralRule = GetPluralRule(formattingInfo);
 
-            if (pluralRule == null)
-            {
-                // Not a supported language.
-                return false;
-            }
+            if (pluralRule == null) return false;
 
             var pluralCount = pluralWords.Count;
             var pluralIndex = pluralRule(value, pluralCount);
 
             if (pluralIndex < 0 || pluralWords.Count <= pluralIndex)
-            {
-                // The plural rule should always return a value in-range!
-                throw new FormattingException(format, "Invalid number of plural parameters", pluralWords.Last().endIndex);
-            }
+                throw new FormattingException(format, "Invalid number of plural parameters",
+                    pluralWords.Last().endIndex);
 
             // Output the selected word (allowing for nested formats):
             var pluralForm = pluralWords[pluralIndex];
@@ -138,6 +80,35 @@ namespace SmartFormat.Extensions
             return true;
         }
 
+        private PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
+        {
+            // See if the language was explicitly passed:
+            var pluralOptions = formattingInfo.FormatterOptions;
+            if (pluralOptions.Length != 0) return PluralRules.GetPluralRule(pluralOptions);
+
+            // See if a CustomPluralRuleProvider is available from the FormatProvider:
+            var provider = formattingInfo.FormatDetails.Provider;
+            if (provider != null)
+            {
+                var pluralRuleProvider =
+                    (CustomPluralRuleProvider) provider.GetFormat(typeof(CustomPluralRuleProvider));
+                if (pluralRuleProvider != null) return pluralRuleProvider.GetPluralRule();
+            }
+
+            // Use the CultureInfo, if provided:
+            var cultureInfo = provider as CultureInfo;
+            if (cultureInfo != null)
+            {
+                var culturePluralRule = PluralRules.GetPluralRule(cultureInfo.TwoLetterISOLanguageName);
+                return culturePluralRule;
+            }
+
+
+            // Use the default, if provided:
+            if (defaultPluralRule != null) return defaultPluralRule;
+
+            return null;
+        }
     }
 
     /// <summary>
@@ -145,15 +116,16 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class CustomPluralRuleProvider : IFormatProvider
     {
-        public object GetFormat(Type formatType)
-        {
-            return (formatType == typeof(CustomPluralRuleProvider)) ? this : null;
-        }
-
         private readonly PluralRules.PluralRuleDelegate _pluralRule;
+
         public CustomPluralRuleProvider(PluralRules.PluralRuleDelegate pluralRule)
         {
             _pluralRule = pluralRule;
+        }
+
+        public object GetFormat(Type formatType)
+        {
+            return formatType == typeof(CustomPluralRuleProvider) ? this : null;
         }
 
         public PluralRules.PluralRuleDelegate GetPluralRule()
@@ -161,5 +133,4 @@ namespace SmartFormat.Extensions
             return _pluralRule;
         }
     }
-
 }

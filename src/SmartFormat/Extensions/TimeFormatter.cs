@@ -7,7 +7,7 @@ namespace SmartFormat.Extensions
 {
     public class TimeFormatter : IFormatter
     {
-        public string[] Names { get; set; } = { "timespan", "time", "t", "" };
+        public string[] Names { get; set; } = {"timespan", "time", "t", ""};
 
         #region Constructors
 
@@ -17,14 +17,15 @@ namespace SmartFormat.Extensions
         public TimeFormatter() : this(null)
         {
         }
+
         /// <summary>
         /// Initializes the extension with a default TimeTextInfo.
         /// </summary>
         /// <param name="defaultTwoLetterLanguageName">This will be used when no CultureInfo is supplied.  Can be null.</param>
         public TimeFormatter(string defaultTwoLetterLanguageName)
         {
-            this.DefaultFormatOptions = TimeSpanUtility.DefaultFormatOptions;
-            this.DefaultTwoLetterISOLanguageName = defaultTwoLetterLanguageName;
+            DefaultFormatOptions = TimeSpanUtility.DefaultFormatOptions;
+            DefaultTwoLetterISOLanguageName = defaultTwoLetterLanguageName;
         }
 
         #endregion
@@ -45,38 +46,36 @@ namespace SmartFormat.Extensions
 
             if (format != null && format.HasNested) return false;
             string options;
-            if (formattingInfo.FormatterOptions != "") 
+            if (formattingInfo.FormatterOptions != "")
                 options = formattingInfo.FormatterOptions;
-            else if (format != null) 
+            else if (format != null)
                 options = format.GetLiteralText();
-            else 
+            else
                 options = "";
-            
+
             TimeSpan fromTime;
             if (current is TimeSpan)
             {
-                fromTime = (TimeSpan)current;
+                fromTime = (TimeSpan) current;
             }
             else if (current is DateTime && formattingInfo.FormatterOptions != "")
             {
-                fromTime = DateTime.Now.Subtract((DateTime)current);
+                fromTime = DateTime.Now.Subtract((DateTime) current);
             }
             else if (current is DateTime && options.StartsWith("timestring"))
             {
                 options = options.Substring(10);
-                fromTime = DateTime.Now.Subtract((DateTime)current);
+                fromTime = DateTime.Now.Subtract((DateTime) current);
             }
             else
             {
                 return false;
             }
+
             var timeTextInfo = GetTimeTextInfo(formattingInfo.FormatDetails.Provider);
-            if (timeTextInfo == null)
-            {
-                return false;
-            }
+            if (timeTextInfo == null) return false;
             var formattingOptions = TimeSpanFormatOptionsConverter.Parse(options);
-            var timeString = TimeSpanUtility.ToTimeString(fromTime, formattingOptions, timeTextInfo);
+            var timeString = fromTime.ToTimeString(formattingOptions, timeTextInfo);
             formattingInfo.Write(timeString);
             return true;
         }
@@ -86,11 +85,8 @@ namespace SmartFormat.Extensions
             if (provider != null)
             {
                 // See if the provider can give us what we want:
-                var timeTextInfo = (TimeTextInfo)provider.GetFormat(typeof (TimeTextInfo));
-                if (timeTextInfo != null)
-                {
-                    return timeTextInfo;
-                }
+                var timeTextInfo = (TimeTextInfo) provider.GetFormat(typeof(TimeTextInfo));
+                if (timeTextInfo != null) return timeTextInfo;
 
                 // See if there is a rule for this culture:
                 var cultureInfo = provider as CultureInfo;
@@ -108,7 +104,5 @@ namespace SmartFormat.Extensions
         }
 
         #endregion
-
     }
-
 }

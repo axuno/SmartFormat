@@ -41,6 +41,9 @@
     <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -76,14 +79,13 @@
     <Compile Include="Extensions\DefaultFormatter.cs" />
     <Compile Include="Extensions\DefaultSource.cs" />
     <Compile Include="Extensions\DictionarySource.cs" />
-    <Compile Include="Extensions\IsMatchFormatter.cs" />
-    <Compile Include="Extensions\JsonSource.cs" />
     <Compile Include="Extensions\ListFormatter.cs" />
     <Compile Include="Extensions\PluralLocalizationFormatter.cs" />
     <Compile Include="Extensions\ReflectionSource.cs" />
     <Compile Include="Extensions\TemplateFormatter.cs" />
     <Compile Include="Extensions\TimeFormatter.cs" />
     <Compile Include="Extensions\XElementFormatter.cs" />
+    <Compile Include="Extensions\JsonSource.cs" />
     <Compile Include="Extensions\XmlSource.cs" />
     <Compile Include="FormattingErrorEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="Utilities\TimeSpanUtility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="SmartFormat.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

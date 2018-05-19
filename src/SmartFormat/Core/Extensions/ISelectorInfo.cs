@@ -8,7 +8,7 @@ namespace SmartFormat.Core.Extensions
     /// Contains all the necessary information for evaluating a selector.
     /// </summary>
     /// <example>
-    /// When evaluating "{Items.Length}", 
+    /// When evaluating "{Items.Length}",
     /// the CurrentValue might be Items, and the Selector would be "Length".
     /// The job of an ISource is to set CurrentValue to Items.Length.
     /// </example>

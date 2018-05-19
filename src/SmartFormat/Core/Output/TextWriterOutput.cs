@@ -12,7 +12,8 @@ namespace SmartFormat.Core.Output
         {
             Output = output;
         }
-        public TextWriter Output { get; private set; }
+
+        public TextWriter Output { get; }
 
         public void Write(string text, IFormattingInfo formattingInfo)
         {

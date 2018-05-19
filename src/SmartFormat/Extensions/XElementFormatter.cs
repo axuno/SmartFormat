@@ -17,12 +17,9 @@ namespace SmartFormat.Extensions
             if (format != null && format.HasNested) return false;
             // if we need to format list of XElements then we just take and format first
             var xElmentsAsList = current as IList<XElement>;
-            if (xElmentsAsList != null && xElmentsAsList.Count > 0)
-            {
-                currentXElement = xElmentsAsList[0];
-            }
+            if (xElmentsAsList != null && xElmentsAsList.Count > 0) currentXElement = xElmentsAsList[0];
 
-            var currentAsXElement = (currentXElement) ?? current as XElement;
+            var currentAsXElement = currentXElement ?? current as XElement;
             if (currentAsXElement != null)
             {
                 formattingInfo.Write(currentAsXElement.Value);
@@ -31,7 +28,5 @@ namespace SmartFormat.Extensions
 
             return false;
         }
-
     }
-
 }

@@ -8,7 +8,7 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class DefaultFormatter : IFormatter
     {
-        public string[] Names { get; set; } = { "default", "d", "" };
+        public string[] Names { get; set; } = {"default", "d", ""};
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
@@ -24,10 +24,7 @@ namespace SmartFormat.Extensions
             }
 
             // If the object is null, we shouldn't write anything
-            if (current == null)
-            {
-                current = "";
-            }
+            if (current == null) current = "";
 
 
             //  (The following code was adapted from the built-in String.Format code)
@@ -38,7 +35,8 @@ namespace SmartFormat.Extensions
             IFormattable formattable;
             // Use the provider to see if a CustomFormatter is available:
             var provider = formattingInfo.FormatDetails.Provider;
-            if (provider != null && (cFormatter = provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
+            if (provider != null &&
+                (cFormatter = provider.GetFormat(typeof(ICustomFormatter)) as ICustomFormatter) != null)
             {
                 var formatText = format == null ? null : format.GetLiteralText();
                 result = cFormatter.Format(formatText, current, provider);
@@ -63,10 +61,7 @@ namespace SmartFormat.Extensions
             if (formattingInfo.Alignment > 0)
             {
                 var spaces = formattingInfo.Alignment - result.Length;
-                if (spaces > 0)
-                {
-                    formattingInfo.Write(new String(' ', spaces));
-                }
+                if (spaces > 0) formattingInfo.Write(new string(' ', spaces));
             }
 
             // Output the result:
@@ -76,14 +71,10 @@ namespace SmartFormat.Extensions
             if (formattingInfo.Alignment < 0)
             {
                 var spaces = -formattingInfo.Alignment - result.Length;
-                if (spaces > 0)
-                {
-                    formattingInfo.Write(new String(' ', spaces));
-                }
+                if (spaces > 0) formattingInfo.Write(new string(' ', spaces));
             }
 
             return true;
         }
-
     }
 }

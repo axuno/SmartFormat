@@ -1,11 +1,11 @@
-﻿using SmartFormat.Core.Settings;
+﻿using System;
 
 namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Supplies information about parsing errors.
     /// </summary>
-    public class ParsingErrorEventArgs : System.EventArgs
+    public class ParsingErrorEventArgs : EventArgs
     {
         internal ParsingErrorEventArgs(ParsingErrors errors, bool throwsException)
         {

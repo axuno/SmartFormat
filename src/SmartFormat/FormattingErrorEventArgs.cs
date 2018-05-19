@@ -1,9 +1,11 @@
-﻿namespace SmartFormat
+﻿using System;
+
+namespace SmartFormat
 {
     /// <summary>
     /// Supplies information about formatting errors.
     /// </summary>
-    public class FormattingErrorEventArgs : System.EventArgs
+    public class FormattingErrorEventArgs : EventArgs
     {
         internal FormattingErrorEventArgs(string rawText, int errorIndex, bool ignoreError)
         {

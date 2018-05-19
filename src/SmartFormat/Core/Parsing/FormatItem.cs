@@ -8,10 +8,15 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public abstract class FormatItem
     {
+        public readonly string baseString;
+        public int endIndex;
         protected SmartSettings SmartSettings;
+        public int startIndex;
 
-        protected FormatItem(SmartSettings smartSettings, FormatItem parent, int startIndex) : this(smartSettings, parent.baseString, startIndex, parent.baseString.Length)
-        { }
+        protected FormatItem(SmartSettings smartSettings, FormatItem parent, int startIndex) : this(smartSettings,
+            parent.baseString, startIndex, parent.baseString.Length)
+        {
+        }
 
         protected FormatItem(SmartSettings smartSettings, string baseString, int startIndex, int endIndex)
         {
@@ -24,18 +29,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Retrieves the raw text that this item represents.
         /// </summary>
-        public string RawText
-        {
-            get
-            {
-                return this.baseString.Substring(startIndex, endIndex - startIndex);
-            }
-        }
-
-
-        public readonly string baseString;
-        public int startIndex;
-        public int endIndex;
+        public string RawText => baseString.Substring(startIndex, endIndex - startIndex);
 
         public override string ToString()
         {

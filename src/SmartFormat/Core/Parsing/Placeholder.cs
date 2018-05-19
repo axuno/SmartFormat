@@ -9,27 +9,29 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     /// <example>
     /// For example, in "{Items.Length,10:choose(1,2,3):one|two|three}",
-    /// the <see cref="Alignment"/>s is "10", 
-    /// the <see cref="Selector"/>s are "Items" and "Length", 
+    /// the <see cref="Alignment" />s is "10",
+    /// the <see cref="Selector" />s are "Items" and "Length",
     /// the <see cref="FormatterName" /> is "choose",
-    /// the <see cref="FormatterOptions"/> is "1,2,3",
-    /// and the <see cref="Format"/> is "one|two|three".
+    /// the <see cref="FormatterOptions" /> is "1,2,3",
+    /// and the <see cref="Format" /> is "one|two|three".
     /// </example>
     public class Placeholder : FormatItem
     {
-        public Placeholder(SmartSettings smartSettings, Format parent, int startIndex, int nestedDepth) : base(smartSettings, parent, startIndex)
+        public readonly Format parent;
+
+        public Placeholder(SmartSettings smartSettings, Format parent, int startIndex, int nestedDepth) : base(
+            smartSettings, parent, startIndex)
         {
             this.parent = parent;
-            this.Selectors = new List<Selector>();
-            this.NestedDepth = nestedDepth;
-            this.FormatterName = "";
-            this.FormatterOptions = "";
+            Selectors = new List<Selector>();
+            NestedDepth = nestedDepth;
+            FormatterName = "";
+            FormatterOptions = "";
         }
 
-        public readonly Format parent;
         public int NestedDepth { get; set; }
 
-        public List<Selector> Selectors { get; private set; }
+        public List<Selector> Selectors { get; }
         public int Alignment { get; set; }
         public string FormatterName { get; set; }
         public string FormatterOptions { get; set; }
@@ -39,15 +41,13 @@ namespace SmartFormat.Core.Parsing
         {
             var result = new StringBuilder(endIndex - startIndex);
             result.Append('{');
-            foreach (var s in Selectors)
-            {
-                result.Append(s.baseString, s.operatorStart, s.endIndex - s.operatorStart);
-            }
+            foreach (var s in Selectors) result.Append(s.baseString, s.operatorStart, s.endIndex - s.operatorStart);
             if (Alignment != 0)
             {
                 result.Append(',');
                 result.Append(Alignment);
             }
+
             if (FormatterName != "")
             {
                 result.Append(':');
@@ -59,11 +59,13 @@ namespace SmartFormat.Core.Parsing
                     result.Append(')');
                 }
             }
+
             if (Format != null)
             {
                 result.Append(':');
-                result.Append(Format.ToString());
+                result.Append(Format);
             }
+
             result.Append('}');
             return result.ToString();
         }

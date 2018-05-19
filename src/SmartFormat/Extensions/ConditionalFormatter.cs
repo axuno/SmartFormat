@@ -8,24 +8,21 @@ namespace SmartFormat.Extensions
 {
     public class ConditionalFormatter : IFormatter
     {
-        public string[] Names { get; set; } = { "conditional", "cond", "" };
-
         private static readonly Regex _complexConditionPattern
             = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
-            //   Description:      and/or    comparator     value
-            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                //   Description:      and/or    comparator     value
+                RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        public string[] Names { get; set; } = {"conditional", "cond", ""};
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
-            
+
             if (format == null) return false;
             // Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
-            if (format.baseString[format.startIndex] == ':')
-            {
-                format = format.Substring(1);
-            }
+            if (format.baseString[format.startIndex] == ':') format = format.Substring(1);
 
             // See if the format string contains un-nested "|":
             var parameters = format.Split('|');
@@ -41,36 +38,28 @@ namespace SmartFormat.Extensions
 #else
             if (currentIsNumber == false && current != null && current.GetType().IsEnum)
 #endif
-            {
                 currentIsNumber = true;
-            }
             var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
-            
+
             int paramIndex; // Determines which parameter to use for output
 
             // First, we'll see if we are using "complex conditions":
-            if (currentIsNumber) {
+            if (currentIsNumber)
+            {
                 paramIndex = -1;
                 while (true)
                 {
                     paramIndex++;
-                    if (paramIndex == parameters.Count)
-                    {
-                        // We reached the end of our parameters,
-                        // so we output nothing
-                        return true;
-                    }
+                    if (paramIndex == parameters.Count) return true;
 
-                    if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out var conditionWasTrue, out Format outputItem))
+                    if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out var conditionWasTrue,
+                        out var outputItem))
                     {
                         // This parameter doesn't have a
                         // complex condition (making it a "else" condition)
 
                         // Only do "complex conditions" if the first item IS a "complex condition".
-                        if (paramIndex == 0)
-                        {
-                            break;
-                        }
+                        if (paramIndex == 0) break;
                         // Otherwise, output the "else" section:
                         conditionWasTrue = true;
                     }
@@ -82,6 +71,7 @@ namespace SmartFormat.Extensions
                         return true;
                     }
                 }
+
                 // We don't have any "complex conditions",
                 // so let's do the normal conditional formatting:
             }
@@ -90,82 +80,61 @@ namespace SmartFormat.Extensions
             var paramCount = parameters.Count;
 
             // Determine the Current item's Type:
-            if (currentIsNumber) {
+            if (currentIsNumber)
+            {
                 if (currentNumber < 0)
-                {
                     paramIndex = paramCount - 1;
-                }
                 else
-                {
-                    paramIndex = Math.Min((int)Math.Floor(currentNumber), paramCount - 1);
-                }
+                    paramIndex = Math.Min((int) Math.Floor(currentNumber), paramCount - 1);
             }
-            else if (current is bool) {
+            else if (current is bool)
+            {
                 // Bool: True|False
-                bool arg = (bool)current;
+                var arg = (bool) current;
                 if (arg)
-                {
                     paramIndex = 0;
-                }
                 else
-                {
                     paramIndex = 1;
-                }
             }
-            else if (current is DateTime) {
+            else if (current is DateTime)
+            {
                 // Date: Past|Present|Future   or   Past/Present|Future
-                DateTime arg = (DateTime)current;
+                var arg = (DateTime) current;
                 if (paramCount == 3 && arg.Date == DateTime.Today)
-                {
                     paramIndex = 1;
-                }
                 else if (arg <= DateTime.Now)
-                {
                     paramIndex = 0;
-                }
                 else
-                {
                     paramIndex = paramCount - 1;
-                }
             }
-            else if (current is TimeSpan) {
+            else if (current is TimeSpan)
+            {
                 // TimeSpan: Negative|Zero|Positive  or  Negative/Zero|Positive
-                TimeSpan arg = (TimeSpan)current;
+                var arg = (TimeSpan) current;
                 if (paramCount == 3 && arg == TimeSpan.Zero)
-                {
                     paramIndex = 1;
-                }
                 else if (arg.CompareTo(TimeSpan.Zero) <= 0)
-                {
                     paramIndex = 0;
-                }
                 else
-                {
                     paramIndex = paramCount - 1;
-                }
             }
-            else if (current is string) {
+            else if (current is string)
+            {
                 // String: Value|NullOrEmpty
-                var arg = (string)current;
+                var arg = (string) current;
                 if (!string.IsNullOrEmpty(arg))
-                {
                     paramIndex = 0;
-                }
                 else
-                {
                     paramIndex = 1;
-                }
-            } else {
+            }
+            else
+            {
                 // Object: Something|Nothing
-                object arg = current;
+                var arg = current;
                 if (arg != null)
-                {
                     paramIndex = 0;
-                }
                 else
-                {
                     paramIndex = 1;
-                }
             }
 
             // Now, output the selected parameter:
@@ -178,34 +147,37 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Evaluates a conditional format.
-        ///
         /// Each condition must start with a comparor: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
         /// Conditions must be separated by either "&amp;" (AND) or "/" (OR).
         /// The conditional statement must end with a "?".
-        ///
         /// Examples:
         /// &gt;=21&amp;&lt;30&amp;!=25/=40?
         /// </summary>
-        private static bool TryEvaluateCondition(Format parameter, decimal value, out bool conditionResult, out Format outputItem)
+        private static bool TryEvaluateCondition(Format parameter, decimal value, out bool conditionResult,
+            out Format outputItem)
         {
             conditionResult = false;
             // Let's evaluate the conditions into a boolean value:
-            Match m = _complexConditionPattern.Match(parameter.baseString, parameter.startIndex, parameter.endIndex - parameter.startIndex);
-            if (!m.Success) {
+            var m = _complexConditionPattern.Match(parameter.baseString, parameter.startIndex,
+                parameter.endIndex - parameter.startIndex);
+            if (!m.Success)
+            {
                 // Could not parse the "complex condition"
                 outputItem = parameter;
                 return false;
             }
 
 
-            CaptureCollection andOrs = m.Groups[1].Captures;
-            CaptureCollection comps = m.Groups[2].Captures;
-            CaptureCollection values = m.Groups[3].Captures;
+            var andOrs = m.Groups[1].Captures;
+            var comps = m.Groups[2].Captures;
+            var values = m.Groups[3].Captures;
 
-            for (int i = 0; i < andOrs.Count; i++) {
-                decimal v = decimal.Parse(values[i].Value);
-                bool exp = false;
-                switch (comps[i].Value) {
+            for (var i = 0; i < andOrs.Count; i++)
+            {
+                var v = decimal.Parse(values[i].Value);
+                var exp = false;
+                switch (comps[i].Value)
+                {
                     case ">":
                         exp = value > v;
                         break;
@@ -228,15 +200,12 @@ namespace SmartFormat.Extensions
                         break;
                 }
 
-                if (i == 0) {
+                if (i == 0)
                     conditionResult = exp;
-                }
-                else if (andOrs[i].Value == "/") {
+                else if (andOrs[i].Value == "/")
                     conditionResult = conditionResult | exp;
-                }
-                else {
+                else
                     conditionResult = conditionResult & exp;
-                }
             }
 
             // Successful
@@ -245,6 +214,5 @@ namespace SmartFormat.Extensions
             outputItem = parameter.Substring(newStartIndex);
             return true;
         }
-
     }
 }

@@ -8,7 +8,7 @@
 *.ncrunch*
 *.cache
 *.nupkg
-**project.lock.json
+*.project.lock.json
 
 # NuGet Packages
 *.nupkg

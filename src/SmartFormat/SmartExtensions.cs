@@ -65,7 +65,8 @@ namespace SmartFormat
             return Smart.Format(format, args);
         }
 
-        /// <summary> Formats the specified arguments using this string as a template.
+        /// <summary>
+        /// Formats the specified arguments using this string as a template.
         /// Caches the parsing results for increased performance.
         /// </summary>
         /// <param name="format">The template that defines how the arguments are formatted</param>
@@ -78,6 +79,5 @@ namespace SmartFormat
         }
 
         #endregion
-
     }
 }

@@ -1,49 +1,42 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-#if !NETSTANDARD1_6
-// Not supported by .Net Core
-using System.Runtime.Remoting.Messaging;
-#endif
 using System.Threading;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+#if !NETSTANDARD1_6
+// Not supported by .Net Core
+using System.Runtime.Remoting.Messaging;
+#endif
 
 namespace SmartFormat.Extensions
 {
     /// <summary>
     /// If the source value is an array (or supports ICollection),
     /// then each item will be custom formatted.
-    ///
-    ///
     /// Syntax:
     /// #1: "format|spacer"
     /// #2: "format|spacer|last spacer"
     /// #3: "format|spacer|last spacer|two spacer"
-    ///
-    /// The format will be used for each item in the collection, the spacer will be between all items, and the last spacer will replace the spacer for the last item only.
-    ///
+    /// The format will be used for each item in the collection, the spacer will be between all items, and the last spacer
+    /// will replace the spacer for the last item only.
     /// Example:
-    /// CustomFormat("{Dates:D|; |; and }", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "January 1, 2000; December 31, 2999; and September 9, 9999"
+    /// CustomFormat("{Dates:D|; |; and }", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "January 1, 2000; December 31, 2999;
+    /// and September 9, 9999"
     /// In this example, format = "D", spacer = "; ", and last spacer = "; and "
-    ///
-    ///
-    ///
     /// Advanced:
     /// Composite Formatting is allowed in the format by using nested braces.
     /// If a nested item is detected, Composite formatting will be used.
-    ///
     /// Example:
     /// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
     /// In this example, format = "{Width}x{Height}".  Notice the nested braces.
-    ///
     /// </summary>
     public class ListFormatter : IFormatter, ISource
     {
-        private SmartSettings _smartSettings;
+        private readonly SmartSettings _smartSettings;
 
-        public string[] Names { get; set; } = { "list", "l", "" };
+        public string[] Names { get; set; } = {"list", "l", ""};
 
         public ListFormatter(SmartFormatter formatter)
         {
@@ -53,7 +46,6 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// This allows an integer to be used as a selector to index an array (or list).
-        ///
         /// This is better described using an example:
         /// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
         /// The ".2" selector is used to reference Dates[2].
@@ -66,8 +58,9 @@ namespace SmartFormat.Extensions
             // See if we're trying to access a specific index:
             int itemIndex;
             var currentList = current as IList;
-            var isAbsolute = (selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0);
-            if (!isAbsolute && currentList != null && int.TryParse(selector, out itemIndex) && itemIndex < currentList.Count)
+            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
+            if (!isAbsolute && currentList != null && int.TryParse(selector, out itemIndex) &&
+                itemIndex < currentList.Count)
             {
                 // The current is a List, and the selector is a number;
                 // let's return the List item:
@@ -112,7 +105,7 @@ namespace SmartFormat.Extensions
         private static readonly string key = "664c3d47-8d00-4825-b4fb-f3dd7c8a9bdf";
 
         /// <remarks>
-        /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
+        /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data
         /// not supported by .Net Core. Instead .Net Core provides AsyncLocal&lt;T&gt;
         /// </remarks>
         private static int CollectionIndex
@@ -122,12 +115,12 @@ namespace SmartFormat.Extensions
                 var val = CallContext.LogicalGetData(key);
                 return (int?) val ?? -1;
             }
-            set { CallContext.LogicalSetData(key, value); }
+            set => CallContext.LogicalSetData(key, value);
         }
 #else
-        /// <remarks>
-        /// Wrap, so that CollectionIndex can be used without code changes.
-        /// </remarks>
+/// <remarks>
+/// Wrap, so that CollectionIndex can be used without code changes.
+/// </remarks>
         private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
 
         /// <remarks>
@@ -146,7 +139,7 @@ namespace SmartFormat.Extensions
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
-            
+
             // This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
 
             // This extension requires at least IEnumerable
@@ -170,9 +163,9 @@ namespace SmartFormat.Extensions
             // itemFormat|spacer|lastSpacer
             // itemFormat|spacer|lastSpacer|twoSpacer
             var itemFormat = parameters[0];
-            var spacer = (parameters.Count >= 2) ? parameters[1].GetLiteralText() : "";
-            var lastSpacer = (parameters.Count >= 3) ? parameters[2].GetLiteralText() : spacer;
-            var twoSpacer = (parameters.Count >= 4) ? parameters[3].GetLiteralText() : lastSpacer;
+            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : "";
+            var lastSpacer = parameters.Count >= 3 ? parameters[2].GetLiteralText() : spacer;
+            var twoSpacer = parameters.Count >= 4 ? parameters[3].GetLiteralText() : lastSpacer;
 
             if (!itemFormat.HasNested)
             {
@@ -198,16 +191,15 @@ namespace SmartFormat.Extensions
             if (items == null)
             {
                 var allItems = new List<object>();
-                foreach (var item in enumerable)
-                {
-                    allItems.Add(item);
-                }
+                foreach (var item in enumerable) allItems.Add(item);
                 items = allItems;
             }
 
-            var oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
+            var oldCollectionIndex =
+                CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
             CollectionIndex = -1;
-            foreach (object item in items) {
+            foreach (var item in items)
+            {
                 CollectionIndex += 1; // Keep track of the index
 
                 // Determine which spacer to write:
@@ -215,7 +207,8 @@ namespace SmartFormat.Extensions
                 {
                     // Don't write the spacer.
                 }
-                else if (CollectionIndex < items.Count - 1) {
+                else if (CollectionIndex < items.Count - 1)
+                {
                     formattingInfo.Write(spacer);
                 }
                 else if (CollectionIndex == 1)

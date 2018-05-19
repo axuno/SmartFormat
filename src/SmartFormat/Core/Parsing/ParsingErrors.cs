@@ -10,29 +10,26 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class ParsingErrors : Exception
     {
+        private readonly Format result;
+
         public ParsingErrors(Format result)
         {
             this.result = result;
-            this.Issues = new List<ParsingIssue>();
+            Issues = new List<ParsingIssue>();
         }
 
-        private readonly Format result;
-        public List<ParsingIssue> Issues { get; private set; }
-        public bool HasIssues { get { return Issues.Count > 0; } }
-        public void AddIssue(Format parent, string issue, int startIndex, int endIndex)
-        {
-            Issues.Add(new ParsingIssue(issue, startIndex, endIndex - startIndex));
-        }
+        public List<ParsingIssue> Issues { get; }
+        public bool HasIssues => Issues.Count > 0;
 
         public string MessageShort
         {
             get
             {
                 return string.Format("The format string has {0} issue{1}: {2}",
-                                     Issues.Count,
-                                     Issues.Count == 1 ? "" : "s",
-                                     string.Join(", ", Issues.Select(i => i.Issue).ToArray())
-                                     );
+                    Issues.Count,
+                    Issues.Count == 1 ? "" : "s",
+                    string.Join(", ", Issues.Select(i => i.Issue).ToArray())
+                );
             }
         }
 
@@ -56,26 +53,34 @@ namespace SmartFormat.Core.Parsing
                         lastArrow = issue.Index + 1;
                     }
                 }
+
                 return string.Format("The format string has {0} issue{1}:\n{2}\nIn: \"{3}\"\nAt:  {4} ",
-                                     Issues.Count,
-                                     Issues.Count == 1 ? "" : "s",
-                                     string.Join(", ", Issues.Select(i => i.Issue).ToArray()),
-                                     result.baseString,
-                                     arrows
-                                     );
+                    Issues.Count,
+                    Issues.Count == 1 ? "" : "s",
+                    string.Join(", ", Issues.Select(i => i.Issue).ToArray()),
+                    result.baseString,
+                    arrows
+                );
             }
         }
+
+        public void AddIssue(Format parent, string issue, int startIndex, int endIndex)
+        {
+            Issues.Add(new ParsingIssue(issue, startIndex, endIndex - startIndex));
+        }
+
         public class ParsingIssue
         {
             public ParsingIssue(string issue, int index, int length)
             {
-                this.Issue = issue;
-                this.Index = index;
-                this.Length = length;
+                Issue = issue;
+                Index = index;
+                Length = length;
             }
-            public int Index { get; private set;}
-            public int Length { get; private set;}
-            public string Issue { get; private set;}
+
+            public int Index { get; }
+            public int Length { get; }
+            public string Issue { get; }
         }
     }
 }
