@@ -38,6 +38,7 @@ https://github.com/scottrippey/SmartFormat.NET/blob/master/CHANGES.md</PackageRe
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
   </ItemGroup>

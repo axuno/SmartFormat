@@ -28,15 +28,17 @@ namespace SmartFormat
 
         public static string Format(string format, object arg0, object arg1, object arg2)
         {
-            return Format(format, new object[] { arg0, arg1, arg2 });
+            return Format(format, new[] {arg0, arg1, arg2});
         }
+
         public static string Format(string format, object arg0, object arg1)
         {
-            return Format(format, new object[] { arg0, arg1 });
+            return Format(format, new[] {arg0, arg1});
         }
+
         public static string Format(string format, object arg0)
         {
-            return Default.Format(format, new object[] { arg0 }); // call Default.Format in order to avoid infinite recursive method call
+            return Default.Format(format, arg0); // call Default.Format in order to avoid infinite recursive method call
         }
 
         #endregion
@@ -44,6 +46,7 @@ namespace SmartFormat
         #region: Default formatter :
 
         private static SmartFormatter _default;
+
         public static SmartFormatter Default
         {
             get
@@ -52,44 +55,43 @@ namespace SmartFormat
                     _default = CreateDefaultSmartFormat();
                 return _default;
             }
-            set
-            {
-                _default = value;
-            }
+            set => _default = value;
         }
 
         public static SmartFormatter CreateDefaultSmartFormat()
         {
             // Register all default extensions here:
-            var result = new SmartFormatter();
+            var formatter = new SmartFormatter();
             // Add all extensions:
             // Note, the order is important; the extensions
             // will be executed in this order:
 
-            var listFormatter = new ListFormatter(result);
-            
-            result.AddExtensions(
-                (ISource)listFormatter,
-                new ReflectionSource(result),
-                new DictionarySource(result),
-                new XmlSource(result),
-                // These default extensions reproduce the String.Format behavior:
-                new DefaultSource(result)
-                );
-            result.AddExtensions(
-                (IFormatter)listFormatter,
+            var listFormatter = new ListFormatter(formatter);
+
+            // sources for specific types must be in the list before ReflectionSource
+            formatter.AddExtensions(
+                (ISource) listFormatter, // ListFormatter MUST be first
+                new DictionarySource(formatter),
+                new JsonSource(formatter),
+                new XmlSource(formatter),
+                new ReflectionSource(formatter),
+
+                // The DefaultSource reproduces the string.Format behavior:
+                new DefaultSource(formatter)
+            );
+            formatter.AddExtensions(
+                (IFormatter) listFormatter,
                 new PluralLocalizationFormatter("en"),
                 new ConditionalFormatter(),
                 new TimeFormatter("en"),
                 new XElementFormatter(),
                 new ChooseFormatter(),
                 new DefaultFormatter()
-                );
+            );
 
-            return result;
+            return formatter;
         }
 
         #endregion
-
     }
 }

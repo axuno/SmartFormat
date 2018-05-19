@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
+using Newtonsoft.Json.Linq;
 #if !NETCOREAPP1_0
 using System.Runtime.Remoting.Messaging;
 #endif
@@ -137,71 +138,6 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual(expected, result);
         }
 
-        [Test, Explicit("Performance tests should be run explicitly. This test will take about 4 seconds.")]
-        public void Dictionary_Performance()
-        {
-            var result = string.Empty;
-            var addr = new Address();
-            const string format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
-                                  "Name: {Person.FirstName} {Person.LastName}";
-
-            var sw = new Stopwatch();
-
-            // Direct member acess:
-            sw.Start();
-            for (var i = 0; i < 100000; i++)
-            {
-                result = $"Address: {addr.City.ZipCode} {addr.City.Name}, {addr.City.AreaCode}\n" +
-                         $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
-            }
-            sw.Stop();
-            var directMemberTest = sw.ElapsedMilliseconds;
-            sw.Reset();
-
-            // Smart.Format with reflection:
-            var formatter = new SmartFormatter();
-            formatter.AddExtensions(
-                new ReflectionSource(formatter),
-                new DefaultSource(formatter)
-                );
-            formatter.AddExtensions(
-                new DefaultFormatter()
-                );
-
-            sw.Start();
-            for (var i = 0; i < 100000; i++)
-            {
-                result = formatter.Format(format, addr);
-            }
-            sw.Stop();
-            var reflectionMemberTest = sw.ElapsedMilliseconds;
-            sw.Reset();
-
-            // Smart.Format with Dictionary:
-            formatter = new SmartFormatter();
-            formatter.AddExtensions(
-                new DictionarySource(formatter),
-                new DefaultSource(formatter)
-                );
-            formatter.AddExtensions(
-                new DefaultFormatter()
-                );
-
-            sw.Start();
-            var dict = addr.ToDictionary(); // get class projection to dictionary hierarchy
-            for (var i = 0; i < 100000; i++)
-            {
-                result = formatter.Format(format, dict);
-            }
-            sw.Stop();
-            var dictionaryProjectionTest = sw.ElapsedMilliseconds;
-            sw.Reset();
-
-            Console.WriteLine("Test results as performance index:");
-            Console.WriteLine("Direct Member Test: {0} ({1} ms)", directMemberTest/ directMemberTest, directMemberTest);
-            Console.WriteLine("Reflection Test: {0} ({1} ms)", reflectionMemberTest / directMemberTest, reflectionMemberTest);
-            Console.WriteLine("Dictionary Projection Test: {0} ({1} ms)", dictionaryProjectionTest / directMemberTest, dictionaryProjectionTest);
-        }
 
         public class Address
         {
@@ -216,6 +152,11 @@ namespace SmartFormat.Tests.Extensions
                     { nameof(Person), Person.ToDictionary() }
                 };
                 return d;
+            }
+
+            public JObject ToJson()
+            {
+                return JObject.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(this));
             }
 
             public class CityDetails
