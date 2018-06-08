@@ -56,6 +56,43 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
+        public void Test_English_Unsigned()
+        {
+            /**
+             * Different pattern for this test because simply casting ints to u* types
+             * for use in TestCase or ExpectedResults will pass with the old code
+             * but actually declaring them as u* doesn't.
+             */
+
+            const string format = "There {0:plural(en):is|are} {0} {0:plural(en):item|items} remaining";
+
+            var expectedResults = new[]
+            {
+                "There are 0 items remaining",
+                "There is 1 item remaining",
+                "There are 2 items remaining"
+            };
+
+            for (ushort i = 0; i < expectedResults.Length; i++)
+            {
+                var actualResult = Smart.Format(format, i);
+                Assert.AreEqual(expectedResults[i], actualResult);
+            }
+
+            for (uint i = 0; i < expectedResults.Length; i++)
+            {
+                var actualResult = Smart.Format(format, i);
+                Assert.AreEqual(expectedResults[i], actualResult);
+            }
+
+            for (ulong i = 0; i < (ulong)expectedResults.Length; i++)
+            {
+                var actualResult = Smart.Format(format, i);
+                Assert.AreEqual(expectedResults[i], actualResult);
+            }
+        }
+
+        [Test]
         public void Test_Turkish()
         {
             TestAllResults(
