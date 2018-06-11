@@ -57,8 +57,8 @@ namespace SmartFormat.Extensions
                 || current is float || current is double || current is decimal
                 || current is ushort || current is uint || current is ulong)
                 value = Convert.ToDecimal(current);
-            else if (current is IEnumerable<object>)
-                value = ((IEnumerable<object>) current).Count();
+            else if (current is IEnumerable<object> objects)
+                value = objects.Count();
             else
                 return false;
 
@@ -89,26 +89,19 @@ namespace SmartFormat.Extensions
 
             // See if a CustomPluralRuleProvider is available from the FormatProvider:
             var provider = formattingInfo.FormatDetails.Provider;
-            if (provider != null)
-            {
-                var pluralRuleProvider =
-                    (CustomPluralRuleProvider) provider.GetFormat(typeof(CustomPluralRuleProvider));
-                if (pluralRuleProvider != null) return pluralRuleProvider.GetPluralRule();
-            }
+            var pluralRuleProvider =
+                (CustomPluralRuleProvider) provider?.GetFormat(typeof(CustomPluralRuleProvider));
+            if (pluralRuleProvider != null) return pluralRuleProvider.GetPluralRule();
 
             // Use the CultureInfo, if provided:
-            var cultureInfo = provider as CultureInfo;
-            if (cultureInfo != null)
+            if (provider is CultureInfo cultureInfo)
             {
                 var culturePluralRule = PluralRules.GetPluralRule(cultureInfo.TwoLetterISOLanguageName);
                 return culturePluralRule;
             }
-
-
+            
             // Use the default, if provided:
-            if (defaultPluralRule != null) return defaultPluralRule;
-
-            return null;
+            return defaultPluralRule;
         }
     }
 
