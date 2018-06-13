@@ -1,6 +1,12 @@
 Latest Changes
 ====
 
+v2.3.0.0
+===
+* Support for JSON Objects as data source
+* Added **IsMatchFormatter** [thanks to ericpyle](https://github.com/scottrippey/SmartFormat.NET/issues/88)
+* Fixes issue with unsigned integers [#101](https://github.com/scottrippey/SmartFormat.NET/issues/108)
+
 v2.2.0.0
 ===
 * Fixes issue [#101](https://github.com/scottrippey/SmartFormat.NET/issues/101)

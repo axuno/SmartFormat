@@ -65,6 +65,7 @@
     <Compile Include="Extensions\ChooseFormatterTests.cs" />
     <Compile Include="Extensions\ConditionalFormatterTests.cs" />
     <Compile Include="Extensions\IsMatchFormatterTests.cs" />
+    <Compile Include="Extensions\JsonSourceTests.cs" />
     <Compile Include="Extensions\SourcePerformanceTests.cs" />
     <Compile Include="Extensions\DictionaryFormatterTests.cs" />
     <Compile Include="Extensions\ListFormatterTests.cs" />
@@ -73,7 +74,6 @@
     <Compile Include="Extensions\StringBuilderTests.cs" />
     <Compile Include="Extensions\TemplateFormatterTests.cs" />
     <Compile Include="Extensions\TimeFormatterTests.cs" />
-    <Compile Include="Extensions\JsonSourceTest.cs" />
     <Compile Include="Extensions\XmlSourceTest.cs" />
     <Compile Include="OldTests\CodeProjectExampleTests.cs" />
     <Compile Include="OldTests\PerformanceTests.cs" />

@@ -22,7 +22,8 @@ https://github.com/scottrippey/SmartFormat.NET/blob/master/CHANGES.md</PackageRe
     <PackageProjectUrl>https://github.com/scottrippey/SmartFormat.NET</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/scottrippey/SmartFormat.NET/master/SmartFormat_365x365.png</PackageIconUrl>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Version>2.2.0.0</Version>
+    <Version>2.3.0.0</Version>
+    <RepositoryUrl>https://github.com/scottrippey/SmartFormat.NET</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
