@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-#if !NETSTANDARD1_6
+#if !NETSTANDARD
 using System.Reflection;
 
 // General Information about an assembly is controlled through the following

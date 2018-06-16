@@ -58,7 +58,7 @@ namespace SmartFormat.Demo
 {"Basics of SmartFormat", 
 @"Basics of SmartFormat
 Similar to String.Format, SmartFormat uses curly braces to identify a placeholder:  The arguments on the right side of this window can be referenced in a template as follows:
-{Person}, {Date}, {Inventory}
+{Person}, {Date}
 
 Many .NET objects can be formatted in a specific or custom way by using a ""format string"", which is any text that comes after a colon : in a placeholder:
 Long date format: {Date:D}

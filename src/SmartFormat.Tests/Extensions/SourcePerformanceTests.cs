@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Newtonsoft.Json.Linq;
-#if !NETCOREAPP1_0
+#if !NETCOREAPP2_0
 using System.Runtime.Remoting.Messaging;
 #endif
 using NUnit.Framework;

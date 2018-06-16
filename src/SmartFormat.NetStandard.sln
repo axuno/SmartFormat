@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.NetStandard1_6", "SmartFormat\SmartFormat.NetStandard1_6.csproj", "{948084ED-DFA5-4588-B05F-ECF8CC98CBE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.NetStandard", "SmartFormat\SmartFormat.NetStandard.csproj", "{948084ED-DFA5-4588-B05F-ECF8CC98CBE3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Tests.FxCore", "SmartFormat.Tests\SmartFormat.Tests.FxCore.csproj", "{FF479926-FA9A-4517-8B3C-94BC580EABE7}"
 EndProject

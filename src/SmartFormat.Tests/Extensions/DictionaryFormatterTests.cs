@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using Newtonsoft.Json.Linq;
-#if !NETCOREAPP1_0
+#if NET45
 using System.Runtime.Remoting.Messaging;
 #endif
 using NUnit.Framework;
