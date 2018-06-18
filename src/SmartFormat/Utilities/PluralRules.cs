@@ -1,20 +1,300 @@
-﻿namespace SmartFormat.Utilities
+﻿using System;
+using System.Collections.Generic;
+
+namespace SmartFormat.Utilities
 {
+    /// <summary>
+    /// Assigns the ISO language code to a pluralization rule.
+    /// </summary>
     public static class PluralRules
     {
         /// <summary>
-        /// This delegate determines which singular or plural word
-        /// should be chosen for the given quantity.
-        /// This allows each language to define its own behavior
-        /// for singular or plural words.
-        /// It should return the index of the correct parameter.
+        /// Holds the ISO langue code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
+        /// </summary>
+        public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate =
+            new Dictionary<string, PluralRuleDelegate>
+            {
+                // Singular
+                {"az", Singular}, // Azerbaijani
+                {"bm", Singular}, // Bambara
+                {"bo", Singular}, // Tibetan
+                {"dz", Singular}, // Dzongkha
+                {"fa", Singular}, // Persian
+                {"hu", Singular}, // Hungarian
+                {"id", Singular}, // Indonesian
+                {"ig", Singular}, // Igbo
+                {"ii", Singular}, // Sichuan Yi
+                {"ja", Singular}, // Japanese
+                {"jv", Singular}, // Javanese
+                {"ka", Singular}, // Georgian
+                {"kde", Singular}, // Makonde
+                {"kea", Singular}, // Kabuverdianu
+                {"km", Singular}, // Khmer
+                {"kn", Singular}, // Kannada
+                {"ko", Singular}, // Korean
+                {"ms", Singular}, // Malay
+                {"my", Singular}, // Burmese
+                {"root", Singular}, // Root (?)
+                {"sah", Singular}, // Sakha
+                {"ses", Singular}, // Koyraboro Senni
+                {"sg", Singular}, // Sango
+                {"th", Singular}, // Thai
+                {"to", Singular}, // Tonga
+                {"vi", Singular}, // Vietnamese
+                {"wo", Singular}, // Wolof
+                {"yo", Singular}, // Yoruba
+                {"zh", Singular}, // Chinese
+                // Dual: one (n == 1), other
+                {"af", DualOneOther}, // Afrikaans
+                {"bem", DualOneOther}, // Bembda
+                {"bg", DualOneOther}, // Bulgarian
+                {"bn", DualOneOther}, // Bengali
+                {"brx", DualOneOther}, // Bodo
+                {"ca", DualOneOther}, // Catalan
+                {"cgg", DualOneOther}, // Chiga
+                {"chr", DualOneOther}, // Cherokee
+                {"da", DualOneOther}, // Danish
+                {"de", DualOneOther}, // German
+                {"dv", DualOneOther}, // Divehi
+                {"ee", DualOneOther}, // Ewe
+                {"el", DualOneOther}, // Greek
+                {"en", DualOneOther}, // English
+                {"eo", DualOneOther}, // Esperanto
+                {"es", DualOneOther}, // Spanish
+                {"et", DualOneOther}, // Estonian
+                {"eu", DualOneOther}, // Basque
+                {"fi", DualOneOther}, // Finnish
+                {"fo", DualOneOther}, // Faroese
+                {"fur", DualOneOther}, // Friulian
+                {"fy", DualOneOther}, // Western Frisian
+                {"gl", DualOneOther}, // Galician
+                {"gsw", DualOneOther}, // Swiss German
+                {"gu", DualOneOther}, // Gujarati
+                {"ha", DualOneOther}, // Hausa
+                {"haw", DualOneOther}, // Hawaiian
+                {"he", DualOneOther}, // Hebrew
+                {"is", DualOneOther}, // Icelandic
+                {"it", DualOneOther}, // Italian
+                {"kk", DualOneOther}, // Kazakh
+                {"kl", DualOneOther}, // Kalaallisut
+                {"ku", DualOneOther}, // Kurdish
+                {"lb", DualOneOther}, // Luxembourgish
+                {"lg", DualOneOther}, // Ganda
+                {"lo", DualOneOther}, // Lao
+                {"mas", DualOneOther}, // Masai
+                {"ml", DualOneOther}, // Malayalam
+                {"mn", DualOneOther}, // Mongolian
+                {"mr", DualOneOther}, // Marathi
+                {"nah", DualOneOther}, // Nahuatl
+                {"nb", DualOneOther}, // Norwegian Bokmål
+                {"ne", DualOneOther}, // Nepali
+                {"nl", DualOneOther}, // Dutch
+                {"nn", DualOneOther}, // Norwegian Nynorsk
+                {"no", DualOneOther}, // Norwegian
+                {"nyn", DualOneOther}, // Nyankole
+                {"om", DualOneOther}, // Oromo
+                {"or", DualOneOther}, // Oriya
+                {"pa", DualOneOther}, // Punjabi
+                {"pap", DualOneOther}, // Papiamento
+                {"ps", DualOneOther}, // Pashto
+                {"pt", DualOneOther}, // Portuguese
+                {"rm", DualOneOther}, // Romansh
+                {"saq", DualOneOther}, // Samburu
+                {"so", DualOneOther}, // Somali
+                {"sq", DualOneOther}, // Albanian
+                {"ssy", DualOneOther}, // Saho
+                {"sw", DualOneOther}, // Swahili
+                {"sv", DualOneOther}, // Swedish
+                {"syr", DualOneOther}, // Syriac
+                {"ta", DualOneOther}, // Tamil
+                {"te", DualOneOther}, // Telugu
+                {"tk", DualOneOther}, // Turkmen
+                {"tr", DualOneOther}, // Turkish
+                {"ur", DualOneOther}, // Urdu
+                {"wae", DualOneOther}, // Walser
+                {"xog", DualOneOther}, // Soga
+                {"zu", DualOneOther}, // Zulu
+                // DualWithZero: one (n == 0..1), other
+                {"ak", DualWithZero}, // Akan
+                {"am", DualWithZero}, // Amharic
+                {"bh", DualWithZero}, // Bihari
+                {"fil", DualWithZero}, // Filipino
+                {"guw", DualWithZero}, // Gun
+                {"hi", DualWithZero}, // Hindi
+                {"ln", DualWithZero}, // Lingala
+                {"mg", DualWithZero}, // Malagasy
+                {"nso", DualWithZero}, // Northern Sotho
+                {"ti", DualWithZero}, // Tigrinya
+                {"tl", DualWithZero}, // Tagalog
+                {"wa", DualWithZero}, // Walloon
+                // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+                {"ff", DualFromZeroToTwo}, // Fulah
+                {"fr", DualFromZeroToTwo}, // French
+                {"kab", DualFromZeroToTwo}, // Kabyle
+                // Triple: one (n == 1), two (n == 2), other
+                {"ga", TripleOneTwoOther}, // Irish
+                {"iu", TripleOneTwoOther}, // Inuktitut
+                {"ksh", TripleOneTwoOther}, // Colognian
+                {"kw", TripleOneTwoOther}, // Cornish
+                {"se", TripleOneTwoOther}, // Northern Sami
+                {"sma", TripleOneTwoOther}, // Southern Sami
+                {"smi", TripleOneTwoOther}, // Sami language
+                {"smj", TripleOneTwoOther}, // Lule Sami
+                {"smn", TripleOneTwoOther}, // Inari Sami
+                {"sms", TripleOneTwoOther}, // Skolt Sami
+                // Russian & Serbo-Croatian
+                {"be", RussianSerboCroatian}, // Belarusian
+                {"bs", RussianSerboCroatian}, // Bosnian
+                {"hr", RussianSerboCroatian}, // Croatian
+                {"ru", RussianSerboCroatian}, // Russian
+                {"sh", RussianSerboCroatian}, // Serbo-Croatian
+                {"sr", RussianSerboCroatian}, // Serbian
+                {"uk", RussianSerboCroatian}, // Ukrainian
+                // Unique
+                // Arabic
+                {"ar", Arabic},
+                // Breton
+                {"br", Breton},
+                // Czech
+                {"cs", Czech},
+                // Welsh
+                {"cy", Welsh},
+                // Manx
+                {"gv", Manx},
+                // Langi
+                {"lag", Langi},
+                // Lithuanian
+                {"lt", Lithuanian},
+                // Latvian
+                {"lv", Latvian},
+                // Macedonian
+                {"mb", Macedonian},
+                // Moldavian
+                {"mo", Moldavian},
+                // Maltese
+                {"mt", Maltese},
+                // Polish
+                {"pl", Polish},
+                // Romanian
+                {"ro", Romanian},
+                // Tachelhit
+                {"shi", Tachelhit},
+                // Slovak
+                {"sk", Slovak},
+                // Slovenian
+                {"sl", Slovenian},
+                // Central Morocco Tamazight
+                {"tzm", CentralMoroccoTamazight}
+            };
+
+        private static PluralRuleDelegate Singular => (n, c) => 0;
+        private static PluralRuleDelegate DualOneOther => (n, c) =>
+        {
+            if (c == 2) return n == 1 ? 0 : 1;
+            if (c == 3) return n == 0 ? 0 : n == 1 ? 1 : 2;
+            if (c == 4) return n < 0 ? 0 : n == 0 ? 1 : n == 1 ? 2 : 3;
+            return -1;
+        };// Dual: one (n == 1), other
+        private static PluralRuleDelegate DualWithZero => (n, c) => n == 0 || n == 1 ? 0 : 1; // DualWithZero: one (n == 0..1), other
+        private static PluralRuleDelegate DualFromZeroToTwo => (n, c) => n == 0 || n == 1 ? 0 : 1; // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+        private static PluralRuleDelegate TripleOneTwoOther => (n, c) => n == 1 ? 0 : n == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
+        private static PluralRuleDelegate RussianSerboCroatian => (n, c) =>
+            n % 10 == 1 && n % 100 != 11 ? 0 : // one
+            (n % 10).Between(2, 4) && !(n % 100).Between(12, 14) ? 1 : // few
+            2; // Russian & Serbo-Croatian
+        private static PluralRuleDelegate Arabic => (n, c) =>
+            n == 0 ? 0 : // zero
+            n == 1 ? 1 : // one
+            n == 2 ? 2 : // two
+            (n % 100).Between(3, 10) ? 3 : // few
+            (n % 100).Between(11, 99) ? 4 : // many
+            5; // other
+        private static PluralRuleDelegate Breton => (n, c) =>
+            n == 0 ? 0 : // zero
+            n == 1 ? 1 : // one
+            n == 2 ? 2 : // two
+            n == 3 ? 3 : // few
+            n == 6 ? 4 : // many
+            5; // other
+        private static PluralRuleDelegate Czech => (n, c) =>
+            n == 1 ? 0 : // one
+            n.Between(2, 4) ? 1 : // few
+            2;
+        private static PluralRuleDelegate Welsh => (n, c) =>
+            n == 0 ? 0 : // zero
+            n == 1 ? 1 : // one
+            n == 2 ? 2 : // two
+            n == 3 ? 3 : // few
+            n == 6 ? 4 : // many
+            5;
+        private static PluralRuleDelegate Manx => (n, c) =>
+            (n % 10).Between(1, 2) || n % 20 == 0
+                ? 0
+                : // one
+                1;
+        private static PluralRuleDelegate Langi => (n, c) =>
+            n == 0 ? 0 : // zero
+            n > 0 && n < 2 ? 1 : // one
+            2;
+        private static PluralRuleDelegate Lithuanian => (n, c) =>
+            n % 10 == 1 && !(n % 100).Between(11, 19) ? 0 : // one
+            (n % 10).Between(2, 9) && !(n % 100).Between(11, 19) ? 1 : // few
+            2;
+        private static PluralRuleDelegate Latvian => (n, c) =>
+            n == 0 ? 0 : // zero
+            n % 10 == 1 && n % 100 != 11 ? 1 :
+            2;
+        private static PluralRuleDelegate Macedonian => (n, c) =>
+            n % 10 == 1 && n != 11
+                ? 0
+                : // one
+                1;
+        private static PluralRuleDelegate Moldavian => (n, c) =>
+            n == 1 ? 0 : // one
+            n == 0 || n != 1 && (n % 100).Between(1, 19) ? 1 : // few
+            2;
+        private static PluralRuleDelegate Maltese => (n, c) =>
+            n == 1 ? 0 : // one
+            n == 0 || (n % 100).Between(2, 10) ? 1 : // few
+            (n % 100).Between(11, 19) ? 2 : // many
+            3;
+        private static PluralRuleDelegate Polish => (n, c) =>
+            n == 1 ? 0 : // one
+            (n % 10).Between(2, 4) && !(n % 100).Between(12, 14) ? 1 : // few
+            (n % 10).Between(0, 1) || (n % 10).Between(5, 9) || (n % 100).Between(12, 14) ? 2 : // many
+            3;
+        private static PluralRuleDelegate Romanian => (n, c) =>
+            n == 1 ? 0 : // one
+            n == 0 || (n % 100).Between(1, 19) ? 1 : // few
+            2;
+        private static PluralRuleDelegate Tachelhit => (n, c) =>
+            n >= 0 && n <= 1 ? 0 : // one
+            n.Between(2, 10) ? 1 : // few
+            2;
+        private static PluralRuleDelegate Slovak => (n, c) =>
+            n == 1 ? 0 : // one
+            n.Between(2, 4) ? 1 : // few
+            2;
+        private static PluralRuleDelegate Slovenian => (n, c) =>
+            n % 100 == 1 ? 0 : // one
+            n % 100 == 2 ? 1 : // two
+            (n % 100).Between(3, 4) ? 2 : // few
+            3;
+        private static PluralRuleDelegate CentralMoroccoTamazight => (n, c) =>
+            n.Between(0, 1) || n.Between(11, 99)
+                ? 0
+                : // one
+                1;
+
+        /// <summary>
+        /// This delegate determines which singular or plural word should be chosen for the given quantity.
+        /// This allows each language to define its own behavior for singular or plural words.
         /// </summary>
         /// <param name="value">The value that is being referenced by the singular or plural words</param>
         /// <param name="pluralCount"></param>
-        /// <returns></returns>
+        /// <returns>Returns the index of the parameter to be used for pluraization.</returns>
         public delegate int PluralRuleDelegate(decimal value, int pluralCount);
-
-
+        
         /// <summary>Construct a ruleset for the language code.</summary>
         /// <param name="twoLetterISOLanguageName">The language code in two-letter ISO-639 format.</param>
         /// <remarks>
@@ -23,306 +303,7 @@
         /// </remarks>
         public static PluralRuleDelegate GetPluralRule(string twoLetterISOLanguageName)
         {
-            switch (twoLetterISOLanguageName)
-            {
-                // Singular
-                case "az": // Azerbaijani
-                case "bm": // Bambara
-                case "bo": // Tibetan
-                case "dz": // Dzongkha
-                case "fa": // Persian
-                case "hu": // Hungarian
-                case "id": // Indonesian
-                case "ig": // Igbo
-                case "ii": // Sichuan Yi
-                case "ja": // Japanese
-                case "jv": // Javanese
-                case "ka": // Georgian
-                case "kde": // Makonde
-                case "kea": // Kabuverdianu
-                case "km": // Khmer
-                case "kn": // Kannada
-                case "ko": // Korean
-                case "ms": // Malay
-                case "my": // Burmese
-                case "root": // Root (?)
-                case "sah": // Sakha
-                case "ses": // Koyraboro Senni
-                case "sg": // Sango
-                case "th": // Thai
-                case "to": // Tonga
-                case "vi": // Vietnamese
-                case "wo": // Wolof
-                case "yo": // Yoruba
-                case "zh": // Chinese
-                    return (n, c) => 0;
-
-                // Dual: one (n == 1), other
-                case "af": // Afrikaans
-                case "bem": // Bembda
-                case "bg": // Bulgarian
-                case "bn": // Bengali
-                case "brx": // Bodo
-                case "ca": // Catalan
-                case "cgg": // Chiga
-                case "chr": // Cherokee
-                case "da": // Danish
-                case "de": // German
-                case "dv": // Divehi
-                case "ee": // Ewe
-                case "el": // Greek
-                case "en": // English
-                case "eo": // Esperanto
-                case "es": // Spanish
-                case "et": // Estonian
-                case "eu": // Basque
-                case "fi": // Finnish
-                case "fo": // Faroese
-                case "fur": // Friulian
-                case "fy": // Western Frisian
-                case "gl": // Galician
-                case "gsw": // Swiss German
-                case "gu": // Gujarati
-                case "ha": // Hausa
-                case "haw": // Hawaiian
-                case "he": // Hebrew
-                case "is": // Icelandic
-                case "it": // Italian
-                case "kk": // Kazakh
-                case "kl": // Kalaallisut
-                case "ku": // Kurdish
-                case "lb": // Luxembourgish
-                case "lg": // Ganda
-                case "lo": // Lao
-                case "mas": // Masai
-                case "ml": // Malayalam
-                case "mn": // Mongolian
-                case "mr": // Marathi
-                case "nah": // Nahuatl
-                case "nb": // Norwegian Bokmål
-                case "ne": // Nepali
-                case "nl": // Dutch
-                case "nn": // Norwegian Nynorsk
-                case "no": // Norwegian
-                case "nyn": // Nyankole
-                case "om": // Oromo
-                case "or": // Oriya
-                case "pa": // Punjabi
-                case "pap": // Papiamento
-                case "ps": // Pashto
-                case "pt": // Portuguese
-                case "rm": // Romansh
-                case "saq": // Samburu
-                case "so": // Somali
-                case "sq": // Albanian
-                case "ssy": // Saho
-                case "sw": // Swahili
-                case "sv": // Swedish
-                case "syr": // Syriac
-                case "ta": // Tamil
-                case "te": // Telugu
-                case "tk": // Turkmen
-                case "tr": // Turkish
-                case "ur": // Urdu
-                case "wae": // Walser
-                case "xog": // Soga
-                case "zu": // Zulu
-                    return (n, c) =>
-                    {
-                        if (c == 2) return n == 1 ? 0 : 1;
-                        if (c == 3) return n == 0 ? 0 : n == 1 ? 1 : 2;
-                        if (c == 4) return n < 0 ? 0 : n == 0 ? 1 : n == 1 ? 2 : 3;
-                        return -1;
-                    };
-
-                // DualWithZero: one (n == 0..1), other
-                case "ak": // Akan
-                case "am": // Amharic
-                case "bh": // Bihari
-                case "fil": // Filipino
-                case "guw": // Gun
-                case "hi": // Hindi
-                case "ln": // Lingala
-                case "mg": // Malagasy
-                case "nso": // Northern Sotho
-                case "ti": // Tigrinya
-                case "tl": // Tagalog
-                case "wa": // Walloon
-                    return (n, c) => n == 0 || n == 1 ? 0 : 1;
-
-                // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
-                case "ff": // Fulah
-                case "fr": // French
-                case "kab": // Kabyle
-                    return (n, c) => n >= 0 && n < 2 ? 0 : 1;
-
-                // Triple: one (n == 1), two (n == 2), other
-                case "ga": // Irish
-                case "iu": // Inuktitut
-                case "ksh": // Colognian
-                case "kw": // Cornish
-                case "se": // Northern Sami
-                case "sma": // Southern Sami
-                case "smi": // Sami language
-                case "smj": // Lule Sami
-                case "smn": // Inari Sami
-                case "sms": // Skolt Sami
-                    return (n, c) => n == 1 ? 0 : n == 2 ? 1 : 2;
-
-                // Russian & Serbo-Croatian
-                case "be": // Belarusian
-                case "bs": // Bosnian
-                case "hr": // Croatian
-                case "ru": // Russian
-                case "sh": // Serbo-Croatian
-                case "sr": // Serbian
-                case "uk": // Ukrainian
-                    return (n, c) =>
-                        n % 10 == 1 && !(n % 100 == 11) ? 0 : // one
-                        (n % 10).Between(2, 4) && !(n % 100).Between(12, 14) ? 1 : // few
-                        2;
-
-                // Unique:
-
-                // Arabic
-                case "ar":
-                    return (n, c) =>
-                        n == 0 ? 0 : // zero
-                        n == 1 ? 1 : // one
-                        n == 2 ? 2 : // two
-                        (n % 100).Between(3, 10) ? 3 : // few
-                        (n % 100).Between(11, 99) ? 4 : // many
-                        5; // other
-
-                // Breton
-                case "br":
-                    return (n, c) =>
-                        n == 0 ? 0 : // zero
-                        n == 1 ? 1 : // one
-                        n == 2 ? 2 : // two
-                        n == 3 ? 3 : // few
-                        n == 6 ? 4 : // many
-                        5; // other
-
-                // Czech
-                case "cs":
-                    return (n, c) =>
-                        n == 1 ? 0 : // one
-                        n.Between(2, 4) ? 1 : // few
-                        2;
-
-                // Welsh
-                case "cy":
-                    return (n, c) =>
-                        n == 0 ? 0 : // zero
-                        n == 1 ? 1 : // one
-                        n == 2 ? 2 : // two
-                        n == 3 ? 3 : // few
-                        n == 6 ? 4 : // many
-                        5;
-
-                // Manx
-                case "gv":
-                    return (n, c) =>
-                        (n % 10).Between(1, 2) || n % 20 == 0
-                            ? 0
-                            : // one
-                            1;
-
-                // Langi
-                case "lag":
-                    return (n, c) =>
-                        n == 0 ? 0 : // zero
-                        n > 0 && n < 2 ? 1 : // one
-                        2;
-
-                // Lithuanian
-                case "lt":
-                    return (n, c) =>
-                        n % 10 == 1 && !(n % 100).Between(11, 19) ? 0 : // one
-                        (n % 10).Between(2, 9) && !(n % 100).Between(11, 19) ? 1 : // few
-                        2;
-
-                // Latvian
-                case "lv":
-                    return (n, c) =>
-                        n == 0 ? 0 : // zero
-                        n % 10 == 1 && n % 100 != 11 ? 1 :
-                        2;
-
-                // Macedonian
-                case "mb":
-                    return (n, c) =>
-                        n % 10 == 1 && n != 11
-                            ? 0
-                            : // one
-                            1;
-
-                // Moldavian
-                case "mo":
-                    return (n, c) =>
-                        n == 1 ? 0 : // one
-                        n == 0 || n != 1 && (n % 100).Between(1, 19) ? 1 : // few
-                        2;
-
-                // Maltese
-                case "mt":
-                    return (n, c) =>
-                        n == 1 ? 0 : // one
-                        n == 0 || (n % 100).Between(2, 10) ? 1 : // few
-                        (n % 100).Between(11, 19) ? 2 : // many
-                        3;
-
-                // Polish
-                case "pl":
-                    return (n, c) =>
-                        n == 1 ? 0 : // one
-                        (n % 10).Between(2, 4) && !(n % 100).Between(12, 14) ? 1 : // few
-                        (n % 10).Between(0, 1) || (n % 10).Between(5, 9) || (n % 100).Between(12, 14) ? 2 : // many
-                        3;
-
-                // Romanian
-                case "ro":
-                    return (n, c) =>
-                        n == 1 ? 0 : // one
-                        n == 0 || (n % 100).Between(1, 19) ? 1 : // few
-                        2;
-
-                // Tachelhit
-                case "shi":
-                    return (n, c) =>
-                        n >= 0 && n <= 1 ? 0 : // one
-                        n.Between(2, 10) ? 1 : // few
-                        2;
-
-                // Slovak
-                case "sk":
-                    return (n, c) =>
-                        n == 1 ? 0 : // one
-                        n.Between(2, 4) ? 1 : // few
-                        2;
-
-                // Slovenian
-                case "sl":
-                    return (n, c) =>
-                        n % 100 == 1 ? 0 : // one
-                        n % 100 == 2 ? 1 : // two
-                        (n % 100).Between(3, 4) ? 2 : // few
-                        3;
-
-                // Central Morocco Tamazight
-                case "tzm":
-                    return (n, c) =>
-                        n.Between(0, 1) || n.Between(11, 99)
-                            ? 0
-                            : // one
-                            1;
-
-
-                // Unknown language
-                default:
-                    return null;
-            }
+            return IsoLangToDelegate.ContainsKey(twoLetterISOLanguageName) ? IsoLangToDelegate[twoLetterISOLanguageName] : null;
         }
 
         /// <summary>

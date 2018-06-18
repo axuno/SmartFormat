@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using NUnit.Framework;
+using SmartFormat.Extensions;
+using SmartFormat.Utilities;
 using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
 
 namespace SmartFormat.Tests.Extensions
@@ -202,6 +204,19 @@ namespace SmartFormat.Tests.Extensions
             var culture = new CultureInfo("en-US");
             var actualResult = Smart.Format(culture, format, arg0);
             Assert.AreEqual(expectedResult, actualResult);
+        }
+
+        [Test]
+        public void Test_With_CustomPluralRuleProvider()
+        {
+            var actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")), "{0:plural:Frau|Frauen}", new string[2], "more");
+            Assert.AreEqual("Frauen", actualResult);
+
+            actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[2], "more");
+            Assert.AreEqual("people", actualResult);
+
+            actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
+            Assert.AreEqual("person", actualResult);
         }
     }
 }
