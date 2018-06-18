@@ -94,7 +94,6 @@
     <Compile Include="SmartObjects.cs" />
     <Compile Include="Utilities\FormatDelegate.cs" />
     <Compile Include="Utilities\PluralRules.cs" />
-    <Compile Include="Utilities\PluralRules_Old.cs" />
     <Compile Include="Utilities\TimeSpanUtility.cs" />
   </ItemGroup>
   <ItemGroup>
