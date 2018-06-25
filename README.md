@@ -7,13 +7,18 @@
 
 **SmartFormat** is a **string composition** library written in C# which is basically compatible with string.Format. More than that **SmartFormat** can format data with named placeholders, lists, pluralization and other smart extensions.
 
-There is a [Nuget Package](https://www.nuget.org/packages/SmartFormat.NET/) which can be installed with
+### Supported Frameworks
+* .Net Framework 4.5+
+* .Net Core
 
-```Install-Package SmartFormat.NET```
+### Get started
+[![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the NuGet package
 
-See [further information on the wiki](https://github.com/scottrippey/SmartFormat.NET/wiki).
+[![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/wiki)
+Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.Net/wiki)
 
 See [changelog](CHANGES.md) for changes.
+
 
 **Projects, where SmartFormat.Net is used**:
 (let us know if you'd like to be listed here):
