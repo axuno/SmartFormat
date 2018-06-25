@@ -3,7 +3,7 @@
 [![GitHub release](https://img.shields.io/github/release/axuno/smartformat.net.svg)](https://github.com/axuno/SmartFormat.Net/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/blob/master/License.txt)
 [![Build status](https://ci.appveyor.com/api/projects/status/9gpm43038riwlbu2/branch/master?svg=true)](https://ci.appveyor.com/project/axuno/SmartFormat.Net/branch/master)
-[![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/SmartFormat.Net.svg)](https://ci.appveyor.com/project/axuno/SmartFormat.Net/branch/master/tests)
+[![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/SmartFormat-Net.svg)](https://ci.appveyor.com/project/axuno/SmartFormat-Net/branch/master/tests)
 
 **SmartFormat** is a **string composition** library written in C# which is basically compatible with string.Format. More than that **SmartFormat** can format data with named placeholders, lists, pluralization and other smart extensions.
 
