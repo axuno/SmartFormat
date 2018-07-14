@@ -72,6 +72,7 @@
     <Compile Include="Core\Settings\CaseSensitivityType.cs" />
     <Compile Include="Core\Settings\ErrorAction.cs" />
     <Compile Include="Core\Settings\SmartSettings.cs" />
+    <Compile Include="Extensions\SubStringFormatter.cs" />
     <Compile Include="Extensions\IsMatchFormatter.cs" />
     <Compile Include="Extensions\ChooseFormatter.cs" />
     <Compile Include="Extensions\ConditionalFormatter.cs" />

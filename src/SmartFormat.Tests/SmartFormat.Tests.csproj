@@ -73,6 +73,7 @@
     <Compile Include="Extensions\ReflectionFormatterTests.cs" />
     <Compile Include="Extensions\StringBuilderTests.cs" />
     <Compile Include="Extensions\TemplateFormatterTests.cs" />
+    <Compile Include="Extensions\SubStringFormatterTests.cs" />
     <Compile Include="Extensions\TimeFormatterTests.cs" />
     <Compile Include="Extensions\PluralRulesTest.cs" />
     <Compile Include="Extensions\XmlSourceTest.cs" />
