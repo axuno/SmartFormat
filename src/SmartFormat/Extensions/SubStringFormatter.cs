@@ -8,7 +8,7 @@ namespace SmartFormat.Extensions
     public class SubStringFormatter : IFormatter
     {
         /// <summary>
-        /// Formatter names
+        /// The names for this Formatter.
         /// </summary>
         public string[] Names { get; set; } = {"substr"};
 
@@ -16,6 +16,11 @@ namespace SmartFormat.Extensions
         /// The delimiter to separate parameters, defaults to comma.
         /// </summary>
         public char ParameterDelimiter { get; set; } = ',';
+
+        /// <summary>
+        /// Get or set the string to display for NULL values, defaults to "(null)".
+        /// </summary>
+        public string NullDisplayString { get; set; } = "(null)";
 
         /// <summary>
         /// Tries to process the given <see cref="IFormattingInfo"/>.
@@ -27,7 +32,12 @@ namespace SmartFormat.Extensions
             if (formattingInfo.FormatterOptions == string.Empty) return false;
             var parameters = formattingInfo.FormatterOptions.Split(ParameterDelimiter);
 
-            var currentValue = formattingInfo.CurrentValue?.ToString() ?? string.Empty;
+            var currentValue = formattingInfo.CurrentValue?.ToString();
+            if (currentValue == null)
+            {
+                formattingInfo.Write(NullDisplayString);
+                return true;
+            }
 
             var startPos = int.Parse(parameters[0]);
             var length = parameters.Length > 1 ? int.Parse(parameters[1]) : 0;
