@@ -1,16 +1,23 @@
 Latest Changes
 ====
 
+v2.3.1.0
+===
+* Added **SubStringFormatter** [thanks to arilani](https://github.com/axuno/SmartFormat.NET/issues/80)
+* Improved code coverage in unit tests
+* Updated dependencies
+* As announced: **Dropped support for .NET 4.0**, which was released back in 2010.
+
 v2.3.0.0
 ===
 * Support for JSON Objects as data source
-* Added **IsMatchFormatter** [thanks to ericpyle](https://github.com/scottrippey/SmartFormat.NET/issues/88)
-* Fixes issue with unsigned integers [#101](https://github.com/scottrippey/SmartFormat.NET/issues/108)
+* Added **IsMatchFormatter** [thanks to ericpyle](https://github.com/axuno/SmartFormat.NET/issues/88)
+* Fixes issue with unsigned integers [#101](https://github.com/axuno/SmartFormat.NET/issues/108)
 * **This is the last version supporting .NET 4.0**, which was released back in 2010.
 
 v2.2.0.0
 ===
-* Fixes issue [#101](https://github.com/scottrippey/SmartFormat.NET/issues/101)
+* Fixes issue [#101](https://github.com/axuno/SmartFormat.NET/issues/101)
 * This version includes a breaking change:
    * Before: ```OnParsingFailure``` event was invoked after each parsing error
    * **Now**: ```OnParsingFailure``` event is invoked after parsing is completed
@@ -19,14 +26,14 @@ v2.2.0.0
 
 v2.1.0.2
 ===
-* Fixes issue [#94](https://github.com/scottrippey/SmartFormat.NET/issues/94)
+* Fixes issue [#94](https://github.com/axuno/SmartFormat.NET/issues/94)
 
 v2.1.0.1
 ===
 
-* [Characters Literals in Format Strings](https://github.com/scottrippey/SmartFormat.NET/wiki/Character-Literals-in-Format-Strings)
-* [Improved working with several data sources](https://github.com/scottrippey/SmartFormat.NET/wiki/Several-Data-Sources): SmartObjects
-* [Changes in SmartSettings](https://github.com/scottrippey/SmartFormat.NET/wiki/SmartSettings)
+* [Characters Literals in Format Strings](https://github.com/axuno/SmartFormat.NET/wiki/Character-Literals-in-Format-Strings)
+* [Improved working with several data sources](https://github.com/axuno/SmartFormat.NET/wiki/Several-Data-Sources): SmartObjects
+* [Changes in SmartSettings](https://github.com/axuno/SmartFormat.NET/wiki/SmartSettings)
 * Fixed signing assemblies
 
 v2.0.0
@@ -109,8 +116,8 @@ V1.1
 - [#11](#11) Added case insensitivity as option.
 - [#12](#12) Added support for expando objects.
 
-[#11]: https://github.com/scottrippey/SmartFormat.NET/pull/11
-[#12]: https://github.com/scottrippey/SmartFormat.NET/pull/12
+[#11]: https://github.com/axuno/SmartFormat.NET/pull/11
+[#12]: https://github.com/axuno/SmartFormat.NET/pull/12
 
 V1.0
 ====
