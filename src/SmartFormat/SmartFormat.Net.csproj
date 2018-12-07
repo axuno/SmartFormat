@@ -15,7 +15,6 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SmartFormat</PackageId>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <PackageReleaseNotes>See the change log with links to the Wiki for new features:
 https://github.com/axuno/SmartFormat.NET/blob/master/CHANGES.md</PackageReleaseNotes>
     <PackageLicenseUrl>https://github.com/axuno/SmartFormat.NET/wiki/License</PackageLicenseUrl>
