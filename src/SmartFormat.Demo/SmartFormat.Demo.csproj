@@ -118,12 +118,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SmartFormat.Tests\SmartFormat.Tests.csproj">
-      <Project>{5B6368BF-B7C3-440F-ABAA-52A48A837A46}</Project>
+      <Project>{ff479926-fa9a-4517-8b3c-94bc580eabe7}</Project>
       <Name>SmartFormat.Tests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SmartFormat\SmartFormat.csproj">
-      <Project>{83A94F48-8529-4A41-B5E1-1684827180DF}</Project>
-      <Name>SmartFormat</Name>
+    <ProjectReference Include="..\SmartFormat\SmartFormat.Net.csproj">
+      <Project>{948084ed-dfa5-4588-b05f-ecf8cc98cbe3}</Project>
+      <Name>SmartFormat.Net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

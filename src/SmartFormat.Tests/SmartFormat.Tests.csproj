@@ -1,112 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" />
-  <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{01349AC6-24E8-4CDB-9F42-877909955922}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SmartFormat.Tests</RootNamespace>
+    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/scottrippey/SmartFormat.NET</Description>
+    <Copyright>Copyright 2011-2018 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
+    <AssemblyTitle>SmartFormat.Test</AssemblyTitle>
+    <VersionPrefix>1.0.0.0</VersionPrefix>
+    <Authors>Scott Rippey, axuno gGmbH, Bernhard Millauer and other contributors.</Authors>
+    <TargetFrameworks>netcoreapp2.0;net45</TargetFrameworks>
+    <DefineConstants>$(DefineConstants)</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>SmartFormat.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\net45\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\net45\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>SmartFormat.Tests</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\SmartFormat\SmartFormat.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Properties\**\*;project.*.json" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Core\FormatterTests.cs" />
-    <Compile Include="Core\LiteralTextTests.cs" />
-    <Compile Include="Core\NamedFormatterTests.cs" />
-    <Compile Include="Core\NestingTests.cs" />
-    <Compile Include="Core\ParserTests.cs" />
-    <Compile Include="Core\SmartObjectsTests.cs" />
-    <Compile Include="Core\StringFormatCompatibilityTests.cs" />
-    <Compile Include="Extensions\ChooseFormatterTests.cs" />
-    <Compile Include="Extensions\ConditionalFormatterTests.cs" />
-    <Compile Include="Extensions\IsMatchFormatterTests.cs" />
-    <Compile Include="Extensions\JsonSourceTests.cs" />
-    <Compile Include="Extensions\SourcePerformanceTests.cs" />
-    <Compile Include="Extensions\DictionaryFormatterTests.cs" />
-    <Compile Include="Extensions\ListFormatterTests.cs" />
-    <Compile Include="Extensions\PluralLocalizationFormatterTests.cs" />
-    <Compile Include="Extensions\ReflectionFormatterTests.cs" />
-    <Compile Include="Extensions\StringBuilderTests.cs" />
-    <Compile Include="Extensions\TemplateFormatterTests.cs" />
-    <Compile Include="Extensions\SubStringFormatterTests.cs" />
-    <Compile Include="Extensions\TimeFormatterTests.cs" />
-    <Compile Include="Extensions\PluralRulesTest.cs" />
-    <Compile Include="Extensions\XmlSourceTest.cs" />
-    <Compile Include="OldTests\CodeProjectExampleTests.cs" />
-    <Compile Include="OldTests\PerformanceTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestUtils\Address.cs" />
-    <Compile Include="TestUtils\ArgumentValidator.cs" />
-    <Compile Include="TestUtils\EnumerableExtensions.cs" />
-    <Compile Include="TestUtils\ExceptionCollection.cs" />
-    <Compile Include="TestUtils\Person.cs" />
-    <Compile Include="TestUtils\TestFactory.cs" />
-    <Compile Include="TestUtils\TestHelpers.cs" />
-    <Compile Include="Utilities\FormatDelegateTests.cs" />
+    <None Remove="packages.config" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="packages.config" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.2" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\SmartFormat\SmartFormat.csproj">
-      <Project>{4b496273-d820-46fe-b9b6-c03010f46e0e}</Project>
-      <Name>SmartFormat</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\SmartFormat\SmartFormat.Net.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.1\build\NUnit.props'))" />
-    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props'))" />
-  </Target>
+
 </Project>
