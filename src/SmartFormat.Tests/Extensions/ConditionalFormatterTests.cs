@@ -14,10 +14,13 @@ namespace SmartFormat.Tests.Extensions
                 -1,-2, // {4},{5}
                 TestFactory.GetPerson(), // {6}
                 false,true, // {7},{8}
+                // Note: only the date part will be compared:
                 new DateTime(1111,1,1,1,1,1),DateTime.Now,new DateTime(5555,5,5,5,5,5), // {9},{10},{11}
                 new TimeSpan(-1,-1,-1,-1,-1), TimeSpan.Zero,new TimeSpan(5,5,5,5,5), // {12},{13},{14}
                 "Hello", "", // {15},{16}
                 new {NotNull = true}, null, // {17},{18}
+                // Note: only the date part will be compared:
+                DateTimeOffset.UtcNow.AddDays(-1),DateTimeOffset.UtcNow,DateTimeOffset.UtcNow.AddDays(1) // {19},{20},{21}
             };
         }
 
@@ -86,6 +89,22 @@ namespace SmartFormat.Tests.Extensions
             var args = GetArgs();
             Smart.Default.Test(formats, args, expected);
         }
+        [Test]
+        public void Test_DateTimeOffset_Dates()
+        {
+            var formats = new[] {
+                "{19:Past|Future} {20:Past|Future} {21:Past|Future}",
+                "{19:Past|Present|Future} {20:Past|Present|Future} {21:Past|Present|Future}",
+            };
+            var expected = new[] {
+                "Past Past Future",
+                "Past Present Future",
+            };
+
+            var args = GetArgs();
+            Smart.Default.Test(formats, args, expected);
+        }
+
         [Test]
         public void Test_TimeSpan()
         {

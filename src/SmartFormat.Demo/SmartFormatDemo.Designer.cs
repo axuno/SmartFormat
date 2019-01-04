@@ -39,6 +39,7 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -46,6 +47,7 @@
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
@@ -57,7 +59,7 @@
             this.txtInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtInput.Location = new System.Drawing.Point(3, 30);
             this.txtInput.Name = "txtInput";
-            this.txtInput.Size = new System.Drawing.Size(448, 128);
+            this.txtInput.Size = new System.Drawing.Size(547, 128);
             this.txtInput.TabIndex = 0;
             this.txtInput.Text = "";
             this.txtInput.TextChanged += new System.EventHandler(this.txtInput_TextChanged);
@@ -67,7 +69,7 @@
             this.txtOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtOutput.Location = new System.Drawing.Point(3, 16);
             this.txtOutput.Name = "txtOutput";
-            this.txtOutput.Size = new System.Drawing.Size(454, 311);
+            this.txtOutput.Size = new System.Drawing.Size(553, 311);
             this.txtOutput.TabIndex = 0;
             this.txtOutput.Text = "";
             // 
@@ -86,7 +88,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.groupBox2);
-            this.splitContainer1.Size = new System.Drawing.Size(460, 514);
+            this.splitContainer1.Size = new System.Drawing.Size(559, 514);
             this.splitContainer1.SplitterDistance = 180;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -98,7 +100,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(460, 180);
+            this.groupBox1.Size = new System.Drawing.Size(559, 180);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Format";
@@ -117,7 +119,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(454, 161);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(553, 161);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // label1
@@ -137,7 +139,7 @@
             this.lstExamples.FormattingEnabled = true;
             this.lstExamples.Location = new System.Drawing.Point(100, 3);
             this.lstExamples.Name = "lstExamples";
-            this.lstExamples.Size = new System.Drawing.Size(351, 21);
+            this.lstExamples.Size = new System.Drawing.Size(450, 21);
             this.lstExamples.TabIndex = 2;
             this.lstExamples.SelectedIndexChanged += new System.EventHandler(this.lstExamples_SelectedIndexChanged);
             // 
@@ -149,7 +151,7 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(460, 330);
+            this.groupBox2.Size = new System.Drawing.Size(559, 330);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Output";
@@ -162,7 +164,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(236, 514);
+            this.groupBox3.Size = new System.Drawing.Size(331, 514);
             this.groupBox3.TabIndex = 3;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Arguments";
@@ -172,7 +174,8 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(3, 16);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(230, 495);
+            this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Alphabetical;
+            this.propertyGrid1.Size = new System.Drawing.Size(325, 495);
             this.propertyGrid1.TabIndex = 0;
             // 
             // splitContainer2
@@ -189,15 +192,15 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.groupBox3);
-            this.splitContainer2.Size = new System.Drawing.Size(700, 514);
-            this.splitContainer2.SplitterDistance = 460;
+            this.splitContainer2.Size = new System.Drawing.Size(894, 514);
+            this.splitContainer2.SplitterDistance = 559;
             this.splitContainer2.TabIndex = 3;
             // 
             // SmartFormatDemo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(700, 514);
+            this.ClientSize = new System.Drawing.Size(894, 514);
             this.Controls.Add(this.splitContainer2);
             this.Name = "SmartFormatDemo";
             this.Text = "SmartFormat Demo";
@@ -206,6 +209,7 @@
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -215,6 +219,7 @@
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             this.splitContainer2.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.ResumeLayout(false);
 

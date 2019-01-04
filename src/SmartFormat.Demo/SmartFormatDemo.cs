@@ -40,6 +40,7 @@ namespace SmartFormat.Demo
 
             args.Person = TestFactory.GetPerson();
             args.Date = DateTime.Now;
+            args.DateTimeOffset = DateTimeOffset.Now - new TimeSpan(1, 0,0,0);
             args.Inventory = TestFactory.GetItems();
             args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
             propertyGrid1.SelectedObject = args;
@@ -55,7 +56,7 @@ namespace SmartFormat.Demo
             this.lstExamples.DisplayMember = "Key";
             //this.lstExamples.ValueMember = "Value";
             var examples = new Dictionary<string, string> {
-{"Basics of SmartFormat", 
+{"Basics of SmartFormat",
 @"Basics of SmartFormat
 Similar to String.Format, SmartFormat uses curly braces to identify a placeholder:  The arguments on the right side of this window can be referenced in a template as follows:
 {Person}, {Date}
@@ -65,7 +66,12 @@ Long date format: {Date:D}
 Short date format: {Date:d}
 Custom format: {Date:""today is"" dddd, ""the"" d ""of"" MMMM}
 
-For more information on Composite Formatting and standard formatting strings, please visit http://msdn.microsoft.com/en-us/library/txafckwd.aspx
+Also works with DateTimeOffset types: 
+Yesterday Local Time: {DateTimeOffset}
+Yesterday Universal Time: {DateTimeOffset.UtcNow.DateTime}
+Express Local Time offset to UTC with TimeFormatter: {DateTimeOffset.Offset:time(hours noless)}
+
+For more information on Composite Formatting and standard formatting strings, please visit https://docs.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting
 "},
 
 {"Named Placeholders", 
@@ -124,6 +130,8 @@ Example:
             public object Person { get; set; }
             [TypeConverter(typeof(ExpandableObjectConverter))]
             public object Date { get; set; }
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            public object DateTimeOffset { get; set; }
             [TypeConverter(typeof(ArrayConverter))]
             public object Inventory { get; set; }
 
@@ -178,7 +186,5 @@ Example:
             if (example.Value == null) return;
             this.txtInput.Text = example.Value;
         }
-
-
     }
 }

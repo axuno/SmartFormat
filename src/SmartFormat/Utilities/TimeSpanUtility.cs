@@ -187,6 +187,7 @@ namespace SmartFormat.Utilities
         /// </summary>
         /// <param name="FromTime">A <c>TimeSpan</c> to be rounded.</param>
         /// <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
+        [Obsolete("Use System.Math.Floor(int) instead", true)]
         public static TimeSpan Floor(this TimeSpan FromTime, long intervalTicks)
         {
             var extra = FromTime.Ticks % intervalTicks;
@@ -197,13 +198,14 @@ namespace SmartFormat.Utilities
         /// <para>Returns the smallest <c>TimeSpan</c> greater than or equal to the specified interval.</para>
         /// <para>For example: <c>Ceiling("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "01:00:00"</c></para>
         /// </summary>
-        /// <param name="FromTime">A <c>TimeSpan</c> to be rounded.</param>
+        /// <param name="fromTime">A <c>TimeSpan</c> to be rounded.</param>
         /// <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
-        public static TimeSpan Ceiling(this TimeSpan FromTime, long intervalTicks)
+        [Obsolete("Use System.Math.Ceiling(int) instead", true)]
+        public static TimeSpan Ceiling(this TimeSpan fromTime, long intervalTicks)
         {
-            var extra = FromTime.Ticks % intervalTicks;
-            if (extra == 0) return FromTime;
-            return TimeSpan.FromTicks(FromTime.Ticks - extra + intervalTicks);
+            var extra = fromTime.Ticks % intervalTicks;
+            if (extra == 0) return fromTime;
+            return TimeSpan.FromTicks(fromTime.Ticks - extra + intervalTicks);
         }
 
         /// <summary>
@@ -536,7 +538,7 @@ namespace SmartFormat.Utilities
             this.lessThan = lessThan;
         }
 
-        private static string getValue(PluralRules.PluralRuleDelegate pluralRule, int value, string[] units)
+        private static string GetValue(PluralRules.PluralRuleDelegate pluralRule, int value, string[] units)
         {
             // Get the plural index from the plural rule,
             // unless there's only 1 unit in the first place:
@@ -554,17 +556,17 @@ namespace SmartFormat.Utilities
             switch (unit)
             {
                 case TimeSpanFormatOptions.RangeWeeks:
-                    return getValue(PluralRule, value, abbr ? w : week);
+                    return GetValue(PluralRule, value, abbr ? w : week);
                 case TimeSpanFormatOptions.RangeDays:
-                    return getValue(PluralRule, value, abbr ? d : day);
+                    return GetValue(PluralRule, value, abbr ? d : day);
                 case TimeSpanFormatOptions.RangeHours:
-                    return getValue(PluralRule, value, abbr ? h : hour);
+                    return GetValue(PluralRule, value, abbr ? h : hour);
                 case TimeSpanFormatOptions.RangeMinutes:
-                    return getValue(PluralRule, value, abbr ? m : minute);
+                    return GetValue(PluralRule, value, abbr ? m : minute);
                 case TimeSpanFormatOptions.RangeSeconds:
-                    return getValue(PluralRule, value, abbr ? s : second);
+                    return GetValue(PluralRule, value, abbr ? s : second);
                 case TimeSpanFormatOptions.RangeMilliSeconds:
-                    return getValue(PluralRule, value, abbr ? ms : millisecond);
+                    return GetValue(PluralRule, value, abbr ? ms : millisecond);
             }
 
             // (should be unreachable)
