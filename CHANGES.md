@@ -1,6 +1,24 @@
 Latest Changes
 ====
 
+v2.4.0.0
+===
+
+**TimeFormatter**
+* *New:* Supports DateTimeOffset as parameter
+* CTOR TimeFormatter(languageCode) throws for not implemented languageCode
+* CTOR TimeFormatter() is obsolete (redundant)
+* Obsolete in TimeSpanUtility
+  * TimeSpan extension method Floor (redundant)
+  * TimeSpan extension method Ceiling (redundant)
+
+**ConditionalFormatter**
+* *New:* Supports DateTimeOffset as parameter
+
+**Demo**
+* Updated with DateTimeOffset example
+* Updated with TimeFormatter example
+
 v2.3.1.0
 ===
 * Added **SubStringFormatter** [thanks to arilani](https://github.com/axuno/SmartFormat.NET/issues/80)
