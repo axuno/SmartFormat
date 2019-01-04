@@ -4,7 +4,7 @@ Latest Changes
 v2.4.0.0
 ===
 
-**TimeFormatter*
+**TimeFormatter**
 * *New:* Supports DateTimeOffset as parameter
 * CTOR TimeFormatter(languageCode) throws for not implemented languageCode
 * CTOR TimeFormatter() is obsolete (redundant)
