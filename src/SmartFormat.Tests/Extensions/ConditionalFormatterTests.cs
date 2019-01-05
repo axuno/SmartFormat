@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using SmartFormat.Net.Utilities;
 using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
@@ -15,12 +16,12 @@ namespace SmartFormat.Tests.Extensions
                 TestFactory.GetPerson(), // {6}
                 false,true, // {7},{8}
                 // Note: only the date part will be compared:
-                new DateTime(1111,1,1,1,1,1),DateTime.Now,new DateTime(5555,5,5,5,5,5), // {9},{10},{11}
+                new DateTime(1111,1,1,1,1,1),SystemTime.Now(),new DateTime(5555,5,5,5,5,5), // {9},{10},{11}
                 new TimeSpan(-1,-1,-1,-1,-1), TimeSpan.Zero,new TimeSpan(5,5,5,5,5), // {12},{13},{14}
                 "Hello", "", // {15},{16}
                 new {NotNull = true}, null, // {17},{18}
                 // Note: only the date part will be compared:
-                DateTimeOffset.UtcNow.AddDays(-1),DateTimeOffset.UtcNow,DateTimeOffset.UtcNow.AddDays(1) // {19},{20},{21}
+                SystemTime.OffsetNow().UtcDateTime.AddDays(-1),SystemTime.OffsetNow().UtcDateTime,SystemTime.OffsetNow().UtcDateTime.AddDays(1) // {19},{20},{21}
             };
         }
 

@@ -74,7 +74,7 @@ namespace SmartFormat.Extensions
                 case DateTime dateTime:
                     if (formattingInfo.FormatterOptions != "")
                     {
-                        fromTime = SystemTime.Now().Subtract(dateTime);
+                        fromTime = SystemTime.Now().ToUniversalTime().Subtract(dateTime.ToUniversalTime());
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace SmartFormat.Extensions
                 case DateTimeOffset dateTimeOffset:
                     if (formattingInfo.FormatterOptions != "")
                     {
-                        fromTime = SystemTime.OffsetNow().Subtract(dateTimeOffset);
+                        fromTime = SystemTime.OffsetNow().UtcDateTime.Subtract(dateTimeOffset.UtcDateTime);
                     }
                     else
                     {

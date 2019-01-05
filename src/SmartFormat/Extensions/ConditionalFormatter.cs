@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Net.Utilities;
 
 namespace SmartFormat.Extensions
 {
@@ -94,20 +95,20 @@ namespace SmartFormat.Extensions
                     paramIndex = boolArg ? 0 : 1;
                     break;
                 // Date: Past|Present|Future   or   Past/Present|Future
-                case DateTime dateTimeArg when paramCount == 3 && dateTimeArg.Date == DateTime.Today:
+                case DateTime dateTimeArg when paramCount == 3 && dateTimeArg.ToUniversalTime().Date == SystemTime.Now().ToUniversalTime().Date:
                     paramIndex = 1;
                     break;
-                case DateTime dateTimeArg when dateTimeArg <= DateTime.Now:
+                case DateTime dateTimeArg when dateTimeArg.ToUniversalTime() <= SystemTime.Now().ToUniversalTime():
                     paramIndex = 0;
                     break;
                 case DateTime dateTimeArg:
                     paramIndex = paramCount - 1;
                     break;
                 // Date: Past|Present|Future   or   Past/Present|Future
-                case DateTimeOffset dateTimeOffsetArg when paramCount == 3 && dateTimeOffsetArg.UtcDateTime.Date == DateTimeOffset.UtcNow.Date:
+                case DateTimeOffset dateTimeOffsetArg when paramCount == 3 && dateTimeOffsetArg.UtcDateTime.Date == SystemTime.OffsetNow().UtcDateTime.Date:
                     paramIndex = 1;
                     break;
-                case DateTimeOffset dateTimeOffsetArg when dateTimeOffsetArg.UtcDateTime.Date <= DateTimeOffset.UtcNow.Date:
+                case DateTimeOffset dateTimeOffsetArg when dateTimeOffsetArg.UtcDateTime <= SystemTime.OffsetNow().UtcDateTime:
                     paramIndex = 0;
                     break;
                 case DateTimeOffset dateTimeOffsetArg:
