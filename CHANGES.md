@@ -15,6 +15,7 @@ v2.4.1.0
 
 **ConditionalFormatter**
 * *New:* Supports DateTimeOffset as parameter
+* *Changed:* ```DateTime``` operations always use their Universal Time representation. (Before, in case a ```DateTime``` had property ```Kind``` set to ```Kind.Unspecified```, the result of a comparison was ambiguous.)
 
 **Demo**
 * Updated with DateTimeOffset example
