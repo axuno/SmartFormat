@@ -1,11 +1,12 @@
 Latest Changes
 ====
 
-v2.4.0.0
+v2.4.1.0
 ===
 
 **TimeFormatter**
 * *New:* Supports DateTimeOffset as parameter
+* *Changed:* ```DateTime``` operations always use their Universal Time representation. (Before, in case a ```DateTime``` had property ```Kind``` set to ```Kind.Unspecified```, the result of a comparison was ambiguous.)
 * CTOR TimeFormatter(languageCode) throws for not implemented languageCode
 * CTOR TimeFormatter() is obsolete (redundant)
 * Obsolete in TimeSpanUtility
