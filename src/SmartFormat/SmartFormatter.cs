@@ -238,7 +238,7 @@ namespace SmartFormat
                 }
                 catch (Exception ex)
                 {
-                    // An error occurred while evalation selectors
+                    // An error occurred while evaluation selectors
                     var errorIndex = placeholder.Format?.startIndex ?? placeholder.Selectors.Last().endIndex;
                     FormatError(item, ex, errorIndex, childFormattingInfo);
                     continue;

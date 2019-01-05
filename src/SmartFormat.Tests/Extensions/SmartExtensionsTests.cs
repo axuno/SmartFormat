@@ -1,13 +1,19 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using NUnit.Framework;
+using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Tests.Common;
 
 namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
-    public class StringBuilderTests
+    public class SmartExtensionsTests
     {
+        #region : StringBuilderTests :
+
         public object[] GetArgs()
         {
             return new object[] {
@@ -138,5 +144,62 @@ namespace SmartFormat.Tests.Extensions
             allErrors.ThrowIfNotEmpty();
         }
 
+        #endregion
+
+        #region : TextWriterTests :
+
+        [Test]
+        public void WriteSmartTest()
+        {
+            var sb = new StringBuilder();
+            var text = "abc";
+            var fmt = "{0}";
+            var sw = new StringWriter(sb);
+            sw.WriteSmart("{0}", text);
+            sw.Flush();
+            sw.Close();
+            Assert.AreEqual(string.Format(fmt, text), sb.ToString());
+        }
+
+        [Test]
+        public void WriteLineSmartTest()
+        {
+            var sb = new StringBuilder();
+            var text = "abc";
+            var fmt = "{0}";
+            var sw = new StringWriter(sb);
+            sw.WriteLineSmart("{0}", text);
+            sw.Flush();
+            sw.Close();
+            Assert.AreEqual(string.Format(fmt, text) + Environment.NewLine, sb.ToString());
+        }
+
+        #endregion
+
+        #region : StringExtensionTests :
+
+        [Test]
+        public void StringFormatSmartTest()
+        {
+            var text = "abc";
+            var fmt = "{0}";
+            var result = fmt.FormatSmart(text);
+
+            Assert.AreEqual(string.Format(fmt, text), result);
+        }
+
+        #endregion
+
+        #region : StringOutputTests :
+
+        [Test]
+        public void StringOutputTest()
+        {
+            var so = new StringOutput();
+            so.Write("text", 0, 2, null);
+            Assert.AreEqual("te", so.ToString());
+        }
+
+        #endregion
     }
 }
