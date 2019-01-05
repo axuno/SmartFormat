@@ -21,7 +21,7 @@ namespace SmartFormat.Tests.Extensions
                 "Hello", "", // {15},{16}
                 new {NotNull = true}, null, // {17},{18}
                 // Note: only the date part will be compared:
-                SystemTime.OffsetNow().UtcDateTime.AddDays(-1),SystemTime.OffsetNow().UtcDateTime,SystemTime.OffsetNow().UtcDateTime.AddDays(1) // {19},{20},{21}
+                SystemTime.OffsetNow().AddDays(-1),SystemTime.OffsetNow(),SystemTime.OffsetNow().AddDays(1) // {19},{20},{21}
             };
         }
 
