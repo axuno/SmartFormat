@@ -144,7 +144,7 @@ namespace SmartFormat
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
-        /// <returns>Returns the formated input with items replaced with their string representation.</returns>
+        /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(string format, params object[] args)
         {
             return Format(null, format, args ?? new object[] {null});
@@ -156,7 +156,7 @@ namespace SmartFormat
         /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
-        /// <returns>Returns the formated input with items replaced with their string representation.</returns>
+        /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider provider, string format, params object[] args)
         {
             args = args ?? new object[] {null};
@@ -222,8 +222,7 @@ namespace SmartFormat
             CheckForExtensions();
             foreach (var item in formattingInfo.Format.Items)
             {
-                var literalItem = item as LiteralText;
-                if (literalItem != null)
+                if (item is LiteralText literalItem)
                 {
                     formattingInfo.Write(literalItem.ToString());
                     continue;
@@ -332,15 +331,18 @@ namespace SmartFormat
                 // if the current value is of type SmartObjects
                 // then try to find the right source extension for each of the objects in SmartObjects
                 // Note: SmartObjects cannot be nested, so this can be the case only once. 
-                var smartObjects = formattingInfo.CurrentValue as SmartObjects;
-                if (smartObjects != null)
+                if (formattingInfo.CurrentValue is SmartObjects smartObjects)
                 {
                     var savedCurrentValue = formattingInfo.CurrentValue;
                     foreach (var obj in smartObjects)
                     {
                         formattingInfo.CurrentValue = obj;
                         var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
-                        if (handled) return true;
+                        if (handled)
+                        {
+                            formattingInfo.CurrentValue = savedCurrentValue;
+                            return true;
+                        }
                     }
 
                     formattingInfo.CurrentValue = savedCurrentValue;
