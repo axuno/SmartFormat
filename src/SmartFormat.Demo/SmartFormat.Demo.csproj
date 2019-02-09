@@ -121,9 +121,9 @@
       <Project>{ff479926-fa9a-4517-8b3c-94bc580eabe7}</Project>
       <Name>SmartFormat.Tests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SmartFormat\SmartFormat.Net.csproj">
+    <ProjectReference Include="..\SmartFormat\SmartFormat.csproj">
       <Project>{948084ed-dfa5-4588-b05f-ecf8cc98cbe3}</Project>
-      <Name>SmartFormat.Net</Name>
+      <Name>SmartFormat</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
