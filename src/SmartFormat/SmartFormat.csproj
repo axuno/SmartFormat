@@ -15,14 +15,14 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SmartFormat.NET</PackageId>
     <PackageReleaseNotes>See the change log with links to the Wiki for new features:
-https://github.com/axuno/SmartFormat.NET/blob/master/CHANGES.md</PackageReleaseNotes>
-    <PackageLicenseUrl>https://github.com/axuno/SmartFormat.NET/wiki/License</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/axuno/SmartFormat.NET</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat.NET/master/SmartFormat_365x365.png</PackageIconUrl>
+https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
+    <PackageLicenseUrl>https://github.com/axuno/SmartFormat/wiki/License</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat/master/SmartFormat_365x365.png</PackageIconUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageTags>string-format string-composition smartformat netstandard net45</PackageTags>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <RepositoryUrl>https://github.com/axuno/SmartFormat.NET</RepositoryUrl>
+    <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
     <AssemblyVersion>2.4.2.0</AssemblyVersion>
   </PropertyGroup>
 
