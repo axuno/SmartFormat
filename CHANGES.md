@@ -1,6 +1,11 @@
 Latest Changes
 ====
 
+v2.4.2.0
+===
+
+Fixed an [issue](https://github.com/axuno/SmartFormat.NET/issues/116) with SmartObjects
+
 v2.4.0.0 and v2.4.1.0
 ===
 
