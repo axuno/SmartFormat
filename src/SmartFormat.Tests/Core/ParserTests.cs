@@ -62,7 +62,35 @@ namespace SmartFormat.Tests.Core
             {
                 Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
             }
+        }
 
+        [Test]
+        public void Parser_Exception_ErrorDescription()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.ParseErrorAction = ErrorAction.ThrowError;
+
+            foreach (var format in new[] { "{.}", "{.}{0.}" })
+            {
+                try
+                {
+                    formatter.Format(format);
+                }
+                catch (ParsingErrors e)
+                {
+                    Assert.IsTrue(e.HasIssues);
+                    if (e.Issues.Count == 1)
+                    {
+                        Assert.IsTrue(e.Message.Contains("has 1 issue"));
+                        Assert.IsTrue(e.MessageShort.Contains("has 1 issue"));
+                    }
+                    else
+                    {
+                        Assert.IsTrue(e.Message.Contains($"has {e.Issues.Count} issues"));
+                        Assert.IsTrue(e.MessageShort.Contains($"has {e.Issues.Count} issues"));
+                    }
+                }
+            }
         }
 
         [Test]
@@ -120,39 +148,66 @@ namespace SmartFormat.Tests.Core
         public void Test_Format_Substring()
         {
             var parser = GetRegularParser();
-            var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
+            var formatString = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
 
-            var Format = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
+            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
 
             // Extract the substrings of literal text:
-            Assert.That(Format.Substring( 1, 3).ToString(), Is.EqualTo("a|a"));
-            Assert.That(Format.Substring(41, 4).ToString(), Is.EqualTo("gg|g"));
+            Assert.That(format.Substring( 1, 3).ToString(), Is.EqualTo("a|a"));
+            Assert.That(format.Substring(41, 4).ToString(), Is.EqualTo("gg|g"));
 
             // Extract a substring that overlaps into the placeholder:
-            Assert.That(Format.Substring(4, 3).ToString(), Is.EqualTo("a {bbb: ccc dd|d {:|||} {eee} ff|f }"));
-            Assert.That(Format.Substring(20, 23).ToString(), Is.EqualTo("{bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
+            Assert.That(format.Substring(4, 3).ToString(), Is.EqualTo("a {bbb: ccc dd|d {:|||} {eee} ff|f }"));
+            Assert.That(format.Substring(20, 23).ToString(), Is.EqualTo("{bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
 
             // Make sure a invalid values are caught:
-            Assert.That(() => Format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
-            Assert.That(() => Format.Substring(100), Throws.TypeOf<ArgumentOutOfRangeException>());
-            Assert.That(() => Format.Substring(10, 100), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(100), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(10, 100), Throws.TypeOf<ArgumentOutOfRangeException>());
 
 
             // Now, test nested format strings:
-            var placeholder = (Placeholder)Format.Items[1];
-            Format = placeholder.Format;
-            Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
+            var placeholder = (Placeholder)format.Items[1];
+            format = placeholder.Format;
+            Assert.That(format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
 
-            Assert.That(Format.Substring(5, 4).ToString(), Is.EqualTo("dd|d"));
-            Assert.That(Format.Substring(8, 3).ToString(), Is.EqualTo("d {:|||}"));
-            Assert.That(Format.Substring(8, 10).ToString(), Is.EqualTo("d {:|||} {eee}"));
-            Assert.That(Format.Substring(8, 16).ToString(), Is.EqualTo("d {:|||} {eee} f"));
+            Assert.That(format.Substring(5, 4).ToString(), Is.EqualTo("dd|d"));
+            Assert.That(format.Substring(8, 3).ToString(), Is.EqualTo("d {:|||}"));
+            Assert.That(format.Substring(8, 10).ToString(), Is.EqualTo("d {:|||} {eee}"));
+            Assert.That(format.Substring(8, 16).ToString(), Is.EqualTo("d {:|||} {eee} f"));
 
             // Make sure invalid values are caught:
-            Assert.That(() => Format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
-            Assert.That(() => Format.Substring(30), Throws.TypeOf<ArgumentOutOfRangeException>());
-            Assert.That(() => Format.Substring(25, 5), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(30), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(25, 5), Throws.TypeOf<ArgumentOutOfRangeException>());
 
+        }
+
+        [Test]
+        public void Test_Format_Alignment()
+        {
+            var parser = GetRegularParser();
+            var formatString = "{0}";
+
+            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
+            var placeholder = (Placeholder) format.Items[0];
+            Assert.AreEqual(formatString, placeholder.ToString());
+            placeholder.Alignment = 10;
+            Assert.AreEqual($"{{0,{placeholder.Alignment}}}", placeholder.ToString());
+        }
+
+        [Test]
+        public void Test_Formatter_Name_And_Options()
+        {
+            var parser = GetRegularParser();
+            var formatString = "{0}";
+
+            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
+            var placeholder = (Placeholder)format.Items[0];
+            placeholder.FormatterName = "test";
+            Assert.AreEqual($"{{0:{placeholder.FormatterName}}}", placeholder.ToString());
+            placeholder.FormatterOptions = "options";
+            Assert.AreEqual($"{{0:{placeholder.FormatterName}({placeholder.FormatterOptions})}}", placeholder.ToString());
         }
 
         [Test]

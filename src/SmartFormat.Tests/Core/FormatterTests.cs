@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Output;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
@@ -103,6 +104,26 @@ namespace SmartFormat.Tests.Core
             var smart = Smart.CreateDefaultSmartFormat();
             object boxedNull = null;
             Assert.AreEqual(smart.Format("{dummy}", null), smart.Format("{dummy}", boxedNull));
+        }
+
+        [Test]
+        public void SmartFormatter_FormatDetails()
+        {
+            var args = new object[] {new Dictionary<string, string> {{"Greeting", "Hello"}} };
+            var format = "{Greeting}";
+            var output = new StringOutput();
+            var formatter = new SmartFormatter();
+            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            formatter.Settings.ConvertCharacterStringLiterals = true;
+            formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
+            formatter.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+            var formatParsed = formatter.Parser.ParseFormat(format, new []{string.Empty});
+            var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
+            
+            Assert.AreEqual(args, formatDetails.OriginalArgs);
+            Assert.AreEqual(format, formatDetails.OriginalFormat.RawText);
+            Assert.AreEqual(formatter.Settings, formatDetails.Settings);
+            Assert.IsTrue(formatDetails.FormatCache == null);
         }
     }
 }

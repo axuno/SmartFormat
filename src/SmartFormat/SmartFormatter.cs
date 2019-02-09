@@ -151,7 +151,7 @@ namespace SmartFormat
         }
 
         /// <summary>
-        /// Replaces one or more format items in as specified string with the string representation of a specific object.
+        /// Replaces one or more format items in a specified string with the string representation of a specific object.
         /// </summary>
         /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
         /// <param name="format">A composite format string.</param>
@@ -169,6 +169,12 @@ namespace SmartFormat
             return output.ToString();
         }
 
+        /// <summary>
+        /// Writes the formatting result into an <see cref="IOutput"/> instance.
+        /// </summary>
+        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">The objects to format.</param>
         public void FormatInto(IOutput output, string format, params object[] args)
         {
             args = args ?? new object[] {null};
@@ -178,6 +184,14 @@ namespace SmartFormat
             Format(formatDetails, formatParsed, current);
         }
 
+        /// <summary>
+        /// Replaces one or more format items in a specified string with the string representation of a specific object,
+        /// using the <see cref="FormatCache"/>.
+        /// </summary>
+        /// <param name="cache">The <see cref="FormatCache" /> to use.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">The objects to format.</param>
+        /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
         {
             args = args ?? new object[] {null};
@@ -192,6 +206,13 @@ namespace SmartFormat
             return output.ToString();
         }
 
+        /// <summary>
+        /// Writes the formatting result into an <see cref="IOutput"/> instance, using the <see cref="FormatCache"/>.
+        /// </summary>
+        /// <param name="cache">The <see cref="FormatCache"/> to use.</param>
+        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">The objects to format.</param>
         public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
         {
             args = args ?? new object[] {null};
@@ -213,7 +234,7 @@ namespace SmartFormat
         #region: Format :
 
         /// <summary>
-        /// Format the input given in parameter <see cref="FormattingInfo" />.
+        /// Format the <see cref="FormattingInfo" /> argument.
         /// </summary>
         /// <param name="formattingInfo"></param>
         public void Format(FormattingInfo formattingInfo)

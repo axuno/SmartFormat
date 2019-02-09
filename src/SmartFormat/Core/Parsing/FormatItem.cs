@@ -33,9 +33,9 @@ namespace SmartFormat.Core.Parsing
 
         public override string ToString()
         {
-            if (endIndex <= startIndex)
-                return string.Format("Empty ({0})", baseString.Substring(startIndex));
-            return string.Format("{0}", baseString.Substring(startIndex, endIndex - startIndex));
+            return endIndex <= startIndex
+                ? $"Empty ({baseString.Substring(startIndex)})"
+                : $"{baseString.Substring(startIndex, endIndex - startIndex)}";
         }
     }
 }

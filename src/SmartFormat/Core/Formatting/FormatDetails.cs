@@ -28,6 +28,9 @@ namespace SmartFormat.Core.Formatting
         /// </summary>
         public SmartFormatter Formatter { get; }
 
+        /// <summary>
+        /// Gets the original <see cref="Format"/> returned by the parser.
+        /// </summary>
         public Format OriginalFormat { get; }
 
         /// <summary>
@@ -49,6 +52,9 @@ namespace SmartFormat.Core.Formatting
         /// </summary>
         public IFormatProvider Provider { get; }
 
+        /// <summary>
+        /// Gets the <see cref="IOutput"/> where the result is written.
+        /// </summary>
         public IOutput Output { get; }
 
         /// <summary>
