@@ -72,6 +72,8 @@ namespace SmartFormat
             formatter.AddExtensions(
                 (ISource) listFormatter, // ListFormatter MUST be first
                 new DictionarySource(formatter),
+                new SmartObjectsSource(formatter),
+                new ValueTupleSource(formatter),
                 new JsonSource(formatter),
                 new XmlSource(formatter),
                 new ReflectionSource(formatter),

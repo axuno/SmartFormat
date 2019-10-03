@@ -45,8 +45,7 @@ namespace SmartFormat.Extensions
                 templateName = formattingInfo.Format.RawText;
             }
 
-            Format template;
-            if (!_templates.TryGetValue(templateName, out template))
+            if (!_templates.TryGetValue(templateName, out var template))
             {
                 if (Names.Contains(formattingInfo.Placeholder.FormatterName))
                     throw new FormatException(

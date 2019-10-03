@@ -11,7 +11,7 @@ namespace SmartFormat.Extensions
             // Note: We only have ONE parser at a time.
             // These settings will affect all extensions loaded at the same time
 
-            // Excaped JSON property names and special characters are not supported in
+            // Escaped JSON property names and special characters are not supported in
             // order to avoid interference with other extensions
             formatter.Parser.AddAlphanumericSelectors(); // (A-Z + a-z)
             formatter.Parser.AddAdditionalSelectorChars("_");
