@@ -54,7 +54,7 @@ namespace SmartFormat.Tests.Utilities
             var amount = (decimal) 123.456;
             var c = new CultureInfo("fr-FR");
             var formatDelegate = new FormatDelegate((text, culture) => GetAnswer("The amount is: ", amount, c));
-            Assert.That(Smart.Format("{0}{1}", formatDelegate)
+            Assert.That(Smart.Format("{0}", formatDelegate)
                 , Is.EqualTo($"The amount is: {amount.ToString(c)}"));
         }
     }
