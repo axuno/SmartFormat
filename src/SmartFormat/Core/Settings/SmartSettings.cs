@@ -46,9 +46,9 @@ namespace SmartFormat.Core.Settings
                 switch (CaseSensitivity)
                 {
                     case CaseSensitivityType.CaseSensitive:
-                        return StringComparer.CurrentCulture;
+                        return StringComparer.Ordinal;
                     case CaseSensitivityType.CaseInsensitive:
-                        return StringComparer.CurrentCultureIgnoreCase;
+                        return StringComparer.OrdinalIgnoreCase;
                     default:
                         throw new InvalidOperationException(
                             $"The case sensitivity type [{CaseSensitivity}] is unknown.");
@@ -62,9 +62,9 @@ namespace SmartFormat.Core.Settings
                 switch (CaseSensitivity)
                 {
                     case CaseSensitivityType.CaseSensitive:
-                        return StringComparison.CurrentCulture;
+                        return StringComparison.Ordinal;
                     case CaseSensitivityType.CaseInsensitive:
-                        return StringComparison.CurrentCultureIgnoreCase;
+                        return StringComparison.OrdinalIgnoreCase;
                     default:
                         throw new InvalidOperationException(
                             $"The case sensitivity type [{CaseSensitivity}] is unknown.");
