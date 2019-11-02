@@ -24,6 +24,7 @@ namespace SmartFormat
     /// Smart.Format("{myKey} - {mySecondKey}", smartSrc);
     /// result: "myValue - mySecondValue"
     /// </code>
+    [Obsolete("Depreciated in favor of ValueTuples", false)]
     public class SmartObjects : List<object>
     {
         /// <summary>

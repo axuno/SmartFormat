@@ -22,12 +22,12 @@ namespace SmartFormat.Tests
             var addr = new Extensions.DictionaryFormatterTests.Address();
             var dict1 = new Dictionary<string, string> { {"dict1key", "dict1 Value"} };
             var dict2 = new Dictionary<string, string> { { "dict2key", "dict2 Value" } };
-            
-            // format for SmartObjects as argument 1 to Smart.Format
+
+            // format for ValueTuples as argument 1 to Smart.Format
             const string format1 = "Name: {Person.FirstName} {Person.LastName}\n" +
                                   "Dictionaries: {dict1key}, {dict2key}";
 
-            // format for SmartObjects as argument 2 to Smart.Format:
+            // format for ValueTuples as argument 2 to Smart.Format:
             // works although unnecessary and leading to argument references in the format string
             const string format2 = "Name: {1.Person.FirstName} {1.Person.LastName}\n" +
                                    "Dictionaries: {1.dict1key}, {1.dict2key}";

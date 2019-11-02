@@ -4,18 +4,18 @@ using SmartFormat.Core.Formatting;
 
 namespace SmartFormat.Extensions
 {
-    [Obsolete("Depreciated in favor of ValueTuples", false)]
+    [Obsolete("Depreciated in favor of ValueTupleSource", false)]
     public class SmartObjectsSource : ISource
     {
         private readonly SmartFormatter _formatter;
 
-        [Obsolete("Depreciated in favor of ValueTuples", false)]
+        [Obsolete("Depreciated in favor of ValueTupleSource", false)]
         public SmartObjectsSource(SmartFormatter formatter)
         {
             _formatter = formatter;
         }
 
-        [Obsolete("Depreciated in favor of ValueTuples", false)]
+        [Obsolete("Depreciated in favor of ValueTupleSource", false)]
         public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             if (!(selectorInfo is FormattingInfo formattingInfo)) return false;
