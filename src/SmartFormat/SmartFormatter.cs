@@ -35,12 +35,6 @@ namespace SmartFormat
             FormatterExtensions = new List<IFormatter>();
         }
 
-        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
-        public SmartFormatter(ErrorAction errorAction = ErrorAction.Ignore) : this()
-        {
-            Settings.FormatErrorAction = errorAction;
-        }
-
         #endregion
 
         #region: Extension Registry :
@@ -120,16 +114,6 @@ namespace SmartFormat
         /// Gets or set the instance of the <see cref="Core.Parsing.Parser" />
         /// </summary>
         public Parser Parser { get; }
-
-        /// <summary>
-        /// Gets or set the <see cref="Core.Settings.ErrorAction" /> for the formatter.
-        /// </summary>
-        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
-        public ErrorAction ErrorAction
-        {
-            get => Settings.FormatErrorAction;
-            set => Settings.FormatErrorAction = value;
-        }
 
         /// <summary>
         /// Get the <see cref="Core.Settings.SmartSettings" /> for Smart.Format

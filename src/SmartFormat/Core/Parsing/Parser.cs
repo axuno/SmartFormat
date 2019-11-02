@@ -30,12 +30,6 @@ namespace SmartFormat.Core.Parsing
 
         #region: Constructor :
 
-        [Obsolete("Depreciated. Parser should be created by SmartFormatter only.", false)]
-        public Parser(ErrorAction errorAction = ErrorAction.Ignore)
-        {
-            Settings.ParseErrorAction = errorAction;
-        }
-
         internal Parser(SmartSettings smartSettings)
         {
             Settings = smartSettings;
@@ -466,13 +460,6 @@ namespace SmartFormat.Core.Parsing
         #endregion
 
         #region: Errors :
-
-        [Obsolete("Depreciated. Use the ParserErrorAction in Settings instead.", false)]
-        public ErrorAction ErrorAction
-        {
-            get => Settings.ParseErrorAction;
-            set => Settings.ParseErrorAction = value;
-        }
 
         public enum ParsingError
         {
