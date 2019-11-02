@@ -1,6 +1,20 @@
 Latest Changes
 ====
 
+v2.5.0.0
+===
+
+**Sources**
+* *New:* Added ```ValueTupleSource``` for ```ValueTuple```s
+* *Changed:* ```SmartObjects``` and ```SmartObjectsSource``` are depreciated in favor of ```ValueTupleSource```
+
+**Settings**
+* *Breaking Change:* String comparisons are no more culture-specific, but ```Ordinal``` or ```OrdinalIgnoreCase``` respectively. See discussion [under this issue](https://github.com/axuno/SmartFormat/issues/122).
+* *Breaking Change:* Default ```ErrorAction``` is now ```ThrowError``` for parser and formatter, instead of ```Ignore```
+
+**Other**
+* *Changed:* Removed all members which were flagged obsolete since more than a year.
+
 v2.4.2.0
 ===
 
