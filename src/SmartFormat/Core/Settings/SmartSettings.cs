@@ -12,17 +12,19 @@ namespace SmartFormat.Core.Settings
         {
             CaseSensitivity = CaseSensitivityType.CaseSensitive;
             ConvertCharacterStringLiterals = true;
-            FormatErrorAction = ErrorAction.Ignore;
-            ParseErrorAction = ErrorAction.Ignore;
+            FormatErrorAction = ErrorAction.ThrowError;
+            ParseErrorAction = ErrorAction.ThrowError;
         }
 
         /// <summary>
         /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
+        /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
         public ErrorAction FormatErrorAction { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormat.Core.Parsing.Parser" />.
+        /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
         public ErrorAction ParseErrorAction { get; set; }
 
