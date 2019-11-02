@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/axuno/SmartFormat.NET</Description>
+    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/axuno/SmartFormat</Description>
     <Copyright>Copyright 2011-2019 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
     <AssemblyTitle>SmartFormat</AssemblyTitle>
     <Version>2.5.0.0</Version>
@@ -16,7 +16,7 @@
     <PackageId>SmartFormat.NET</PackageId>
     <PackageReleaseNotes>See the change log with links to the Wiki for new features:
 https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
-    <PackageLicenseUrl>https://github.com/axuno/SmartFormat/wiki/License</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat/master/SmartFormat_365x365.png</PackageIconUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -25,6 +25,9 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
     <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
     <AssemblyVersion>2.5.0.0</AssemblyVersion>
     <FileVersion>2.5.0.0</FileVersion>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>GitHub</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -54,7 +57,7 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
