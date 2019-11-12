@@ -8,8 +8,16 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class DefaultFormatter : IFormatter
     {
+        /// <summary>
+        /// Gets or set the names of the <see cref="DefaultFormatter"/>.
+        /// </summary>
         public string[] Names { get; set; } = {"default", "d", ""};
 
+        /// <summary>
+        /// Checks, if the current value of the <see cref="ISelectorInfo"/> can be processed by the <see cref="DefaultFormatter"/>.
+        /// </summary>
+        /// <param name="formattingInfo"></param>
+        /// <returns>Returns true, if the current value of the <see cref="ISelectorInfo"/> can be processed by the <see cref="DefaultFormatter"/></returns>
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
