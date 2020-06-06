@@ -5,8 +5,8 @@
     <Copyright>Copyright 2011-2019 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
     <AssemblyTitle>SmartFormat.Test</AssemblyTitle>
     <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-    <Version>2.4.1.0</Version>
-    <TargetFrameworks>netcoreapp2.0;net45</TargetFrameworks>
+    <Version>2.5.0.0</Version>
+    <TargetFrameworks>netcoreapp3.1;net462</TargetFrameworks>
     <DefineConstants>$(DefineConstants)</DefineConstants>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <AssemblyName>SmartFormat.Tests</AssemblyName>
