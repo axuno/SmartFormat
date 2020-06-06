@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat", "SmartFormat\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Tests", "SmartFormat.Tests\SmartFormat.Tests.csproj", "{FF479926-FA9A-4517-8B3C-94BC580EABE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Demo", "SmartFormat.Demo\SmartFormat.Demo.csproj", "{54A06E44-EA03-4138-BCD6-C2D47527AA02}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Demo.NetFramework", "SmartFormat.Demo.NetFramework\SmartFormat.Demo.NetFramework.csproj", "{54A06E44-EA03-4138-BCD6-C2D47527AA02}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Demo", "SmartFormat.Demo\SmartFormat.Demo.csproj", "{DE4BE604-4A7F-4550-B45B-BCB169FC3895}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{54A06E44-EA03-4138-BCD6-C2D47527AA02}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54A06E44-EA03-4138-BCD6-C2D47527AA02}.Release|x86.ActiveCfg = Release|x86
 		{54A06E44-EA03-4138-BCD6-C2D47527AA02}.Release|x86.Build.0 = Release|x86
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Debug|x86.Build.0 = Debug|Any CPU
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Release|x86.ActiveCfg = Release|Any CPU
+		{DE4BE604-4A7F-4550-B45B-BCB169FC3895}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

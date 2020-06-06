@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{54A06E44-EA03-4138-BCD6-C2D47527AA02}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SmartFormat.Demo</RootNamespace>
+    <AssemblyName>SmartFormat.Demo</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Release\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SmartFormatDemo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SmartFormatDemo.Designer.cs">
+      <DependentUpon>SmartFormatDemo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Sample Extensions\RTFOutput.cs" />
+    <Compile Include="ThirdParty\RTFLib\IRTFCell.cs" />
+    <Compile Include="ThirdParty\RTFLib\IRtfProcessor.cs" />
+    <Compile Include="ThirdParty\RTFLib\IRTFRow.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFAlignment.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFBorderSide.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFBuilder.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFBuilder.RTFFonts.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFBuilder.RTFFormatWrap.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFBuilder.RTFParaWrap.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFBuilder.UnWrapped.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFBuilderbase.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFCell.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFCellDefinition.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFCellDefinitionBuilder.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFFont.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFImage.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFRow.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFRowDefinition.cs" />
+    <Compile Include="ThirdParty\RTFLib\RTFUtil.cs" />
+    <EmbeddedResource Include="SmartFormatDemo.resx">
+      <DependentUpon>SmartFormatDemo.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ThirdParty\RTFLib\Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SmartFormat.Tests\SmartFormat.Tests.csproj">
+      <Project>{ff479926-fa9a-4517-8b3c-94bc580eabe7}</Project>
+      <Name>SmartFormat.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SmartFormat\SmartFormat.csproj">
+      <Project>{948084ed-dfa5-4588-b05f-ecf8cc98cbe3}</Project>
+      <Name>SmartFormat</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

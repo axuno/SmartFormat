@@ -14,7 +14,7 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SmartFormat.NET</PackageId>
-    <PackageReleaseNotes>See the change log with links to the Wiki for new features:
+    <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
 https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
