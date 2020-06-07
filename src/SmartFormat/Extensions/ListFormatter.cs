@@ -5,10 +5,6 @@ using System.Threading;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
-#if NET452
-// Not supported by .Net Core
-using System.Runtime.Remoting.Messaging;
-#endif
 
 namespace SmartFormat.Extensions
 {
@@ -97,30 +93,9 @@ namespace SmartFormat.Extensions
         // [ThreadStatic] private static int CollectionIndex = -1;
         // same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
         // Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
-
-#if NET452
-        /// <summary>
-        /// The key for CallContext.Logical[Get|Set]Data().
-        /// </summary>
-        private static readonly string key = "664c3d47-8d00-4825-b4fb-f3dd7c8a9bdf";
-
         /// <remarks>
-        /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data
-        /// not supported by .Net Core. Instead .Net Core provides AsyncLocal&lt;T&gt;
+        /// Wrap, so that CollectionIndex can be used without code changes.
         /// </remarks>
-        private static int CollectionIndex
-        {
-            get
-            {
-                var val = CallContext.LogicalGetData(key);
-                return (int?) val ?? -1;
-            }
-            set => CallContext.LogicalSetData(key, value);
-        }
-#else
-/// <remarks>
-/// Wrap, so that CollectionIndex can be used without code changes.
-/// </remarks>
         private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
 
         /// <remarks>
@@ -134,7 +109,7 @@ namespace SmartFormat.Extensions
             get { return _collectionIndex.Value ?? -1; }
             set { _collectionIndex.Value = value; }
         }    
-#endif
+
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
