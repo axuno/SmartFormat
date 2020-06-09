@@ -19,7 +19,7 @@ namespace SmartFormat.Tests.Extensions
 
         private const string JsonOneLevel = @"{'Name': 'Doe'}";
         private const string JsonTwoLevel = @"{'Name': {'First': 'Joe'}}";
-
+        private const string JsonNull = @"{'Name': null}";
         private const string JsonComplex = @"{
   'Stores': [
     'Lambton Quay',
@@ -55,6 +55,14 @@ namespace SmartFormat.Tests.Extensions
 }";
 
         #region *** NewtonSoftJson ***
+
+        [Test]
+        public void NS_Format_Null_Json()
+        {
+            var jObject = JObject.Parse(JsonNull);
+            var result = Smart.Format("{Name}", jObject);
+            Assert.AreEqual("", result);
+        }
 
         [Test]
         public void NS_Format_OneLevel_Json()
@@ -119,6 +127,14 @@ namespace SmartFormat.Tests.Extensions
         #endregion
 
         #region *** System.Text.Json ***
+
+        [Test]
+        public void ST_Format_Null_Json()
+        {
+            var jObject = JsonDocument.Parse(JsonNull.Replace("'", "\"")).RootElement;
+            var result = Smart.Format("{Name}", jObject);
+            Assert.AreEqual("", result);
+        }
 
         [Test]
         public void ST_Format_OneLevel_Json()

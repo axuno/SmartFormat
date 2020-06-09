@@ -77,9 +77,11 @@ namespace SmartFormat.Extensions
                 }
 
                 switch (targetElement.ValueKind) {
-                    case JsonValueKind.Null:
                     case JsonValueKind.Undefined:
                         throw new FormatException($"'{selectorInfo.SelectorText}'");
+                    case JsonValueKind.Null:
+                        selectorInfo.Result = null;
+                        break;
                     case JsonValueKind.Number:
                         selectorInfo.Result = targetElement.GetDouble();
                         break;
