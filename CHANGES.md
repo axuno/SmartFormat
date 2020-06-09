@@ -4,6 +4,7 @@ Latest Changes
 v2.5.1.0
 ===
 * Added ```System.Text.Json.JsonElement``` to the JsonSource extension. ```Newtonsoft.Json``` is still included.
+* Added a demo version as a netcoreapp3.1 WindowsDesktop App
 * Supported framworks now are: 
   * .Net Framework 4.6.2, 4.7.2 and 4.8 (```System.Text.Json``` is not supported for .Net Framework 4.5.x and thus had to be dropped)
   * .Net Standard 2.0 and 2.1
