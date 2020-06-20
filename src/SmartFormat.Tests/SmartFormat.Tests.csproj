@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/scottrippey/SmartFormat.NET</Description>
+    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
     <Copyright>Copyright 2011-2020 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
     <AssemblyTitle>SmartFormat.Test</AssemblyTitle>
     <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-    <Version>2.5.1.0</Version>
+    <Version>2.5.2.0</Version>
     <TargetFrameworks>netcoreapp3.1;net462</TargetFrameworks>
     <DefineConstants>$(DefineConstants)</DefineConstants>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -17,16 +17,8 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
     <Company>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Company>
-    <FileVersion>2.5.0.0</FileVersion>
+    <FileVersion>2.5.2.0</FileVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="project.*.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="packages.config" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

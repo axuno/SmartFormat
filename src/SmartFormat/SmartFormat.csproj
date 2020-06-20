@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/axuno/SmartFormat</Description>
+    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
     <Copyright>Copyright 2011-2020 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
     <AssemblyTitle>SmartFormat</AssemblyTitle>
     <Version>2.5.2.0</Version>
@@ -19,16 +19,15 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat/master/SmartFormat_365x365.png</PackageIconUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageTags>string-format string-composition smartformat netstandard netframework</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
     <AssemblyVersion>2.5.2.0</AssemblyVersion>
     <FileVersion>2.5.2.0</FileVersion>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryType>GitHub</RepositoryType>
-    <UserSecretsId>0f7ff624-9c50-4773-a68a-40b1d3de9d7b</UserSecretsId>
+    <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -36,19 +35,12 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>3</WarningLevel>
+    <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Properties\**\*;project.*.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="packages.config" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Compile Remove="Properties\**\*" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   
