@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace SmartFormat.Tests.Core
 {
