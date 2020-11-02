@@ -1,6 +1,10 @@
 Latest Changes
 ====
 
+v2.5.3.0-preview1
+===
+Bugfix: ```ListFormatter``` will now process ```IList``` data sources only.
+
 v2.5.2.0
 ===
 Supported frameworks now are: 
