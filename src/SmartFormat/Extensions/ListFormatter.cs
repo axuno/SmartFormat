@@ -51,11 +51,11 @@ namespace SmartFormat.Extensions
             var current = selectorInfo.CurrentValue;
             var selector = selectorInfo.SelectorText;
 
+            if (!(current is IList currentList)) return false;
+
             // See if we're trying to access a specific index:
-            int itemIndex;
-            var currentList = current as IList;
             var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
-            if (!isAbsolute && currentList != null && int.TryParse(selector, out itemIndex) &&
+            if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
                 itemIndex < currentList.Count)
             {
                 // The current is a List, and the selector is a number;
@@ -65,7 +65,6 @@ namespace SmartFormat.Extensions
                 selectorInfo.Result = currentList[itemIndex];
                 return true;
             }
-
 
             // We want to see if there is an "Index" property that was supplied.
             if (selector.Equals("index", StringComparison.OrdinalIgnoreCase))
@@ -78,7 +77,7 @@ namespace SmartFormat.Extensions
                 }
 
                 // Looking for 2 lists to sync: "{List1: {List2[Index]} }"
-                if (currentList != null && 0 <= CollectionIndex && CollectionIndex < currentList.Count)
+                if (0 <= CollectionIndex && CollectionIndex < currentList.Count)
                 {
                     selectorInfo.Result = currentList[CollectionIndex];
                     return true;

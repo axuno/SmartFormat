@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SmartFormat.Core.Formatting;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
@@ -130,7 +132,7 @@ namespace SmartFormat.Tests.Extensions
             // const string format = "{wheres.Count::>0? where |}{wheres:{}| and }";
             const string format = "Wheres-Index={Index}.";
 
-            var wheres = new List<string>(){"test = @test"};
+            var wheres = new List<string>{"test1 = test1", "test2 = test2"};
             
             var tasks = new List<Task<string>>();
             for (int i = 0; i < 10; ++i)
@@ -138,12 +140,12 @@ namespace SmartFormat.Tests.Extensions
                 tasks.Add(Task.Factory.StartNew(val =>
                 {
                     Thread.Sleep(5 * (int)val);
-                    string ret = Smart.Default.Format(format, new {wheres});
+                    string ret = Smart.Default.Format(format, wheres);
                     Thread.Sleep(5 * (int)val); /* add some delay to force ThreadPool swapping */
                     return ret;
                 }, i));
             }
-            
+
             foreach (var t in tasks)
             {
                 // Old test did not show wrong Index value:
@@ -157,6 +159,25 @@ namespace SmartFormat.Tests.Extensions
             }
         }
 
+        [Test]
+        public void Objects_Not_Implementing_IList_Are_Not_Processed()
+        {
+            var items = new[] { "one", "two", "three" };
+            
+            var formatter = new SmartFormatter();
+            var listFormatter = new ListFormatter(formatter);
+            formatter.SourceExtensions.Add(listFormatter);
+            formatter.FormatterExtensions.Add(listFormatter);
+            formatter.SourceExtensions.Add(new DefaultSource(formatter));
+            formatter.FormatterExtensions.Add(new DefaultFormatter());
+
+            Assert.Multiple(
+                () =>
+                {
+                    Assert.AreEqual("one, two, and three", formatter.Format("{0:list:{}|, |, and }", new object[] { items }));
+                    Assert.Throws<FormattingException>(() => formatter.Format("{0:list:{}|, |, and }", new { Index = 100 })); // no formatter found
+                });
+        }
 
         [Test]
         public void TestIndex()
