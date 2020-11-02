@@ -9,7 +9,7 @@
 **SmartFormat** is a **string composition** library written in C# which is basically compatible with string.Format. More than that **SmartFormat** can format data with named placeholders, lists, pluralization and other smart extensions.
 
 ### Supported Frameworks
-* .Net Framework 4.6.2, 4.7.2 and 4.8
+* .Net Framework 4.6.1, 4.6.2, 4.7.2 and 4.8
 * .Net Standard 2.0 and 2.1
 
 ### Get started
