@@ -182,33 +182,6 @@ namespace SmartFormat.Utilities
         #region: TimeSpan Rounding :
 
         /// <summary>
-        /// <para>Returns the largest <c>TimeSpan</c> less than or equal to the specified interval.</para>
-        /// <para>For example: <c>Floor("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "00:55:00"</c></para>
-        /// </summary>
-        /// <param name="FromTime">A <c>TimeSpan</c> to be rounded.</param>
-        /// <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
-        [Obsolete("Use System.Math.Floor(int) instead", true)]
-        public static TimeSpan Floor(this TimeSpan FromTime, long intervalTicks)
-        {
-            var extra = FromTime.Ticks % intervalTicks;
-            return TimeSpan.FromTicks(FromTime.Ticks - extra);
-        }
-
-        /// <summary>
-        /// <para>Returns the smallest <c>TimeSpan</c> greater than or equal to the specified interval.</para>
-        /// <para>For example: <c>Ceiling("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "01:00:00"</c></para>
-        /// </summary>
-        /// <param name="fromTime">A <c>TimeSpan</c> to be rounded.</param>
-        /// <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
-        [Obsolete("Use System.Math.Ceiling(int) instead", true)]
-        public static TimeSpan Ceiling(this TimeSpan fromTime, long intervalTicks)
-        {
-            var extra = fromTime.Ticks % intervalTicks;
-            if (extra == 0) return fromTime;
-            return TimeSpan.FromTicks(fromTime.Ticks - extra + intervalTicks);
-        }
-
-        /// <summary>
         /// <para>Returns the <c>TimeSpan</c> closest to the specified interval.</para>
         /// <para>For example: <c>Round("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "00:55:00"</c></para>
         /// </summary>

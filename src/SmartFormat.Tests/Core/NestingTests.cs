@@ -7,7 +7,7 @@ namespace SmartFormat.Tests.Core
     {
         public NestingTests()
         {
-            this.data = new {
+            data = new {
                 One = 1,
                 ChildOne = new {
                     Two = 2,
@@ -40,6 +40,23 @@ namespace SmartFormat.Tests.Core
         {
             var actual = Smart.Format(format, data);
             Assert.AreEqual(expectedOutput, actual);
+        }
+
+        [Test]
+        public void Nesting_CurrentScope_propertyName_outrules_OuterScope_propertyName()
+        {
+            var nestedObject = new
+            {
+                IdenticalName = "Name from parent", 
+                ParentValue = "Parent value",
+                Child = new {IdenticalName = "Name from Child", ChildValue = "Child value"}
+            };
+
+            // Access to outer scope, if no current scope variable is found
+            Assert.AreEqual(string.Format($"{nestedObject.ParentValue} - {nestedObject.Child.ChildValue}"), Smart.Format("{Child:{ParentValue} - {Child.ChildValue}|}", nestedObject));
+
+            // Access to current scope, although outer scope variable with same name exists
+            Assert.AreNotEqual(string.Format($"{nestedObject.IdenticalName} - {nestedObject.Child.IdenticalName}"), Smart.Format("{Child:{IdenticalName} - {Child.IdenticalName}|}", nestedObject));
         }
 
         [Test]

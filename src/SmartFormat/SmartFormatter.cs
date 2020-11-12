@@ -6,6 +6,7 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+using SmartFormat.Utilities;
 
 namespace SmartFormat
 {
@@ -32,12 +33,6 @@ namespace SmartFormat
             Parser = new Parser(Settings);
             SourceExtensions = new List<ISource>();
             FormatterExtensions = new List<IFormatter>();
-        }
-
-        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
-        public SmartFormatter(ErrorAction errorAction = ErrorAction.Ignore) : this()
-        {
-            Settings.FormatErrorAction = errorAction;
         }
 
         #endregion
@@ -119,16 +114,6 @@ namespace SmartFormat
         /// Gets or set the instance of the <see cref="Core.Parsing.Parser" />
         /// </summary>
         public Parser Parser { get; }
-
-        /// <summary>
-        /// Gets or set the <see cref="Core.Settings.ErrorAction" /> for the formatter.
-        /// </summary>
-        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
-        public ErrorAction ErrorAction
-        {
-            get => Settings.FormatErrorAction;
-            set => Settings.FormatErrorAction = value;
-        }
 
         /// <summary>
         /// Get the <see cref="Core.Settings.SmartSettings" /> for Smart.Format
@@ -349,31 +334,8 @@ namespace SmartFormat
         {
             foreach (var sourceExtension in SourceExtensions)
             {
-                // if the current value is of type SmartObjects
-                // then try to find the right source extension for each of the objects in SmartObjects
-                // Note: SmartObjects cannot be nested, so this can be the case only once. 
-                if (formattingInfo.CurrentValue is SmartObjects smartObjects)
-                {
-                    var savedCurrentValue = formattingInfo.CurrentValue;
-                    foreach (var obj in smartObjects)
-                    {
-                        formattingInfo.CurrentValue = obj;
-                        var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
-                        if (handled)
-                        {
-                            formattingInfo.CurrentValue = savedCurrentValue;
-                            return true;
-                        }
-                    }
-
-                    formattingInfo.CurrentValue = savedCurrentValue;
-                }
-                else
-                {
-                    // other object - default handling
-                    var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
-                    if (handled) return true;
-                }
+                var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
+                if (handled) return true;
             }
 
             return false;

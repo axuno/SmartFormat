@@ -103,7 +103,7 @@ namespace SmartFormat.Tests.Core
             // see issue https://github.com/scottrippey/SmartFormat.NET/issues/101
             var smart = Smart.CreateDefaultSmartFormat();
             object boxedNull = null;
-            Assert.AreEqual(smart.Format("{dummy}", null), smart.Format("{dummy}", boxedNull));
+            Assert.AreEqual(smart.Format("{0}", null), smart.Format("{0}", boxedNull));
         }
 
         [Test]

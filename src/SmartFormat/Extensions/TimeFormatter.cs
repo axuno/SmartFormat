@@ -13,13 +13,6 @@ namespace SmartFormat.Extensions
         #region Constructors
 
         /// <summary>
-        /// Initializes the extension with no default TimeTextInfo.
-        /// </summary>
-        [Obsolete("Use CTOR TimeFormatter(string defaultTwoLetterLanguageName) instead", true)]
-        public TimeFormatter() : this(null)
-        {}
-
-        /// <summary>
         /// Initializes the extension with a default TimeTextInfo.
         /// </summary>
         /// <param name="defaultTwoLetterLanguageName">This will be used when no CultureInfo is supplied.  Can be null.</param>

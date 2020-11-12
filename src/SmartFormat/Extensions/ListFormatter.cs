@@ -5,10 +5,6 @@ using System.Threading;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
-#if NET45
-// Not supported by .Net Core
-using System.Runtime.Remoting.Messaging;
-#endif
 
 namespace SmartFormat.Extensions
 {
@@ -55,11 +51,11 @@ namespace SmartFormat.Extensions
             var current = selectorInfo.CurrentValue;
             var selector = selectorInfo.SelectorText;
 
+            if (!(current is IList currentList)) return false;
+
             // See if we're trying to access a specific index:
-            int itemIndex;
-            var currentList = current as IList;
             var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
-            if (!isAbsolute && currentList != null && int.TryParse(selector, out itemIndex) &&
+            if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
                 itemIndex < currentList.Count)
             {
                 // The current is a List, and the selector is a number;
@@ -69,7 +65,6 @@ namespace SmartFormat.Extensions
                 selectorInfo.Result = currentList[itemIndex];
                 return true;
             }
-
 
             // We want to see if there is an "Index" property that was supplied.
             if (selector.Equals("index", StringComparison.OrdinalIgnoreCase))
@@ -82,7 +77,7 @@ namespace SmartFormat.Extensions
                 }
 
                 // Looking for 2 lists to sync: "{List1: {List2[Index]} }"
-                if (currentList != null && 0 <= CollectionIndex && CollectionIndex < currentList.Count)
+                if (0 <= CollectionIndex && CollectionIndex < currentList.Count)
                 {
                     selectorInfo.Result = currentList[CollectionIndex];
                     return true;
@@ -97,30 +92,9 @@ namespace SmartFormat.Extensions
         // [ThreadStatic] private static int CollectionIndex = -1;
         // same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
         // Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
-
-#if NET45
-        /// <summary>
-        /// The key for CallContext.Logical[Get|Set]Data().
-        /// </summary>
-        private static readonly string key = "664c3d47-8d00-4825-b4fb-f3dd7c8a9bdf";
-
         /// <remarks>
-        /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data
-        /// not supported by .Net Core. Instead .Net Core provides AsyncLocal&lt;T&gt;
+        /// Wrap, so that CollectionIndex can be used without code changes.
         /// </remarks>
-        private static int CollectionIndex
-        {
-            get
-            {
-                var val = CallContext.LogicalGetData(key);
-                return (int?) val ?? -1;
-            }
-            set => CallContext.LogicalSetData(key, value);
-        }
-#else
-/// <remarks>
-/// Wrap, so that CollectionIndex can be used without code changes.
-/// </remarks>
         private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
 
         /// <remarks>
@@ -134,7 +108,7 @@ namespace SmartFormat.Extensions
             get { return _collectionIndex.Value ?? -1; }
             set { _collectionIndex.Value = value; }
         }    
-#endif
+
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;

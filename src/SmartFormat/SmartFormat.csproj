@@ -1,59 +1,67 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting. Project hosted on GitHub https://github.com/axuno/SmartFormat.NET</Description>
-    <Copyright>Copyright 2011-2019 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
-    <AssemblyTitle>SmartFormat</AssemblyTitle>
-    <Version>2.4.2.0</Version>
-    <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-    <TargetFrameworks>netstandard1.6;netstandard2.0;net45</TargetFrameworks>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>SmartFormat</AssemblyName>
-    <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>SmartFormat.NET</PackageId>
-    <PackageReleaseNotes>See the change log with links to the Wiki for new features:
+    <PropertyGroup>
+        <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
+        <Copyright>Copyright 2011-2020 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
+        <AssemblyTitle>SmartFormat</AssemblyTitle>
+        <Version>2.5.3.0</Version>
+        <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462;net472;net48</TargetFrameworks>
+        <DefineConstants>TRACE;DEBUG</DefineConstants>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>SmartFormat</AssemblyName>
+        <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <SignAssembly>true</SignAssembly>
+        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+        <PackageId>SmartFormat.NET</PackageId>
+        <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
 https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
-    <PackageLicenseUrl>https://github.com/axuno/SmartFormat/wiki/License</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat/master/SmartFormat_365x365.png</PackageIconUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageTags>string-format string-composition smartformat netstandard net45</PackageTags>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
-    <AssemblyVersion>2.4.2.0</AssemblyVersion>
-  </PropertyGroup>
+        <PackageLicenseUrl></PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat/master/SmartFormat_365x365.png</PackageIconUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
+        <AssemblyVersion>2.5.3.0</AssemblyVersion>
+        <FileVersion>2.5.3.0</FileVersion>
+        <PackageLicenseFile></PackageLicenseFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryType>Git</RepositoryType>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>3</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Properties\**\*;project.*.json" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <Deterministic>true</Deterministic>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="packages.config" />
-  </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'Release' and '$(SourceRoot)'==''">
+        <SourceRoot Include="$(MSBuildThisFileDirectory)/" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Properties\**\*" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.1" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+        <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    </ItemGroup>
 
 </Project>

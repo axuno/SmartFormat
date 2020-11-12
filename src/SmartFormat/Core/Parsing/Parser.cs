@@ -30,12 +30,6 @@ namespace SmartFormat.Core.Parsing
 
         #region: Constructor :
 
-        [Obsolete("Depreciated. Parser should be created by SmartFormatter only.", false)]
-        public Parser(ErrorAction errorAction = ErrorAction.Ignore)
-        {
-            Settings.ParseErrorAction = errorAction;
-        }
-
         internal Parser(SmartSettings smartSettings)
         {
             Settings = smartSettings;
@@ -149,6 +143,11 @@ namespace SmartFormat.Core.Parsing
         private char _openingBrace = '{';
         private char _closingBrace = '}';
 
+        /// <summary>
+        /// Set the closing and opening braces for the parser.
+        /// </summary>
+        /// <param name="opening"></param>
+        /// <param name="closing"></param>
         public void UseAlternativeBraces(char opening, char closing)
         {
             _openingBrace = opening;
@@ -159,6 +158,12 @@ namespace SmartFormat.Core.Parsing
 
         #region: Parsing :
 
+        /// <summary>
+        /// Parses a format string.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="formatterExtensionNames"></param>
+        /// <returns>Returns the <see cref="Format"/> for the parsed string.</returns>
         public Format ParseFormat(string format, string[] formatterExtensionNames)
         {
             var result = new Format(Settings, format);
@@ -467,21 +472,32 @@ namespace SmartFormat.Core.Parsing
 
         #region: Errors :
 
-        [Obsolete("Depreciated. Use the ParserErrorAction in Settings instead.", false)]
-        public ErrorAction ErrorAction
-        {
-            get => Settings.ParseErrorAction;
-            set => Settings.ParseErrorAction = value;
-        }
-
+        /// <summary>
+        /// Parsing errors.
+        /// </summary>
         public enum ParsingError
         {
+            /// <summary>
+            /// Too many closing braces.
+            /// </summary>
             TooManyClosingBraces = 1,
+            /// <summary>
+            /// Trailing operators in the selector.
+            /// </summary>
             TrailingOperatorsInSelector,
+            /// <summary>
+            /// Invalid characters in the selector.
+            /// </summary>
             InvalidCharactersInSelector,
+            /// <summary>
+            /// Missing closing brace.
+            /// </summary>
             MissingClosingBrace
         }
 
+        /// <summary>
+        /// Supplies error text for the <see cref="Parser"/>.
+        /// </summary>
         public class ParsingErrorText
         {
             private readonly Dictionary<ParsingError, string> _errors = new Dictionary<ParsingError, string>

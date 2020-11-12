@@ -1,6 +1,39 @@
 Latest Changes
 ====
 
+v2.5.3.0-preview1
+===
+Bugfix: ```ListFormatter``` will now process ```IList``` data sources only.
+
+v2.5.2.0
+===
+Supported frameworks now are: 
+  * .Net Framework 4.6.1, 4.6.2, 4.7.2 and 4.8 (```System.Text.Json``` is not supported for .Net Framework 4.5.x and thus had to be dropped)
+  * .Net Standard 2.0 and 2.1
+
+v2.5.1.0
+===
+* Added ```System.Text.Json.JsonElement``` to the JsonSource extension. ```Newtonsoft.Json``` is still included.
+* Added a demo version as a netcoreapp3.1 WindowsDesktop App
+* Supported framworks now are: 
+  * .Net Framework 4.6.2, 4.7.2 and 4.8 (```System.Text.Json``` is not supported for .Net Framework 4.5.x and thus had to be dropped)
+  * .Net Standard 2.0 and 2.1
+* Updated the [Wiki](https://github.com/axuno/SmartFormat/wiki)
+
+v2.5.0.0
+===
+
+**Sources**
+* *New:* Added ```ValueTupleSource``` for ```ValueTuple```s
+* *Changed:* ```SmartObjects``` and ```SmartObjectsSource``` are depreciated in favor of ```ValueTupleSource```
+
+**Settings**
+* *Breaking Change:* Internal string comparisons (i.e. for placeholder names) are no more culture-specific, but ```Ordinal``` or ```OrdinalIgnoreCase``` respectively. See discussion [under this issue](https://github.com/axuno/SmartFormat/issues/122).
+* *Breaking Change:* Default ```ErrorAction``` is now ```ThrowError``` for parser and formatter, instead of ```Ignore```
+
+**Other**
+* *Changed:* Removed all members which were flagged obsolete since more than a year.
+
 v2.4.2.0
 ===
 

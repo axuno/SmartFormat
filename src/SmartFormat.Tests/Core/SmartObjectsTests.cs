@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests
 {
@@ -27,6 +31,43 @@ namespace SmartFormat.Tests
                 so.AddRange(new[] {new object(), new SmartObjects() });
             });
         }
+
+        [Test]
+        public void SmartObjects_Add_Regular()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                new SmartObjects().Add(new SmartSettings());
+            });
+        }
+
+        [Test]
+        public void SmartObjects_AddRange_Regular()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                new SmartObjects().AddRange(new []{ new SmartSettings(), new SmartSettings() } );
+            });
+        }
+
+        [Test]
+        public void SmartObjects_Add_Null()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new SmartObjects().Add(null);
+            });
+        }
+
+        [Test]
+        public void SmartObjects_AddRange_Null()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new SmartObjects().AddRange(null);
+            });
+        }
+
 
         [Test]
         public void Format_With_SmartObjects()
@@ -74,6 +115,23 @@ namespace SmartFormat.Tests
 
             result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", new SmartObjects(new object[] { clubNoMember, say }));
             Assert.AreEqual($"{clubOrMember.Club.Name} - {say.Hello}", result);
+        }
+
+        [Test]
+        public void Not_Invoked_With_FormattingInfo()
+        {
+            Assert.IsFalse(new SmartObjectsSource(new SmartFormatter()).TryEvaluateSelector(new SelectorInfo()));
+        }
+
+        private class SelectorInfo : ISelectorInfo
+        {
+            public object CurrentValue { get; }
+            public string SelectorText { get; }
+            public int SelectorIndex { get; }
+            public string SelectorOperator { get; }
+            public object Result { get; set; }
+            public Placeholder Placeholder { get; }
+            public FormatDetails FormatDetails { get; }
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Newtonsoft.Json.Linq;
-#if !NETCOREAPP2_0
+#if NET462
 using System.Runtime.Remoting.Messaging;
 #endif
 using NUnit.Framework;
@@ -23,7 +23,7 @@ namespace SmartFormat.Tests.Extensions
 
             var sw = new Stopwatch();
 
-            // Direct member acess:
+            // Direct member access:
             sw.Start();
             for (var i = 0; i < 100000; i++)
             {
