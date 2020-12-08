@@ -88,10 +88,10 @@ namespace SmartFormat
         /// Returns null if the type cannot be found.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <returns>Returns a Source Extension or <see langword="null" />, if the type cannot be found.</returns>
         public T GetSourceExtension<T>() where T : class, ISource
         {
-            return SourceExtensions.OfType<T>().First();
+            return SourceExtensions.OfType<T>().FirstOrDefault();
         }
 
         /// <summary>
@@ -100,10 +100,10 @@ namespace SmartFormat
         /// Returns null if the type cannot be found.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <returns>Returns a Formatter Extension or <see langword="null" />, if the type cannot be found.</returns>
         public T GetFormatterExtension<T>() where T : class, IFormatter
         {
-            return FormatterExtensions.OfType<T>().First();
+            return FormatterExtensions.OfType<T>().FirstOrDefault();
         }
 
         #endregion
