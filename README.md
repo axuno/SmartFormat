@@ -21,7 +21,7 @@ Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.N
 See [changelog](CHANGES.md) for changes.
 
 # Version 3.0
-We have started to think about a new version of ```SmartFormat.Net``` and **would like to collect your input using GitHub Discussions**.
+We have started to think about a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**.
 
 * Improve management of extensions for better performance:
   * make named formatters obligatory instead of iterating through all formatters
