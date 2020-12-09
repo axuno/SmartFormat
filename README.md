@@ -20,9 +20,16 @@ Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.N
 
 See [changelog](CHANGES.md) for changes.
 
+# Version 3.0
+We have started to think about a new version of ```SmartFormat.Net``` and **would like to collect your input using GitHub Discussions**.
 
-**Projects, where SmartFormat.Net is used**:
-(let us know if you'd like to be listed here):
-
-[<img src="https://raw.githubusercontent.com/axuno/MailMergeLib/master/MailMergeLlib.png" width="300" alt="Logo">](https://github.com/axuno/MailMergeLib)<br/>
-[MailMergeLib](https://github.com/axuno/MailMergeLib) is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.
+* Improve management of extensions for better performance:
+  * make named formatters obligatory instead of iterating through all formatters
+  * the sequence, how extensions are loaded should not have an impact on identifying the right formatter
+* Make caching of ```Parser.ParseFormat``` results the standard behavior
+* Support for Net 5.0
+* Remove ```public``` properties/methods which should better be ```internal``` or even ```privat```
+* Upgrade the project to C# 8 with nullable reference types included
+* Code clean-up: Make us of current C# features, add missing comments
+* Re-organize unit tests
+* ... ?
