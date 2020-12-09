@@ -30,6 +30,6 @@ We have started to think about a new version of ```SmartFormat.Net``` and **woul
 * Support for Net 5.0
 * Remove ```public``` properties/methods which should better be ```internal``` or even ```privat```
 * Upgrade the project to C# 8 with nullable reference types included
-* Code clean-up: Make us of current C# features, add missing comments
+* Code clean-up: Make use of current C# features, add missing comments
 * Re-organize unit tests
 * ... ?
