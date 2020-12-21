@@ -120,4 +120,5 @@ dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 
 # Copyright file header
-file_header_template = \nCopyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.\n
+file_header_template = \nCopyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.\nLicensed under the MIT license.\n
+
