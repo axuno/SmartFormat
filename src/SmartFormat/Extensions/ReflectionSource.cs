@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+using System.Linq;
 using System.Reflection;
 using SmartFormat.Core.Extensions;
 

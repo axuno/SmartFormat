@@ -1,3 +1,7 @@
+//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]

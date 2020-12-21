@@ -1,3 +1,7 @@
+//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
 using System.IO;
 using System.Text;
 using SmartFormat.Core.Formatting;

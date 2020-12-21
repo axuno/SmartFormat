@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+using System.Text;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output

@@ -1,4 +1,8 @@
-﻿namespace SmartFormat.Core.Extensions
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+namespace SmartFormat.Core.Extensions
 {
     /// <summary> Converts an object to a string. </summary>
     public interface IFormatter

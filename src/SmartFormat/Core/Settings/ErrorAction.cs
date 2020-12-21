@@ -1,4 +1,8 @@
-﻿namespace SmartFormat.Core.Settings
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+namespace SmartFormat.Core.Settings
 {
     /// <summary>
     /// Determines how format errors are handled.

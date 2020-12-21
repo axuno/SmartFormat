@@ -1,4 +1,8 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+using System;
 using System.Globalization;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Net.Utilities;

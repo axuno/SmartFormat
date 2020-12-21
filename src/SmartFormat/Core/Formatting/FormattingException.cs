@@ -1,4 +1,8 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+using System;
 using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Formatting

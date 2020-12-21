@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+using System.Collections.Generic;
 using System.Text;
 using SmartFormat.Core.Settings;
 

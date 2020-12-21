@@ -1,4 +1,8 @@
-﻿using SmartFormat.Core.Extensions;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Formatting

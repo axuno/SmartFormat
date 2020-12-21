@@ -1,4 +1,8 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+//
+
+using System;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using SmartFormat.Core.Extensions;
