@@ -203,7 +203,7 @@ namespace SmartFormat.Tests.Common
         /// <param name="args">An optional list of objects to use for formatting the message.</param>
         public void AddNewException(string message, params object[] args)
         {
-            AddNewException(null, message, args);
+            AddNewException(default, message, args);
         }
         /// <summary>
         /// Adds a new Exception to the ExceptionCollection.
@@ -212,7 +212,7 @@ namespace SmartFormat.Tests.Common
         /// <param name="message">The issue message that explains the reason for the exception.
         /// This message can optionally contain string.Format placeholders for the following arguments.</param>
         /// <param name="args">An optional list of objects to use for formatting the message.</param>
-        public void AddNewException(Exception innerException, string message, params object[] args)
+        public void AddNewException(Exception? innerException, string message, params object[] args)
         {
             if (args != null && args.Length > 0)
             {

@@ -90,7 +90,7 @@ namespace SmartFormat.Tests.Extensions
                 var format = bunchOfFormat[i % bunchOfFormat.Length];
                 var expected = bunchOfExpected[i % bunchOfExpected.Length];
 
-                string actual = null;
+                string actual = string.Empty;
 
                 try
                 {
@@ -122,7 +122,7 @@ namespace SmartFormat.Tests.Extensions
                 var format = bunchOfFormat[i % bunchOfFormat.Length];
                 var expected = bunchOfExpected[i % bunchOfExpected.Length];
 
-                string actual = null;
+                string? actual = null;
 
                 try
                 {
@@ -196,7 +196,7 @@ namespace SmartFormat.Tests.Extensions
         public void StringOutputTest()
         {
             var so = new StringOutput();
-            so.Write("text", 0, 2, null);
+            so.Write("text", 0, 2, null!);
             Assert.AreEqual("te", so.ToString());
         }
 

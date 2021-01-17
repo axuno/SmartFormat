@@ -29,7 +29,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Event raising, if an error occurs during parsing.
         /// </summary>
-        public event EventHandler<ParsingErrorEventArgs> OnParsingFailure;
+        public event EventHandler<ParsingErrorEventArgs>? OnParsingFailure;
 
         #endregion
 
@@ -173,7 +173,7 @@ namespace SmartFormat.Core.Parsing
         {
             var result = new Format(Settings, format);
             var current = result;
-            Placeholder currentPlaceholder = null;
+            Placeholder? currentPlaceholder = null;
             var namedFormatterStartIndex = -1;
             var namedFormatterOptionsStartIndex = -1;
             var namedFormatterOptionsEndIndex = -1;
@@ -342,7 +342,9 @@ namespace SmartFormat.Core.Parsing
                                     i - namedFormatterStartIndex);
 
                                 if (FormatterNameExists(formatterName, formatterExtensionNames))
-                                    parentPlaceholder.FormatterName = formatterName;
+                                {
+                                    if (parentPlaceholder != null) parentPlaceholder.FormatterName = formatterName;
+                                }
                                 else
                                     lastI = current.startIndex;
                             }
@@ -353,10 +355,13 @@ namespace SmartFormat.Core.Parsing
 
                                 if (FormatterNameExists(formatterName, formatterExtensionNames))
                                 {
-                                    parentPlaceholder.FormatterName = formatterName;
-                                    parentPlaceholder.FormatterOptions = format.Substring(
-                                        namedFormatterOptionsStartIndex + 1,
-                                        namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+                                    if (parentPlaceholder != null)
+                                    {
+                                        parentPlaceholder.FormatterName = formatterName;
+                                        parentPlaceholder.FormatterOptions = format.Substring(
+                                            namedFormatterOptionsStartIndex + 1,
+                                            namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+                                    }
                                 }
                                 else
                                 {

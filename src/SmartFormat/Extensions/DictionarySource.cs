@@ -30,7 +30,7 @@ namespace SmartFormat.Extensions
             if (rawDict != null)
                 foreach (DictionaryEntry entry in rawDict)
                 {
-                    var key = entry.Key as string ?? entry.Key.ToString();
+                    var key = entry.Key as string ?? entry.Key.ToString()!;
 
                     if (key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
                     {
@@ -40,9 +40,7 @@ namespace SmartFormat.Extensions
                 }
 
             // this check is for dynamics and generic dictionaries
-            var dict = current as IDictionary<string, object>;
-
-            if (dict != null)
+            if (current is IDictionary<string, object> dict)
             {
                 var val = dict.FirstOrDefault(x =>
                     x.Key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison())).Value;

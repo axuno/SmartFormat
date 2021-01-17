@@ -24,8 +24,7 @@ namespace SmartFormat.Extensions
             var selector = selectorInfo.SelectorText;
             var formatDetails = selectorInfo.FormatDetails;
 
-            int selectorValue;
-            if (int.TryParse(selector, out selectorValue))
+            if (int.TryParse(selector, out var selectorValue))
             {
                 // Argument Index:
                 // Just like String.Format, the arg index must be in-range,
@@ -44,7 +43,7 @@ namespace SmartFormat.Extensions
                 if (selectorInfo.SelectorOperator == ",")
                 {
                     // This selector is actually an Alignment modifier.
-                    selectorInfo.Placeholder.Alignment = selectorValue;
+                    if (selectorInfo.Placeholder != null) selectorInfo.Placeholder.Alignment = selectorValue;
                     selectorInfo.Result = current; // (don't change the current item)
                     return true;
                 }

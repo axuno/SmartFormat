@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
-        <Copyright>Copyright 2011-2020 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
+        <Copyright>Copyright 2011-2021 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
-        <Version>2.5.3.1</Version>
+        <Version>2.6.0.0</Version>
+        <AssemblyVersion>2.6.0.0</AssemblyVersion>
+        <FileVersion>2.6.0.0</FileVersion>
         <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462;net472;net48</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462;net472;net48;net50</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG</DefineConstants>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>
@@ -22,27 +24,31 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
         <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
-        <AssemblyVersion>2.5.3.1</AssemblyVersion>
-        <FileVersion>2.5.3.1</FileVersion>
         <PackageLicenseFile></PackageLicenseFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryType>Git</RepositoryType>
+        <LangVersion>8.0</LangVersion>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
+        <DebugType>portable</DebugType>
         <Optimize>false</Optimize>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
         <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <OutputPath>bin\Release\</OutputPath>
+        <WarningLevel>3</WarningLevel>
+        <DocumentationFile>bin\Release\SmartFormat.xml</DocumentationFile>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <Deterministic>true</Deterministic>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Release' and '$(SourceRoot)'==''">
@@ -50,8 +56,9 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Properties\**\*" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>SmartFormat.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100a1cdb8ba81e1a00f0f9509a8f0c896e0de0da6875652fffd44fb867e6b78fd78c31c6fdb07544b2ae53ed4b56daa90333d32ac14387f7f68d39165da8f99b8c294c1cee1bcc4bbcbe2dd73879824b53708837f425e2bf5c7d2cf868de9548c44871888bf9db5cb425064dda4b17134f8e3b52e1f686315a1832043c7b58fb0ac</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>

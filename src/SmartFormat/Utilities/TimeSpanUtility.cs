@@ -505,6 +505,9 @@ namespace SmartFormat.Utilities
         public TimeTextInfo(string week, string day, string hour, string minute, string second, string millisecond,
             string lessThan)
         {
+            // must not be null here
+            this.d = this.h = this.m = this.ms = this.s = this.w = new string[] { }; 
+
             // Always use singular:
             PluralRule = (d, c) => 0;
             this.week = new[] {week};
@@ -531,24 +534,17 @@ namespace SmartFormat.Utilities
 
         public virtual string GetUnitText(TimeSpanFormatOptions unit, int value, bool abbr)
         {
-            switch (unit)
+            return unit switch
             {
-                case TimeSpanFormatOptions.RangeWeeks:
-                    return GetValue(PluralRule, value, abbr ? w : week);
-                case TimeSpanFormatOptions.RangeDays:
-                    return GetValue(PluralRule, value, abbr ? d : day);
-                case TimeSpanFormatOptions.RangeHours:
-                    return GetValue(PluralRule, value, abbr ? h : hour);
-                case TimeSpanFormatOptions.RangeMinutes:
-                    return GetValue(PluralRule, value, abbr ? m : minute);
-                case TimeSpanFormatOptions.RangeSeconds:
-                    return GetValue(PluralRule, value, abbr ? s : second);
-                case TimeSpanFormatOptions.RangeMilliSeconds:
-                    return GetValue(PluralRule, value, abbr ? ms : millisecond);
-            }
-
-            // (should be unreachable)
-            return null;
+                TimeSpanFormatOptions.RangeWeeks => GetValue(PluralRule, value, abbr ? w : week),
+                TimeSpanFormatOptions.RangeDays => GetValue(PluralRule, value, abbr ? d : day),
+                TimeSpanFormatOptions.RangeHours => GetValue(PluralRule, value, abbr ? h : hour),
+                TimeSpanFormatOptions.RangeMinutes => GetValue(PluralRule, value, abbr ? m : minute),
+                TimeSpanFormatOptions.RangeSeconds => GetValue(PluralRule, value, abbr ? s : second),
+                TimeSpanFormatOptions.RangeMilliSeconds => GetValue(PluralRule, value, abbr ? ms : millisecond),
+                // (should be unreachable)
+                _ => string.Empty
+            };
         }
     }
 
@@ -571,15 +567,13 @@ namespace SmartFormat.Utilities
             "less than {0}"
         );
 
-        public static TimeTextInfo GetTimeTextInfo(string twoLetterISOLanguageName)
+        public static TimeTextInfo? GetTimeTextInfo(string twoLetterISOLanguageName)
         {
-            switch (twoLetterISOLanguageName)
+            return twoLetterISOLanguageName switch
             {
-                case "en":
-                    return English;
-                default:
-                    return null;
-            }
+                "en" => English,
+                _ => null
+            };
         }
     }
 

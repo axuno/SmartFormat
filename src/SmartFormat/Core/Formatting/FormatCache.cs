@@ -14,8 +14,6 @@ namespace SmartFormat.Core.Formatting
     /// </summary>
     public class FormatCache
     {
-        private Dictionary<string, object> cachedObjects;
-
         public FormatCache(Format format)
         {
             Format = format;
@@ -31,7 +29,6 @@ namespace SmartFormat.Core.Formatting
         /// This can be used by extensions that want to cache data,
         /// such as reflection information.
         /// </summary>
-        public Dictionary<string, object> CachedObjects =>
-            cachedObjects ?? (cachedObjects = new Dictionary<string, object>());
+        public Dictionary<string, object> CachedObjects { get; } = new Dictionary<string, object>();
     }
 }

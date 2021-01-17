@@ -81,7 +81,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void DataItemIsNull()
         {
-            Assert.AreEqual(new SubStringFormatter().NullDisplayString, _smart.Format("{Name:substr(0,3)}", new Dictionary<string, string> { { "Name", null } }));
+            Assert.AreEqual(new SubStringFormatter().NullDisplayString, _smart.Format("{Name:substr(0,3)}", new Dictionary<string, string?> { { "Name", null } }));
         }
     }
 }

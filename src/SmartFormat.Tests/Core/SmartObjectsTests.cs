@@ -55,7 +55,7 @@ namespace SmartFormat.Tests
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                new SmartObjects().Add(null);
+                new SmartObjects().Add(default!);
             });
         }
 
@@ -64,7 +64,7 @@ namespace SmartFormat.Tests
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                new SmartObjects().AddRange(null);
+                new SmartObjects().AddRange(default!);
             });
         }
 
@@ -95,7 +95,7 @@ namespace SmartFormat.Tests
 
             var formatter = Smart.CreateDefaultSmartFormat();
             var result1 = formatter.Format(format1, new SmartObjects(new object[] { addr, dict1, dict2 }));
-            var result2 = formatter.Format(format2, null, new SmartObjects(new object[] { addr, dict1, dict2 }));
+            var result2 = formatter.Format(format2, default!, new SmartObjects(new object[] { addr, dict1, dict2 }));
 
             Assert.AreEqual(expected, result1);
             Assert.AreEqual(expected, result2);
@@ -125,13 +125,13 @@ namespace SmartFormat.Tests
 
         private class SelectorInfo : ISelectorInfo
         {
-            public object CurrentValue { get; }
-            public string SelectorText { get; }
+            public object? CurrentValue { get; }
+            public string? SelectorText { get; }
             public int SelectorIndex { get; }
-            public string SelectorOperator { get; }
-            public object Result { get; set; }
-            public Placeholder Placeholder { get; }
-            public FormatDetails FormatDetails { get; }
+            public string? SelectorOperator { get; }
+            public object? Result { get; set; }
+            public Placeholder? Placeholder { get; }
+            public FormatDetails FormatDetails { get; } = (FormatDetails) null!; // dummy
         }
     }
 }

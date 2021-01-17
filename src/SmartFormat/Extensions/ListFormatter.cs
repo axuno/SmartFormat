@@ -59,7 +59,7 @@ namespace SmartFormat.Extensions
             if (!(current is IList currentList)) return false;
 
             // See if we're trying to access a specific index:
-            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
+            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator?.Length == 0;
             if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
                 itemIndex < currentList.Count)
             {
@@ -72,7 +72,7 @@ namespace SmartFormat.Extensions
             }
 
             // We want to see if there is an "Index" property that was supplied.
-            if (selector.Equals("index", StringComparison.OrdinalIgnoreCase))
+            if (selector != null && selector.Equals("index", StringComparison.OrdinalIgnoreCase))
             {
                 // Looking for "{Index}"
                 if (selectorInfo.SelectorIndex == 0)

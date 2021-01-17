@@ -21,7 +21,7 @@ namespace SmartFormat.Tests.Utilities
         [Test]
         public void FormatDelegate_Works_WithStringFormat()
         {
-            var formatDelegate = new FormatDelegate(text => HtmlActionLink(text, "SomePage"));
+            var formatDelegate = new FormatDelegate(text => HtmlActionLink(text ?? "null", "SomePage"));
 
             Assert.That(string.Format("Please visit {0:this page} for more info.", formatDelegate)
                          , Is.EqualTo("Please visit <a href='www.example.com/SomePage'>this page</a> for more info."));
@@ -36,7 +36,7 @@ namespace SmartFormat.Tests.Utilities
         [Test]
         public void FormatDelegate_Works_WithSmartFormat()
         {
-            var formatDelegate = new FormatDelegate((text) => HtmlActionLink(text, "SomePage"));
+            var formatDelegate = new FormatDelegate((text) => HtmlActionLink(text ?? "null", "SomePage"));
 
             Assert.That(Smart.Format("Please visit {0:this page} for more info.", formatDelegate)
                         , Is.EqualTo("Please visit <a href='www.example.com/SomePage'>this page</a> for more info."));

@@ -50,11 +50,11 @@ namespace SmartFormat.Tests.OldTests
             var args = new object[] { "Zero", 1, new DateTime(2010, 10, 10) };
 
 
-            FormatCache cache = null;
-            FormatCache cache2 = null;
-            var NoExtensions = new SmartFormatter();
-            NoExtensions.AddExtensions(new DefaultSource(NoExtensions));
-            NoExtensions.AddExtensions(new DefaultFormatter());
+            FormatCache? cache = null;
+            FormatCache? cache2 = null;
+            var noExtensions = new SmartFormatter();
+            noExtensions.AddExtensions(new DefaultSource(noExtensions));
+            noExtensions.AddExtensions(new DefaultFormatter());
 
             var formatters = new[] {
                 new {
@@ -67,7 +67,7 @@ namespace SmartFormat.Tests.OldTests
                 },
                 new {
                     Title = "NoExtensions.Format",
-                    Function = new Func<string, object[], string>(NoExtensions.Format),
+                    Function = new Func<string, object[], string>(noExtensions.Format),
                 },
                 new {
                     Title = "Smart.FormatWithCache",
@@ -75,7 +75,7 @@ namespace SmartFormat.Tests.OldTests
                 },
                 new {
                     Title = "NoExtensions.FormatWithCache",
-                    Function = new Func<string, object[], string>((format, args2) => NoExtensions.FormatWithCache(ref cache2, format, args2)),
+                    Function = new Func<string, object[], string>((format, args2) => noExtensions.FormatWithCache(ref cache2, format, args2)),
                 },
             };
 

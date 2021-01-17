@@ -50,18 +50,7 @@ namespace SmartFormat
 
         #region: Default formatter :
 
-        private static SmartFormatter _default;
-
-        public static SmartFormatter Default
-        {
-            get
-            {
-                if (_default == null)
-                    _default = CreateDefaultSmartFormat();
-                return _default;
-            }
-            set => _default = value;
-        }
+        public static SmartFormatter Default { get; set; } = CreateDefaultSmartFormat();
 
         public static SmartFormatter CreateDefaultSmartFormat()
         {

@@ -5,9 +5,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
+using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -139,9 +141,9 @@ namespace SmartFormat.Tests.Extensions
             {
                 tasks.Add(Task.Factory.StartNew(val =>
                 {
-                    Thread.Sleep(5 * (int)val);
+                    Thread.Sleep(5 * (int)(val ?? 100));
                     string ret = Smart.Default.Format(format, wheres);
-                    Thread.Sleep(5 * (int)val); /* add some delay to force ThreadPool swapping */
+                    Thread.Sleep(5 * (int)(val ?? 100)); /* add some delay to force ThreadPool swapping */
                     return ret;
                 }, i));
             }

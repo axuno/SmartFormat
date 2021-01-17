@@ -17,14 +17,14 @@ namespace SmartFormat.Extensions
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            if (formattingInfo.FormatterOptions == "") return false;
-            var chooseOptions = formattingInfo.FormatterOptions.Split(SplitChar);
-            var formats = formattingInfo.Format.Split(SplitChar);
-            if (formats.Count < 2) return false;
+            if (string.IsNullOrEmpty(formattingInfo.FormatterOptions)) return false;
+            var chooseOptions = formattingInfo.FormatterOptions!.Split(SplitChar);
+            var formats = formattingInfo.Format?.Split(SplitChar);
+            if (formats is null || formats.Count < 2) return false;
 
             var chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
 
-            formattingInfo.Write(chosenFormat, formattingInfo.CurrentValue);
+            formattingInfo.Write(chosenFormat, formattingInfo.CurrentValue ?? string.Empty);
 
             return true;
         }

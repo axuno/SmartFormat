@@ -32,7 +32,7 @@ namespace SmartFormat.Extensions
             // instead of formatting the item:
             if (format != null && format.HasNested)
             {
-                formattingInfo.Write(format, current);
+                formattingInfo.Write(format, current ?? string.Empty);
                 return true;
             }
 
@@ -61,7 +61,7 @@ namespace SmartFormat.Extensions
             // ToString:
             else
             {
-                result = current.ToString();
+                result = current.ToString() ?? "null";
             }
 
             // Now that we have the result, let's output it (and consider alignment):
@@ -69,7 +69,7 @@ namespace SmartFormat.Extensions
             // See if there's a pre-alignment to consider:
             if (formattingInfo.Alignment > 0)
             {
-                var spaces = formattingInfo.Alignment - result.Length;
+                var spaces = formattingInfo.Alignment - result!.Length;
                 if (spaces > 0) formattingInfo.Write(new string(' ', spaces));
             }
 

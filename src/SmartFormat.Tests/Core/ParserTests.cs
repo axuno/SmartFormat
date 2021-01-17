@@ -113,7 +113,7 @@ namespace SmartFormat.Tests.Core
             };
             foreach (var format in invalidFormats)
             {
-                var discard = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
+                _ = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
             }
         }
 
@@ -129,10 +129,10 @@ namespace SmartFormat.Tests.Core
 
             Assert.AreEqual("bbb", ((Placeholder)parsed.Items[1]).Selectors[0].RawText);
             Assert.AreEqual("ccc", ((Placeholder)parsed.Items[3]).Selectors[0].RawText);
-            Assert.AreEqual("ddd", ((Placeholder)parsed.Items[3]).Format.Items[0].RawText);
+            Assert.AreEqual("ddd", ((Placeholder)parsed.Items[3]).Format?.Items[0].RawText);
             Assert.AreEqual(" {eee} ", ((LiteralText)parsed.Items[4]).RawText);
-            Assert.AreEqual("{ggg}", ((Placeholder)parsed.Items[5]).Format.Items[0].RawText);
-            Assert.AreEqual("iii", ((Placeholder)((Placeholder)parsed.Items[7]).Format.Items[0]).Selectors[0].RawText);
+            Assert.AreEqual("{ggg}", ((Placeholder)parsed.Items[5]).Format?.Items[0].RawText);
+            Assert.AreEqual("iii", ((Placeholder)((Placeholder)parsed.Items[7]).Format!.Items[0]).Selectors[0].RawText);
 
         }
         
@@ -161,14 +161,15 @@ namespace SmartFormat.Tests.Core
             Assert.That(format.Substring(20, 23).ToString(), Is.EqualTo("{bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
 
             // Make sure a invalid values are caught:
-            Assert.That(() => format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
-            Assert.That(() => format.Substring(100), Throws.TypeOf<ArgumentOutOfRangeException>());
-            Assert.That(() => format.Substring(10, 100), Throws.TypeOf<ArgumentOutOfRangeException>());
+            var format1 = format;
+            Assert.That(() => format1.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format1.Substring(100), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format1.Substring(10, 100), Throws.TypeOf<ArgumentOutOfRangeException>());
 
 
             // Now, test nested format strings:
             var placeholder = (Placeholder)format.Items[1];
-            format = placeholder.Format;
+            format = placeholder.Format!;
             Assert.That(format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
 
             Assert.That(format.Substring(5, 4).ToString(), Is.EqualTo("dd|d"));
@@ -224,7 +225,7 @@ namespace SmartFormat.Tests.Core
 
             // Test nested formats:
             var placeholder = (Placeholder) Format.Items[1];
-            Format = placeholder.Format;
+            Format = placeholder.Format!;
             Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
 
             Assert.That(Format.IndexOf('|'), Is.EqualTo(7));
@@ -238,8 +239,8 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-            var Format = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
-            var splits = Format.Split('|');
+            var parsedFormat = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
+            var splits = parsedFormat.Split('|');
 
             Assert.That(splits.Count, Is.EqualTo(3));
             Assert.That(splits[0].ToString(), Is.EqualTo(" a"));
@@ -247,10 +248,10 @@ namespace SmartFormat.Tests.Core
             Assert.That(splits[2].ToString(), Is.EqualTo("g "));
 
             // Test nested formats:
-            var placeholder = (Placeholder) Format.Items[1];
-            Format = placeholder.Format;
-            Assert.That(Format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
-            splits = Format.Split('|');
+            var placeholder = (Placeholder) parsedFormat.Items[1];
+            parsedFormat = placeholder.Format!;
+            Assert.That(parsedFormat.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
+            splits = parsedFormat.Split('|');
 
             Assert.That(splits.Count, Is.EqualTo(3));
             Assert.That(splits[0].ToString(), Is.EqualTo(" ccc dd"));
@@ -281,7 +282,7 @@ namespace SmartFormat.Tests.Core
             var placeholder = (Placeholder) Parse(format, formatterExtensions).Items[0];
             Assert.AreEqual(expectedName, placeholder.FormatterName);
             Assert.AreEqual(expectedOptions, placeholder.FormatterOptions);
-            Assert.AreEqual(expectedFormat, placeholder.Format.ToString());
+            Assert.AreEqual(expectedFormat, placeholder.Format!.ToString());
         }
 
         [Test]
@@ -289,7 +290,7 @@ namespace SmartFormat.Tests.Core
         {
             // find formatter formattername, which does not exist in the (empty) list of formatter extensions
             var placeholderWithNonExistingName = (Placeholder)Parse("{0:formattername:}", new string[] {} ).Items[0];
-            Assert.AreEqual("formattername:", placeholderWithNonExistingName.Format.ToString()); // name is only treaded as a literal
+            Assert.AreEqual("formattername:", placeholderWithNonExistingName.Format?.ToString()); // name is only treaded as a literal
         }
 
         // Incomplete:
@@ -342,20 +343,20 @@ namespace SmartFormat.Tests.Core
             var placeholder = (Placeholder) parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") }).Items[0];
             Assert.IsEmpty(placeholder.FormatterName);
             Assert.IsEmpty(placeholder.FormatterOptions);
-            var literalText = placeholder.Format.GetLiteralText();
+            var literalText = placeholder.Format?.GetLiteralText();
             Assert.AreEqual(expectedLiteralText, literalText);
         }
 
         [Test]
         public void Parser_NotifyParsingError()
         {
-            ParsingErrors parsingError = null;
+            ParsingErrors? parsingError = null;
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
             formatter.Settings.ParseErrorAction = ErrorAction.Ignore;
             formatter.Parser.OnParsingFailure += (o, args) => parsingError = args.Errors;
-            var res = formatter.Format("{NoName {Other} {Same", default(object));
-            Assert.That(parsingError.Issues.Count == 3);
+            var res = formatter.Format("{NoName {Other} {Same", default(object)!);
+            Assert.That(parsingError!.Issues.Count == 3);
             Assert.That(parsingError.Issues[2].Issue == new Parser.ParsingErrorText()[Parser.ParsingError.MissingClosingBrace]);
         }
 
@@ -368,8 +369,8 @@ namespace SmartFormat.Tests.Core
             var placeholders = parser.ParseFormat("{c1:{c2:{c3}}}", new[] {Guid.NewGuid().ToString("N")});
 
             var c1 = (Placeholder) placeholders.Items[0];
-            var c2 = (Placeholder) c1.Format.Items[0];
-            var c3 = (Placeholder) c2.Format.Items[0];
+            var c2 = (Placeholder) c1.Format?.Items[0]!;
+            var c3 = (Placeholder) c2.Format?.Items[0]!;
             Assert.AreEqual("c1", c1.Selectors[0].RawText);
             Assert.AreEqual("c2", c2.Selectors[0].RawText);
             Assert.AreEqual("c3", c3.Selectors[0].RawText);

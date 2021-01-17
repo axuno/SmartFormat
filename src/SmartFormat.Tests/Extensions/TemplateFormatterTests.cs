@@ -8,13 +8,17 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class TemplateFormatterTests
     {
-        private SmartFormatter smart;
+        private SmartFormatter _smart;
+
+        public TemplateFormatterTests()
+        {
+            _smart = Smart.CreateDefaultSmartFormat();
+        }
         
         [OneTimeSetUp]
         public void SetupSmart()
         {
-            this.smart = Smart.CreateDefaultSmartFormat();
-            RegisterTemplates(this.smart);
+            RegisterTemplates(_smart);
         }
 
         private void RegisterTemplates(SmartFormatter smart)
@@ -42,7 +46,7 @@ namespace SmartFormat.Tests.Extensions
                 Last = "Rippey",
             };
 
-            var actual = smart.Format(format, person);
+            var actual = _smart.Format(format, person);
             Assert.AreEqual(expected, actual);
         }
         private void TestWithMultipleUsers(string format, string expected)
@@ -53,7 +57,7 @@ namespace SmartFormat.Tests.Extensions
                 new { First = "Dwight", Last = "Schrute" },
             };
 
-            var actual = smart.Format(format, (object)people);
+            var actual = _smart.Format(format, (object)people);
             Assert.AreEqual(expected, actual);
         }
 
@@ -105,8 +109,8 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{:template():AAAA}")]
         public void Templates_must_be_defined(string format)
         {
-            smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
-            Assert.Throws<FormattingException>(() => smart.Format(format, 5));
+            _smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            Assert.Throws<FormattingException>(() => _smart.Format(format, 5));
         }
 
         [Test]
@@ -115,8 +119,8 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{:template:LaSt}")]
         public void Templates_are_case_sensitive(string format)
         {
-            smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
-            Assert.Throws<FormattingException>(() => smart.Format(format, 5));
+            _smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            Assert.Throws<FormattingException>(() => _smart.Format(format, 5));
         }
 
         [Test]
@@ -130,9 +134,9 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{:template:fIrStLaSt}", "Scott Rippey")]
         public void Templates_can_be_case_insensitive_and_overwrite_each_other(string format, string expected)
         {
-            this.smart = Smart.CreateDefaultSmartFormat();
-            this.smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-            RegisterTemplates(this.smart);
+            this._smart = Smart.CreateDefaultSmartFormat();
+            this._smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            RegisterTemplates(this._smart);
             TestWithScottRippey(format, expected);
 
             // Reset:

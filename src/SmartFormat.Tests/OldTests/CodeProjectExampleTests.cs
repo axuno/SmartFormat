@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
@@ -19,10 +20,61 @@ namespace SmartFormat.Tests.OldTests
         public int Height;
     }
 
-
+    /// <summary>
+    /// DANGER ZONE: ConditionalFormatter and PluralLocalizationFormatter use similar syntax.
+    /// The loading sequence of these formatters, this may lead to surprising test results.
+    /// ALWAYS choose explicitly, which formatter to use, i.e. {0:cond:item|items} or {0:p:item|items}
+    /// </summary>
     [TestFixture]
     public class CodeProjectExampleTests
     {
+        private readonly SmartFormatter _smart;
+
+        public CodeProjectExampleTests()
+        {
+            _smart = CreateTestFormatter();
+        }
+
+        #region: Create formatter :
+
+        private SmartFormatter CreateTestFormatter()
+        {
+            // Register all default extensions here:
+            var formatter = new SmartFormatter();
+            // Add all extensions:
+            // Note, the order is important; the extensions
+            // will be executed in this order:
+
+            var listFormatter = new ListFormatter(formatter);
+
+            // sources for specific types must be in the list before ReflectionSource
+            formatter.AddExtensions(
+                (ISource) listFormatter, // ListFormatter MUST be first
+                new DictionarySource(formatter),
+                new ValueTupleSource(formatter),
+                new JsonSource(formatter),
+                new XmlSource(formatter),
+                new ReflectionSource(formatter),
+
+                // The DefaultSource reproduces the string.Format behavior:
+                new DefaultSource(formatter)
+            );
+            formatter.AddExtensions(
+                (IFormatter) listFormatter,
+                new PluralLocalizationFormatter("en"),
+                new ConditionalFormatter(),
+                new TimeFormatter("en"),
+                new XElementFormatter(),
+                new ChooseFormatter(),
+                new SubStringFormatter(),
+                new DefaultFormatter()
+            );
+
+            return formatter;
+        }
+
+        #endregion
+
         private Person MakeQuentin()
         {
             var p = new Person()
@@ -61,7 +113,7 @@ namespace SmartFormat.Tests.OldTests
             var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
             var specificCulture = new CultureInfo("en-us");
-            string actualOutput = Smart.Format(specificCulture, formatString, p.FirstName, p.Age, p.Friends.Count);
+            string actualOutput = _smart.Format(specificCulture, formatString, p.FirstName, p.Age, p.Friends.Count);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -75,7 +127,7 @@ namespace SmartFormat.Tests.OldTests
             var expectedOutput = "Quentin is 30 years old and has 4.00 friends.";
 
             var specificCulture = new CultureInfo("en-us");
-            string actualOutput = Smart.Format(specificCulture, formatString, p);
+            string actualOutput = _smart.Format(specificCulture, formatString, p);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -87,7 +139,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "There {0:is|are} {0} item{0:|s} remaining...";
             var expectedOutput = "There are 5 items remaining...";
 
-            string actualOutput = Smart.Format(formatString, 5);
+            string actualOutput = _smart.Format(formatString, 5);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -106,7 +158,7 @@ namespace SmartFormat.Tests.OldTests
             var expectedOutput = "All dates: 12/31/1999 and 10/10/2010 and 1/1/3000.";
 
             var specificCulture = new CultureInfo("en-us");
-            string actualOutput = Smart.Format(specificCulture, formatString, data);
+            string actualOutput = _smart.Format(specificCulture, formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -120,7 +172,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "Person0: {0.FirstName}, Person1: {1.FirstName}";
             var expectedOutput = "Person0: Quentin, Person1: Melinda";
 
-            string actualOutput = Smart.Format(formatString, p1, p2);
+            string actualOutput = _smart.Format(formatString, p1, p2);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -133,7 +185,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{Address.City}, {Address.State} {Address.Zip}";
             var expectedOutput = "Minneapolis, Minnesota 55401";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -162,7 +214,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{Address:{City}, {State} {Zip}}";
             var expectedOutput = "Minneapolis, Minnesota 55401";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -175,7 +227,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{0:({Width} x {Height})| and }";
             var expectedOutput = "(1 x 1) and (4 x 3) and (16 x 9)";
 
-            string actualOutput = Smart.Format(formatString, sizes);
+            string actualOutput = _smart.Format(formatString, sizes);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -203,7 +255,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{0.Address:{City}, {State} {Zip}}";
             var expectedOutput = "Minneapolis, Minnesota 55401";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -217,7 +269,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{FirstName} {0.FirstName} {1.FirstName}";
             var expectedOutput = "Quentin Quentin Melinda";
 
-            string actualOutput = Smart.Format(formatString, p1, p2);
+            string actualOutput = _smart.Format(formatString, p1, p2);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -230,7 +282,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{Friends.Count:There {:is|are} {} friend{:|s}.}";
             var expectedOutput = "There are 4 friends.";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -243,29 +295,29 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{Address:{City}, {State}, {0.Age} {0.FullName}}";
             var expectedOutput = "Minneapolis, Minnesota, 30 Quentin Starin";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
 
         [Test]
-        public void ConditonalNumber_OneOrDefault_Value0()
+        public void PluralNumber_OneOrDefault_Value0()
         {
-            var formatString = "{0} {0:item|items}";
+            var formatString = "{0} {0:p:item|items}";
             var expectedOutput = "0 items";
 
-            string actualOutput = Smart.Format(formatString, 0);
+            string actualOutput = _smart.Format(formatString, 0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
 
         [Test]
-        public void ConditonalNumber_OneOrDefault_Value1()
+        public void PluralNumber_OneOrDefault_Value1()
         {
-            var formatString = "{0} {0:item|items}";
+            var formatString = "{0} {0:p:item|items}";
             var expectedOutput = "1 item";
 
-            string actualOutput = Smart.Format(formatString, 1);
+            string actualOutput = _smart.Format(formatString, 1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -273,10 +325,10 @@ namespace SmartFormat.Tests.OldTests
         [Test]
         public void ConditonalNumber_OneOrDefault_Value3()
         {
-            var formatString = "{0} {0:item|items}";
+            var formatString = "{0} {0:cond:item|items}";
             var expectedOutput = "3 items";
 
-            string actualOutput = Smart.Format(formatString, 3);
+            string actualOutput = _smart.Format(formatString, 3);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -284,10 +336,10 @@ namespace SmartFormat.Tests.OldTests
         [Test]
         public void ConditonalNumber_ZeroOneOrDefault_Value0()
         {
-            var formatString = "{0:no item|one item|many items}";
+            var formatString = "{0:cond:no item|one item|many items}";
             var expectedOutput = "no item";
 
-            string actualOutput = Smart.Format(formatString, 0);
+            string actualOutput = _smart.Format(formatString, 0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -295,10 +347,10 @@ namespace SmartFormat.Tests.OldTests
         [Test]
         public void ConditonalNumber_ZeroOneOrDefault_Value1()
         {
-            var formatString = "{0:no item|one item|many items}";
+            var formatString = "{0:cond:no item|one item|many items}";
             var expectedOutput = "one item";
 
-            string actualOutput = Smart.Format(formatString, 1);
+            string actualOutput = _smart.Format(formatString, 1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -306,54 +358,54 @@ namespace SmartFormat.Tests.OldTests
         [Test]
         public void ConditonalNumber_ZeroOneOrDefault_Value3()
         {
-            var formatString = "{0:no item|one item|many items}";
+            var formatString = "{0:cond:no item|one item|many items}";
             var expectedOutput = "many items";
 
-            string actualOutput = Smart.Format(formatString, 3);
+            string actualOutput = _smart.Format(formatString, 3);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
 
         [Test]
-        public void ConditonalNumber_NegativeZeroOneOrDefault_Value0()
+        public void PluralNumber_NegativeZeroOneOrDefault_Value0()
         {
-            var formatString = "{0:negative items|no item|one item|many items}";
+            var formatString = "{0:p:negative items|no item|one item|many items}";
             var expectedOutput = "no item";
 
-            string actualOutput = Smart.Format(formatString, 0);
+            string actualOutput = _smart.Format(formatString, 0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
 
         [Test]
-        public void ConditonalNumber_NegativeZeroOneOrDefault_Value1()
+        public void PluralNumber_NegativeZeroOneOrDefault_Value1()
         {
-            var formatString = "{0:negative items|no item|one item|many items}";
+            var formatString = "{0:p:negative items|no item|one item|many items}";
             var expectedOutput = "one item";
 
-            string actualOutput = Smart.Format(formatString, 1);
+            string actualOutput = _smart.Format(formatString, 1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
 
         [Test]
-        public void ConditonalNumber_NegativeZeroOneOrDefault_Value3()
+        public void PluralNumber_NegativeZeroOneOrDefault_Value4()
         {
-            var formatString = "{0:negative items|no item|one item|many items}";
+            var formatString = "{0:p:negative items|no item|one item|many items}";
             var expectedOutput = "many items";
 
-            string actualOutput = Smart.Format(formatString, 3);
+            string actualOutput = _smart.Format(formatString, 4);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
 
         [Test]
-        public void ConditonalNumber_NegativeZeroOneOrDefault_ValueNegative2()
+        public void PluralNumber_NegativeZeroOneOrDefault_ValueNegative2()
         {
-            var formatString = "{0:negative items|no item|one item|many items}";
+            var formatString = "{0:p:negative items|no item|one item|many items}";
             var expectedOutput = "negative items";
 
-            string actualOutput = Smart.Format(formatString, -2);
+            string actualOutput = _smart.Format(formatString, -2);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -366,7 +418,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{Age::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
             var expectedOutput = "Adult";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -379,7 +431,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{Age::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
             var expectedOutput = "Senior Citizen";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -408,7 +460,7 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{Age::>=55?Senior Citizen|>=30?Adult|>=18?Young Adult|>12?Teenager|>2?Child|Baby}";
             var expectedOutput = "Baby";
 
-            string actualOutput = Smart.Format(formatString, p1);
+            string actualOutput = _smart.Format(formatString, p1);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -426,7 +478,7 @@ namespace SmartFormat.Tests.OldTests
             var expectedOutput = "12/31/1999, 10/10/2010, and 1/1/3000.";
 
             var specificCulture = new CultureInfo("en-us");
-            string actualOutput = Smart.Format(specificCulture, formatString, data);
+            string actualOutput = _smart.Format(specificCulture, formatString, data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -439,8 +491,8 @@ namespace SmartFormat.Tests.OldTests
             var formatString = "{0:{} = {Index}|, }";
             var expectedOutput = "A = 0, B = 1, C = 2";
 
-            //string actualOutput = Smart.Format(formatString, data);
-            string actualOutput = Smart.Format(formatString, (object)data);
+            //string actualOutput = _smart.Format(formatString, data);
+            string actualOutput = _smart.Format(formatString, (object)data);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
@@ -469,7 +521,7 @@ namespace SmartFormat.Tests.OldTests
             var format = @"{0} \{0\} \{{0}\} {3:00\}} {3:00}\}";
             var expected = "Zero {0} {Zero} 03} 03}";
 
-            var actual = smart.Format(format, args);
+            var actual = _smart.Format(format, args);
             Assert.AreEqual(expected, actual);
         }
     }

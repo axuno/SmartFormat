@@ -34,8 +34,8 @@ namespace SmartFormat.Extensions
         /// <returns></returns>
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            if (formattingInfo.FormatterOptions == string.Empty) return false;
-            var parameters = formattingInfo.FormatterOptions.Split(ParameterDelimiter);
+            if (string.IsNullOrEmpty(formattingInfo.FormatterOptions)) return false;
+            var parameters = formattingInfo.FormatterOptions!.Split(ParameterDelimiter);
 
             var currentValue = formattingInfo.CurrentValue?.ToString();
             if (currentValue == null)

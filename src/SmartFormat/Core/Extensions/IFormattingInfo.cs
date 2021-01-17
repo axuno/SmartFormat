@@ -23,18 +23,18 @@ namespace SmartFormat.Core.Extensions
         /// <summary>
         /// The current value that is to be formatted.
         /// </summary>
-        object CurrentValue { get; }
+        object? CurrentValue { get; }
 
         /// <summary>
         /// This format specifies how to output the <see cref="CurrentValue" />.
         /// </summary>
-        Format Format { get; }
+        Format? Format { get; }
 
         /// <summary>
         /// Contains all the details about the current placeholder.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        Placeholder Placeholder { get; }
+        Placeholder? Placeholder { get; }
 
         /// <summary>
         /// Alignment inserts spaces into the output to ensure consistent length.
@@ -49,7 +49,7 @@ namespace SmartFormat.Core.Extensions
         /// When a named formatter is used, this will hold the options.
         /// For example, in "{0:choose(1,2,3):one|two|three}", FormatterOptions is "1,2,3".
         /// </summary>
-        string FormatterOptions { get; }
+        string? FormatterOptions { get; }
 
         /// <summary>
         /// Infrequently used details, often used for debugging

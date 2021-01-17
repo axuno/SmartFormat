@@ -48,13 +48,13 @@ namespace SmartFormat.Extensions
                         return true;
                     case MemberTypes.Property:
                     case MemberTypes.Method:
-                        MethodInfo method;
+                        MethodInfo? method;
                         if (member.MemberType == MemberTypes.Property)
                         {
                             //  Selector is a Property
                             var prop = (PropertyInfo) member;
                             //  Make sure the property is not WriteOnly:
-                            if (prop.CanRead)
+                            if (prop != null && prop.CanRead)
                                 method = prop.GetGetMethod();
                             else
                                 continue;
@@ -67,13 +67,13 @@ namespace SmartFormat.Extensions
 
                         //  Check that this method is valid -- it needs to return a value and has to be parameter-less:
                         //  We are only looking for a parameter-less Function/Property:
-                        if (method.GetParameters().Length > 0) continue;
+                        if (method?.GetParameters().Length > 0) continue;
 
                         //  Make sure that this method is not void!  It has to be a Function!
-                        if (method.ReturnType == typeof(void)) continue;
+                        if (method?.ReturnType == typeof(void)) continue;
 
                         //  Retrieve the Selectors/ParseFormat value:
-                        selectorInfo.Result = method.Invoke(current, new object[0]);
+                        selectorInfo.Result = method?.Invoke(current, new object[0]);
                         return true;
                 }
 

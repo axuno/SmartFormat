@@ -40,7 +40,7 @@ namespace SmartFormat.Core.Parsing
         public int Alignment { get; set; }
         public string FormatterName { get; set; }
         public string FormatterOptions { get; set; }
-        public Format Format { get; set; }
+        public Format? Format { get; set; }
 
         public override string ToString()
         {

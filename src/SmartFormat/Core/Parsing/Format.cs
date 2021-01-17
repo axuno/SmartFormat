@@ -39,7 +39,7 @@ namespace SmartFormat.Core.Parsing
 
         #region: Fields and Properties :
 
-        public readonly Placeholder parent;
+        public readonly Placeholder? parent;
         public List<FormatItem> Items { get; }
         public bool HasNested { get; set; }
 
@@ -167,7 +167,7 @@ namespace SmartFormat.Core.Parsing
         #region: Split :
 
         private char splitCacheChar;
-        private IList<Format> splitCache;
+        private IList<Format>? splitCache;
 
         public IList<Format> Split(char search)
         {
