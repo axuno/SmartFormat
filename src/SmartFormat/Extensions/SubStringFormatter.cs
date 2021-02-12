@@ -27,6 +27,12 @@ namespace SmartFormat.Extensions
         /// </summary>
         public string NullDisplayString { get; set; } = "(null)";
 
+
+        /// <summary>
+        /// Get or set the behavior for when startindex and/or length is too great, defaults to SubStringOutOfRangeBehavior.ReturnEmptyString.
+        /// </summary>
+        public SubStringOutOfRangeBehavior OutOfRangeBehavior { get; set; } = SubStringOutOfRangeBehavior.ReturnEmptyString;
+
         /// <summary>
         /// Tries to process the given <see cref="IFormattingInfo"/>.
         /// </summary>
@@ -52,12 +58,20 @@ namespace SmartFormat.Extensions
                 startPos = currentValue.Length;
             if (length < 0)
                 length = currentValue.Length - startPos + length;
-            if (startPos > currentValue.Length)
-                startPos = currentValue.Length;
 
-            if (startPos + length > currentValue.Length)
-                length = (currentValue.Length - startPos);
-
+            switch(OutOfRangeBehavior)
+            {
+                case SubStringOutOfRangeBehavior.ReturnEmptyString:
+                    if (startPos + length > currentValue.Length)
+                        length = 0;
+                    break;
+                case SubStringOutOfRangeBehavior.ReturnStartIndexToEndOfString:
+                    if (startPos > currentValue.Length)
+                        startPos = currentValue.Length;
+                    if (startPos + length > currentValue.Length)
+                        length = (currentValue.Length - startPos);
+                    break;
+            }
 
             var substring = parameters.Length > 1
                 ? currentValue.Substring(startPos, length)
@@ -66,6 +80,25 @@ namespace SmartFormat.Extensions
             formattingInfo.Write(substring);
 
             return true;
+        }
+
+        /// <summary>
+        /// Specify behavior when startindex and/or length is out of range
+        /// </summary>
+        public enum SubStringOutOfRangeBehavior
+        {
+            /// <summary>
+            /// Returns string.Empty
+            /// </summary>
+            ReturnEmptyString,
+            /// <summary>
+            /// Returns the remainder of the string, starting at StartIndex
+            /// </summary>
+            ReturnStartIndexToEndOfString,
+            /// <summary>
+            /// Throws OutOfRangeException
+            /// </summary>
+            ThrowException
         }
     }
 }
