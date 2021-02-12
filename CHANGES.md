@@ -1,6 +1,16 @@
 Latest Changes
 ====
 
+v2.6.1
+===
+* Fixed [#136](https://github.com/axuno/SmartFormat/issues/136)
+* Upgraded test project to netcoreapp3.1
+* Enhanced SubString extension as described in [PR142](https://github.com/axuno/SmartFormat/pull/142) - Thanks to [Anders Jonsson](https://github.com/andersjonsson)
+
+v2.6.0
+===
+* Migrated project with Nullable Reference Types (NRT) enabled
+
 v2.5.3.0
 ===
 Bugfix: ```ListFormatter``` will now process ```IList``` data sources only.
