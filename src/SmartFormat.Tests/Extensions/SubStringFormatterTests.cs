@@ -49,16 +49,37 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
-        public void LengthLongerThanString()
+        public void LengthLongerThanString_ReturnEmptyString()
+        {
+            var formatter = _smart.GetFormatterExtension<SubStringFormatter>()!;
+            var behavior = formatter.OutOfRangeBehavior;
+            
+            formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ReturnEmptyString;
+            Assert.AreEqual(string.Empty, _smart.Format("{Name:substr(0,999)}", _people.First()));
+
+            formatter.OutOfRangeBehavior = behavior;
+        }
+
+        [Test]
+        public void LengthLongerThanString_ReturnStartIndexToEndOfString()
         {
             var formatter = _smart.GetFormatterExtension<SubStringFormatter>()!;
             var behavior = formatter.OutOfRangeBehavior;
 
             formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ReturnStartIndexToEndOfString;
             Assert.AreEqual("Long John", _smart.Format("{Name:substr(0,999)}", _people.First()));
-            
-            formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ReturnEmptyString;
-            Assert.AreEqual(string.Empty, _smart.Format("{Name:substr(0,999)}", _people.First()));
+
+            formatter.OutOfRangeBehavior = behavior;
+        }
+
+        [Test]
+        public void LengthLongerThanString_ThrowException()
+        {
+            var formatter = _smart.GetFormatterExtension<SubStringFormatter>()!;
+            var behavior = formatter.OutOfRangeBehavior;
+
+            formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ThrowException;
+            Assert.Throws<SmartFormat.Core.Formatting.FormattingException>(() => _smart.Format("{Name:substr(0,999)}", _people.First()));
 
             formatter.OutOfRangeBehavior = behavior;
         }

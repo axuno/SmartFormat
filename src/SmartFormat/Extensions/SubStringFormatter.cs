@@ -27,9 +27,8 @@ namespace SmartFormat.Extensions
         /// </summary>
         public string NullDisplayString { get; set; } = "(null)";
 
-
         /// <summary>
-        /// Get or set the behavior for when startindex and/or length is too great, defaults to SubStringOutOfRangeBehavior.ReturnEmptyString.
+        /// Get or set the behavior for when start index and/or length is too great, defaults to <see cref="SubStringOutOfRangeBehavior.ReturnEmptyString"/>.
         /// </summary>
         public SubStringOutOfRangeBehavior OutOfRangeBehavior { get; set; } = SubStringOutOfRangeBehavior.ReturnEmptyString;
 
@@ -83,7 +82,7 @@ namespace SmartFormat.Extensions
         }
 
         /// <summary>
-        /// Specify behavior when startindex and/or length is out of range
+        /// Specify behavior when start index and/or length is out of range
         /// </summary>
         public enum SubStringOutOfRangeBehavior
         {
@@ -96,7 +95,7 @@ namespace SmartFormat.Extensions
             /// </summary>
             ReturnStartIndexToEndOfString,
             /// <summary>
-            /// Throws OutOfRangeException
+            /// Throws <see cref="SmartFormat.Core.Formatting.FormattingException"/> 
             /// </summary>
             ThrowException
         }
