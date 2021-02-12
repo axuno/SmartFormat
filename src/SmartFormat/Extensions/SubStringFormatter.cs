@@ -52,8 +52,13 @@ namespace SmartFormat.Extensions
                 startPos = currentValue.Length;
             if (length < 0)
                 length = currentValue.Length - startPos + length;
+            if (startPos > currentValue.Length)
+                startPos = currentValue.Length;
+
             if (startPos + length > currentValue.Length)
-                length = 0;
+                length = (currentValue.Length - startPos);
+
+
             var substring = parameters.Length > 1
                 ? currentValue.Substring(startPos, length)
                 : currentValue.Substring(startPos);

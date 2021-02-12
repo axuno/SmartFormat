@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
     public class SubStringFormatterTests
     {
-        private List<object> _people;
-        private SmartFormatter _smart;
+        private readonly List<object> _people;
+        private readonly SmartFormatter _smart;
 
         public SubStringFormatterTests()
         {
@@ -46,6 +46,12 @@ namespace SmartFormat.Tests.Extensions
         public void StartPositionAndLengthLongerThanString()
         {
             Assert.AreEqual(string.Empty, _smart.Format("{Name:substr(999,1)}", _people.First()));
+        }
+
+        [Test]
+        public void LengthLongerThanString()
+        {
+            Assert.AreEqual("Long John", _smart.Format("{Name:substr(0,999)}", _people.First()));
         }
 
         [Test]
