@@ -12,7 +12,7 @@
 * .Net Framework 4.6.1, 4.6.2, 4.7.2 and 4.8
 * .Net Standard 2.0 and 2.1
 * .Net 5.0
-
+ 
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the NuGet package
 
