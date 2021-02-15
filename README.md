@@ -1,10 +1,10 @@
-<img src="https://raw.githubusercontent.com/scottrippey/SmartFormat.NET/master/SmartFormat_64x64.png" width="64" alt="Logo">
+<img src="https://raw.githubusercontent.com/scottrippey/SmartFormat.NET/main/SmartFormat_64x64.png" width="64" alt="Logo">
 
 [![GitHub release](https://img.shields.io/github/release/axuno/smartformat.net.svg)](https://github.com/axuno/SmartFormat.Net/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/blob/master/License.txt)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/blob/main/License.txt)
 [![Build status](https://ci.appveyor.com/api/projects/status/g27r62fm9c7e0ctv?svg=true)](https://ci.appveyor.com/project/axuno/smartformat)
-[![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/SmartFormat.svg)](https://ci.appveyor.com/project/axuno/SmartFormat/branch/master/tests)
-[![codecov](https://codecov.io/gh/axuno/SmartFormat/branch/master/graph/badge.svg)](https://codecov.io/gh/axuno/SmartFormat)
+[![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/SmartFormat.svg)](https://ci.appveyor.com/project/axuno/SmartFormat/branch/main/tests)
+[![codecov](https://codecov.io/gh/axuno/SmartFormat/branch/main/graph/badge.svg)](https://codecov.io/gh/axuno/SmartFormat)
 
 **SmartFormat** is a **string composition** library written in C# which is basically compatible with string.Format. More than that **SmartFormat** can format data with named placeholders, lists, pluralization and other smart extensions.
 
