@@ -117,6 +117,7 @@ namespace SmartFormat.Tests.Core
             formatter.Settings.ConvertCharacterStringLiterals = true;
             formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
             formatter.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+            formatter.Parser.AddAlphanumericSelectors(); // required for this test
             var formatParsed = formatter.Parser.ParseFormat(format, new []{string.Empty});
             var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
             
