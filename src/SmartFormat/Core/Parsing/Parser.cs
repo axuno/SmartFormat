@@ -466,8 +466,7 @@ namespace SmartFormat.Core.Parsing
                 OnParsingFailure?.Invoke(this,
                     new ParsingErrorEventArgs(parsingErrors, Settings.ParseErrorAction == ErrorAction.ThrowError));
 
-                if (Settings.ParseErrorAction == ErrorAction.ThrowError)
-                    throw parsingErrors;
+                return HandleParsingErrors(parsingErrors, result);
             }
 
             return result;
@@ -531,6 +530,40 @@ namespace SmartFormat.Core.Parsing
             /// <param name="parsingErrorKey"></param>
             /// <returns>The string representation of the ParsingError enum</returns>
             public string this[ParsingError parsingErrorKey] => _errors[parsingErrorKey];
+        }
+
+        /// <summary>
+        /// Handles <see cref="ParsingError"/>s as defined in <see cref="SmartSettings.ParseErrorAction"/>,
+        /// which leads to results similar to <see cref="SmartSettings.FormatErrorAction"/>s
+        /// </summary>
+        /// <param name="parsingErrors"></param>
+        /// <param name="currentResult"></param>
+        /// <returns>The <see cref="Format"/> which will be further processed with formatting.</returns>
+        private Format HandleParsingErrors(ParsingErrors parsingErrors, Format currentResult)
+        {
+            switch (Settings.ParseErrorAction)
+            {
+                case ErrorAction.ThrowError:
+                    throw parsingErrors;
+                case ErrorAction.MaintainTokens:
+                    var fmt = new Format(Settings, currentResult.baseString) {
+                        startIndex = 0,
+                        endIndex = currentResult.baseString.Length
+                    };
+                    fmt.Items.Add(new LiteralText(Settings, fmt));
+                    return fmt;
+                case ErrorAction.Ignore:
+                    return new Format(Settings, string.Empty);
+                case ErrorAction.OutputErrorInResult:
+                    fmt = new Format(Settings, parsingErrors.Message) {
+                        startIndex = 0,
+                        endIndex = parsingErrors.Message.Length
+                    };
+                    fmt.Items.Add(new LiteralText(Settings, fmt));
+                    return fmt;
+                default:
+                    return currentResult;
+            }
         }
 
         #endregion
