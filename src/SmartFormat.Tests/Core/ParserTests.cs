@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.Common;
 using SmartFormat.Tests.TestUtils;
+using System;
+using System.Linq;
 
 namespace SmartFormat.Tests.Core
 {
@@ -115,6 +114,47 @@ namespace SmartFormat.Tests.Core
             {
                 _ = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
             }
+        }
+
+        [Test]
+        public void Parser_Error_Action_Ignore()
+        {
+            var invalidTemplate = "Hello, I'm {Name from {City}";
+
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Settings.ParseErrorAction = ErrorAction.Ignore;
+
+            var result = smart.Format(invalidTemplate, new { Name = "John", City = "Oklahoma" });
+
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
+        public void Parser_Error_Action_MaintainTokens()
+        {
+            var invalidTemplate = "Hello, I'm {Name from {City}";
+
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
+
+            var result = smart.Format(invalidTemplate, new { Name = "John", City = "Oklahoma" });
+
+            Assert.AreEqual("Hello, I'm {Name from {City}", result);
+        }
+
+        [Test]
+        public void Parser_Error_Action_OutputErrorInResult()
+        {
+            var invalidTemplate = "Hello, I'm {Name from {City}";
+
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+
+            var result = smart.Format(invalidTemplate, new { Name = "John", City = "Oklahoma" });
+
+            Assert.IsTrue(
+                result.StartsWith("The format string has")
+                );
         }
 
         [Test]
