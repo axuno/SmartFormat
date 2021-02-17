@@ -1,6 +1,10 @@
 Latest Changes
 ====
 
+v2.6.2
+===
+* Fix: Fully implemented all `Settings.ParseErrorAction`, see [#143](https://github.com/axuno/SmartFormat/pull/143) - Thanks to [Anders Jonsson](https://github.com/andersjonsson)
+
 v2.6.1
 ===
 * Fixed [#136](https://github.com/axuno/SmartFormat/issues/136)
