@@ -1,0 +1,12 @@
+version: 2.6.2.{build}
+image: Visual Studio 2019
+build_script:
+- ps: cd $env:APPVEYOR_BUILD_FOLDER\src
+- ps: dotnet restore --verbosity quiet
+- ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
+- ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
+test_script:
+- cmd: nuget install Appveyor.TestLogger
+- cmd: dotnet test --no-build --framework net5.0 --test-adapter-path:. --logger:Appveyor SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+- cmd: nuget install codecov -excludeversion
+- cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net5.0.xml" -n net5.0win
