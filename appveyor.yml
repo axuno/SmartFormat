@@ -1,7 +1,7 @@
 version: 2.6.2.{build}
 image: Visual Studio 2019
 build_script:
-- ps: cd $env:APPVEYOR_BUILD_FOLDER
+- ps: cd $env:APPVEYOR_BUILD_FOLDER\src
 - ps: dotnet restore --verbosity quiet
 - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
 - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
