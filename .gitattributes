@@ -9,15 +9,37 @@
 *.msg text
 *.txt text
 *.yml text
-*.cs text
-*.md text
+*.cs text diff=csharp
+*.md text diff=markdown
+*.editorconfig text
+*.json text
+*.xml text
+*.bash text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.css text
+*.scss text diff=css
+*.htm text diff=html
+*.html text diff=html
+*.sql text
+*.js text
+*.ts text
 
 # Declare files that will always have CRLF line endings on checkout.
 *.sln text eol=crlf
 *.{cmd,[cC][mM][dD]} text eol=crlf
 *.{bat,[bB][aA][tT]} text eol=crlf
 
+# Documents
+*.docx diff=astextplain
+*.xlsx binary
+*.pdf diff=astextplain
+*.csv text
+
 # Denote all files that are truly binary and should not be modified.
 *.png binary
+*.gif binary
 *.jpg binary
 *.cdr binary
+*.psd binary
