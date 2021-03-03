@@ -28,6 +28,8 @@ We have started to think about a new version of ```SmartFormat.Net``` and **woul
   * make named formatters obligatory instead of iterating through all formatters
   * the sequence, how extensions are loaded should not have an impact on identifying the right formatter
 * Make caching of ```Parser.ParseFormat``` results the standard behavior
+* Performance improvements
+*  less generated garbage 
 * Support for Net 5.0
 * Remove ```public``` properties/methods which should better be ```internal``` or even ```privat```
 * Upgrade the project to C# 8 with nullable reference types included
