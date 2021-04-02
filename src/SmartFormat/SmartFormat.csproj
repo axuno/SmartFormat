@@ -7,7 +7,7 @@
         <AssemblyVersion>2.6.2.0</AssemblyVersion>
         <FileVersion>2.6.2.0</FileVersion>
         <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462;net472;net48;net50</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG</DefineConstants>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>

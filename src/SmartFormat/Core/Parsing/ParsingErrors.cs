@@ -26,17 +26,8 @@ namespace SmartFormat.Core.Parsing
         public List<ParsingIssue> Issues { get; }
         public bool HasIssues => Issues.Count > 0;
 
-        public string MessageShort
-        {
-            get
-            {
-                return string.Format("The format string has {0} issue{1}: {2}",
-                    Issues.Count,
-                    Issues.Count == 1 ? "" : "s",
-                    string.Join(", ", Issues.Select(i => i.Issue).ToArray())
-                );
-            }
-        }
+        public string MessageShort =>
+            $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? "" : "s")}: {string.Join(", ", Issues.Select(i => i.Issue).ToArray())}";
 
         public override string Message
         {
@@ -59,13 +50,8 @@ namespace SmartFormat.Core.Parsing
                     }
                 }
 
-                return string.Format("The format string has {0} issue{1}:\n{2}\nIn: \"{3}\"\nAt:  {4} ",
-                    Issues.Count,
-                    Issues.Count == 1 ? "" : "s",
-                    string.Join(", ", Issues.Select(i => i.Issue).ToArray()),
-                    result.baseString,
-                    arrows
-                );
+                return
+                    $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? "" : "s")}:\n{string.Join(", ", Issues.Select(i => i.Issue).ToArray())}\nIn: \"{result.baseString}\"\nAt:  {arrows} ";
             }
         }
 

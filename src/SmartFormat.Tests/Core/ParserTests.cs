@@ -14,7 +14,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void TestParser()
         {
-            var parser = new SmartFormatter() {Settings = { ParseErrorAction = ErrorAction.ThrowError}}.Parser;
+            var parser = new SmartFormatter {Settings = { ParseErrorAction = ErrorAction.ThrowError}}.Parser;
             parser.AddAlphanumericSelectors();
             parser.AddAdditionalSelectorChars("_");
             parser.AddOperators(".");
@@ -35,32 +35,26 @@ namespace SmartFormat.Tests.Core
             results.TryAll(r => Assert.AreEqual(r.format, r.parsed.ToString())).ThrowIfNotEmpty();
         }
 
-        [Test]
-        public void Parser_Throws_Exceptions()
+        [TestCase("{")]
+        [TestCase("{0")]
+        [TestCase("}")]
+        [TestCase("0}")]
+        [TestCase("{{{")]
+        [TestCase("}}}")]
+        [TestCase("{.}")]
+        [TestCase("{.:}")]
+        [TestCase("{..}")]
+        [TestCase("{..:}")]
+        [TestCase("{0.}")]
+        [TestCase("{0.:}")]
+        public void Parser_Throws_Exceptions(string format)
         {
             // Let's set the "ErrorAction" to "Throw":
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.ParseErrorAction = ErrorAction.ThrowError;
 
             var args = new object[] { TestFactory.GetPerson() };
-            var invalidFormats = new[] {
-                "{",
-                "{0",
-                "}",
-                "0}",
-                "{{{",
-                "}}}",
-                "{.}",
-                "{.:}",
-                "{..}",
-                "{..:}",
-                "{0.}",
-                "{0.:}",
-            };
-            foreach (var format in invalidFormats)
-            {
-                Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
-            }
+            Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
         }
 
         [Test]
@@ -119,42 +113,191 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Parser_Error_Action_Ignore()
         {
-            var invalidTemplate = "Hello, I'm {Name from {City}";
+            //                     | Literal  | Erroneous     | | Okay |  
+            var invalidTemplate = "Hello, I'm {Name from {City} {Street}";
 
             var smart = Smart.CreateDefaultSmartFormat();
             smart.Settings.ParseErrorAction = ErrorAction.Ignore;
-
-            var result = smart.Format(invalidTemplate, new { Name = "John", City = "Oklahoma" });
-
-            Assert.AreEqual(string.Empty, result);
+            
+            var parser = GetRegularParser();
+            parser.Settings.ParseErrorAction = ErrorAction.Ignore;
+            var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
+            
+            Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
+            Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "), "Literal text");
+            Assert.That(parsed.Items[1].RawText, Is.EqualTo(string.Empty), "Erroneous placeholder");
+            Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
+            Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)));
+            Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"), "Correct placeholder");
         }
 
         [Test]
         public void Parser_Error_Action_MaintainTokens()
         {
-            var invalidTemplate = "Hello, I'm {Name from {City}";
+            //                     | Literal  | Erroneous     | | Okay |  
+            var invalidTemplate = "Hello, I'm {Name from {City} {Street}";
+            
+            var parser = GetRegularParser();
+            parser.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
+            var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
 
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
-
-            var result = smart.Format(invalidTemplate, new { Name = "John", City = "Oklahoma" });
-
-            Assert.AreEqual("Hello, I'm {Name from {City}", result);
+            Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
+            Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "));
+            Assert.That(parsed.Items[1].RawText, Is.EqualTo("{Name from {City}"));
+            Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
+            Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)));
+            Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"));
         }
 
         [Test]
         public void Parser_Error_Action_OutputErrorInResult()
         {
+            //                     | Literal  | Erroneous     |
             var invalidTemplate = "Hello, I'm {Name from {City}";
+            
+            var parser = GetRegularParser();
+            parser.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+            var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
 
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+            Assert.That(parsed.Items.Count, Is.EqualTo(1));
+            Assert.That(parsed.Items[0].RawText, Does.StartWith("The format string has 3 issues"));
+        }
 
-            var result = smart.Format(invalidTemplate, new { Name = "John", City = "Oklahoma" });
+        /// <summary>
+        /// SmartFormat is not designed for processing JavaScript because of interfering usage of {}[].
+        /// This example shows that even a comment can lead to parsing will work or not.
+        /// </summary>
+        [TestCase("/* The comment with this '}{' makes it fail */", "############### {TheVariable} ###############", false)]
+        [TestCase("", "############### {TheVariable} ###############", true)]
+        public void Parse_JavaScript_May_Succeed_Or_Fail(string var0, string var1, bool shouldSucceed)
+        {
+            var js = @"
+(function(exports) {
+  'use strict';
+  /**
+   * Searches for specific element in a given array using
+   * the interpolation search algorithm.<br><br>
+   * Time complexity: O(log log N) when elements are uniformly
+   * distributed, and O(N) in the worst case
+   *
+   * @example
+   *
+   * var search = require('path-to-algorithms/src/searching/'+
+   * 'interpolation-search').interpolationSearch;
+   * console.log(search([1, 2, 3, 4, 5], 4)); // 3
+   *
+   * @public
+   * @module searching/interpolation-search
+   * @param {Array} sortedArray Input array.
+   * @param {Number} seekIndex of the element which index should be found.
+   * @returns {Number} Index of the element or -1 if not found.
+   */
+  function interpolationSearch(sortedArray, seekIndex) {
+    let leftIndex = 0;
+    let rightIndex = sortedArray.length - 1;
 
-            Assert.IsTrue(
-                result.StartsWith("The format string has")
-                );
+    while (leftIndex <= rightIndex) {
+      const rangeDiff = sortedArray[rightIndex] - sortedArray[leftIndex];
+      const indexDiff = rightIndex - leftIndex;
+      const valueDiff = seekIndex - sortedArray[leftIndex];
+
+      if (valueDiff < 0) {
+        return -1;
+      }
+
+      if (!rangeDiff) {
+        return sortedArray[leftIndex] === seekIndex ? leftIndex : -1;
+      }
+
+      const middleIndex =
+        leftIndex + Math.floor((valueDiff * indexDiff) / rangeDiff);
+
+      if (sortedArray[middleIndex] === seekIndex) {
+        return middleIndex;
+      }
+
+      if (sortedArray[middleIndex] < seekIndex) {
+        leftIndex = middleIndex + 1;
+      } else {
+        rightIndex = middleIndex - 1;
+      }
+    }
+    " + var0 + @"
+    /* " + var1 + @" */
+    return -1;
+  }
+  exports.interpolationSearch = interpolationSearch;
+})(typeof window === 'undefined' ? module.exports : window);
+";
+            var parser = GetRegularParser();
+            parser.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
+            var parsed = parser.ParseFormat(js, new[] { Guid.NewGuid().ToString("N") });
+
+            // No characters should get lost compared to the format string,
+            // no matter if a Placeholder can be identified or not
+            Assert.That(parsed.Items.Sum(i => i.RawText.Length), Is.EqualTo(js.Length), "No characters lost");
+
+            if (shouldSucceed)
+            {
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
+                    "One placeholders");
+                Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
+                    Is.EqualTo("{TheVariable}"));
+            }
+            else
+            {
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
+                    "NO placeholder");
+            }
+        }
+        
+        /// <summary>
+        /// SmartFormat is not designed for processing CSS because of interfering usage of {}[].
+        /// This example shows that even a comment can lead to parsing will work or not.
+        /// </summary>
+        [TestCase("", "############### {TheVariable} ###############", false)]
+        [TestCase("/* This '}' in the comment makes it succeed */", "############### {TheVariable} ###############", true)]
+        public void Parse_Css_May_Succeed_Or_Fail(string var0, string var1, bool shouldSucceed)
+        {
+            var css = @"
+.media {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+
+.media .content {
+  font-size: .8rem;
+}
+
+.comment img {
+  border: 1px solid grey;  " + var0 + @"
+  anything: '" + var1 + @"'
+}
+
+.list-item {
+  border-bottom: 1px solid grey;
+} 
+";
+            var parser = GetRegularParser();
+            parser.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
+            var parsed = parser.ParseFormat(css, new[] { Guid.NewGuid().ToString("N") });
+
+            // No characters should get lost compared to the format string,
+            // no matter if a Placeholder can be identified or not
+            Assert.That(parsed.Items.Sum(i => i.RawText.Length), Is.EqualTo(css.Length), "No characters lost");
+
+            if (shouldSucceed)
+            {
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
+                    "One placeholders");
+                Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
+                    Is.EqualTo("{TheVariable}"));
+            }
+            else
+            {
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
+                    "NO placeholder");
+            }
         }
 
         [Test]
