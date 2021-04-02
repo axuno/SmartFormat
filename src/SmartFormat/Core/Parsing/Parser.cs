@@ -243,6 +243,8 @@ namespace SmartFormat.Core.Parsing
                         // Make sure that this is a nested placeholder before we un-nest it:
                         if (current.parent == null)
                         {
+                            // Don't swallow-up redundant closing braces, but treat them as literals
+                            current.Items.Add(new LiteralText(Settings, current, i) {endIndex = i + 1});
                             parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i,
                                 i + 1);
                             continue;
@@ -399,7 +401,7 @@ namespace SmartFormat.Core.Parsing
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
                                 selectorIndex));
                         else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
                                 operatorIndex, i);
                         lastI = i + 1;
 
@@ -418,7 +420,7 @@ namespace SmartFormat.Core.Parsing
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
                                 selectorIndex));
                         else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
                                 operatorIndex, i);
                         lastI = i + 1;
 
@@ -437,7 +439,7 @@ namespace SmartFormat.Core.Parsing
                             || _alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')
                             || _allowedSelectorChars.IndexOf(c) != -1;
                         if (!isValidSelectorChar)
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " +  parsingErrorText[ParsingError.InvalidCharactersInSelector],
                                 i, i + 1);
                     }
                 }
@@ -533,12 +535,11 @@ namespace SmartFormat.Core.Parsing
         }
 
         /// <summary>
-        /// Handles <see cref="ParsingError"/>s as defined in <see cref="SmartSettings.ParseErrorAction"/>,
-        /// which leads to results similar to <see cref="SmartSettings.FormatErrorAction"/>s
+        /// Handles <see cref="ParsingError"/>s as defined in <see cref="SmartSettings.ParseErrorAction"/>.
         /// </summary>
         /// <param name="parsingErrors"></param>
         /// <param name="currentResult"></param>
-        /// <returns>The <see cref="Format"/> which will be further processed with formatting.</returns>
+        /// <returns>The <see cref="Format"/> which will be further processed by the formatter.</returns>
         private Format HandleParsingErrors(ParsingErrors parsingErrors, Format currentResult)
         {
             switch (Settings.ParseErrorAction)
@@ -546,23 +547,35 @@ namespace SmartFormat.Core.Parsing
                 case ErrorAction.ThrowError:
                     throw parsingErrors;
                 case ErrorAction.MaintainTokens:
-                    var fmt = new Format(Settings, currentResult.baseString) {
-                        startIndex = 0,
-                        endIndex = currentResult.baseString.Length
-                    };
-                    fmt.Items.Add(new LiteralText(Settings, fmt));
-                    return fmt;
+                    // Replace erroneous Placeholders with tokens as LiteralText
+                    // Placeholder without issues are left unmodified
+                    for (var i = 0; i < currentResult.Items.Count; i++)
+                    {
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        {
+                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex){endIndex = ph.endIndex};
+                        }
+                    }
+                    return currentResult;
                 case ErrorAction.Ignore:
-                    return new Format(Settings, string.Empty);
+                    // Replace erroneous Placeholders with an empty LiteralText
+                    for (var i = 0; i < currentResult.Items.Count; i++)
+                    {
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        {
+                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex){endIndex = ph.startIndex};
+                        }
+                    }
+                    return currentResult;
                 case ErrorAction.OutputErrorInResult:
-                    fmt = new Format(Settings, parsingErrors.Message) {
+                    var fmt = new Format(Settings, parsingErrors.Message) {
                         startIndex = 0,
                         endIndex = parsingErrors.Message.Length
                     };
                     fmt.Items.Add(new LiteralText(Settings, fmt));
                     return fmt;
                 default:
-                    return currentResult;
+                    throw new ArgumentException("Illegal type for ParsingErrors", parsingErrors);
             }
         }
 

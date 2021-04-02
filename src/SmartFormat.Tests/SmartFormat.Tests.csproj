@@ -8,7 +8,7 @@
 		<Version>2.6.2.0</Version>
         <FileVersion>2.6.2.0</FileVersion>
 		<AssemblyVersion>2.6.2.0</AssemblyVersion>
-        <TargetFrameworks>net462;netcoreapp3.1;net5.0</TargetFrameworks>
+        <TargetFrameworks>net462;net5.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants)</DefineConstants>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<AssemblyName>SmartFormat.Tests</AssemblyName>
@@ -37,7 +37,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+	  <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
 	</ItemGroup>
 
 </Project>
