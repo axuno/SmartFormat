@@ -131,12 +131,14 @@ namespace SmartFormat.Tests.Core
             Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"), "Correct placeholder");
         }
 
-        [Test]
-        public void Parser_Error_Action_MaintainTokens()
+        //         | Literal  | Erroneous     | | Okay |  
+        //         Hello, I'm {Name from {City} {Street}
+        [TestCase("Hello, I'm {Name from {City} {Street}", true)]
+        //         | Literal  | Erroneous     | | Erroneous
+        //         Hello, I'm {Name from {City} {Street
+        [TestCase("Hello, I'm {Name from {City} {Street", false)]
+        public void Parser_Error_Action_MaintainTokens(string invalidTemplate, bool lastItemIsPlaceholder)
         {
-            //                     | Literal  | Erroneous     | | Okay |  
-            var invalidTemplate = "Hello, I'm {Name from {City} {Street}";
-            
             var parser = GetRegularParser();
             parser.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
             var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
@@ -145,8 +147,16 @@ namespace SmartFormat.Tests.Core
             Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "));
             Assert.That(parsed.Items[1].RawText, Is.EqualTo("{Name from {City}"));
             Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
-            Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)));
-            Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"));
+            if (lastItemIsPlaceholder)
+            {
+                Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)), "Last item should be Placeholder");
+                Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"));
+            }
+            else
+            {
+                Assert.That(parsed.Items[3], Is.TypeOf(typeof(LiteralText)), "Last item should be LiteralText");
+                Assert.That(parsed.Items[3].RawText, Does.Contain("{Street"));
+            }
         }
 
         [Test]

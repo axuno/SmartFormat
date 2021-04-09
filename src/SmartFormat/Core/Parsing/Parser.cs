@@ -445,21 +445,26 @@ namespace SmartFormat.Core.Parsing
                 }
             }
 
-            // finish the last text item:
-            if (lastI != format.Length)
-                current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = format.Length});
-
-            // Check that the format is finished:
+            // We're at the end of the input string
+            
+            // 1. Is the last item a placeholder, that is not finished yet?
             if (current.parent != null || currentPlaceholder != null)
             {
                 parsingErrors.AddIssue(current, parsingErrorText[ParsingError.MissingClosingBrace], format.Length,
                     format.Length);
                 current.endIndex = format.Length;
-                while (current.parent != null)
-                {
-                    current = current.parent.parent;
-                    current.endIndex = format.Length;
-                }
+            }
+            else if (lastI != format.Length)
+            {
+                // 2. The last item must be a literal, so add it
+                current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = format.Length});
+            }
+            
+            // Todo v2.7.0: There is no unit test for this condition!
+            while (current.parent != null)
+            {
+                current = current.parent.parent;
+                current.endIndex = format.Length;
             }
 
             // Check for any parsing errors:
