@@ -13,7 +13,7 @@ namespace SmartFormat.Core.Parsing
     /// A placeholder is the part of a format string between the { braces }.
     /// </summary>
     /// <example>
-    /// For example, in "{Items.Length,10:choose(1,2,3):one|two|three}",
+    /// For example, in "{Items.Length,-10:choose(1|2|3):one|two|three}",
     /// the <see cref="Alignment" />s is "10",
     /// the <see cref="Selector" />s are "Items" and "Length",
     /// the <see cref="FormatterName" /> is "choose",
