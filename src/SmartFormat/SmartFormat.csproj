@@ -1,19 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
         <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
-        <Copyright>Copyright 2011-2021 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
         <Version>2.6.2.0</Version>
-        <AssemblyVersion>2.6.2.0</AssemblyVersion>
         <FileVersion>2.6.2.0</FileVersion>
-        <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462;net472;net48;net50</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG</DefineConstants>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>
         <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
-        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
         <PackageId>SmartFormat.NET</PackageId>
         <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
 https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
@@ -22,12 +19,10 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat/master/SmartFormat_365x365.png</PackageIconUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-        <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
         <PackageLicenseFile></PackageLicenseFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryType>Git</RepositoryType>
-        <LangVersion>8.0</LangVersion>
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
@@ -37,23 +32,11 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <Optimize>false</Optimize>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <OutputPath>bin\Release\</OutputPath>
         <WarningLevel>3</WarningLevel>
-        <DocumentationFile>bin\Release\SmartFormat.xml</DocumentationFile>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <Deterministic>true</Deterministic>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <IncludeSymbols>true</IncludeSymbols>
     </PropertyGroup>
-
-    <ItemGroup Condition="'$(Configuration)' == 'Release' and '$(SourceRoot)'==''">
-        <SourceRoot Include="$(MSBuildThisFileDirectory)/" />
-    </ItemGroup>
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
