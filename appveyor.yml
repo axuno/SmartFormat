@@ -24,9 +24,9 @@ test_script:
 artifacts:
     - path: 'artifacts\*.nupkg'
     - path: 'artifacts\*.snupkg'
-#deploy:
-#- provider: NuGet
-#  api_key:
-#  secure: <token>
-#  on:
-#  branch: main
+deploy:
+- provider: NuGet
+  api_key:
+  secure: OxZeF53X5DcHmg+t3zMNZP9NhlpSJHEQN6O4zuz6/FT3SCaBh8kp+tbftzt+nlhi
+  on:
+    branch: main
