@@ -33,6 +33,7 @@ namespace SmartFormat.Core.Parsing
         private string ConvertCharacterLiteralsToUnicode()
         {
             var source = baseString.Substring(startIndex, endIndex - startIndex);
+            if (source.Length == 0) return source;
 
             // No character literal escaping - nothing to do
             if (source[0] != Parser.CharLiteralEscapeChar)
