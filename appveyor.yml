@@ -8,7 +8,7 @@ build_script:
 - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
 - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
 - ps: |
-    $version = "2.6.2"
+    $version = "2.7.0"
     $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
 
     if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
