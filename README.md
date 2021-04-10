@@ -10,7 +10,7 @@
 
 ### Supported Frameworks
 * .Net Framework 4.6.1 and later
-* .Net Standard 2.0 and later, including .Net 5.0
+* .Net Standard 2.0 and later (including .Net 5.0)
  
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the NuGet package
@@ -27,6 +27,7 @@ We have started to think about a new version of ```SmartFormat.Net``` and **woul
   * make named formatters obligatory instead of iterating through all formatters
   * the sequence, how extensions are loaded should not have an impact on identifying the right formatter
 * Make caching of ```Parser.ParseFormat``` results the standard behavior
+* Rewrite the parser
 * Performance improvements
 *  less generated garbage 
 * Remove ```public``` properties/methods which should better be ```internal``` or even ```privat```
