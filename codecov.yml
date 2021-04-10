@@ -1,0 +1,8 @@
+coverage:
+  precision: 0      # no decimals
+  round: nearest    # round up/down
+  range: "50...100"
+  status:
+    patch:          # show status on patch level only
+      default:
+        target: 50  # minimum coverage for successful commit 
