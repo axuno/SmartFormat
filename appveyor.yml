@@ -1,12 +1,32 @@
 version: 2.6.2.{build}
+environment:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 image: Visual Studio 2019
 build_script:
 - ps: cd $env:APPVEYOR_BUILD_FOLDER\src
 - ps: dotnet restore --verbosity quiet
 - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
 - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
+- ps: |
+    $version = "2.6.2"
+    $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
+
+    if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+        $version = $version + "-PR" + $env:APPVEYOR_PULL_REQUEST_NUMBER
+    }
+
+    dotnet pack SmartFormat --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
 test_script:
 - cmd: nuget install Appveyor.TestLogger
 - cmd: dotnet test --no-build --framework net5.0 --test-adapter-path:. --logger:Appveyor SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
 - cmd: nuget install codecov -excludeversion
 - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net5.0.xml" -n net5.0win
+artifacts:
+    - path: 'artifacts\*.nupkg'
+    - path: 'artifacts\*.snupkg'
+deploy:
+- provider: NuGet
+  api_key:
+    secure: OxZeF53X5DcHmg+t3zMNZP9NhlpSJHEQN6O4zuz6/FT3SCaBh8kp+tbftzt+nlhi
+  on:
+    APPVEYOR_REPO_TAG: true
