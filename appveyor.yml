@@ -22,8 +22,8 @@ test_script:
 - cmd: nuget install codecov -excludeversion
 - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net5.0.xml" -n net5.0win
 artifacts:
-    - path: 'artifacts\*.nupkg'
-    - path: 'artifacts\*.snupkg'
+    - path: '..\artifacts\*.nupkg'
+    - path: '..\artifacts\*.snupkg'
 #deploy:
 #- provider: NuGet
 #  api_key:
