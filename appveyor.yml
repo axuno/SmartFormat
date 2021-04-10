@@ -29,4 +29,4 @@ deploy:
   api_key:
     secure: OxZeF53X5DcHmg+t3zMNZP9NhlpSJHEQN6O4zuz6/FT3SCaBh8kp+tbftzt+nlhi
   on:
-    branch: main
+    APPVEYOR_REPO_TAG: true
