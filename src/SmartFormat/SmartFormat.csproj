@@ -12,11 +12,11 @@
         <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
         <PackageId>SmartFormat.NET</PackageId>
-        <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
+        <PackageReleaseNotes>See the change log with for details of this release:
 https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
-        <PackageIconUrl>https://raw.githubusercontent.com/axuno/SmartFormat/master/SmartFormat_365x365.png</PackageIconUrl>
+        <PackageIcon>SmartFormat_365x365.png</PackageIcon>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
         <PackageLicenseFile></PackageLicenseFile>
@@ -25,6 +25,10 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="" />
+    </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <DebugSymbols>true</DebugSymbols>
