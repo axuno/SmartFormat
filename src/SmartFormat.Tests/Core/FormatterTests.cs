@@ -68,6 +68,38 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
+        public void Nested_Placeholders_Braces()
+        {
+            var data = new {Person = new {FirstName = "John", LastName = "Long"}, Address = new {City = "London"}};
+            var formatter = Smart.CreateDefaultSmartFormat();
+            
+            // This is necessary to avoid undesired trailing blanks:
+            // }}} are now considered as 3 different closing braces
+            formatter.Parser.UseAlternativeEscapeChar('\\');
+            
+            // This allows a nested template to access outer scopes.
+            // Here, {City} will come from Address, but {FirstName} will come from Person:
+            var result = formatter.Format("{Person:{Address:City: {City}, Name: {FirstName}}}", data);
+            
+            Assert.That(result, Is.EqualTo("City: London, Name: John"));
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        public void Nested_PlaceHolders_Conditional(int numOfPeople)
+        {
+
+            var data = numOfPeople == 1
+                ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
+                : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
+            var formatter = Smart.CreateDefaultSmartFormat();
+            
+            var result = formatter.Format("There {People.Count:is a person.|are {} people.}", data);
+            
+            Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
+        }
+
+        [Test]
         public void Formatter_NotifyFormattingError()
         {
             var obj = new { Name = "some name" };
