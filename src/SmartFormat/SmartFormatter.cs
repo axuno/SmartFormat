@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SmartFormat.Core.Extensions;
@@ -6,7 +11,6 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
-using SmartFormat.Utilities;
 
 namespace SmartFormat
 {
@@ -23,7 +27,7 @@ namespace SmartFormat
         /// <summary>
         /// Event raising, if an error occurs during formatting.
         /// </summary>
-        public event EventHandler<FormattingErrorEventArgs> OnFormattingFailure;
+        public event EventHandler<FormattingErrorEventArgs>? OnFormattingFailure;
 
         #endregion
 
@@ -91,7 +95,7 @@ namespace SmartFormat
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetSourceExtension<T>() where T : class, ISource
+        public T? GetSourceExtension<T>() where T : class, ISource
         {
             return SourceExtensions.OfType<T>().FirstOrDefault();
         }
@@ -103,7 +107,7 @@ namespace SmartFormat
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetFormatterExtension<T>() where T : class, IFormatter
+        public T? GetFormatterExtension<T>() where T : class, IFormatter
         {
             return FormatterExtensions.OfType<T>().FirstOrDefault();
         }
@@ -155,7 +159,7 @@ namespace SmartFormat
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IFormatProvider provider, string format, params object[] args)
+        public string Format(IFormatProvider? provider, string format, params object[] args)
         {
             return Format(null, args, format);
         }
@@ -167,7 +171,7 @@ namespace SmartFormat
         /// <param name="args">The object to format.</param>
         /// <param name="format">A composite format string.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IFormatProvider provider, IList<object> args, string format)
+        public string Format(IFormatProvider? provider, IList<object> args, string format)
         {
             args = args ?? k_Empty;
             var output = new StringOutput(format.Length + args.Count * 8);
@@ -213,7 +217,7 @@ namespace SmartFormat
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The objects to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
+        public string FormatWithCache(ref FormatCache? cache, string format, params object[] args)
         {
             return FormatWithCache(ref cache, args, format);
         }
@@ -226,7 +230,7 @@ namespace SmartFormat
         /// <param name="args">The objects to format.</param>
         /// <param name="format">A composite format string.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string FormatWithCache(ref FormatCache cache, IList<object> args, string format)
+        public string FormatWithCache(ref FormatCache? cache, IList<object> args, string format)
         {
             args = args ?? k_Empty;
             var output = new StringOutput(format.Length + args.Count * 8);
@@ -287,6 +291,7 @@ namespace SmartFormat
         {
             // Before we start, make sure we have at least one source extension and one formatter extension:
             CheckForExtensions();
+            if (formattingInfo.Format is null) return;
             foreach (var item in formattingInfo.Format.Items)
             {
                 if (item is LiteralText literalItem)
@@ -344,7 +349,7 @@ namespace SmartFormat
                     formattingInfo.FormatDetails.FormattingException = null;
                     break;
                 case ErrorAction.MaintainTokens:
-                    formattingInfo.Write(formattingInfo.Placeholder.RawText);
+                    formattingInfo.Write(formattingInfo.Placeholder?.RawText ?? "'null'");
                     break;
             }
         }
@@ -361,9 +366,10 @@ namespace SmartFormat
 
         private void EvaluateSelectors(FormattingInfo formattingInfo)
         {
-            var placeholder = formattingInfo.Placeholder;
+            if (formattingInfo.Placeholder is null) return;
+
             var firstSelector = true;
-            foreach (var selector in placeholder.Selectors)
+            foreach (var selector in formattingInfo.Placeholder.Selectors)
             {
                 formattingInfo.Selector = selector;
                 formattingInfo.Result = null;
@@ -422,6 +428,7 @@ namespace SmartFormat
         /// <returns>True if an FormatterExtension was found, else False.</returns>
         private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
         {
+            if (formattingInfo.Placeholder is null) return false;
             var formatterName = formattingInfo.Placeholder.FormatterName;
 
             // Evaluate the named formatter (or, evaluate all "" formatters)

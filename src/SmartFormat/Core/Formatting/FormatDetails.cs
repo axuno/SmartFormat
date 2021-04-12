@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections.Generic;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
@@ -13,7 +18,7 @@ namespace SmartFormat.Core.Formatting
     public class FormatDetails
     {
         public FormatDetails(SmartFormatter formatter, Format originalFormat, IList<object> originalArgs,
-            FormatCache formatCache, IFormatProvider provider, IOutput output)
+            FormatCache? formatCache, IFormatProvider? provider, IOutput output)
         {
             Formatter = formatter;
             OriginalFormat = originalFormat;
@@ -44,14 +49,14 @@ namespace SmartFormat.Core.Formatting
         /// This object can be used to cache resources between formatting calls.
         /// It will be null unless FormatWithCache is called.
         /// </summary>
-        public FormatCache FormatCache { get; }
+        public FormatCache? FormatCache { get; }
 
         /// <summary>
         /// The Format Provider that can be used to determine how to
         /// format items such as numbers, dates, and anything else that
         /// might be culture-specific.
         /// </summary>
-        public IFormatProvider Provider { get; }
+        public IFormatProvider? Provider { get; }
 
         /// <summary>
         /// Gets the <see cref="IOutput"/> where the result is written.
@@ -62,7 +67,7 @@ namespace SmartFormat.Core.Formatting
         /// If ErrorAction is set to OutputErrorsInResult, this will
         /// contain the exception that caused the formatting error.
         /// </summary>
-        public FormattingException FormattingException { get; set; }
+        public FormattingException? FormattingException { get; set; }
 
         /// <summary>
         /// Contains case-sensitivity settings
