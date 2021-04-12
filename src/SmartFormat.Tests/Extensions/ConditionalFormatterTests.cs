@@ -19,7 +19,7 @@ namespace SmartFormat.Tests.Extensions
                 new DateTime(1111,1,1,1,1,1),SystemTime.Now(),new DateTime(5555,5,5,5,5,5), // {9},{10},{11}
                 new TimeSpan(-1,-1,-1,-1,-1), TimeSpan.Zero,new TimeSpan(5,5,5,5,5), // {12},{13},{14}
                 "Hello", "", // {15},{16}
-                new {NotNull = true}, null, // {17},{18}
+                new {NotNull = true}, null!, // {17},{18}
                 // Note: only the date part will be compared:
                 SystemTime.OffsetNow().AddDays(-1),SystemTime.OffsetNow(),SystemTime.OffsetNow().AddDays(1) // {19},{20},{21}
             };

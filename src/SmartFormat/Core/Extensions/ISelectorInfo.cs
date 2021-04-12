@@ -1,4 +1,9 @@
-﻿using System.ComponentModel;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System.ComponentModel;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 
@@ -17,12 +22,12 @@ namespace SmartFormat.Core.Extensions
         /// <summary>
         /// The current value to evaluate.
         /// </summary>
-        object CurrentValue { get; }
+        object? CurrentValue { get; }
 
         /// <summary>
         /// The selector to evaluate
         /// </summary>
-        string SelectorText { get; }
+        string? SelectorText { get; }
 
         /// <summary>
         /// The index of the selector in a multi-part selector.
@@ -34,18 +39,18 @@ namespace SmartFormat.Core.Extensions
         /// <summary>
         /// The operator that came before the selector; typically "."
         /// </summary>
-        string SelectorOperator { get; }
+        string? SelectorOperator { get; }
 
         /// <summary>
         /// Sets the result of evaluating the selector.
         /// </summary>
-        object Result { set; }
+        object? Result { set; }
 
         /// <summary>
         /// Contains all the details about the current placeholder.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        Placeholder Placeholder { get; }
+        Placeholder? Placeholder { get; }
 
         /// <summary>
         /// Infrequently used details, often used for debugging

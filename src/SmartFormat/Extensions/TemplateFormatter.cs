@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SmartFormat.Core.Extensions;
@@ -38,23 +43,23 @@ namespace SmartFormat.Extensions
         /// <returns>Returns true if successful, else false.</returns>
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var templateName = formattingInfo.FormatterOptions;
-            if (templateName == "")
+            var templateName = formattingInfo.FormatterOptions ?? string.Empty;
+            if (templateName == string.Empty)
             {
-                if (formattingInfo.Format.HasNested) return false;
-                templateName = formattingInfo.Format.RawText;
+                if (formattingInfo.Format != null && formattingInfo.Format.HasNested) return false;
+                templateName = formattingInfo.Format?.RawText;
             }
 
-            if (!_templates.TryGetValue(templateName, out var template))
+            if (!_templates.TryGetValue(templateName!, out var template))
             {
-                if (Names.Contains(formattingInfo.Placeholder.FormatterName))
+                if (Names.Contains(formattingInfo.Placeholder?.FormatterName))
                     throw new FormatException(
-                        $"Formatter '{formattingInfo.Placeholder.FormatterName}' found no registered template named '{templateName}'");
+                        $"Formatter '{formattingInfo.Placeholder?.FormatterName ?? "null"}' found no registered template named '{templateName}'");
 
                 return false;
             }
 
-            formattingInfo.Write(template, formattingInfo.CurrentValue);
+            formattingInfo.Write(template, formattingInfo.CurrentValue ?? string.Empty);
             return true;
         }
 

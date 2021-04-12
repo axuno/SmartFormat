@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Globalization;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Net.Utilities;
@@ -50,12 +55,12 @@ namespace SmartFormat.Extensions
 
             if (format != null && format.HasNested) return false;
             string options;
-            if (formattingInfo.FormatterOptions != "")
-                options = formattingInfo.FormatterOptions;
+            if (!string.IsNullOrEmpty(formattingInfo.FormatterOptions))
+                options = formattingInfo.FormatterOptions!;
             else if (format != null)
                 options = format.GetLiteralText();
             else
-                options = "";
+                options = string.Empty;
 
             TimeSpan fromTime;
             
@@ -65,7 +70,7 @@ namespace SmartFormat.Extensions
                     fromTime = timeSpan;
                     break;
                 case DateTime dateTime:
-                    if (formattingInfo.FormatterOptions != "")
+                    if (formattingInfo.FormatterOptions != string.Empty)
                     {
                         fromTime = SystemTime.Now().ToUniversalTime().Subtract(dateTime.ToUniversalTime());
                     }
@@ -75,7 +80,7 @@ namespace SmartFormat.Extensions
                     }
                     break;
                 case DateTimeOffset dateTimeOffset:
-                    if (formattingInfo.FormatterOptions != "")
+                    if (formattingInfo.FormatterOptions != string.Empty)
                     {
                         fromTime = SystemTime.OffsetNow().UtcDateTime.Subtract(dateTimeOffset.UtcDateTime);
                     }
@@ -96,24 +101,22 @@ namespace SmartFormat.Extensions
             return true;
         }
 
-        private TimeTextInfo GetTimeTextInfo(IFormatProvider provider)
+        private TimeTextInfo? GetTimeTextInfo(IFormatProvider? provider)
         {
             // Return the default if there is no provider:
             if (provider == null)
                 return CommonLanguagesTimeTextInfo.GetTimeTextInfo(DefaultTwoLetterISOLanguageName);
             
             // See if the provider can give us what we want:
-            var timeTextInfo = (TimeTextInfo) provider.GetFormat(typeof(TimeTextInfo));
-            if (timeTextInfo != null) return timeTextInfo;
+            if (provider.GetFormat(typeof(TimeTextInfo)) is TimeTextInfo timeTextInfo) return timeTextInfo;
 
             // See if there is a rule for this culture:
             if (!(provider is CultureInfo cultureInfo))
                 return CommonLanguagesTimeTextInfo.GetTimeTextInfo(DefaultTwoLetterISOLanguageName);
 
-            timeTextInfo = CommonLanguagesTimeTextInfo.GetTimeTextInfo(cultureInfo.TwoLetterISOLanguageName);
             // If cultureInfo was supplied,
             // we will always return, even if null:
-            return timeTextInfo;
+            return CommonLanguagesTimeTextInfo.GetTimeTextInfo(cultureInfo.TwoLetterISOLanguageName);
         }
 
         #endregion

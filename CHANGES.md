@@ -1,7 +1,29 @@
 Latest Changes
 ====
 
-v2.5.3.0-preview1
+v2.7.0
+===
+* **Fixed** broken backward compatibilty introduced in v2.6.2 (issues referenced in [#148](https://github.com/axuno/SmartFormat/issues/148), [#147](https://github.com/axuno/SmartFormat/issues/147), [#143](https://github.com/axuno/SmartFormat/issues/143)).
+* **Fixed**: Take an erroneous format string like `"this is {uncomplete"` (missing closing brace). Before v2.7.0 the parser handled `{uncomplete` as a `TextLiteral`, not as an erroneous `Placeholder`.
+* **Fixed**: Since v1.6.1 there was an undiscovered issue: If the `Parser` encountered a `ParsingError.TooManyClosingBraces`, this closing brace was simply "swallowed-up". This way, the result with `Parser.ErrorAction.MaintainTokens` differs from the original format string. From v2.7.0, the redundant closing brace is handled as a `TextLiteral`. 
+* **Improved**: For `ParsingError.TrailingOperatorsInSelector` and `ParsingError.InvalidCharactersInSelector` the causing character is now included in the `Exception.Message`.
+* If you have issues formatting HTML with CSS and/or JavaScript included, please read the bullet-proof [How-to in the Wiki](https://github.com/axuno/SmartFormat/wiki/HTML-with-CSS-or-JavaScript)
+
+v2.6.2
+===
+* Fix: Fully implemented all `Settings.ParseErrorAction`, see [#143](https://github.com/axuno/SmartFormat/pull/143) - Thanks to [Anders Jonsson](https://github.com/andersjonsson)
+
+v2.6.1
+===
+* Fixed [#136](https://github.com/axuno/SmartFormat/issues/136)
+* Upgraded test project to netcoreapp3.1
+* Enhanced SubString extension as described in [PR142](https://github.com/axuno/SmartFormat/pull/142) - Thanks to [Anders Jonsson](https://github.com/andersjonsson)
+
+v2.6.0
+===
+* Migrated project with Nullable Reference Types (NRT) enabled
+
+v2.5.3.0
 ===
 Bugfix: ```ListFormatter``` will now process ```IList``` data sources only.
 

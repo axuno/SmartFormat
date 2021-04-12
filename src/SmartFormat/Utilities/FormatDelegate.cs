@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 
 namespace SmartFormat.Utilities
 {
@@ -7,20 +12,20 @@ namespace SmartFormat.Utilities
     /// to any string-formatting method (such as <see cref="string.Format(string, object)" />).
     /// For example:
     /// <code>
-    ///  var textWithLink = String.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
-    ///  </code>
+    /// var textWithLink = string.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
+    /// </code>
     /// </summary>
     public class FormatDelegate : IFormattable
     {
-        private readonly Func<string, string> getFormat1;
-        private readonly Func<string, IFormatProvider, string> getFormat2;
+        private readonly Func<string?, string>? getFormat1;
+        private readonly Func<string?, IFormatProvider?, string>? getFormat2;
 
-        public FormatDelegate(Func<string, string> getFormat)
+        public FormatDelegate(Func<string?, string> getFormat)
         {
             getFormat1 = getFormat;
         }
 
-        public FormatDelegate(Func<string, IFormatProvider, string> getFormat)
+        public FormatDelegate(Func<string?, IFormatProvider?, string> getFormat)
         {
             getFormat2 = getFormat;
         }
@@ -31,9 +36,9 @@ namespace SmartFormat.Utilities
         /// <param name="format"></param>
         /// <param name="formatProvider"></param>
         /// <returns></returns>
-        public string ToString(string format, IFormatProvider formatProvider)
+        string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
         {
-            return getFormat1 != null ? getFormat1(format) : getFormat2(format, formatProvider);
+            return getFormat1 != null ? getFormat1(format) : getFormat2 != null ? getFormat2(format, formatProvider) : string.Empty;
         }
     }
 }

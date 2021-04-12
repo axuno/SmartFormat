@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
@@ -20,8 +25,10 @@ namespace SmartFormat.Extensions
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var expression = formattingInfo.FormatterOptions;
-            var formats = formattingInfo.Format.Split('|');
+            var expression = formattingInfo.FormatterOptions ?? string.Empty;
+            var formats = formattingInfo.Format?.Split('|');
+
+            if (formats is null) return false;
 
             if (formats.Count == 0)
                 return true;
@@ -31,10 +38,10 @@ namespace SmartFormat.Extensions
 
             var regEx = new Regex(expression, RegexOptions);
 
-            if (regEx.IsMatch(formattingInfo.CurrentValue.ToString()))
+            if (formattingInfo.CurrentValue != null && regEx.IsMatch(formattingInfo.CurrentValue.ToString()!))
                 formattingInfo.Write(formats[0], formattingInfo.CurrentValue);
             else if (formats.Count == 2)
-                formattingInfo.Write(formats[1], formattingInfo.CurrentValue);
+                formattingInfo.Write(formats[1], formattingInfo.CurrentValue ?? string.Empty);
 
             return true;
         }

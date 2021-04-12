@@ -11,8 +11,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class TimeFormatterTests
     {
-        private SmartFormatter _smart;
-        private TimeFormatter _timeFormatter;
+        private readonly SmartFormatter _smart;
 
         public TimeFormatterTests()
         {
@@ -20,11 +19,11 @@ namespace SmartFormat.Tests.Extensions
             _smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
             _smart.Settings.ParseErrorAction = ErrorAction.ThrowError;
 
-            _timeFormatter = _smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("time")) as TimeFormatter;
-            if (_timeFormatter == null)
+            var timeFormatter = _smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("time")) as TimeFormatter;
+            if (timeFormatter == null)
             {
-                _timeFormatter = new TimeFormatter("en");
-                _smart.FormatterExtensions.Add(_timeFormatter);
+                timeFormatter = new TimeFormatter("en");
+                _smart.FormatterExtensions.Add(timeFormatter);
             }
         }
 
@@ -38,9 +37,9 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void CreateTimeFormatterCtor_WithLegalLanguage()
         {
-            TimeFormatter tf = null;
+            TimeFormatter? tf = null;
             Assert.DoesNotThrow(() => tf = new TimeFormatter("en"));
-            Assert.AreEqual("en", tf.DefaultTwoLetterISOLanguageName);
+            Assert.AreEqual("en", tf?.DefaultTwoLetterISOLanguageName);
         }
 
         public object[] GetArgs()

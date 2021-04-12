@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -34,7 +39,7 @@ namespace SmartFormat.Core.Parsing
 
         #region: Fields and Properties :
 
-        public readonly Placeholder parent;
+        public readonly Placeholder? parent;
         public List<FormatItem> Items { get; }
         public bool HasNested { get; set; }
 
@@ -162,7 +167,7 @@ namespace SmartFormat.Core.Parsing
         #region: Split :
 
         private char splitCacheChar;
-        private IList<Format> splitCache;
+        private IList<Format>? splitCache;
 
         public IList<Format> Split(char search)
         {

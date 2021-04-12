@@ -1,37 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
-		<Copyright>Copyright 2011-2020 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
+		<Description>Unit tests for SmartFormat</Description>
 		<AssemblyTitle>SmartFormat.Test</AssemblyTitle>
 		<Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-		<Version>2.5.2.0</Version>
-		<TargetFrameworks>netcoreapp2.0;net462</TargetFrameworks>
+    <TargetFrameworks>net462;net5.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants)</DefineConstants>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<AssemblyName>SmartFormat.Tests</AssemblyName>
 		<AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
 		<SignAssembly>true</SignAssembly>
-		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-		<PackageId>SmartFormat.Tests</PackageId>
-		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
-		<Company>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Company>
-		<FileVersion>2.5.2.0</FileVersion>
+    <IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
 		<PackageReference Include="NUnit" Version="3.12.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.15.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
+		<PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+	  <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
 	</ItemGroup>
 
 </Project>

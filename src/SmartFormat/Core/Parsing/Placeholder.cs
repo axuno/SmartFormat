@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System.Collections.Generic;
 using System.Text;
 using SmartFormat.Core.Settings;
 
@@ -8,7 +13,7 @@ namespace SmartFormat.Core.Parsing
     /// A placeholder is the part of a format string between the { braces }.
     /// </summary>
     /// <example>
-    /// For example, in "{Items.Length,10:choose(1,2,3):one|two|three}",
+    /// For example, in "{Items.Length,-10:choose(1|2|3):one|two|three}",
     /// the <see cref="Alignment" />s is "10",
     /// the <see cref="Selector" />s are "Items" and "Length",
     /// the <see cref="FormatterName" /> is "choose",
@@ -35,7 +40,7 @@ namespace SmartFormat.Core.Parsing
         public int Alignment { get; set; }
         public string FormatterName { get; set; }
         public string FormatterOptions { get; set; }
-        public Format Format { get; set; }
+        public Format? Format { get; set; }
 
         public override string ToString()
         {

@@ -112,7 +112,7 @@ namespace SmartFormat.Tests.Core
         public void Implicit_formatters_require_an_empty_string(string format, object arg0, string expectedOutput)
         {
             var formatter = GetCustomFormatter();
-            formatter.GetFormatterExtension<TestExtension1>().Names = new[] {"test2"};
+            formatter.GetFormatterExtension<TestExtension1>()!.Names = new[] {"test2"};
             var actual = formatter.Format(format, arg0);
             Assert.AreEqual(expectedOutput, actual);
         }

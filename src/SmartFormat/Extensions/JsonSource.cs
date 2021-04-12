@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using SmartFormat.Core.Extensions;
@@ -25,15 +30,12 @@ namespace SmartFormat.Extensions
         public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             // Note: Operators are processed by ListFormatter
-            switch (selectorInfo.CurrentValue)
+            return selectorInfo.CurrentValue switch
             {
-                case JObject _:
-                    return NewtonSoftJson.TryEvaluateSelector(selectorInfo);
-                case JsonElement _:
-                    return SystemTextJson.TryEvaluateSelector(selectorInfo);
-                default:
-                    return false;
-            }
+                JObject _ => NewtonSoftJson.TryEvaluateSelector(selectorInfo),
+                JsonElement _ => SystemTextJson.TryEvaluateSelector(selectorInfo),
+                _ => false
+            };
         }
 
         /// <summary>
@@ -44,9 +46,9 @@ namespace SmartFormat.Extensions
             // Note: Operators are processed by ListFormatter
             public static bool TryEvaluateSelector(ISelectorInfo selectorInfo)
             {
-                var jsonObject = (JObject) selectorInfo.CurrentValue;
+                var jsonObject = selectorInfo.CurrentValue as JObject;
 
-                var result = jsonObject.GetValue(selectorInfo.SelectorText,
+                var result = jsonObject?.GetValue(selectorInfo.SelectorText,
                     selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison());
 
                 selectorInfo.Result = result ?? throw new FormatException($"'{selectorInfo.SelectorText}'");
@@ -62,6 +64,8 @@ namespace SmartFormat.Extensions
             // Note: Operators are processed by ListFormatter
             public static bool TryEvaluateSelector(ISelectorInfo selectorInfo)
             {
+                if (selectorInfo.CurrentValue is null) return false;
+
                 var jsonElement = (JsonElement) selectorInfo.CurrentValue;
             
                 var je = jsonElement.Clone();
@@ -73,36 +77,21 @@ namespace SmartFormat.Extensions
                 }
                 else
                 {
-                    targetElement = je.GetProperty(selectorInfo.SelectorText);
+                    targetElement = je.GetProperty(selectorInfo.SelectorText!);
                 }
 
-                switch (targetElement.ValueKind) {
-                    case JsonValueKind.Undefined:
-                        throw new FormatException($"'{selectorInfo.SelectorText}'");
-                    case JsonValueKind.Null:
-                        selectorInfo.Result = null;
-                        break;
-                    case JsonValueKind.Number:
-                        selectorInfo.Result = targetElement.GetDouble();
-                        break;
-                    case JsonValueKind.False:
-                        selectorInfo.Result = false;
-                        break;
-                    case JsonValueKind.True:
-                        selectorInfo.Result = true;
-                        break;
-                    case JsonValueKind.String:
-                        selectorInfo.Result = targetElement.GetString ();
-                        break;
-                    case JsonValueKind.Object:
-                        selectorInfo.Result = targetElement;
-                        break;
-                    case JsonValueKind.Array:
-                        selectorInfo.Result = targetElement.EnumerateArray().ToArray();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                selectorInfo.Result = targetElement.ValueKind switch
+                {
+                    JsonValueKind.Undefined => throw new FormatException($"'{selectorInfo.SelectorText}'"),
+                    JsonValueKind.Null => null,
+                    JsonValueKind.Number => targetElement.GetDouble(),
+                    JsonValueKind.False => false,
+                    JsonValueKind.True => true,
+                    JsonValueKind.String => targetElement.GetString(),
+                    JsonValueKind.Object => targetElement,
+                    JsonValueKind.Array => targetElement.EnumerateArray().ToArray(),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
 
                 return true;
             }
