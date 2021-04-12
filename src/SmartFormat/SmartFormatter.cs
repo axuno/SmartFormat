@@ -235,8 +235,7 @@ namespace SmartFormat
             args = args ?? k_Empty;
             var output = new StringOutput(format.Length + args.Count * 8);
 
-            if (cache == null)
-                cache = new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
+            cache ??= new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
             Format(formatDetails, cache.Format, current);
@@ -266,8 +265,7 @@ namespace SmartFormat
         public void FormatWithCacheInto(ref FormatCache cache, IOutput output, IList<object> args, string format)
         {
             args = args ?? k_Empty;
-            if (cache == null)
-                cache = new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
+            cache ??= new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
             Format(formatDetails, cache.Format, current);
@@ -292,6 +290,7 @@ namespace SmartFormat
             // Before we start, make sure we have at least one source extension and one formatter extension:
             CheckForExtensions();
             if (formattingInfo.Format is null) return;
+
             foreach (var item in formattingInfo.Format.Items)
             {
                 if (item is LiteralText literalItem)
@@ -429,6 +428,7 @@ namespace SmartFormat
         private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
         {
             if (formattingInfo.Placeholder is null) return false;
+
             var formatterName = formattingInfo.Placeholder.FormatterName;
 
             // Evaluate the named formatter (or, evaluate all "" formatters)
