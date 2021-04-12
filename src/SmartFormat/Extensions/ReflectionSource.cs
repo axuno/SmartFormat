@@ -3,6 +3,8 @@
 // Licensed under the MIT license.
 //
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SmartFormat.Core.Extensions;
@@ -11,6 +13,10 @@ namespace SmartFormat.Extensions
 {
     public class ReflectionSource : ISource
     {
+        static readonly object[] k_Empty = new object[0];
+
+        readonly Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> m_TypeCache = new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>();
+
         public ReflectionSource(SmartFormatter formatter)
         {
             // Add some special info to the parser:
@@ -32,6 +38,24 @@ namespace SmartFormat.Extensions
             // Let's see if the argSelector is a Selectors/Field/ParseFormat:
             var sourceType = current.GetType();
 
+            // Check the type cache
+            if (m_TypeCache.TryGetValue((sourceType, selector), out var found))
+            {
+                if (found.field != null)
+                {
+                    selectorInfo.Result = found.field.GetValue(current);
+                    return true;
+                }
+
+                if (found.method != null)
+                {
+                    selectorInfo.Result = found.method.Invoke(current, k_Empty);
+                    return true;
+                }
+
+                return false;
+            }
+
             // Important:
             // GetMembers (opposite to GetMember!) returns all members, 
             // both those defined by the type represented by the current T:System.Type object 
@@ -45,6 +69,7 @@ namespace SmartFormat.Extensions
                         //  Selector is a Field; retrieve the value:
                         var field = (FieldInfo) member;
                         selectorInfo.Result = field.GetValue(current);
+                        m_TypeCache[(sourceType, selector)] = (field, null);
                         return true;
                     case MemberTypes.Property:
                     case MemberTypes.Method:
@@ -72,10 +97,16 @@ namespace SmartFormat.Extensions
                         //  Make sure that this method is not void!  It has to be a Function!
                         if (method?.ReturnType == typeof(void)) continue;
 
+                        // Add to cache
+                        m_TypeCache[(sourceType, selector)] = (null, method);
+
                         //  Retrieve the Selectors/ParseFormat value:
                         selectorInfo.Result = method?.Invoke(current, new object[0]);
                         return true;
                 }
+
+            // We also cache failures so we dont need to call GetMembers again
+            m_TypeCache[(sourceType, selector)] = (null, null);
 
             return false;
         }
