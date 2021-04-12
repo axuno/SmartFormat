@@ -8,21 +8,21 @@ namespace SmartFormat.Tests
     {
         public Person()
         {
-            this.Friends = new List<Person>();
+            Friends = new List<Person>();
         }
         public Person(string newName, Gender gender, DateTime newBirthday, string newAddress, params Person[] newFriends)
         {
-            this.FullName = newName;
-            this.Gender = gender;
-            this.Birthday = newBirthday;
+            FullName = newName;
+            Gender = gender;
+            Birthday = newBirthday;
             if (!string.IsNullOrEmpty(newAddress))
-                this.Address = Address.Parse(newAddress);
-            this.Friends = new List<Person>(newFriends);
+                Address = Address.Parse(newAddress);
+            Friends = new List<Person>(newFriends);
         }
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string MiddleName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string MiddleName { get; set; } = string.Empty;
         public string FullName {
             get {
                 if (string.IsNullOrEmpty(this.MiddleName)) {
@@ -45,13 +45,7 @@ namespace SmartFormat.Tests
                 }
             }
         }
-        public string Name
-        {
-            get
-            {
-                return this.FirstName + " " + this.LastName;
-            }
-        }
+        public string Name => FirstName + " " + LastName;
 
         public DateTime Birthday { get; set; }
         public int Age
@@ -68,19 +62,17 @@ namespace SmartFormat.Tests
                 }
             }
         }
-        public Address Address { get; set; }
+        public Address? Address { get; set; }
 
         public List<Person> Friends { get; set; }
-        public int NumberOfFriends {
-            get { return this.Friends.Count; }
-        }
+        public int NumberOfFriends => this.Friends.Count;
 
         public override string ToString()
         {
             return LastName + ", " + FirstName;
         }
 
-        public Person Spouse { get; set; }
+        public Person? Spouse { get; set; }
 
         public Gender Gender { get; set; }
 

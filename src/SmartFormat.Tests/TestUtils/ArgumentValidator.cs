@@ -5,7 +5,7 @@ namespace SmartFormat.Tests.Common
 {
     public class ArgumentValidator
     {
-        public static void CheckForNullReference(object argument, string argumentName)
+        public static void CheckForNullReference(object? argument, string argumentName)
         {
             if (argument != null) return;
             throw new ArgumentNullException(argumentName);

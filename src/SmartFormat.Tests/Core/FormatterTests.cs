@@ -61,7 +61,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Formatter_AlignNull()
         {
-            string name = null;
+            string? name = null;
             var obj = new { name = name };
             var str2 = Smart.Format("Name: {name,-10}| Column 2", obj);
             Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
@@ -102,8 +102,8 @@ namespace SmartFormat.Tests.Core
         {
             // see issue https://github.com/scottrippey/SmartFormat.NET/issues/101
             var smart = Smart.CreateDefaultSmartFormat();
-            object boxedNull = null;
-            Assert.AreEqual(smart.Format("{0}", null), smart.Format("{0}", boxedNull));
+            object? boxedNull = null;
+            Assert.AreEqual(smart.Format("{0}", default(object)!), smart.Format("{0}", boxedNull!));
         }
 
         [Test]
@@ -117,6 +117,7 @@ namespace SmartFormat.Tests.Core
             formatter.Settings.ConvertCharacterStringLiterals = true;
             formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
             formatter.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+            formatter.Parser.AddAlphanumericSelectors(); // required for this test
             var formatParsed = formatter.Parser.ParseFormat(format, new []{string.Empty});
             var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
             

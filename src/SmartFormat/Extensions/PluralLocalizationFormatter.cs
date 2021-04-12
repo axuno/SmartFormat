@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,28 +15,18 @@ namespace SmartFormat.Extensions
 {
     public class PluralLocalizationFormatter : IFormatter
     {
-        private PluralRules.PluralRuleDelegate defaultPluralRule;
-        private string defaultTwoLetterISOLanguageName;
 
         /// <summary>
         /// Initializes the plugin with rules for many common languages.
         /// If no CultureInfo is supplied to the formatter, the
         /// default language rules will be used by default.
         /// </summary>
-        public PluralLocalizationFormatter(string defaultTwoLetterISOLanguageName)
+        public PluralLocalizationFormatter(string defaultTwoLetterIsoLanguageName)
         {
-            DefaultTwoLetterISOLanguageName = defaultTwoLetterISOLanguageName;
+            DefaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
         }
 
-        public string DefaultTwoLetterISOLanguageName
-        {
-            get => defaultTwoLetterISOLanguageName;
-            set
-            {
-                defaultTwoLetterISOLanguageName = value;
-                defaultPluralRule = PluralRules.GetPluralRule(value);
-            }
-        }
+        public string DefaultTwoLetterISOLanguageName { get; set; }
 
         public string[] Names { get; set; } = {"plural", "p", ""};
 
@@ -81,16 +76,16 @@ namespace SmartFormat.Extensions
             return true;
         }
 
-        private PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
+        private PluralRules.PluralRuleDelegate? GetPluralRule(IFormattingInfo formattingInfo)
         {
             // See if the language was explicitly passed:
             var pluralOptions = formattingInfo.FormatterOptions;
-            if (pluralOptions.Length != 0) return PluralRules.GetPluralRule(pluralOptions);
+            if (pluralOptions?.Length != 0) return PluralRules.GetPluralRule(pluralOptions);
 
             // See if a CustomPluralRuleProvider is available from the FormatProvider:
             var provider = formattingInfo.FormatDetails.Provider;
             var pluralRuleProvider =
-                (CustomPluralRuleProvider) provider?.GetFormat(typeof(CustomPluralRuleProvider));
+                (CustomPluralRuleProvider?) provider?.GetFormat(typeof(CustomPluralRuleProvider));
             if (pluralRuleProvider != null) return pluralRuleProvider.GetPluralRule();
 
             // Use the CultureInfo, if provided:
@@ -101,7 +96,7 @@ namespace SmartFormat.Extensions
             }
             
             // Use the default, if provided:
-            return defaultPluralRule;
+            return PluralRules.GetPluralRule(DefaultTwoLetterISOLanguageName);;
         }
     }
 
@@ -117,9 +112,9 @@ namespace SmartFormat.Extensions
             _pluralRule = pluralRule;
         }
 
-        public object GetFormat(Type formatType)
+        public object? GetFormat(Type? formatType)
         {
-            return formatType == typeof(CustomPluralRuleProvider) ? this : null;
+            return formatType == typeof(CustomPluralRuleProvider) ? this : default;
         }
 
         public PluralRules.PluralRuleDelegate GetPluralRule()

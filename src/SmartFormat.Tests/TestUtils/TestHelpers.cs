@@ -12,7 +12,7 @@ namespace SmartFormat.Tests.TestUtils
         public static void Test(this SmartFormatter formatter, string format, object[] args, string expected)
         {
 
-            string actual = null;
+            string? actual = null;
             try
             {
                 actual = formatter.Format(format, args);
@@ -36,7 +36,7 @@ namespace SmartFormat.Tests.TestUtils
                 var args = bunchOfArgs[i%bunchOfArgs.Length];
                 var expected = bunchOfExpected[i%bunchOfExpected.Length];
 
-                string actual = null;
+                string? actual = null;
                 try
                 {
                     actual = formatter.Format(format, args);
@@ -63,7 +63,7 @@ namespace SmartFormat.Tests.TestUtils
                 var format = bunchOfFormat[i%bunchOfFormat.Length];
                 var expected = bunchOfExpected[i%bunchOfExpected.Length];
 
-                string actual = null;
+                string? actual = null;
                 try
                 {
                     var specificCulture = new CultureInfo("en-us");

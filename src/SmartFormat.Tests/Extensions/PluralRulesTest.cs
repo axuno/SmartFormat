@@ -10,7 +10,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Illegal_Iso_Language()
         {
-            Assert.IsNull(PluralRules.GetPluralRule("-for-sure-illegal-code"));
+            Assert.Throws<System.ArgumentException>(() => PluralRules.GetPluralRule("-for-sure-illegal-code"));
         }
 
         [Test]

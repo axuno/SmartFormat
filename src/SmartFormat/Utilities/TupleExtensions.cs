@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -49,7 +54,7 @@ namespace SmartFormat.Utilities
         /// </summary>
         /// <param name="tuple"></param>
         /// <returns>Returns a list of <see cref="object"/>s with the values for each <see cref="ValueTuple"/> field.</returns>
-        public static IEnumerable<object> GetValueTupleItemObjects(this object tuple) => GetValueTupleItemFields(tuple.GetType()).Select(f => f.GetValue(tuple));
+        public static IEnumerable<object?> GetValueTupleItemObjects(this object tuple) => GetValueTupleItemFields(tuple.GetType()).Select(f => f.GetValue(tuple));
 
         /// <summary>
         /// A list of <see cref="Type"/>s for the fields of a <see cref="ValueTuple"/>.
@@ -67,7 +72,7 @@ namespace SmartFormat.Utilities
         {
             var items = new List<FieldInfo>();
 
-            FieldInfo field;
+            FieldInfo? field;
             var nth = 1;
             while ((field = tupleType.GetRuntimeField($"Item{nth}")) != null)
             {
@@ -78,11 +83,11 @@ namespace SmartFormat.Utilities
             return items;
         }
 
-        public static IEnumerable<object> GetValueTupleItemObjectsFlattened(this object tuple)
+        public static IEnumerable<object?> GetValueTupleItemObjectsFlattened(this object tuple)
         {
             foreach (var theTuple in tuple.GetValueTupleItemObjects())
             {
-                if (theTuple.IsValueTuple())
+                if (theTuple != null && theTuple.IsValueTuple())
                 {
                     foreach (var innerTuple in theTuple.GetValueTupleItemObjectsFlattened())
                     {

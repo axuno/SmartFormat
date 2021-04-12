@@ -1,4 +1,9 @@
-﻿using System.IO;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System.IO;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output

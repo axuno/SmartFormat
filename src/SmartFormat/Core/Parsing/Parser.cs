@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SmartFormat.Core.Settings;
@@ -24,7 +29,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Event raising, if an error occurs during parsing.
         /// </summary>
-        public event EventHandler<ParsingErrorEventArgs> OnParsingFailure;
+        public event EventHandler<ParsingErrorEventArgs>? OnParsingFailure;
 
         #endregion
 
@@ -168,7 +173,7 @@ namespace SmartFormat.Core.Parsing
         {
             var result = new Format(Settings, format);
             var current = result;
-            Placeholder currentPlaceholder = null;
+            Placeholder? currentPlaceholder = null;
             var namedFormatterStartIndex = -1;
             var namedFormatterOptionsStartIndex = -1;
             var namedFormatterOptionsEndIndex = -1;
@@ -238,6 +243,8 @@ namespace SmartFormat.Core.Parsing
                         // Make sure that this is a nested placeholder before we un-nest it:
                         if (current.parent == null)
                         {
+                            // Don't swallow-up redundant closing braces, but treat them as literals
+                            current.Items.Add(new LiteralText(Settings, current, i) {endIndex = i + 1});
                             parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i,
                                 i + 1);
                             continue;
@@ -337,7 +344,9 @@ namespace SmartFormat.Core.Parsing
                                     i - namedFormatterStartIndex);
 
                                 if (FormatterNameExists(formatterName, formatterExtensionNames))
-                                    parentPlaceholder.FormatterName = formatterName;
+                                {
+                                    if (parentPlaceholder != null) parentPlaceholder.FormatterName = formatterName;
+                                }
                                 else
                                     lastI = current.startIndex;
                             }
@@ -348,10 +357,13 @@ namespace SmartFormat.Core.Parsing
 
                                 if (FormatterNameExists(formatterName, formatterExtensionNames))
                                 {
-                                    parentPlaceholder.FormatterName = formatterName;
-                                    parentPlaceholder.FormatterOptions = format.Substring(
-                                        namedFormatterOptionsStartIndex + 1,
-                                        namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+                                    if (parentPlaceholder != null)
+                                    {
+                                        parentPlaceholder.FormatterName = formatterName;
+                                        parentPlaceholder.FormatterOptions = format.Substring(
+                                            namedFormatterOptionsStartIndex + 1,
+                                            namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+                                    }
                                 }
                                 else
                                 {
@@ -389,7 +401,7 @@ namespace SmartFormat.Core.Parsing
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
                                 selectorIndex));
                         else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
                                 operatorIndex, i);
                         lastI = i + 1;
 
@@ -408,7 +420,7 @@ namespace SmartFormat.Core.Parsing
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
                                 selectorIndex));
                         else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
                                 operatorIndex, i);
                         lastI = i + 1;
 
@@ -427,27 +439,32 @@ namespace SmartFormat.Core.Parsing
                             || _alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')
                             || _allowedSelectorChars.IndexOf(c) != -1;
                         if (!isValidSelectorChar)
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " +  parsingErrorText[ParsingError.InvalidCharactersInSelector],
                                 i, i + 1);
                     }
                 }
             }
 
-            // finish the last text item:
-            if (lastI != format.Length)
-                current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = format.Length});
-
-            // Check that the format is finished:
+            // We're at the end of the input string
+            
+            // 1. Is the last item a placeholder, that is not finished yet?
             if (current.parent != null || currentPlaceholder != null)
             {
                 parsingErrors.AddIssue(current, parsingErrorText[ParsingError.MissingClosingBrace], format.Length,
                     format.Length);
                 current.endIndex = format.Length;
-                while (current.parent != null)
-                {
-                    current = current.parent.parent;
-                    current.endIndex = format.Length;
-                }
+            }
+            else if (lastI != format.Length)
+            {
+                // 2. The last item must be a literal, so add it
+                current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = format.Length});
+            }
+            
+            // Todo v2.7.0: There is no unit test for this condition!
+            while (current.parent != null)
+            {
+                current = current.parent.parent;
+                current.endIndex = format.Length;
             }
 
             // Check for any parsing errors:
@@ -456,8 +473,7 @@ namespace SmartFormat.Core.Parsing
                 OnParsingFailure?.Invoke(this,
                     new ParsingErrorEventArgs(parsingErrors, Settings.ParseErrorAction == ErrorAction.ThrowError));
 
-                if (Settings.ParseErrorAction == ErrorAction.ThrowError)
-                    throw parsingErrors;
+                return HandleParsingErrors(parsingErrors, result);
             }
 
             return result;
@@ -521,6 +537,51 @@ namespace SmartFormat.Core.Parsing
             /// <param name="parsingErrorKey"></param>
             /// <returns>The string representation of the ParsingError enum</returns>
             public string this[ParsingError parsingErrorKey] => _errors[parsingErrorKey];
+        }
+
+        /// <summary>
+        /// Handles <see cref="ParsingError"/>s as defined in <see cref="SmartSettings.ParseErrorAction"/>.
+        /// </summary>
+        /// <param name="parsingErrors"></param>
+        /// <param name="currentResult"></param>
+        /// <returns>The <see cref="Format"/> which will be further processed by the formatter.</returns>
+        private Format HandleParsingErrors(ParsingErrors parsingErrors, Format currentResult)
+        {
+            switch (Settings.ParseErrorAction)
+            {
+                case ErrorAction.ThrowError:
+                    throw parsingErrors;
+                case ErrorAction.MaintainTokens:
+                    // Replace erroneous Placeholders with tokens as LiteralText
+                    // Placeholder without issues are left unmodified
+                    for (var i = 0; i < currentResult.Items.Count; i++)
+                    {
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        {
+                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex){endIndex = ph.endIndex};
+                        }
+                    }
+                    return currentResult;
+                case ErrorAction.Ignore:
+                    // Replace erroneous Placeholders with an empty LiteralText
+                    for (var i = 0; i < currentResult.Items.Count; i++)
+                    {
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        {
+                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex){endIndex = ph.startIndex};
+                        }
+                    }
+                    return currentResult;
+                case ErrorAction.OutputErrorInResult:
+                    var fmt = new Format(Settings, parsingErrors.Message) {
+                        startIndex = 0,
+                        endIndex = parsingErrors.Message.Length
+                    };
+                    fmt.Items.Add(new LiteralText(Settings, fmt));
+                    return fmt;
+                default:
+                    throw new ArgumentException("Illegal type for ParsingErrors", parsingErrors);
+            }
         }
 
         #endregion

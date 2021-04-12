@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Core.Formatting
@@ -8,24 +13,24 @@ namespace SmartFormat.Core.Formatting
     /// </summary>
     public class FormattingException : Exception
     {
-        public FormattingException(FormatItem errorItem, Exception formatException, int index)
+        public FormattingException(FormatItem? errorItem, Exception formatException, int index)
         {
-            Format = errorItem.baseString;
+            Format = errorItem?.baseString;
             ErrorItem = errorItem;
             Issue = formatException.Message;
             Index = index;
         }
 
-        public FormattingException(FormatItem errorItem, string issue, int index)
+        public FormattingException(FormatItem? errorItem, string issue, int index)
         {
-            Format = errorItem.baseString;
+            Format = errorItem?.baseString;
             ErrorItem = errorItem;
             Issue = issue;
             Index = index;
         }
 
-        public string Format { get; }
-        public FormatItem ErrorItem { get; }
+        public string? Format { get; }
+        public FormatItem? ErrorItem { get; }
         public string Issue { get; }
         public int Index { get; }
 

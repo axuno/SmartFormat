@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using System.Collections.Generic;
 
 namespace SmartFormat.Utilities
@@ -296,14 +301,17 @@ namespace SmartFormat.Utilities
         public delegate int PluralRuleDelegate(decimal value, int pluralCount);
         
         /// <summary>Construct a rule set for the language code.</summary>
-        /// <param name="twoLetterISOLanguageName">The language code in two-letter ISO-639 format.</param>
+        /// <param name="twoLetterIsoLanguageName">The language code in two-letter ISO-639 format.</param>
         /// <remarks>
         /// The pluralization rules are taken from
         /// http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/language_plural_rules.html
         /// </remarks>
-        public static PluralRuleDelegate GetPluralRule(string twoLetterISOLanguageName)
+        public static PluralRuleDelegate GetPluralRule(string? twoLetterIsoLanguageName)
         {
-            return IsoLangToDelegate.ContainsKey(twoLetterISOLanguageName) ? IsoLangToDelegate[twoLetterISOLanguageName] : null;
+            if (twoLetterIsoLanguageName != null && IsoLangToDelegate.ContainsKey(twoLetterIsoLanguageName)) 
+                return IsoLangToDelegate[twoLetterIsoLanguageName];
+
+            throw new ArgumentException($"{nameof(IsoLangToDelegate)} not found for {twoLetterIsoLanguageName ?? "'null'"}", nameof(twoLetterIsoLanguageName));
         }
 
         /// <summary>

@@ -1,4 +1,9 @@
-﻿using SmartFormat.Core.Extensions;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output
 {

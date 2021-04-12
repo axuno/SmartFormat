@@ -1,4 +1,9 @@
-﻿using System;
+﻿//
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+//
+
+using System;
 using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
@@ -28,6 +33,7 @@ namespace SmartFormat.Core.Parsing
         private string ConvertCharacterLiteralsToUnicode()
         {
             var source = baseString.Substring(startIndex, endIndex - startIndex);
+            if (source.Length == 0) return source;
 
             // No character literal escaping - nothing to do
             if (source[0] != Parser.CharLiteralEscapeChar)
