@@ -3,6 +3,8 @@
 // Licensed under the MIT license.
 //
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SmartFormat.Core.Extensions;
@@ -11,6 +13,10 @@ namespace SmartFormat.Extensions
 {
     public class ReflectionSource : ISource
     {
+        private static readonly object[] Empty = Array.Empty<object>();
+
+        private readonly Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> _typeCache = new();
+
         public ReflectionSource(SmartFormatter formatter)
         {
             // Add some special info to the parser:
@@ -32,6 +38,24 @@ namespace SmartFormat.Extensions
             // Let's see if the argSelector is a Selectors/Field/ParseFormat:
             var sourceType = current.GetType();
 
+            // Check the type cache
+            if (_typeCache.TryGetValue((sourceType, selector), out var found))
+            {
+                if (found.field != null)
+                {
+                    selectorInfo.Result = found.field.GetValue(current);
+                    return true;
+                }
+
+                if (found.method != null)
+                {
+                    selectorInfo.Result = found.method.Invoke(current, Empty);
+                    return true;
+                }
+
+                return false;
+            }
+
             // Important:
             // GetMembers (opposite to GetMember!) returns all members, 
             // both those defined by the type represented by the current T:System.Type object 
@@ -45,6 +69,7 @@ namespace SmartFormat.Extensions
                         //  Selector is a Field; retrieve the value:
                         var field = (FieldInfo) member;
                         selectorInfo.Result = field.GetValue(current);
+                        _typeCache[(sourceType, selector)] = (field, null);
                         return true;
                     case MemberTypes.Property:
                     case MemberTypes.Method:
@@ -72,10 +97,16 @@ namespace SmartFormat.Extensions
                         //  Make sure that this method is not void!  It has to be a Function!
                         if (method?.ReturnType == typeof(void)) continue;
 
+                        // Add to cache
+                        _typeCache[(sourceType, selector)] = (null, method);
+
                         //  Retrieve the Selectors/ParseFormat value:
                         selectorInfo.Result = method?.Invoke(current, new object[0]);
                         return true;
                 }
+
+            // We also cache failures so we dont need to call GetMembers again
+            _typeCache[(sourceType, selector)] = (null, null);
 
             return false;
         }
