@@ -13,9 +13,9 @@ namespace SmartFormat.Extensions
 {
     public class ReflectionSource : ISource
     {
-        static readonly object[] k_Empty = new object[0];
+        private static readonly object[] Empty = Array.Empty<object>();
 
-        readonly Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> m_TypeCache = new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>();
+        private readonly Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> _typeCache = new();
 
         public ReflectionSource(SmartFormatter formatter)
         {
@@ -39,7 +39,7 @@ namespace SmartFormat.Extensions
             var sourceType = current.GetType();
 
             // Check the type cache
-            if (m_TypeCache.TryGetValue((sourceType, selector), out var found))
+            if (_typeCache.TryGetValue((sourceType, selector), out var found))
             {
                 if (found.field != null)
                 {
@@ -49,7 +49,7 @@ namespace SmartFormat.Extensions
 
                 if (found.method != null)
                 {
-                    selectorInfo.Result = found.method.Invoke(current, k_Empty);
+                    selectorInfo.Result = found.method.Invoke(current, Empty);
                     return true;
                 }
 
@@ -69,7 +69,7 @@ namespace SmartFormat.Extensions
                         //  Selector is a Field; retrieve the value:
                         var field = (FieldInfo) member;
                         selectorInfo.Result = field.GetValue(current);
-                        m_TypeCache[(sourceType, selector)] = (field, null);
+                        _typeCache[(sourceType, selector)] = (field, null);
                         return true;
                     case MemberTypes.Property:
                     case MemberTypes.Method:
@@ -98,7 +98,7 @@ namespace SmartFormat.Extensions
                         if (method?.ReturnType == typeof(void)) continue;
 
                         // Add to cache
-                        m_TypeCache[(sourceType, selector)] = (null, method);
+                        _typeCache[(sourceType, selector)] = (null, method);
 
                         //  Retrieve the Selectors/ParseFormat value:
                         selectorInfo.Result = method?.Invoke(current, new object[0]);
@@ -106,7 +106,7 @@ namespace SmartFormat.Extensions
                 }
 
             // We also cache failures so we dont need to call GetMembers again
-            m_TypeCache[(sourceType, selector)] = (null, null);
+            _typeCache[(sourceType, selector)] = (null, null);
 
             return false;
         }
