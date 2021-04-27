@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 
@@ -13,6 +15,31 @@ namespace SmartFormat.Tests.Core
     public class FormatterTests
     {
         private object[] errorArgs = new object[]{ new FormatDelegate(format => { throw new Exception("ERROR!"); } ) };
+
+        private SmartFormatter GetSimpleFormatter()
+        {
+            var formatter = new SmartFormatter(); 
+            formatter.FormatterExtensions.Add(new DefaultFormatter());
+            formatter.SourceExtensions.Add(new ReflectionSource(formatter));
+            formatter.SourceExtensions.Add(new DefaultSource(formatter));
+            formatter.Parser.AddAlphanumericSelectors();
+            return formatter;
+        }
+
+        [Test]
+        public void Formatter_With_Params_Objects()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("{0}{1}", 0, 1), Is.EqualTo("01"));
+        }
+
+        [Test]
+        public void Formatter_With_IList_Objects()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("{0}{1}", new List<object>{0,1}), Is.EqualTo("01"));
+        }
+
 
         [Test]
         public void Formatter_Throws_Exceptions()
@@ -157,6 +184,55 @@ namespace SmartFormat.Tests.Core
             Assert.AreEqual(format, formatDetails.OriginalFormat.RawText);
             Assert.AreEqual(formatter.Settings, formatDetails.Settings);
             Assert.IsTrue(formatDetails.FormatCache == null);
+        }
+
+        [Test]
+        public void Missing_FormatExtensions_Should_Throw()
+        {
+            var formatter = GetSimpleFormatter();
+
+            formatter.FormatterExtensions.Clear();
+            Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
+        }
+
+        [Test]
+        public void Missing_SourceExtensions_Should_Throw()
+        {
+            var formatter = GetSimpleFormatter();
+
+            formatter.SourceExtensions.Clear();
+            Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
+        }
+
+        [Test]
+        public void Format_WithCache()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
+            var cache = new FormatCache(format);
+            Assert.That(formatter.FormatWithCache(ref cache, formatString, data), Is.EqualTo($"{data.Name}, {data.City}"));
+        }
+
+        [Test]
+        public void Format_WithCache_Into()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
+            var cache = new FormatCache(format);
+            var output = new StringOutput();
+            formatter.FormatWithCacheInto(ref cache, output, formatString, data);
+            Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
+        }
+
+        [Test]
+        public void Formatter_GetSourceExtension()
+        {
+            var formatter = GetSimpleFormatter();
+            Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));  ;
         }
     }
 }

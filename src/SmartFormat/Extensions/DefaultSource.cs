@@ -30,7 +30,7 @@ namespace SmartFormat.Extensions
                 // Just like String.Format, the arg index must be in-range,
                 // should be the first item, and shouldn't have any operator:
                 if (selectorInfo.SelectorIndex == 0
-                    && selectorValue < formatDetails.OriginalArgs.Length
+                    && selectorValue < formatDetails.OriginalArgs.Count
                     && selectorInfo.SelectorOperator == "")
                 {
                     // This selector is an argument index.
