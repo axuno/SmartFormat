@@ -1,15 +1,13 @@
 Latest Changes
 ====
 
-v2.7.2
+v3.0.0 (Draft)
 ===
-* **Fixed**: `ConditionalFormatter` processes unsigned numbers in arguments correctly.
-* **Fixed**: `JsonSource`: Corrected handling of `null` values in NewtonSoftJson objects.
+Currently merged to the `version/v3` branch:
 
-v2.7.1
-===
-* **Fixed**: [#179](https://github.com/axuno/SmartFormat/issues/179) DualFromZeroToTwo plural rule. Thanks to [@OhSoGood](https://github.com/OhSoGood)
-* **Fixed**: [#211](https://github.com/axuno/SmartFormat/issues/211) Illegal placeholder characters that are not 8-bit, will no more throw unexpected `ThrowByteOverflowException`. Thanks to [@bogatykh](https://github.com/bogatykh)
+* Added type cache to `ReflectionSource`, improving performance by 50% (thanks to @karljj1)
+* Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to @karljj1)
+* Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`)
 
 v2.7.0
 ===
