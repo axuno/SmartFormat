@@ -24,7 +24,7 @@ See [changelog](CHANGES.md) for changes.
 
 <hr>
 
-**See the [list of changes](https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md) already merged into branch `version\v3`**
+**See the [list of changes](https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md) already merged into branch `version/v3`**
 
 <hr>
 
