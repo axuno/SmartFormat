@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
@@ -16,7 +17,7 @@ namespace SmartFormat.Core.Formatting
     /// </summary>
     public class FormatDetails
     {
-        public FormatDetails(SmartFormatter formatter, Format originalFormat, object[] originalArgs,
+        public FormatDetails(SmartFormatter formatter, Format originalFormat, IList<object> originalArgs,
             FormatCache? formatCache, IFormatProvider? provider, IOutput output)
         {
             Formatter = formatter;
@@ -42,7 +43,7 @@ namespace SmartFormat.Core.Formatting
         /// The original set of arguments passed to the format function.
         /// These provide global-access to the original arguments.
         /// </summary>
-        public object[] OriginalArgs { get; }
+        public IList<object> OriginalArgs { get; }
 
         /// <summary>
         /// This object can be used to cache resources between formatting calls.
