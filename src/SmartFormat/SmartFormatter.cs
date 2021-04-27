@@ -136,18 +136,18 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(string format, params object[] args)
         {
-            return Format(null, args, format);
+            return Format(null, format, (IList<object>) args);
         }
 
         /// <summary>
         /// Replaces one or more format items in as specified string with the string representation of a specific object.
         /// </summary>
-        /// <param name="args">The object to format.</param>
         /// <param name="format">A composite format string.</param>
+        /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IList<object> args, string format)
+        public string Format(string format, IList<object> args)
         {
-            return Format(null, args, format);
+            return Format(null, format, args);
         }
 
         /// <summary>
@@ -159,17 +159,17 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider? provider, string format, params object[] args)
         {
-            return Format(provider, args, format);
+            return Format(provider, format, (IList<object>) args);
         }
 
         /// <summary>
         /// Replaces one or more format items in a specified string with the string representation of a specific object.
         /// </summary>
         /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
-        /// <param name="args">The object to format.</param>
         /// <param name="format">A composite format string.</param>
+        /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IFormatProvider? provider, IList<object> args, string format)
+        public string Format(IFormatProvider? provider, string format, IList<object> args)
         {
             var output = new StringOutput(format.Length + args.Count * 8);
             var formatParsed = Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames());
@@ -188,16 +188,16 @@ namespace SmartFormat
         /// <param name="args">The objects to format.</param>
         public void FormatInto(IOutput output, string format, params object[] args)
         {
-            FormatInto(output, args, format);
+            FormatInto(output, format, (IList<object>) args);
         }
 
         /// <summary>
         /// Writes the formatting result into an <see cref="IOutput"/> instance.
         /// </summary>
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="args">The objects to format.</param>
         /// <param name="format">The format string.</param>
-        public void FormatInto(IOutput output, IList<object> args, string format)
+        /// <param name="args">The objects to format.</param>
+        public void FormatInto(IOutput output, string format, IList<object> args)
         {
             var formatParsed = Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames());
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
@@ -215,7 +215,7 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string FormatWithCache(ref FormatCache? cache, string format, params object[] args)
         {
-            return FormatWithCache(ref cache, args, format);
+            return FormatWithCache(ref cache, format, (IList<object>) args);
         }
 
         /// <summary>
@@ -223,10 +223,10 @@ namespace SmartFormat
         /// using the <see cref="FormatCache"/>.
         /// </summary>
         /// <param name="cache">The <see cref="FormatCache" /> to use.</param>
-        /// <param name="args">The objects to format.</param>
         /// <param name="format">A composite format string.</param>
+        /// <param name="args">The objects to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string FormatWithCache(ref FormatCache? cache, IList<object> args, string format)
+        public string FormatWithCache(ref FormatCache? cache, string format, IList<object> args)
         {
             var output = new StringOutput(format.Length + args.Count * 8);
 
@@ -247,7 +247,7 @@ namespace SmartFormat
         /// <param name="args">The objects to format.</param>
         public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
         {
-            FormatWithCacheInto(ref cache, output, args, format);
+            FormatWithCacheInto(ref cache, output, format, (IList<object>) args);
         }
 
         /// <summary>
@@ -255,9 +255,9 @@ namespace SmartFormat
         /// </summary>
         /// <param name="cache">The <see cref="FormatCache"/> to use.</param>
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="args">The objects to format.</param>
         /// <param name="format">The format string.</param>
-        public void FormatWithCacheInto(ref FormatCache cache, IOutput output, IList<object> args, string format)
+        /// <param name="args">The objects to format.</param>
+        public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, IList<object> args)
         {
             cache ??= new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
