@@ -1,6 +1,14 @@
 Latest Changes
 ====
 
+v3.0.0 (Draft)
+===
+Currently merged to the `version/v3` branch:
+
+* Added type cache to `ReflectionSource`, improving performance by 50% (thanks to @karljj1)
+* Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to @karljj1)
+* Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`)
+
 v2.7.0
 ===
 * **Fixed** broken backward compatibilty introduced in v2.6.2 (issues referenced in [#148](https://github.com/axuno/SmartFormat/issues/148), [#147](https://github.com/axuno/SmartFormat/issues/147), [#143](https://github.com/axuno/SmartFormat/issues/143)).
