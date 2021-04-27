@@ -52,10 +52,10 @@ namespace SmartFormat.Tests
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.ParseErrorAction = formatter.Settings.FormatErrorAction = ErrorAction.ThrowError;
 
-            var result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", new SmartObjects(new object[] { clubOrMember, say }));
+            var result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", (clubOrMember, say));
             Assert.AreEqual($"{clubOrMember.Member.Name} - {say.Hello}", result);
 
-            result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", new SmartObjects(new object[] { clubNoMember, say }));
+            result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", (clubNoMember, say));
             Assert.AreEqual($"{clubOrMember.Club.Name} - {say.Hello}", result);
         }
 
