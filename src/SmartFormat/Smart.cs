@@ -67,7 +67,6 @@ namespace SmartFormat
                 (ISource) listFormatter, // ListFormatter MUST be first
                 new DictionarySource(formatter),
                 new ValueTupleSource(formatter),
-                new SmartObjectsSource(formatter),
                 new JsonSource(formatter),
                 new XmlSource(formatter),
                 new ReflectionSource(formatter),
