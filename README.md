@@ -21,7 +21,14 @@ Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.N
 See [changelog](CHANGES.md) for changes.
 
 # Version 3.0
-We have started to think about a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**.
+
+<hr>
+
+**See the [list of changes](https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md) already merged into branch `version\v3`**
+
+<hr>
+
+We have started to work on a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**.
 
 * Improve management of extensions for better performance:
   * make named formatters obligatory instead of iterating through all formatters
@@ -31,7 +38,6 @@ We have started to think about a new version of ```SmartFormat.Net``` and **woul
 * Performance improvements
 *  less generated garbage 
 * Remove ```public``` properties/methods which should better be ```internal``` or even ```privat```
-* Upgrade the project to C# 8 with nullable reference types included
 * Code clean-up: Make use of current C# features, add missing comments
 * Re-organize unit tests
 * ... ?
