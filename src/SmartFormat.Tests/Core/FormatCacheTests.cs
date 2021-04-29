@@ -1,13 +1,25 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core
 {
     [TestFixture]
     class FormatCacheTests
     {
+        private SmartFormatter GetSimpleFormatter()
+        {
+            var formatter = new SmartFormatter(); 
+            formatter.FormatterExtensions.Add(new DefaultFormatter());
+            formatter.SourceExtensions.Add(new ReflectionSource(formatter));
+            formatter.SourceExtensions.Add(new DefaultSource(formatter));
+            formatter.Parser.AddAlphanumericSelectors();
+            return formatter;
+        }
+
         [Test]
         public void Create_Cache()
         {
@@ -18,6 +30,30 @@ namespace SmartFormat.Tests.Core
             Assert.IsAssignableFrom<Dictionary<string,object>>(fc.CachedObjects);
             fc.CachedObjects.Add("key", "value");
             Assert.IsTrue(fc.CachedObjects["key"].ToString() == "value");
+        }
+
+        [Test]
+        public void Format_WithCache()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
+            var cache = new FormatCache(format);
+            Assert.That(formatter.FormatWithCache(ref cache, formatString, data), Is.EqualTo($"{data.Name}, {data.City}"));
+        }
+
+        [Test]
+        public void Format_WithCache_Into()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
+            var cache = new FormatCache(format);
+            var output = new StringOutput();
+            formatter.FormatWithCacheInto(ref cache, output, formatString, data);
+            Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
         }
     }
 }

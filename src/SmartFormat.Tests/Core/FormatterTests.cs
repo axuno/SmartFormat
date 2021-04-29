@@ -205,30 +205,6 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Format_WithCache()
-        {
-            var data = new {Name = "Joe", City = "Melbourne"};
-            var formatter = GetSimpleFormatter();
-            var formatString = "{Name}, {City}";
-            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
-            var cache = new FormatCache(format);
-            Assert.That(formatter.FormatWithCache(ref cache, formatString, data), Is.EqualTo($"{data.Name}, {data.City}"));
-        }
-
-        [Test]
-        public void Format_WithCache_Into()
-        {
-            var data = new {Name = "Joe", City = "Melbourne"};
-            var formatter = GetSimpleFormatter();
-            var formatString = "{Name}, {City}";
-            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
-            var cache = new FormatCache(format);
-            var output = new StringOutput();
-            formatter.FormatWithCacheInto(ref cache, output, formatString, data);
-            Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
-        }
-
-        [Test]
         public void Formatter_GetSourceExtension()
         {
             var formatter = GetSimpleFormatter();
