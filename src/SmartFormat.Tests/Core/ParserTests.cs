@@ -553,6 +553,15 @@ namespace SmartFormat.Tests.Core
             Assert.That(parsingError.Issues[2].Issue == new Parser.ParsingErrorText()[Parser.ParsingError.MissingClosingBrace]);
         }
 
+
+        [Test]
+        public void Alternative_Escaping_In_Literal()
+        {
+            var parser = GetRegularParser();
+            parser.UseAlternativeEscapeChar('\\');
+            Assert.That(parser.ParseFormat("\\{\\}", Array.Empty<string>()).ToString(), Is.EqualTo("{}"));
+        }
+
         [Test]
         public void Nested_format_with_alternative_escaping()
         {
