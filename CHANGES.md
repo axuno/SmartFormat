@@ -5,10 +5,11 @@ v3.0.0 (Draft)
 ===
 Currently merged to the `version/v3` branch:
 
+* Added `SmartFormat.Performance` project with benchmarks for different data sources ([#162](https://github.com/axuno/SmartFormat/pull/162))
 * Fully cover `Parser` and `ReflectionSource` with unit tests ([#160](https://github.com/axuno/SmartFormat/pull/160))
 * Removed redundant unit tests with no impact on coverage ([#159](https://github.com/axuno/SmartFormat/pull/159))
 * Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`) ([`092b7b1`](https://github.com/axuno/SmartFormat/commit/092b7b1b5873301bdfeb2b62f221f936efc81430))
-* Added type cache to `ReflectionSource`, performance is now more than 5x better (thanks to [@karljj1](https://github.com/karljj1)) ([#155](https://github.com/axuno/SmartFormat/pull/155))
+* Added type cache to `ReflectionSource`, `BenchmarkDotNet` is now about 4x better (thanks to [@karljj1](https://github.com/karljj1)) ([#155](https://github.com/axuno/SmartFormat/pull/155))
 * Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to [@karljj1](https://github.com/karljj1)) ([#154](https://github.com/axuno/SmartFormat/pull/154))
 
 v2.7.0
