@@ -94,18 +94,18 @@ namespace SmartFormat.Extensions
                         //  We are only looking for a parameter-less Function/Property:
                         if (method?.GetParameters().Length > 0) continue;
 
-                        //  Make sure that this method is not void!  It has to be a Function!
+                        //  Make sure that this method is not void! It has to be a Function!
                         if (method?.ReturnType == typeof(void)) continue;
 
                         // Add to cache
                         _typeCache[(sourceType, selector)] = (null, method);
 
                         //  Retrieve the Selectors/ParseFormat value:
-                        selectorInfo.Result = method?.Invoke(current, new object[0]);
+                        selectorInfo.Result = method?.Invoke(current, Array.Empty<object>());
                         return true;
                 }
 
-            // We also cache failures so we dont need to call GetMembers again
+            // We also cache failures so we don't need to call GetMembers again
             _typeCache[(sourceType, selector)] = (null, null);
 
             return false;

@@ -100,10 +100,11 @@ namespace SmartFormat.Tests.Extensions
             Console.WriteLine("Reflection Test: {0} ({1} ms)", reflectionMemberTest / directMemberTest, reflectionMemberTest);
 
             /*
-                Direct Member Test: 1 (34 ms)
-                Dictionary Projection Test: 24 (848 ms)
-                JSON Projection Test: 25 (875 ms)  -  Here the result running NUnit is unexplainable worse
-                Reflection Test: 99 (3371 ms)
+                Test results as performance index (NET5.0, Release):
+                Direct Member Test: 1 (10 ms)
+                Dictionary Projection Test: 51 (511 ms)
+                JSON Projection Test: 48 (486 ms)
+                Reflection Test: 63 (635 ms)  -  More than 5x faster after type caching was introduced
              */
         }
 
