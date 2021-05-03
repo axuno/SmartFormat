@@ -36,13 +36,13 @@ namespace SmartFormat.Tests.Core
             var data = new Dictionary<string, string> { { "key", "value" } };
 
             const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v {key}\0!";
-            const string formatWithCodeBahavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v {key}\0!";
+            const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v {key}\0!";
             
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.ConvertCharacterStringLiterals = true;
 
             var result = formatter.Format(formatWithFileBehavior, data);
-            Assert.AreEqual(string.Format(formatWithCodeBahavior.Replace("{"+ data.First().Key +"}", data.First().Value)), result);
+            Assert.AreEqual(string.Format(formatWithCodeBehavior.Replace("{"+ data.First().Key +"}", data.First().Value)), result);
         }
 
         [Test]

@@ -15,8 +15,8 @@ namespace SmartFormat.Tests.Extensions
         public SubStringFormatterTests()
         {
             _smart = Smart.CreateDefaultSmartFormat();
-            _smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
-            _smart.Settings.ParseErrorAction = ErrorAction.ThrowError;
+            _smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
+            _smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
 
             if (_smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("substr")) == null)
             {

@@ -4,13 +4,17 @@
 //
 
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
     public class DefaultSource : ISource
     {
+        private readonly SmartSettings _settings;
+
         public DefaultSource(SmartFormatter formatter)
         {
+            _settings = formatter.Settings;
             formatter.Parser.AddOperators(","); // This is for alignment.
             formatter.Parser.AddAdditionalSelectorChars("-"); // This is for alignment.
         }
@@ -40,7 +44,7 @@ namespace SmartFormat.Extensions
 
                 // Alignment:
                 // An alignment item should be preceded by a comma
-                if (selectorInfo.SelectorOperator == ",")
+                if (selectorInfo.SelectorOperator == _settings.Parser.AlignmentOperator.ToString())
                 {
                     // This selector is actually an Alignment modifier.
                     if (selectorInfo.Placeholder != null) selectorInfo.Placeholder.Alignment = selectorValue;

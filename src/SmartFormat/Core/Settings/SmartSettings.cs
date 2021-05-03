@@ -13,30 +13,40 @@ namespace SmartFormat.Core.Settings
     /// </summary>
     public class SmartSettings
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
         internal SmartSettings()
         {
-            CaseSensitivity = CaseSensitivityType.CaseSensitive;
-            ConvertCharacterStringLiterals = true;
-            FormatErrorAction = ErrorAction.ThrowError;
-            ParseErrorAction = ErrorAction.ThrowError;
         }
 
         /// <summary>
         /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
         /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
-        public ErrorAction FormatErrorAction { get; set; }
+        [Obsolete("Use 'SmartSettings.Formatter.ErrorAction' instead.", false)]
+        public ErrorAction FormatErrorAction
+        {
+            get => (ErrorAction) Formatter.ErrorAction;
+            set => Formatter.ErrorAction = (FormatErrorAction) value;
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormat.Core.Parsing.Parser" />.
         /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
-        public ErrorAction ParseErrorAction { get; set; }
+        [Obsolete("Use 'SmartSettings.Parser.ErrorAction' instead.", false)]
+        public ErrorAction ParseErrorAction
+        {
+            get => (ErrorAction) Parser.ErrorAction;
+            set => Parser.ErrorAction = (ParseErrorAction) value;
+        }
 
         /// <summary>
         /// Determines whether placeholders are case-sensitive or not.
+        /// The default is <see cref="CaseSensitivityType.CaseSensitive"/>.
         /// </summary>
-        public CaseSensitivityType CaseSensitivity { get; set; }
+        public CaseSensitivityType CaseSensitivity { get; set; } = CaseSensitivityType.CaseSensitive;
 
         /// <summary>
         /// This setting is relevant for the <see cref="Parsing.LiteralText" />.
@@ -45,7 +55,12 @@ namespace SmartFormat.Core.Settings
         /// If false, character string literals are not converted, just like with this string.Format:
         /// string.Format(@"\t")  will return the 2 characters "\" and "t"
         /// </summary>
-        public bool ConvertCharacterStringLiterals { get; set; }
+        [Obsolete("Use SmartSettings.Parser.ConvertCharacterStringLiterals instead", false)]
+        public bool ConvertCharacterStringLiterals
+        {
+            get => Parser.ConvertCharacterStringLiterals;
+            set => Parser.ConvertCharacterStringLiterals = value;
+        }
 
         internal IEqualityComparer<string> GetCaseSensitivityComparer()
         {
@@ -78,5 +93,15 @@ namespace SmartFormat.Core.Settings
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the settings for the parser.
+        /// </summary>
+        public ParserSettings Parser { get; } = new();
+
+        /// <summary>
+        /// Gets the settings for the formatter.
+        /// </summary>
+        public FormatterSettings Formatter { get; } = new();
     }
 }

@@ -118,7 +118,7 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_Exception_Json()
         {
             var savedSetting = Smart.Default.Settings.FormatErrorAction;
-            Smart.Default.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             var jObject = JObject.Parse(JsonOneLevel);
             Assert.Throws<FormattingException>(() => Smart.Format("{Dummy}", jObject));
             Smart.Default.Settings.FormatErrorAction = savedSetting;
@@ -190,7 +190,7 @@ namespace SmartFormat.Tests.Extensions
         public void ST_Format_Exception_Json()
         {
             var savedSetting = Smart.Default.Settings.FormatErrorAction;
-            Smart.Default.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             var jObject = JsonDocument.Parse(JsonOneLevel.Replace("'", "\"")).RootElement;
             Assert.Throws<FormattingException>(() => Smart.Format("{Dummy}", jObject));
             Smart.Default.Settings.FormatErrorAction = savedSetting;

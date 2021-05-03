@@ -45,7 +45,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Throws_Exceptions()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
 
             Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--"));
         }
@@ -54,7 +54,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Outputs_Exceptions()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
 
             formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--ERROR!--ERROR!--");
         }
@@ -63,7 +63,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Ignores_Exceptions()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
 
             formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "------");
         }
@@ -72,7 +72,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Maintains_Tokens()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.MaintainTokens;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.MaintainTokens;
 
             formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--{0}--{0:ZZZZ}--");
         }
@@ -81,8 +81,17 @@ namespace SmartFormat.Tests.Core
         public void Formatter_Maintains_Object_Tokens()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.MaintainTokens;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.MaintainTokens;
             formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
+        }
+
+        [Test]
+        public void Formatter_Align()
+        {
+            string name = "Joe";
+            var obj = new { name = name };
+            var str2 = GetSimpleFormatter().Format("Name: {name,10}| Column 2", obj);
+            Assert.That(str2, Is.EqualTo("Name:        Joe| Column 2"));
         }
 
         [Test]
@@ -90,7 +99,7 @@ namespace SmartFormat.Tests.Core
         {
             string? name = null;
             var obj = new { name = name };
-            var str2 = Smart.Format("Name: {name,-10}| Column 2", obj);
+            var str2 = GetSimpleFormatter().Format("Name: {name,-10}| Column 2", obj);
             Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
         }
 
@@ -133,7 +142,7 @@ namespace SmartFormat.Tests.Core
             var badPlaceholder = new List<string>();
 
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
             formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args.Placeholder);
             var res = formatter.Format("{NoName} {Name} {OtherMissing}", obj);
             Assert.That(badPlaceholder.Count == 2 && badPlaceholder[0] == "{NoName}" && badPlaceholder[1] == "{OtherMissing}");
@@ -143,13 +152,14 @@ namespace SmartFormat.Tests.Core
         public void LeadingBackslashMustNotEscapeBraces()
         {
             var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.ConvertCharacterStringLiterals = false;
+            smart.Settings.Parser.ConvertCharacterStringLiterals = false;
+            smart.Settings.Parser.UseStringFormatCompatibility = true;
 
             var expected = "\\Hello";
             var actual = smart.Format("\\{Test}", new { Test = "Hello" });
             Assert.AreEqual(expected, actual);
 
-            smart.Settings.ConvertCharacterStringLiterals = true;
+            smart.Settings.Parser.ConvertCharacterStringLiterals = true;
 
             expected = @"\Hello";
             actual = smart.Format(@"\\{Test}", new { Test = "Hello" }); // double backslash means escaping the backslash
@@ -174,8 +184,8 @@ namespace SmartFormat.Tests.Core
             var formatter = new SmartFormatter();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
             formatter.Settings.ConvertCharacterStringLiterals = true;
-            formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
-            formatter.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
+            formatter.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
             formatter.Parser.AddAlphanumericSelectors(); // required for this test
             var formatParsed = formatter.Parser.ParseFormat(format, new []{string.Empty});
             var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
