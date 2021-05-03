@@ -3,7 +3,18 @@ Latest Changes
 
 v3.0.0 (Draft)
 ===
-Currently merged to the `version/v3` branch:
+
+**Todo:**
+1. These settings are the default, remove from `ISource` extensions:
+   * Formatter.Parser.AddAlphanumericSelectors()
+   * Formatter.Parser.AddAdditionalSelectorChars("_")
+   * Formatter.Parser.AddOperators(".,")
+2. Remove adding custom operators, can too easily break the parser
+3. Restrict custom selectors to "not reserved characters" like `{}[]().,-:\`
+4. Replace input format `string` with `ReadOnlySpan<char>` in `Parser`
+
+
+**Currently merged to the `version/v3.0` branch:**
 
 * `Parser` ([#164](https://github.com/axuno/SmartFormat/pull/164)):
   * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete.

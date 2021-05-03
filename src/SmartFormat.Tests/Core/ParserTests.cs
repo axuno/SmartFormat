@@ -571,5 +571,29 @@ namespace SmartFormat.Tests.Core
             Assert.AreEqual("c2", c2.Selectors[0].RawText);
             Assert.AreEqual("c3", c3.Selectors[0].RawText);
         }
+
+        [Test]
+        public void Parse_Options()
+        {
+            var parser = GetRegularParser();
+            var selector = "0";
+            var formatterName = "c";
+            // not escaped characters {}(): must finish parsing of format options.
+            // Unescaped operators []., are fine.
+            var options = "\\{.\\)\\:,_][1|2|3"; 
+            // The literal may contain escaped characters
+            var literal = "one|two|th\\} \\{ree|other";
+
+            var format = parser.ParseFormat($"{{{selector}:{formatterName}({options}):{literal}}}", new[] {formatterName});
+            var placeholder = (Placeholder) format.Items[0];
+            
+            Assert.That(format.Items.Count, Is.EqualTo(1));
+            Assert.That(placeholder.Selectors.First().RawText, Is.EqualTo(selector));
+            Assert.That(format.HasNested, Is.True);
+            Assert.That(placeholder.FormatterName, Is.EqualTo(formatterName));
+            Assert.That(placeholder.FormatterOptions, Is.EqualTo(options.Replace("\\", "")));
+            Assert.That(placeholder.Format?.Items.Count, Is.EqualTo(3));
+            Assert.That(string.Concat(placeholder.Format?.Items[0].RawText, placeholder.Format?.Items[1].RawText, placeholder.Format?.Items[2].RawText), Is.EqualTo(literal.Replace("\\","")));
+        }
     }
 }

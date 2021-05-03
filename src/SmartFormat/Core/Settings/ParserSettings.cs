@@ -150,5 +150,11 @@ namespace SmartFormat.Core.Settings
         /// Gets the character indicating the end of formatter options.
         /// </summary>
         public char FormatterOptionsEndChar { get; internal set; } = ')';
+
+        /// <summary>
+        /// Characters which terminate parsing of format options.
+        /// To use them as options, they must be escaped (preceded) by the <see cref="CharLiteralEscapeChar"/>.
+        /// </summary>
+        internal char[] FormatOptionsTerminatorChars => new[] {FormatterNameSeparator, FormatterOptionsBeginChar, FormatterOptionsEndChar, PlaceholderBeginChar, PlaceholderEndChar};
     }
 }

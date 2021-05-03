@@ -55,7 +55,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Includes a-z and A-Z in the list of allowed selector chars.
         /// </summary>
-        [Obsolete("Use '_parserSettings.AllowAlphanumericSelectors' instead.")]
+        [Obsolete("Use 'ParserSettings.AllowAlphanumericSelectors' instead.")]
         public void AddAlphanumericSelectors()
         {
             _parserSettings.AllowAlphanumericSelectors = true;
@@ -449,7 +449,8 @@ namespace SmartFormat.Core.Parsing
                     return false;
                 }
 
-                index.NamedFormatterOptionsStart = index.Current;
+                // Note: This short-circuits the Parser.ParseFormat main loop
+                ParseFormatOptions(inputFormat, ref index);
             }
             else if (inputChar == _parserSettings.FormatterOptionsEndChar || inputChar == _parserSettings.FormatterNameSeparator)
             {
@@ -509,9 +510,10 @@ namespace SmartFormat.Core.Parsing
                         if (parentPlaceholder != null)
                         {
                             parentPlaceholder.FormatterName = formatterName;
+                            // Save the formatter options with CharLiteralEscapeChar removed
                             parentPlaceholder.FormatterOptions = inputFormat.Substring(
                                 index.NamedFormatterOptionsStart + 1,
-                                index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1));
+                                index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1)).Replace(_parserSettings.CharLiteralEscapeChar.ToString(), "");
                         }
                     }
                     else
@@ -611,6 +613,50 @@ namespace SmartFormat.Core.Parsing
                         $"'0x{Convert.ToByte(inputChar):X}': " +
                         _parsingErrorText[ParsingError.InvalidCharactersInSelector],
                         index.Current, index.SafeAdd(index.Current, 1));
+            }
+        }
+
+        /// <summary>
+        /// Parses all option characters.
+        /// This short-circuits the Parser.ParseFormat main loop.
+        /// </summary>
+        /// <param name="inputFormat">The input format string.</param>
+        /// <param name="index">The <see cref="IndexContainer"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ParseFormatOptions(string inputFormat, ref IndexContainer index)
+        {
+            index.NamedFormatterOptionsStart = index.Current;
+
+            /*
+            var nextChar = inputFormat[index.SafeAdd(index.Current, 1)];
+            if(nextChar != _parserSettings.FormatterOptionsEndChar &&
+               nextChar != _parserSettings.FormatterNameSeparator && 
+               nextChar != _parserSettings.PlaceholderEndChar) 
+                while (inputFormat[++index.Current + 1] != _parserSettings.FormatterOptionsEndChar) ;
+            return;
+            */
+
+            var nextChar = inputFormat[index.SafeAdd(index.Current, 1)];
+            // Handle empty options()
+            if (_parserSettings.FormatOptionsTerminatorChars.Contains(nextChar)) return;
+
+            
+            while (++index.Current < index.ObjectLength)
+            {
+                nextChar = inputFormat[index.SafeAdd(index.Current, 1)];
+                // Skip escaped terminating characters
+                if (inputFormat[index.Current] == _parserSettings.CharLiteralEscapeChar &&
+                    _parserSettings.FormatOptionsTerminatorChars.Contains(nextChar))
+                {
+                    index.SafeAdd(index.Current, 1);
+                    continue;
+                }
+                // End of parsing options, when the NEXT character is terminating,
+                // because this character will be handled in the Parser.ParseFormat main loop.
+                if (_parserSettings.FormatOptionsTerminatorChars.Contains(inputFormat[index.Current + 1]))
+                {
+                    return;
+                }
             }
         }
 
