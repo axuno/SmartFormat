@@ -75,6 +75,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_SingleLevelXml_TemplateWithCurlyBraces_Escaped()
         {
             var sf = Smart.CreateDefaultSmartFormat();
+            sf.Settings.Parser.UseStringFormatCompatibility = true;
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
@@ -130,7 +131,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Format_TwoLevelXml_InvalidSelectors_Throws()
         {
-            Smart.Default.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             // arrange
             var xmlEl = XElement.Parse(TwoLevelXml);
             // act
