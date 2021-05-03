@@ -34,7 +34,7 @@ namespace SmartFormat
         public SmartFormatter()
         {
             Settings = new SmartSettings();
-            Parser = new Parser(Settings);
+            Parser = new SmartFormat.Core.Parsing.Parser(Settings);
             SourceExtensions = new List<ISource>();
             FormatterExtensions = new List<IFormatter>();
         }
@@ -117,7 +117,7 @@ namespace SmartFormat
         /// <summary>
         /// Gets or set the instance of the <see cref="Core.Parsing.Parser" />
         /// </summary>
-        public Parser Parser { get; }
+        public SmartFormat.Core.Parsing.Parser Parser { get; }
 
         /// <summary>
         /// Get the <see cref="Core.Settings.SmartSettings" /> for Smart.Format
@@ -326,22 +326,22 @@ namespace SmartFormat
         {
             OnFormattingFailure?.Invoke(this,
                 new FormattingErrorEventArgs(errorItem.RawText, startIndex,
-                    Settings.FormatErrorAction != ErrorAction.ThrowError));
-            switch (Settings.FormatErrorAction)
+                    Settings.Formatter.ErrorAction != FormatErrorAction.ThrowError));
+            switch (Settings.Formatter.ErrorAction)
             {
-                case ErrorAction.Ignore:
+                case FormatErrorAction.Ignore:
                     return;
-                case ErrorAction.ThrowError:
+                case FormatErrorAction.ThrowError:
                     throw innerException as FormattingException ??
                           new FormattingException(errorItem, innerException, startIndex);
-                case ErrorAction.OutputErrorInResult:
+                case FormatErrorAction.OutputErrorInResult:
                     formattingInfo.FormatDetails.FormattingException =
                         innerException as FormattingException ??
                         new FormattingException(errorItem, innerException, startIndex);
                     formattingInfo.Write(innerException.Message);
                     formattingInfo.FormatDetails.FormattingException = null;
                     break;
-                case ErrorAction.MaintainTokens:
+                case FormatErrorAction.MaintainTokens:
                     formattingInfo.Write(formattingInfo.Placeholder?.RawText ?? "'null'");
                     break;
             }

@@ -3,15 +3,12 @@
 // Licensed under the MIT license.
 //
 
-using System;
-
 namespace SmartFormat.Core.Settings
 {
     /// <summary>
-    /// Determines how format errors are handled.
+    /// Determines how parsing errors are handled.
     /// </summary>
-    [Obsolete("Use 'ParseErrorAction' or 'FormatErrorAction' instead.", false)]
-    public enum ErrorAction
+    public enum ParseErrorAction
     {
         /// <summary>Throws an exception. This is only recommended for debugging, so that formatting errors can be easily found.</summary>
         ThrowError,

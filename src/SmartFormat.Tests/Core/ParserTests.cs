@@ -14,7 +14,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void TestParser()
         {
-            var parser = new SmartFormatter {Settings = { ParseErrorAction = ErrorAction.ThrowError}}.Parser;
+            var parser = new SmartFormatter {Settings = { Parser = {ErrorAction = ParseErrorAction.ThrowError}}}.Parser;
             parser.AddAlphanumericSelectors();
             parser.AddAdditionalSelectorChars("_");
             parser.AddOperators(".");
@@ -51,7 +51,7 @@ namespace SmartFormat.Tests.Core
         {
             // Let's set the "ErrorAction" to "Throw":
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.ParseErrorAction = ErrorAction.ThrowError;
+            formatter.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
 
             var args = new object[] { TestFactory.GetPerson() };
             Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
@@ -61,7 +61,7 @@ namespace SmartFormat.Tests.Core
         public void Parser_Exception_ErrorDescription()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.ParseErrorAction = ErrorAction.ThrowError;
+            formatter.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
 
             foreach (var format in new[] { "{.}", "{.}{0.}" })
             {
@@ -89,7 +89,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Parser_Ignores_Exceptions()
         {
-            var parser = new SmartFormatter() { Settings = { ParseErrorAction = ErrorAction.Ignore } }.Parser;
+            var parser = new SmartFormatter() { Settings = { Parser = {ErrorAction = ParseErrorAction.Ignore }}}.Parser;
             var invalidFormats = new[] {
                 "{",
                 "{0",
@@ -117,10 +117,10 @@ namespace SmartFormat.Tests.Core
             var invalidTemplate = "Hello, I'm {Name from {City} {Street}";
 
             var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.ParseErrorAction = ErrorAction.Ignore;
+            smart.Settings.Parser.ErrorAction = ParseErrorAction.Ignore;
             
             var parser = GetRegularParser();
-            parser.Settings.ParseErrorAction = ErrorAction.Ignore;
+            parser.Settings.Parser.ErrorAction = ParseErrorAction.Ignore;
             var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
             
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
@@ -140,7 +140,7 @@ namespace SmartFormat.Tests.Core
         public void Parser_Error_Action_MaintainTokens(string invalidTemplate, bool lastItemIsPlaceholder)
         {
             var parser = GetRegularParser();
-            parser.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
+            parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
             var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
 
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
@@ -166,7 +166,7 @@ namespace SmartFormat.Tests.Core
             var invalidTemplate = "Hello, I'm {Name from {City}";
             
             var parser = GetRegularParser();
-            parser.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
+            parser.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
             var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
 
             Assert.That(parsed.Items.Count, Is.EqualTo(1));
@@ -240,7 +240,7 @@ namespace SmartFormat.Tests.Core
 })(typeof window === 'undefined' ? module.exports : window);
 ";
             var parser = GetRegularParser();
-            parser.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
+            parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
             var parsed = parser.ParseFormat(js, new[] { Guid.NewGuid().ToString("N") });
 
             // No characters should get lost compared to the format string,
@@ -289,7 +289,7 @@ namespace SmartFormat.Tests.Core
 } 
 ";
             var parser = GetRegularParser();
-            parser.Settings.ParseErrorAction = ErrorAction.MaintainTokens;
+            parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
             var parsed = parser.ParseFormat(css, new[] { Guid.NewGuid().ToString("N") });
 
             // No characters should get lost compared to the format string,
@@ -309,31 +309,12 @@ namespace SmartFormat.Tests.Core
                     "NO placeholder");
             }
         }
-
-        [Test]
-        public void Parser_UseAlternativeBraces()
-        {
-            var parser = GetRegularParser();
-            parser.UseAlternativeBraces('[', ']');
-            var format = "aaa [bbb] [ccc:ddd] {eee} [fff:{ggg}] [hhh:[iii:[] ] ] jjj";
-            var parsed = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
-
-            Assert.AreEqual(9, parsed.Items.Count);
-
-            Assert.AreEqual("bbb", ((Placeholder)parsed.Items[1]).Selectors[0].RawText);
-            Assert.AreEqual("ccc", ((Placeholder)parsed.Items[3]).Selectors[0].RawText);
-            Assert.AreEqual("ddd", ((Placeholder)parsed.Items[3]).Format?.Items[0].RawText);
-            Assert.AreEqual(" {eee} ", ((LiteralText)parsed.Items[4]).RawText);
-            Assert.AreEqual("{ggg}", ((Placeholder)parsed.Items[5]).Format?.Items[0].RawText);
-            Assert.AreEqual("iii", ((Placeholder)((Placeholder)parsed.Items[7]).Format!.Items[0]).Selectors[0].RawText);
-
-        }
         
         private static Parser GetRegularParser()
         {
-            var parser = new SmartFormatter() { Settings = { ParseErrorAction = ErrorAction.ThrowError } }.Parser;
+            var parser = new SmartFormatter() { Settings = { Parser = {ErrorAction = ParseErrorAction.ThrowError }}}.Parser;
             parser.AddAlphanumericSelectors();
-            parser.AddOperators(".");
+            parser.AddOperators(".,");
             return parser;
         }
 
@@ -378,7 +359,7 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Test_Format_Alignment()
+        public void Test_Format_Set_Alignment_Property()
         {
             var parser = GetRegularParser();
             var formatString = "{0}";
@@ -388,6 +369,20 @@ namespace SmartFormat.Tests.Core
             Assert.AreEqual(formatString, placeholder.ToString());
             placeholder.Alignment = 10;
             Assert.AreEqual($"{{0,{placeholder.Alignment}}}", placeholder.ToString());
+        }
+
+        [Test]
+        public void Test_Format_With_Alignment()
+        {
+            var parser = GetRegularParser();
+            var formatString = "{0,-10}";
+
+            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
+            var placeholder = (Placeholder) format.Items[0];
+            Assert.That(placeholder.ToString(), Is.EqualTo(formatString));
+            Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
+            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(","));
+            Assert.That(placeholder.Selectors[1].RawText, Is.EqualTo("-10"));
         }
 
         [Test]
@@ -545,15 +540,14 @@ namespace SmartFormat.Tests.Core
         {
             ParsingErrors? parsingError = null;
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
-            formatter.Settings.ParseErrorAction = ErrorAction.Ignore;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
+            formatter.Settings.Parser.ErrorAction = ParseErrorAction.Ignore;
             formatter.Parser.OnParsingFailure += (o, args) => parsingError = args.Errors;
             var res = formatter.Format("{NoName {Other} {Same", default(object)!);
             Assert.That(parsingError!.Issues.Count == 3);
-            Assert.That(parsingError.Issues[2].Issue == new Parser.ParsingErrorText()[Parser.ParsingError.MissingClosingBrace]);
+            Assert.That(parsingError.Issues[2].Issue == new SmartFormat.Core.Parsing.Parser.ParsingErrorText()[SmartFormat.Core.Parsing.Parser.ParsingError.MissingClosingBrace]);
         }
-
-
+        
         [Test]
         public void Alternative_Escaping_In_Literal()
         {

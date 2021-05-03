@@ -50,7 +50,8 @@ namespace SmartFormat.Tests
             var clubNoMember = new { Member = default(object), Club = new { Name = "The Strikers" } };
             var say = new { Hello = "Good morning" };
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.ParseErrorAction = formatter.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            formatter.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
 
             var result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", (clubOrMember, say));
             Assert.AreEqual($"{clubOrMember.Member.Name} - {say.Hello}", result);

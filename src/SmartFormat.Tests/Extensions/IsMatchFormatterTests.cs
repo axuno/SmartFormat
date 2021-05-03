@@ -20,7 +20,7 @@ namespace SmartFormat.Tests.Extensions
         {
             _formatter = Smart.CreateDefaultSmartFormat();
             _formatter.FormatterExtensions.Add(new IsMatchFormatter {RegexOptions = RegexOptions.CultureInvariant});
-            _formatter.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            _formatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
         }
         
         [TestCase("{theKey:ismatch(^.+123.+$):Okay - {}|No match content}", RegexOptions.None, "Okay - Some123Content")]
