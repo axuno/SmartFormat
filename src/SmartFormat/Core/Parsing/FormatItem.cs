@@ -23,6 +23,11 @@ namespace SmartFormat.Core.Parsing
         {
         }
 
+        protected FormatItem(SmartSettings smartSettings, FormatItem parent, int startIndex, int endIndex) : this(smartSettings,
+            parent.baseString, startIndex, endIndex)
+        {
+        }
+
         protected FormatItem(SmartSettings smartSettings, string baseString, int startIndex, int endIndex)
         {
             SmartSettings = smartSettings;

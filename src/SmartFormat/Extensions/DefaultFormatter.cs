@@ -45,7 +45,7 @@ namespace SmartFormat.Extensions
             //  (The following code was adapted from the built-in String.Format code)
 
             //  We will try using IFormatProvider, IFormattable, and if all else fails, ToString.
-            string result;
+            string result; 
             if (provider != null &&
                 provider.GetFormat(typeof(ICustomFormatter)) is ICustomFormatter cFormatter)
             {

@@ -36,8 +36,8 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0:choose(true|TRUE):one|two|default}", true, "default")]
         [TestCase("{0:choose(string|String):one|two|default}", "String", "two")]
         [TestCase("{0:choose(string|STRING):one|two|default}", "String", "default")]
-        [TestCase("{0:choose(ignore|Ignore):one|two|default}", SmartFormat.Core.Settings.ErrorAction.Ignore, "two")]
-        [TestCase("{0:choose(ignore|IGNORE):one|two|default}", SmartFormat.Core.Settings.ErrorAction.Ignore, "default")]
+        [TestCase("{0:choose(ignore|Ignore):one|two|default}", SmartFormat.Core.Settings.FormatErrorAction.Ignore, "two")]
+        [TestCase("{0:choose(ignore|IGNORE):one|two|default}", SmartFormat.Core.Settings.FormatErrorAction.Ignore, "default")]
         public void Choose_should_be_case_sensitive(string format, object arg0, string expectedResult)
         {
             Assert.AreEqual(expectedResult, Smart.Format(format, arg0));
@@ -79,7 +79,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0:choose(1):1}", 99)]
         public void Choose_throws_when_choice_is_invalid(string format, object arg0)
         {
-            Smart.Default.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             Assert.Throws<FormattingException>(() => Smart.Format(format, arg0));
         }
 
@@ -91,7 +91,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0:choose(1|2):1|2|3|4}", 1)]
         public void Choose_throws_when_choices_are_too_few_or_too_many(string format, object arg0)
         {
-            Smart.Default.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            Smart.Default.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             Assert.Throws<FormattingException>(() => Smart.Format(format, arg0));
         }
 

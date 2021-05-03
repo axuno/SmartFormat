@@ -5,6 +5,16 @@ v3.0.0 (Draft)
 ===
 Currently merged to the `version/v3` branch:
 
+* `Parser` ([#163](https://github.com/axuno/SmartFormat/pull/163)):
+  * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete.
+  * `Parser.UseAlternativeBraces(..)` is obsolete and not supported any more
+  * Default character for escaping curly braces is now `\`, i.e. `\{` and `\}` instead of `{{` and `}}`. The latter are used if `ParserSettings.UseStringFormatCompatibility` is `true`.
+  * Alphanumeric selector characters are enabled by default.
+  * Operator characters `.,[]` are set by default.
+* `ErrorAction`s ([#163](https://github.com/axuno/SmartFormat/pull/163)):
+   * Enum `SmartSettings.ErrorAction` is obsolete and replaced with `SmartSettings.ParseErrorAction` and `SmartSettings.FormatErrorAction`
+   * Property `SmartSettings.ParseErrorAction` is obsolete and replaced with `ParserSettings.ErrorAction`
+   * Property `SmartSettings.FormatErrorAction` is obsolete and replaced with `FormatterSettings.ErrorAction`
 * Added `SmartFormat.Performance` project with benchmarks for different data sources ([#162](https://github.com/axuno/SmartFormat/pull/162))
 * Fully cover `Parser` and `ReflectionSource` with unit tests ([#160](https://github.com/axuno/SmartFormat/pull/160))
 * Removed redundant unit tests with no impact on coverage ([#159](https://github.com/axuno/SmartFormat/pull/159))

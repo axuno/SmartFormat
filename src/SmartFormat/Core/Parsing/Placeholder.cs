@@ -45,33 +45,33 @@ namespace SmartFormat.Core.Parsing
         public override string ToString()
         {
             var result = new StringBuilder(endIndex - startIndex);
-            result.Append('{');
+            result.Append(SmartSettings.Parser.PlaceholderBeginChar);
             foreach (var s in Selectors) result.Append(s.baseString, s.operatorStart, s.endIndex - s.operatorStart);
             if (Alignment != 0)
             {
-                result.Append(',');
+                result.Append(SmartSettings.Parser.AlignmentOperator);
                 result.Append(Alignment);
             }
 
             if (FormatterName != "")
             {
-                result.Append(':');
+                result.Append(SmartSettings.Parser.FormatterNameSeparator);
                 result.Append(FormatterName);
                 if (FormatterOptions != "")
                 {
-                    result.Append('(');
+                    result.Append(SmartSettings.Parser.FormatterOptionsBeginChar);
                     result.Append(FormatterOptions);
-                    result.Append(')');
+                    result.Append(SmartSettings.Parser.FormatterOptionsEndChar);
                 }
             }
 
             if (Format != null)
             {
-                result.Append(':');
+                result.Append(SmartSettings.Parser.FormatterNameSeparator);
                 result.Append(Format);
             }
 
-            result.Append('}');
+            result.Append(SmartSettings.Parser.PlaceholderEndChar);
             return result.ToString();
         }
     }

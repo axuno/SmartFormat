@@ -16,8 +16,8 @@ namespace SmartFormat.Tests.Extensions
         public TimeFormatterTests()
         {
             _smart = Smart.CreateDefaultSmartFormat();
-            _smart.Settings.FormatErrorAction = ErrorAction.ThrowError;
-            _smart.Settings.ParseErrorAction = ErrorAction.ThrowError;
+            _smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
+            _smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
 
             var timeFormatter = _smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("time")) as TimeFormatter;
             if (timeFormatter == null)
