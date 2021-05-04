@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 //
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using SmartFormat.Core.Settings;
@@ -22,8 +23,6 @@ namespace SmartFormat.Core.Parsing
     /// </example>
     public class Placeholder : FormatItem
     {
-        public readonly Format parent;
-
         public Placeholder(SmartSettings smartSettings, Format parent, int startIndex, int nestedDepth) : base(
             smartSettings, parent, startIndex)
         {
@@ -34,6 +33,7 @@ namespace SmartFormat.Core.Parsing
             FormatterOptions = "";
         }
 
+        public Format parent { get; }
         public int NestedDepth { get; set; }
 
         public List<Selector> Selectors { get; }
