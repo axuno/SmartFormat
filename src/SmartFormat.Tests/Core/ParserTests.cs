@@ -578,10 +578,11 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             var selector = "0";
             var formatterName = "c";
-            // not escaped characters {}(): must finish parsing of format options.
+            // Not escaped special chars {}:() must finish parsing of format options.
             // Unescaped operators []., are fine.
+            // Options can store any chars, as long as special chars are escaped.
             var options = "\\{.\\)\\:,_][1|2|3"; 
-            // The literal may contain escaped characters
+            // The literal may also contain escaped characters
             var literal = "one|two|th\\} \\{ree|other";
 
             var format = parser.ParseFormat($"{{{selector}:{formatterName}({options}):{literal}}}", new[] {formatterName});
@@ -593,7 +594,7 @@ namespace SmartFormat.Tests.Core
             Assert.That(placeholder.FormatterName, Is.EqualTo(formatterName));
             Assert.That(placeholder.FormatterOptions, Is.EqualTo(options.Replace("\\", "")));
             Assert.That(placeholder.Format?.Items.Count, Is.EqualTo(3));
-            Assert.That(string.Concat(placeholder.Format?.Items[0].RawText, placeholder.Format?.Items[1].RawText, placeholder.Format?.Items[2].RawText), Is.EqualTo(literal.Replace("\\","")));
+            Assert.That(string.Concat(placeholder.Format?.Items[0].ToString(), placeholder.Format?.Items[1].ToString(), placeholder.Format?.Items[2].ToString()), Is.EqualTo(literal.Replace("\\", "")));
         }
     }
 }

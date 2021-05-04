@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -14,7 +13,7 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     internal static class EscapedLiteral
     {
-        private static Dictionary<char, char> _lookupTable = new() {
+        private static Dictionary<char, char> GeneralLookupTable = new() {
             // General
             {'\'', '\''},
             {'\"', '\"'},
@@ -26,9 +25,12 @@ namespace SmartFormat.Core.Parsing
             {'n', '\n'},
             {'r', '\r'},
             {'t', '\t'},
-            {'v', '\v'},
+            {'v', '\v'}
+        };
+
+        private static Dictionary<char, char> FormatterOptionsLookupTable = new() {
             // Smart.Format characters used in formatter options
-            {'(', ')'},
+            {'(', '('},
             {')', ')'},
             {'{', '{'},
             {'}', '}'},
@@ -38,12 +40,65 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Tries to get the <see cref="char"/> that corresponds to an escaped input <see cref="char"/>.
         /// </summary>
-        /// <param name="escaped">The input character.</param>
+        /// <param name="input">The input character.</param>
         /// <param name="result">The matching character.</param>
+        /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
         /// <returns><see langword="true"/>, if a matching character was found.</returns>
-        public static bool TryGetChar(char escaped, out char result)
+        public static bool TryGetChar(char input, out char result, bool includeFormatterOptionChars = false)
         {
-            return _lookupTable.TryGetValue(escaped, out result);
+            return includeFormatterOptionChars
+                ? GeneralLookupTable.TryGetValue(input, out result) ||
+                  FormatterOptionsLookupTable.TryGetValue(input, out result)
+                : GeneralLookupTable.TryGetValue(input, out result);
+        }
+
+        /// <summary>
+        /// Converts escaped characters in input with real characters, e.g. "\\" => "\", if '\' is the escape character.
+        /// </summary>
+        /// <param name="escapingSequenceStart"></param>
+        /// <param name="input"></param>
+        /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
+        /// <returns>The input with escaped characters with their real value.</returns>
+        public static ReadOnlySpan<char> UnescapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars = false)
+        {
+            // Note:
+            // UnescapeCharacter does the same without memory allocation
+            // https://github.com/nemesissoft/Nemesis.TextParsers/blob/master/Nemesis.TextParsers/SpanParserHelper.cs
+
+            var length = input.Length;
+            var result = new List<char>(length);
+            for (var index = 0; index < length; index++)
+            {
+                int next;
+                if (index + 1 < length)
+                {
+                    next = index + 1;
+                }
+                else
+                {
+                    result.Add(input[index]);
+                    return (ReadOnlySpan<char>) result.ToArray();
+                }
+
+                if (input[index] == escapingSequenceStart)
+                {
+                    if (TryGetChar(input[next], out var realChar, includeFormatterOptionChars))
+                    {
+                        result.Add(realChar);
+                    }
+                    else
+                    {
+                        result.Add(input[index]);
+                        result.Add(input[next]);
+                    }
+                    index++;
+                }
+                else
+                {
+                    result.Add(input[index]);
+                }
+            }
+            return (ReadOnlySpan<char>) result.ToArray();
         }
     }
 }

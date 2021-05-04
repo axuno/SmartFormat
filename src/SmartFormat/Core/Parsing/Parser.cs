@@ -511,9 +511,9 @@ namespace SmartFormat.Core.Parsing
                         {
                             parentPlaceholder.FormatterName = formatterName;
                             // Save the formatter options with CharLiteralEscapeChar removed
-                            parentPlaceholder.FormatterOptions = inputFormat.Substring(
-                                index.NamedFormatterOptionsStart + 1,
-                                index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1)).Replace(_parserSettings.CharLiteralEscapeChar.ToString(), "");
+                            parentPlaceholder.FormatterOptions = EscapedLiteral.UnescapeCharLiterals(
+                                _parserSettings.CharLiteralEscapeChar, inputFormat.AsSpan(index.NamedFormatterOptionsStart + 1,
+                                    index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1)), true).ToString();
                         }
                     }
                     else
@@ -627,19 +627,9 @@ namespace SmartFormat.Core.Parsing
         {
             index.NamedFormatterOptionsStart = index.Current;
 
-            /*
-            var nextChar = inputFormat[index.SafeAdd(index.Current, 1)];
-            if(nextChar != _parserSettings.FormatterOptionsEndChar &&
-               nextChar != _parserSettings.FormatterNameSeparator && 
-               nextChar != _parserSettings.PlaceholderEndChar) 
-                while (inputFormat[++index.Current + 1] != _parserSettings.FormatterOptionsEndChar) ;
-            return;
-            */
-
             var nextChar = inputFormat[index.SafeAdd(index.Current, 1)];
             // Handle empty options()
             if (_parserSettings.FormatOptionsTerminatorChars.Contains(nextChar)) return;
-
             
             while (++index.Current < index.ObjectLength)
             {

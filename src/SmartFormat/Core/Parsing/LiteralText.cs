@@ -36,22 +36,10 @@ namespace SmartFormat.Core.Parsing
 
         private string ConvertCharacterLiteralsToUnicode()
         {
-            var source = baseString.Substring(startIndex, endIndex - startIndex);
-            if (source.Length == 0) return source;
+            var source = baseString.AsSpan(startIndex, endIndex - startIndex);
+            if (source.Length == 0) return string.Empty;
 
-            // No character literal escaping - nothing to do
-            if (source[0] != SmartSettings.Parser.CharLiteralEscapeChar)
-                return source;
-
-            // The string length should be 2: escape character \ and literal character
-            if (source.Length < 2) throw new ArgumentException($"Missing escape sequence in literal: \"{source}\"");
-
-            if (EscapedLiteral.TryGetChar(source[1], out var result))
-            {
-                return result.ToString();
-            }
-
-            throw new ArgumentException($"Unrecognized escape sequence in literal: \"{source}\"");
+            return EscapedLiteral.UnescapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, source).ToString();
         }
     }
 }
