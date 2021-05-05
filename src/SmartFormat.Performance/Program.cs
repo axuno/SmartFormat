@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
 namespace SmartFormat.Performance
@@ -7,7 +8,9 @@ namespace SmartFormat.Performance
     {
         public static void Main(string[] args)
         {
-            BenchmarkRunner.Run<SourcePerformanceTests>();
+            //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
+            //BenchmarkRunner.Run<SourcePerformanceTests>();
+            BenchmarkRunner.Run<SimpleSpanParserTests>();
         }
     }
 }

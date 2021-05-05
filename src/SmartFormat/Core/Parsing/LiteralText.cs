@@ -30,11 +30,11 @@ namespace SmartFormat.Core.Parsing
         public override string ToString()
         {
             return SmartSettings.Parser.ConvertCharacterStringLiterals
-                ? ConvertCharacterLiteralsToUnicode()
+                ? UnescapeCharacterLiterals()
                 : baseString.Substring(startIndex, endIndex - startIndex);
         }
 
-        private string ConvertCharacterLiteralsToUnicode()
+        private string UnescapeCharacterLiterals()
         {
             var source = baseString.AsSpan(startIndex, endIndex - startIndex);
             if (source.Length == 0) return string.Empty;
