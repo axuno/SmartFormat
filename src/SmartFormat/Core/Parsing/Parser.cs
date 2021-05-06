@@ -268,6 +268,13 @@ namespace SmartFormat.Core.Parsing
                 // 2. The last item must be a literal, so add it
                 currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, inputFormat.Length));
             }
+            
+            // Todo v2.7.0: There is no unit test for this condition!
+            while (currentFormat.parent != null)
+            {
+                currentFormat = currentFormat.parent.parent;
+                currentFormat.endIndex = inputFormat.Length;
+            }
 
             // Check for any parsing errors:
             if (parsingErrors.HasIssues)
