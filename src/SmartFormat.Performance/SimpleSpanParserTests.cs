@@ -36,12 +36,10 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         [GlobalSetup]
         public void Setup()
         {
-            System.Diagnostics.Debugger.Launch();
-
-            ConstructorInfo ctorSettings = typeof(SmartSettings).GetConstructors
+            var ctorSettings = typeof(SmartSettings).GetConstructors
                 (BindingFlags.Instance | BindingFlags.NonPublic)[0];
 
-            ConstructorInfo ctorParser = typeof(Parser).GetConstructors
+            var ctorParser = typeof(Parser).GetConstructors
                 (BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)[0];
 
             var settings = (SmartSettings) ctorSettings.Invoke(null);
