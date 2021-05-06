@@ -21,7 +21,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 |           Method |      Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
 |----------------- |----------:|---------:|---------:|-------:|------:|------:|----------:|
 | ParseSmartFormat | 102.01 us | 0.665 us | 0.590 us | 1.0986 |     - |     - |   9.87 KB |
-|            Parse |  70.04 us | 0.125 us | 0.117 us | 0.1221 |     - |     - |   1.53 KB |
+|ParsePlaceholders |  70.04 us | 0.125 us | 0.117 us | 0.1221 |     - |     - |   1.53 KB |
     */
 
     [SimpleJob(RuntimeMoniker.NetCoreApp50)]
@@ -62,10 +62,10 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         }
 
         [Benchmark]
-        public void Parse()
+        public void ParsePlaceholders()
         {
             
-            var placeholders = new List<(int Start, ReadOnlyMemory<char> Content)>();
+            var placeholders = new List<(int StartIndex, ReadOnlyMemory<char> Content)>();
             
             var length = _inputFormatMemory.Length;
             int level = 0, start = 0;
