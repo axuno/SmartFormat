@@ -18,10 +18,10 @@ AMD Ryzen 9 3900X, 1 CPU, 24 logical and 12 physical cores
 
 Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
-|           Method |      Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|----------------- |----------:|---------:|---------:|-------:|------:|------:|----------:|
-| ParseSmartFormat | 102.01 us | 0.665 us | 0.590 us | 1.0986 |     - |     - |   9.87 KB |
-|ParsePlaceholders |  70.04 us | 0.125 us | 0.117 us | 0.1221 |     - |     - |   1.53 KB |
+|            Method |     Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------ |---------:|---------:|---------:|-------:|------:|------:|----------:|
+|  ParseSmartFormat | 88.71 us | 1.765 us | 4.092 us | 1.0986 |     - |     - |   9.87 KB |
+| ParsePlaceholders | 35.03 us | 0.690 us | 1.075 us | 0.1831 |     - |     - |   1.53 KB |
     */
 
     [SimpleJob(RuntimeMoniker.NetCoreApp50)]
@@ -69,12 +69,14 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
             
             var length = _inputFormatMemory.Length;
             int level = 0, start = 0;
+            // Using the ReadOnlyMemory.Span doubled speed
+            var inputFormatSpan = _inputFormatMemory.Span;
             for (var index = 0; index < length; index++)
             {
-                var currentChar = _inputFormatMemory.Span[index];
+                var currentChar = inputFormatSpan[index];
                 if (currentChar == '\\' && index + 1 < length)
                 {
-                    var nextChar = _inputFormatMemory.Span[index + 1];
+                    var nextChar = inputFormatSpan[index + 1];
                     if (nextChar == '{' || nextChar == '}') index++;
                 }
 
