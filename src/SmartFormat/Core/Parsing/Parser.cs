@@ -257,7 +257,7 @@ namespace SmartFormat.Core.Parsing
             // We're at the end of the input string
             
             // 1. Is the last item a placeholder, that is not finished yet?
-            if (currentFormat.parent != null || currentPlaceholder != null)
+            if (currentFormat.Parent != null || currentPlaceholder != null)
             {
                 parsingErrors.AddIssue(currentFormat, _parsingErrorText[ParsingError.MissingClosingBrace], inputFormat.Length,
                     inputFormat.Length);
@@ -270,9 +270,9 @@ namespace SmartFormat.Core.Parsing
             }
             
             // Todo v2.7.0: There is no unit test for this condition!
-            while (currentFormat.parent != null)
+            while (currentFormat.Parent != null)
             {
-                currentFormat = currentFormat.parent.Parent;
+                currentFormat = currentFormat.Parent.Parent;
                 currentFormat.endIndex = inputFormat.Length;
             }
 
@@ -317,7 +317,7 @@ namespace SmartFormat.Core.Parsing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool HasProcessedTooMayClosingBraces(Format currentFormat, ParsingErrors parsingErrors, ref IndexContainer index)
         {
-            if (currentFormat.parent != null) return false;
+            if (currentFormat.Parent != null) return false;
 
             // Don't swallow-up redundant closing braces, but treat them as literals
             currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.Current, index.Current + 1));
@@ -378,15 +378,15 @@ namespace SmartFormat.Core.Parsing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void FinishPlaceholderFormat(ref Format currentFormat, ref int nestedDepth, ref IndexContainer index)
         {
-            if (currentFormat.parent == null)
+            if (currentFormat.Parent == null)
             {
-                throw new NullReferenceException($"Unexpected null reference: {nameof(currentFormat.parent)}");
+                throw new NullReferenceException($"Unexpected null reference: {nameof(currentFormat.Parent)}");
             }
 
             nestedDepth--;
             currentFormat.endIndex = index.Current;
-            currentFormat.parent.endIndex = index.SafeAdd(index.Current, 1);
-            currentFormat = currentFormat.parent.Parent;
+            currentFormat.Parent.endIndex = index.SafeAdd(index.Current, 1);
+            currentFormat = currentFormat.Parent.Parent;
             index.NamedFormatterStart = index.NamedFormatterOptionsStart = index.NamedFormatterOptionsEnd = PositionUndefined; //2021-05-03 axuno
         }
 
@@ -486,7 +486,7 @@ namespace SmartFormat.Core.Parsing
                 
                 index.LastEnd = index.SafeAdd(index.Current, 1);
 
-                var parentPlaceholder = currentFormat.parent;
+                var parentPlaceholder = currentFormat.Parent;
 
                 if (index.NamedFormatterOptionsStart == PositionUndefined)
                 {
