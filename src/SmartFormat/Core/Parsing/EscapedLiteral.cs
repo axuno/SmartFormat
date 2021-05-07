@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 
 namespace SmartFormat.Core.Parsing
@@ -11,9 +12,9 @@ namespace SmartFormat.Core.Parsing
     /// <summary>
     /// Handles escaped literals, like \\ or \n
     /// </summary>
-    internal static class EscapedLiteral
+    public static class EscapedLiteral
     {
-        private static Dictionary<char, char> GeneralLookupTable = new() {
+        private static readonly Dictionary<char, char> GeneralLookupTable = new() {
             // General
             {'\'', '\''},
             {'\"', '\"'},
@@ -28,7 +29,7 @@ namespace SmartFormat.Core.Parsing
             {'v', '\v'}
         };
 
-        private static Dictionary<char, char> FormatterOptionsLookupTable = new() {
+        private static readonly Dictionary<char, char> FormatterOptionsLookupTable = new() {
             // Smart.Format characters used in formatter options
             {'(', '('},
             {')', ')'},
@@ -61,44 +62,43 @@ namespace SmartFormat.Core.Parsing
         /// <returns>The input with escaped characters with their real value.</returns>
         public static ReadOnlySpan<char> UnescapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars = false)
         {
-            // Note:
-            // UnescapeCharacter does the same without memory allocation
-            // https://github.com/nemesissoft/Nemesis.TextParsers/blob/master/Nemesis.TextParsers/SpanParserHelper.cs
-
             var length = input.Length;
-            var result = new List<char>(length);
-            for (var index = 0; index < length; index++)
+            //Span<char> result = ArrayPool<char>.Shared.Rent(length);
+            //It's enough to have the buffer with same size as input length
+            var result = new Span<char>(new char[length]);
+            var resultIndex = 0;
+            for (var inputIndex = 0; inputIndex < length; inputIndex++)
             {
-                int next;
-                if (index + 1 < length)
+                int nextInputIndex;
+                if (inputIndex + 1 < length)
                 {
-                    next = index + 1;
+                    nextInputIndex = inputIndex + 1;
                 }
                 else
                 {
-                    result.Add(input[index]);
-                    return (ReadOnlySpan<char>) result.ToArray();
+                    result[resultIndex++] = input[inputIndex];
+                    return (ReadOnlySpan<char>) result.Slice(0, resultIndex);
                 }
 
-                if (input[index] == escapingSequenceStart)
+                if (input[inputIndex] == escapingSequenceStart)
                 {
-                    if (TryGetChar(input[next], out var realChar, includeFormatterOptionChars))
+                    if (TryGetChar(input[nextInputIndex], out var realChar, includeFormatterOptionChars))
                     {
-                        result.Add(realChar);
+                        result[resultIndex++] = realChar;
                     }
                     else
                     {
-                        result.Add(input[index]);
-                        result.Add(input[next]);
+                        result[resultIndex++] = input[inputIndex];
+                        result[resultIndex++] = input[nextInputIndex];
                     }
-                    index++;
+                    inputIndex++;
                 }
                 else
                 {
-                    result.Add(input[index]);
+                    result[resultIndex++] = input[inputIndex];
                 }
             }
-            return (ReadOnlySpan<char>) result.ToArray();
+            return (ReadOnlySpan<char>) result.Slice(0, resultIndex);
         }
     }
 }
