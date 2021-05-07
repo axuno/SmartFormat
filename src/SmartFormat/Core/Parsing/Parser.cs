@@ -272,7 +272,7 @@ namespace SmartFormat.Core.Parsing
             // Todo v2.7.0: There is no unit test for this condition!
             while (currentFormat.parent != null)
             {
-                currentFormat = currentFormat.parent.parent;
+                currentFormat = currentFormat.parent.Parent;
                 currentFormat.endIndex = inputFormat.Length;
             }
 
@@ -386,7 +386,7 @@ namespace SmartFormat.Core.Parsing
             nestedDepth--;
             currentFormat.endIndex = index.Current;
             currentFormat.parent.endIndex = index.SafeAdd(index.Current, 1);
-            currentFormat = currentFormat.parent.parent;
+            currentFormat = currentFormat.parent.Parent;
             index.NamedFormatterStart = index.NamedFormatterOptionsStart = index.NamedFormatterOptionsEnd = PositionUndefined; //2021-05-03 axuno
         }
 
@@ -601,7 +601,7 @@ namespace SmartFormat.Core.Parsing
                 // End the placeholder with no format:
                 nestedDepth--;
                 currentPlaceholder.endIndex = index.SafeAdd(index.Current, 1);
-                currentFormat = currentPlaceholder.parent;
+                currentFormat = currentPlaceholder.Parent;
                 currentPlaceholder = null;
             }
             else
