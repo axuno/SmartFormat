@@ -511,9 +511,8 @@ namespace SmartFormat.Core.Parsing
                         {
                             parentPlaceholder.FormatterName = formatterName;
                             // Save the formatter options with CharLiteralEscapeChar removed
-                            parentPlaceholder.FormatterOptions = EscapedLiteral.UnescapeCharLiterals(
-                                _parserSettings.CharLiteralEscapeChar, inputFormat.AsSpan(index.NamedFormatterOptionsStart + 1,
-                                    index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1)), true).ToString();
+                            parentPlaceholder.FormatterOptionsRaw = inputFormat.Substring(index.NamedFormatterOptionsStart + 1,
+                                    index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1));
                         }
                     }
                     else

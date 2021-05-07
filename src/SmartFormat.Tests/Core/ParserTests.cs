@@ -395,7 +395,7 @@ namespace SmartFormat.Tests.Core
             var placeholder = (Placeholder)format.Items[0];
             placeholder.FormatterName = "test";
             Assert.AreEqual($"{{0:{placeholder.FormatterName}}}", placeholder.ToString());
-            placeholder.FormatterOptions = "options";
+            placeholder.FormatterOptionsRaw = "options";
             Assert.AreEqual($"{{0:{placeholder.FormatterName}({placeholder.FormatterOptions})}}", placeholder.ToString());
         }
 
