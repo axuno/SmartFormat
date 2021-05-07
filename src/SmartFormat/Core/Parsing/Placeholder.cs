@@ -33,7 +33,7 @@ namespace SmartFormat.Core.Parsing
         public Placeholder(SmartSettings smartSettings, Format parent, int startIndex, int nestedDepth) : base(
             smartSettings, parent, startIndex)
         {
-            this.parent = parent;
+            this.Parent = parent;
             Selectors = new List<Selector>();
             NestedDepth = nestedDepth;
             FormatterName = "";
@@ -43,7 +43,13 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Gets the parent <see cref="Parsing.Format"/>.
         /// </summary>
-        public Format parent { get; }
+        public Format Parent { get; }
+
+        /// <summary>
+        /// Gets the parent <see cref="Parsing.Format"/>.
+        /// </summary>
+        [Obsolete("Use property 'Parent' instead", true)]
+        public Format parent => Parent;
 
         /// <summary>
         /// Gets or sets the nesting level the <see cref="Placeholder"/>.
