@@ -19,6 +19,7 @@ v3.0.0 (Draft)
 * Public property`Format.parent` renamed to `Format.Parent`
 * Public property`Placeholder.parent` renamed to `Placeholder.Parent`
 * `Placeholder` now has `FormatterOptionsRaw` with original (unescaped) string and `FormatterOptions` with the escaped string.
+* `EscapedLiteral`: 15% faster, 50% less GC
 * `Parser` ([#164](https://github.com/axuno/SmartFormat/pull/164)):
   * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete.
   * `Parser.UseAlternativeBraces(..)` is obsolete and not supported any more
