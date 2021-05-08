@@ -39,7 +39,7 @@ namespace SmartFormat.Core.Parsing
             var source = baseString.AsSpan(startIndex, endIndex - startIndex);
             if (source.Length == 0) return string.Empty;
 
-            return EscapedLiteral.UnescapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, source).ToString();
+            return EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, source).ToString();
         }
     }
 }

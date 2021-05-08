@@ -178,6 +178,9 @@ namespace SmartFormat.Core.Parsing
             /// <returns>The sum, but not more than <see cref="ObjectLength"/></returns>
             public int SafeAdd(int index, int add)
             {
+                // Todo: Index design
+                // The design is currently the way, that an end index
+                // is always 1 above the last position, like currentFormat.endIndex = inputFormat.Length;
                 return index + add < ObjectLength ? index + add : ObjectLength;
             }
         }
@@ -635,11 +638,19 @@ namespace SmartFormat.Core.Parsing
                 nextChar = inputFormat[index.SafeAdd(index.Current, 1)];
                 // Skip escaped terminating characters
                 if (inputFormat[index.Current] == _parserSettings.CharLiteralEscapeChar &&
-                    _parserSettings.FormatOptionsTerminatorChars.Contains(nextChar))
+                    (_parserSettings.FormatOptionsTerminatorChars.Contains(nextChar) ||
+                     EscapedLiteral.TryGetChar(nextChar, out _, true)))
                 {
-                    index.SafeAdd(index.Current, 1);
+                    index.Current = index.SafeAdd(index.Current, 1);
+                    if (_parserSettings.FormatOptionsTerminatorChars.Contains(
+                        inputFormat[index.SafeAdd(index.Current, 1)]))
+                    {
+                        return;
+                    }
+
                     continue;
                 }
+
                 // End of parsing options, when the NEXT character is terminating,
                 // because this character will be handled in the Parser.ParseFormat main loop.
                 if (_parserSettings.FormatOptionsTerminatorChars.Contains(inputFormat[index.Current + 1]))

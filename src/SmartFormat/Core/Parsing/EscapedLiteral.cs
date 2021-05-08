@@ -4,8 +4,8 @@
 //
 
 using System;
-using System.Buffers;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -60,11 +60,10 @@ namespace SmartFormat.Core.Parsing
         /// <param name="input"></param>
         /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
         /// <returns>The input with escaped characters with their real value.</returns>
-        public static ReadOnlySpan<char> UnescapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars = false)
+        public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars = false)
         {
             var length = input.Length;
-            //Span<char> result = ArrayPool<char>.Shared.Rent(length);
-            //It's enough to have the buffer with same size as input length
+            // It's enough to have the buffer with same size as input length
             var result = new Span<char>(new char[length]);
             var resultIndex = 0;
             for (var inputIndex = 0; inputIndex < length; inputIndex++)
@@ -99,6 +98,47 @@ namespace SmartFormat.Core.Parsing
                 }
             }
             return (ReadOnlySpan<char>) result.Slice(0, resultIndex);
+        }
+
+        /// <summary>
+        /// Escapes a string, that contains character which must be escaped.
+        /// </summary>
+        /// <param name="escapeSequenceStart">The character starting the escape sequence.</param>
+        /// <param name="input">The string to escape.</param>
+        /// <param name="includeFormatterOptionChars"><see langword="true"/>, if characters for formatter options should be included. Default is <see langword="false"/>.</param>
+        /// <returns>Returns the escaped characters.</returns>
+        internal static IEnumerable<char> EscapeCharLiteralsAsEnumerable(char escapeSequenceStart, string input, bool includeFormatterOptionChars)
+        {
+            foreach (var c in input)
+            {
+                if(GeneralLookupTable.ContainsValue(c))
+                {
+                    yield return escapeSequenceStart;
+                    yield return GeneralLookupTable.First(kv => kv.Value == c).Key;
+                    continue;
+                }
+
+                if(includeFormatterOptionChars && FormatterOptionsLookupTable.ContainsValue(c))
+                {
+                    yield return escapeSequenceStart;
+                    yield return FormatterOptionsLookupTable.First(kv => kv.Value == c).Key;
+                    continue;
+                }
+
+                yield return c;
+            }
+        }
+
+        /// <summary>
+        /// Escapes a string, that contains character which must be escaped.
+        /// </summary>
+        /// <param name="escapeSequenceStart">The character starting the escape sequence.</param>
+        /// <param name="input">The string to escape.</param>
+        /// <param name="includeFormatterOptionChars"><see langword="true"/>, if characters for formatter options should be included. Default is <see langword="false"/>.</param>
+        /// <returns>Returns the string with escaped characters.</returns>
+        public static ReadOnlySpan<char> EscapeCharLiterals(char escapeSequenceStart, string input, bool includeFormatterOptionChars)
+        {
+            return EscapeCharLiteralsAsEnumerable(escapeSequenceStart, input, includeFormatterOptionChars).ToArray();
         }
     }
 }

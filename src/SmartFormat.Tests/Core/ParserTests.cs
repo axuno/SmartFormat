@@ -250,7 +250,7 @@ namespace SmartFormat.Tests.Core
             if (shouldSucceed)
             {
                 Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
-                    "One placeholders");
+                    "One placeholder");
                 Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
                     Is.EqualTo("{TheVariable}"));
             }

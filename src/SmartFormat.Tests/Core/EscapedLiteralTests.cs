@@ -31,18 +31,34 @@ namespace SmartFormat.Tests.Core
 
         [TestCase(@"\\ \' abc\\", @"\ ' abc\")] // included in look-up table
         [TestCase(@"\zabc\", @"\zabc\")] // not included in look-up table
-        public void UnescapeCharLiterals_General_Test(string input, string expected)
+        public void UnEscapeCharLiterals_General_Test(string input, string expected)
         {
-            var result = EscapedLiteral.UnescapeCharLiterals('\\', input.AsSpan(),false);
+            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),false);
             Assert.That(result.ToString(), Is.EqualTo(expected));
         }
 
         [TestCase(@"\{ \( abc", @"{ ( abc")] // included in look-up table
         [TestCase(@"\zabc", @"\zabc")] // not included in look-up table
-        public void UnescapeCharLiterals_FormatterOption_Test(string input, string expected)
+        public void UnEscapeCharLiterals_FormatterOption_Test(string input, string expected)
         {
-            var result = EscapedLiteral.UnescapeCharLiterals('\\', input.AsSpan(),true);
+            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),true);
             Assert.That(result.ToString(), Is.EqualTo(expected));
+        }
+
+        [TestCase(@"abc", @"abc")] // not to escape
+        [TestCase("\'\"\\\n", @"\'\""\\\n")] // to escape
+        public void EscapeCharLiterals_General_Test(string input, string expected)
+        {
+            var result = EscapedLiteral.EscapeCharLiterals('\\', input, false).ToString();
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(@"abc", @"abc")] // not to escape
+        [TestCase("(){}:", @"\(\)\{\}\:")] // to escape
+        public void EscapeCharLiterals_FormatOption_Test(string input, string expected)
+        {
+            var result = EscapedLiteral.EscapeCharLiterals('\\', input, true).ToString();
+            Assert.That(result, Is.EqualTo(expected));
         }
     }
 }
