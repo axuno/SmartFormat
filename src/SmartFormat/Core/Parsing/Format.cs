@@ -24,14 +24,14 @@ namespace SmartFormat.Core.Parsing
         public Format(SmartSettings smartSettings, string baseString) : base(smartSettings, baseString, 0,
             baseString.Length)
         {
-            parent = null;
+            Parent = null;
             Items = new List<FormatItem>();
         }
 
         public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent,
             startIndex)
         {
-            this.parent = parent;
+            Parent = parent;
             Items = new List<FormatItem>();
         }
 
@@ -39,8 +39,19 @@ namespace SmartFormat.Core.Parsing
 
         #region: Fields and Properties :
 
-        public readonly Placeholder? parent;
+        /// <summary>
+        /// Gets the parent <see cref="Placeholder"/>.
+        /// </summary>
+        [Obsolete("Use property 'Parent' instead.", true)]
+        public Placeholder? parent => Parent;
+
+        /// <summary>
+        /// Gets the parent <see cref="Placeholder"/>.
+        /// </summary>
+        public Placeholder? Parent { get; }
+
         public List<FormatItem> Items { get; }
+
         public bool HasNested { get; set; }
 
         #endregion

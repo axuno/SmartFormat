@@ -6,7 +6,7 @@ using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
     public class ValueTupleTests
@@ -19,7 +19,7 @@ namespace SmartFormat.Tests
             // * the format string can be written like each object would be the first argument of Smart.Format
             // * there is no need to bother from which argument a value should come from 
 
-            var addr = new Extensions.DictionaryFormatterTests.Address();
+            var addr = new DictionaryFormatterTests.Address();
             var dict1 = new Dictionary<string, string> { {"dict1key", "dict1 Value"} };
             var dict2 = new Dictionary<string, string> { { "dict2key", "dict2 Value" } };
 
