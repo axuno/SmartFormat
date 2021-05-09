@@ -60,5 +60,16 @@ namespace SmartFormat.Tests.Core
             var result = EscapedLiteral.EscapeCharLiterals('\\', input, true).ToString();
             Assert.That(result, Is.EqualTo(expected));
         }
+
+        [TestCase(@"\(([^\)]*)\)")] // escaped parenthesis
+        [TestCase(@"Lon(?=don)")] // parenthesis
+        [TestCase(@"<[^<>]+>")] // square and pointed brackets
+        [TestCase(@"\d{3,}")] // curly braces
+        [TestCase(@"^.{5,}:,$")] // dot, colon, comma
+        public void UnEscape_Escaped_Special_Characters(string pattern)
+        {
+            var optionsEscaped = new string(EscapedLiteral.EscapeCharLiterals('\\', pattern, true).ToArray());
+            Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', optionsEscaped.AsSpan(), true).ToString(), Is.EqualTo(pattern));
+        }
     }
 }

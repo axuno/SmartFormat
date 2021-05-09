@@ -45,7 +45,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="result">The matching character.</param>
         /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
         /// <returns><see langword="true"/>, if a matching character was found.</returns>
-        public static bool TryGetChar(char input, out char result, bool includeFormatterOptionChars = false)
+        public static bool TryGetChar(char input, out char result, bool includeFormatterOptionChars)
         {
             return includeFormatterOptionChars
                 ? GeneralLookupTable.TryGetValue(input, out result) ||
@@ -60,7 +60,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="input"></param>
         /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
         /// <returns>The input with escaped characters with their real value.</returns>
-        public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars = false)
+        public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars)
         {
             var length = input.Length;
             // It's enough to have the buffer with same size as input length

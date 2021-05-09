@@ -30,16 +30,16 @@ namespace SmartFormat.Core.Parsing
         public override string ToString()
         {
             return SmartSettings.Parser.ConvertCharacterStringLiterals
-                ? UnescapeCharacterLiterals()
+                ? UnEscapeCharacterLiterals()
                 : baseString.Substring(startIndex, endIndex - startIndex);
         }
 
-        private string UnescapeCharacterLiterals()
+        private string UnEscapeCharacterLiterals()
         {
             var source = baseString.AsSpan(startIndex, endIndex - startIndex);
             if (source.Length == 0) return string.Empty;
 
-            return EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, source).ToString();
+            return EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, source, false).ToString();
         }
     }
 }
