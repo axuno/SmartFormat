@@ -16,6 +16,7 @@ v3.0.0 (Draft)
 
 **Currently merged to the `version/v3.0` branch:**
 
+* Parser can parse any character as formatter options. This means e.g. no limitations for `RegEx`used `IsMatchFormatter`. ([#165](https://github.com/axuno/SmartFormat/pull/165)) 
 * Public property `Format.parent` renamed to `Format.Parent`
 * Public property `Placeholder.parent` renamed to `Placeholder.Parent`
 * `Placeholder` now has `FormatterOptionsRaw` with original (unescaped) string and `FormatterOptions` with the escaped string.
