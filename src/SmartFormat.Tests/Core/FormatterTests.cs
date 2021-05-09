@@ -30,7 +30,7 @@ namespace SmartFormat.Tests.Core
         public void Formatter_With_Params_Objects()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            Assert.That(formatter.Format("{0}{1}", 0, 1), Is.EqualTo("01"));
+            Assert.That(formatter.Format("{0}{1}ABC", 0, 1), Is.EqualTo("01ABC"));
         }
 
         [Test]
