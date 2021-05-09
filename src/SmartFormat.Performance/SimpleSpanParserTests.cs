@@ -20,8 +20,9 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
 |            Method |     Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
 |------------------ |---------:|---------:|---------:|-------:|------:|------:|----------:|
-|  ParseSmartFormat | 88.71 us | 1.765 us | 4.092 us | 1.0986 |     - |     - |   9.87 KB |
-| ParsePlaceholders | 35.03 us | 0.690 us | 1.075 us | 0.1831 |     - |     - |   1.53 KB |
+|  SmartFormat2.7.0 | 79.23 us | 0.541 us | 0.479 us | 0.8545 |     - |     - |   7.84 KB |
+|  ParseSmartFormat | 81.93 us | 1.035 us | 0.968 us | 1.0986 |     - |     - |   9.87 KB |
+| ParsePlaceholders | 38.14 us | 0.249 us | 0.220 us | 0.1831 |     - |     - |   1.53 KB |
     */
 
     [SimpleJob(RuntimeMoniker.NetCoreApp50)]
