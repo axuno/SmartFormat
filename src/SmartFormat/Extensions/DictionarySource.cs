@@ -26,8 +26,7 @@ namespace SmartFormat.Extensions
             var selector = selectorInfo.SelectorText;
 
             // See if current is a IDictionary and contains the selector:
-            var rawDict = current as IDictionary;
-            if (rawDict != null)
+            if (current is IDictionary rawDict)
                 foreach (DictionaryEntry entry in rawDict)
                 {
                     var key = entry.Key as string ?? entry.Key.ToString()!;

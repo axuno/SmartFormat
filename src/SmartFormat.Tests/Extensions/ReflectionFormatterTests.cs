@@ -143,8 +143,8 @@ namespace SmartFormat.Tests.Extensions
             
             // Invoke formatter 1st time
             Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
-            Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Method)), out var found), Is.True);
-            Assert.That(found.method?.Invoke(obj.Obj, Array.Empty<object>()), Is.EqualTo(obj.Obj.MethodReturnValue));
+            Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Method)), out var found), Is.True);
+            if(found.method != null) Assert.That(found.method.Invoke(obj.Obj, Array.Empty<object>()), Is.EqualTo(obj.Obj.MethodReturnValue));
 
             // Invoke formatter 2nd time
             obj.Obj.MethodReturnValue = "Another Method Value";
@@ -166,7 +166,7 @@ namespace SmartFormat.Tests.Extensions
             
             // Invoke formatter 1st time
             Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
-            Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out var found), Is.True);
+            Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out var found), Is.True);
             Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
 
             // Invoke formatter 2nd time
