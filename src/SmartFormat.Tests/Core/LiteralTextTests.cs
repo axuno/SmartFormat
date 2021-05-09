@@ -56,25 +56,5 @@ namespace SmartFormat.Tests.Core
             Smart.Default.Settings.ConvertCharacterStringLiterals = false;
             Assert.AreEqual("one\ntwo\nand three", result);
         }
-
-        [Test]
-        public void IllegalEscapeSequenceThrowsException()
-        {
-            Smart.Default.Settings.ConvertCharacterStringLiterals = true;
-
-            Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequence at end of line = \z");
-            });
-
-            Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequence \z somewhere in text");
-            });
-
-            Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequences at end of line = \");
-            });
-
-            Smart.Default.Settings.ConvertCharacterStringLiterals = false;
-        }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
@@ -39,11 +40,13 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
-        public void Test_FormatException()
+        public void Less_Than_2_Format_Options_Should_Throw()
         {
-            // less than 2 format options throw exception
+            // less than 2 format options should throw exception
             Assert.Throws<FormattingException>(() =>
                 _formatter.Format("{theKey:ismatch(^.+123.+$):Dummy content}", _variable));
+            Assert.DoesNotThrow(() =>
+                _formatter.Format("{theKey:ismatch(^.+123.+$):Dummy content|2nd option}", _variable));
         }
 
         [Test]
@@ -57,6 +60,70 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual("'match', 'match' and 'no match'",
                 _formatter.Format(CultureInfo.InvariantCulture,
                     "{0:list:{:ismatch(^100|200|999$):'match'|'no match'}|, | and }", myList));
+        }
+
+        [TestCase("€ Euro", true)]
+        [TestCase("¥ Yen", true)]
+        [TestCase("none", false)]
+        public void Currency_Symbol(string currency, bool isMatch)
+        {
+            var variable = new { Currency = currency};
+
+            // If special characters like \{}: are escaped, they can be used in format options:
+            var result = _formatter.Format("{Currency:ismatch(\\p\\{Sc\\}):Currency: {}|Unknown}", variable);
+            if (isMatch) Assert.IsTrue(result.Contains("Currency"), "Result contains Currency");
+            if (!isMatch) Assert.IsTrue(result.Contains("Unknown"), "Result contains Unknown");
+        }
+        
+        // Single-escaped: only for RegEx
+        [TestCase("|", @"\|", @"\|")]
+        [TestCase("?", @"\?", @"\?")]
+        [TestCase("+", @"\+", @"\+")]
+        [TestCase("*", @"\*", @"\*")]
+        [TestCase("^", @"\^", @"\^")]
+        [TestCase(".", @"\.", @"\.")]
+        [TestCase("[", @"\[", @"\[")]
+        [TestCase("]", @"\]", @"\]")]
+        // Single-escaped: only for Smart.Format
+        [TestCase(":", @":", @"\:")]
+        // Double-escaped: once for RegEx, one for Smart.Format
+        [TestCase(@"\", @"\\", @"\\\\")]
+        [TestCase("(", @"\(", @"\\\(")]
+        [TestCase(")", @"\)", @"\\\)")]
+        [TestCase("{", @"\{", @"\\\{")]
+        [TestCase("}", @"\}", @"\\\}")]
+        public void Escaped_Option_And_RegEx_Chars(string search, string regExEscaped, string optionsEscaped)
+        {
+            // To be escaped with backslash for PCRE RegEx:  ".^$*+?()[]{}\|"
+
+            var regEx = new Regex(regExEscaped);
+            Assert.IsTrue(regEx.Match(search).Success);
+            var result = _formatter.Format("{0:ismatch(" + optionsEscaped + "):found {}|}", search);
+            Assert.That(result, Is.EqualTo("found " + search));
+        }
+
+        [TestCase(@"\(([^\)]*)\)", "Text (inside) parenthesis", true)] // escaped parenthesis
+        [TestCase(@"\(([^\)]*)\)", "No parenthesis", false)]
+        [TestCase(@"Lon(?=don)", "This is London", true)] // parenthesis
+        [TestCase(@"Lon(?=don)", "This is Loando", false)]
+        [TestCase(@"<[^<>]+>", "<abcde>", true)] // square and pointed brackets
+        [TestCase(@"<[^<>]+>", "<>", false)]
+        [TestCase(@"\d{3,}", "1234", true)] // curly braces
+        [TestCase(@"\d{3,}", "12", false)]
+        [TestCase(@"^.{5,}:,$", "1z%aW:,", true)] // dot, colon, comma
+        [TestCase(@"^.{5,}:,$", "1z:,", false)]
+        public void Match_Special_Characters(string pattern, string input, bool shouldMatch)
+        {
+            var regExOptions = RegexOptions.None;
+            ((IsMatchFormatter) _formatter.FormatterExtensions.First(fex =>
+                fex.GetType() == typeof(IsMatchFormatter))).RegexOptions = regExOptions;
+
+            var regEx = new Regex(pattern, regExOptions);
+            var optionsEscaped = new string(EscapedLiteral.EscapeCharLiterals('\\', pattern, true).ToArray());
+            var result = _formatter.Format("{0:ismatch(" + optionsEscaped + "):found {}|}", input);
+
+            Assert.That(regEx.Match(input).Success, Is.EqualTo(shouldMatch), "RegEx pattern match");
+            Assert.That(result, shouldMatch ? Is.EqualTo("found " + input) : Is.EqualTo(string.Empty), "IsMatchFormatter pattern match");
         }
     }
 }
