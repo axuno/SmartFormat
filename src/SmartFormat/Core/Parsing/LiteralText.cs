@@ -40,7 +40,7 @@ namespace SmartFormat.Core.Parsing
             if (source[0] != Parser.CharLiteralEscapeChar)
                 return source;
 
-            // The string length should be 2: espace character \ and literal character
+            // The string length should be 2: escape character \ and literal character
             if (source.Length < 2) throw new ArgumentException($"Missing escape sequence in literal: \"{source}\"");
 
             char c;
