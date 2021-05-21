@@ -18,7 +18,7 @@ namespace SmartFormat.Tests.Core
         public void FormatCharacterLiteralsAsString()
         {
             const string formatWithFileBehavior = @"No carriage return\r, no line feed\n";
-            const string formatWithCodeBahavior = "With carriage return\r, and with line feed\n";
+            const string formatWithCodeBehavior = "With carriage return\r, and with line feed\n";
 
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.ConvertCharacterStringLiterals = false;
@@ -26,8 +26,8 @@ namespace SmartFormat.Tests.Core
             var result = formatter.Format(formatWithFileBehavior);
             Assert.AreEqual(string.Format(formatWithFileBehavior), result);
 
-            result = formatter.Format(formatWithCodeBahavior);
-            Assert.AreEqual(string.Format(formatWithCodeBahavior), result);
+            result = formatter.Format(formatWithCodeBehavior);
+            Assert.AreEqual(string.Format(formatWithCodeBehavior), result);
         }
 
         [Test]
@@ -35,14 +35,14 @@ namespace SmartFormat.Tests.Core
         {
             var data = new Dictionary<string, string> { { "key", "value" } };
 
-            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v {key}\0!";
-            const string formatWithCodeBahavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v {key}\0!";
+            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v \u2022 {key}\0!";
+            const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v \u2022 {key}\0!";
             
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.ConvertCharacterStringLiterals = true;
 
             var result = formatter.Format(formatWithFileBehavior, data);
-            Assert.AreEqual(string.Format(formatWithCodeBahavior.Replace("{"+ data.First().Key +"}", data.First().Value)), result);
+            Assert.AreEqual(string.Format(formatWithCodeBehavior.Replace("{"+ data.First().Key +"}", data.First().Value)), result);
         }
 
         [Test]
@@ -63,15 +63,15 @@ namespace SmartFormat.Tests.Core
             Smart.Default.Settings.ConvertCharacterStringLiterals = true;
 
             Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequence at end of line = \z");
+                Smart.Default.Format(@"Illegal escape sequence at end of line = \z");
             });
 
             Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequence \z somewhere in text");
+                Smart.Default.Format(@"Illegal escape sequence \z somewhere in text");
             });
 
             Assert.Throws<ArgumentException>(() => {
-                Smart.Default.Format(@"Illegal excape sequences at end of line = \");
+                Smart.Default.Format(@"Illegal escape sequences at end of line = \");
             });
 
             Smart.Default.Settings.ConvertCharacterStringLiterals = false;
