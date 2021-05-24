@@ -150,16 +150,14 @@ namespace SmartFormat.Extensions
             {
                 // The format is not nested,
                 // so we will treat it as an itemFormat:
-                var newItemFormat = new Format(_smartSettings, itemFormat.baseString)
+                var newItemFormat = new Format(_smartSettings, itemFormat.BaseString, itemFormat.StartIndex, itemFormat.EndIndex)
                 {
-                    startIndex = itemFormat.startIndex,
-                    endIndex = itemFormat.endIndex,
                     HasNested = true
                 };
-                var newPlaceholder = new Placeholder(_smartSettings, newItemFormat, itemFormat.startIndex, 0)
+                var newPlaceholder = new Placeholder(_smartSettings, newItemFormat, itemFormat.StartIndex, 0)
                 {
                     Format = itemFormat,
-                    endIndex = itemFormat.endIndex
+                    EndIndex = itemFormat.EndIndex
                 };
                 newItemFormat.Items.Add(newPlaceholder);
                 itemFormat = newItemFormat;

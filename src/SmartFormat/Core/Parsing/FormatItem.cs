@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 //
 
+using System;
 using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
@@ -13,8 +14,21 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public abstract class FormatItem
     {
-        public readonly string baseString;
+        [Obsolete("Use property 'BaseString' instead")]
+        public string baseString => BaseString;
+
+        /// <summary>
+        /// Gets the base format string.
+        /// </summary>
+        public string BaseString { get; }
         
+        [Obsolete("Use property 'EndIndex' instead")]
+        public int endIndex
+        {
+            get => EndIndex;
+            set => EndIndex = value;
+        }
+
         /// <summary>
         /// The end index is pointing to ONE POSITION AFTER the last character of item.
         ///  </summary>
@@ -24,8 +38,15 @@ namespace SmartFormat.Core.Parsing
         /// Start index for 1st placeholder is 0, for the second it's 3, for the literal it's 6.
         /// End index for the 1st placeholder is 3, for the second it's 6, for the literal it's 9.
         /// </example>
-        public int endIndex;
+        public int EndIndex { get; set; }
         
+        [Obsolete("Use property 'StartIndex' instead")]
+        public int startIndex
+        {
+            get => StartIndex;
+            set => StartIndex = value;
+        }
+
         /// <summary>
         /// The start index is pointing to the first character of item.
         ///  </summary>
@@ -35,41 +56,41 @@ namespace SmartFormat.Core.Parsing
         /// Start index for 1st placeholder is 0, for the second it's 3, for the literal it's 6.
         /// End index for the 1st placeholder is 3, for the second it's 6, for the literal it's 9.
         /// </example>
-        public int startIndex;
+        public int StartIndex { get; set; }
+
+        /// <summary>
+        /// Gets the result of <see cref="EndIndex"/> minus <see cref="StartIndex"/>.
+        /// </summary>
+        public int Length => EndIndex - StartIndex;
 
         /// <summary>
         /// The settings for formatter and parser.
         /// </summary>
         protected SmartSettings SmartSettings;
 
-        protected FormatItem(SmartSettings smartSettings, FormatItem parent, int startIndex) : this(smartSettings,
-            parent.baseString, startIndex, parent.baseString.Length)
-        {
-        }
-
-        protected FormatItem(SmartSettings smartSettings, FormatItem parent, int startIndex, int endIndex) : this(smartSettings,
-            parent.baseString, startIndex, endIndex)
-        {
-        }
-
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="smartSettings"></param>
+        /// <param name="baseString">The base format string.</param>
+        /// <param name="startIndex">The start index of the <see cref="FormatItem"/> within the base format string.</param>
+        /// <param name="endIndex">The end index of the <see cref="FormatItem"/> within the base format string.</param>
         protected FormatItem(SmartSettings smartSettings, string baseString, int startIndex, int endIndex)
         {
             SmartSettings = smartSettings;
-            this.baseString = baseString;
-            this.startIndex = startIndex;
-            this.endIndex = endIndex;
+            BaseString = baseString;
+            StartIndex = startIndex;
+            EndIndex = endIndex;
         }
 
         /// <summary>
         /// Retrieves the raw text that this item represents.
         /// </summary>
-        public string RawText => baseString.Substring(startIndex, endIndex - startIndex);
+        public string RawText => BaseString.Substring(StartIndex, Length);
 
-        public override string ToString()
-        {
-            return endIndex <= startIndex
-                ? $"Empty ({baseString.Substring(startIndex)})"
-                : $"{baseString.Substring(startIndex, endIndex - startIndex)}";
-        }
+        public override string ToString() =>
+            EndIndex <= StartIndex
+                ? $"Empty ({BaseString.Substring(StartIndex)})"
+                : $"{BaseString.Substring(StartIndex, Length)}";
     }
 }

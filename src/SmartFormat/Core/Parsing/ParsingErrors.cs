@@ -51,7 +51,7 @@ namespace SmartFormat.Core.Parsing
                 }
 
                 return
-                    $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? "" : "s")}:\n{string.Join(", ", Issues.Select(i => i.Issue).ToArray())}\nIn: \"{result.baseString}\"\nAt:  {arrows} ";
+                    $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? "" : "s")}:\n{string.Join(", ", Issues.Select(i => i.Issue).ToArray())}\nIn: \"{result.BaseString}\"\nAt:  {arrows} ";
             }
         }
 
