@@ -18,31 +18,40 @@ namespace SmartFormat.Tests.Core
         public void FormatCharacterLiteralsAsString()
         {
             const string formatWithFileBehavior = @"No carriage return\r, no line feed\n";
-            const string formatWithCodeBahavior = "With carriage return\r, and with line feed\n";
+            const string formatWithCodeBehavior = "With carriage return\r, and with line feed\n";
 
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.ConvertCharacterStringLiterals = false;
+            formatter.Settings.Parser.ConvertCharacterStringLiterals = false;
 
             var result = formatter.Format(formatWithFileBehavior);
             Assert.AreEqual(string.Format(formatWithFileBehavior), result);
 
-            result = formatter.Format(formatWithCodeBahavior);
-            Assert.AreEqual(string.Format(formatWithCodeBahavior), result);
+            result = formatter.Format(formatWithCodeBehavior);
+            Assert.AreEqual(string.Format(formatWithCodeBehavior), result);
         }
 
         [Test]
         public void AllSupportedCharacterLiteralsAsUnicode()
         {
-            var data = new Dictionary<string, string> { { "key", "value" } };
-
-            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v {key}\0!";
-            const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v {key}\0!";
+            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v \0!";
+            const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v \0!";
             
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.ConvertCharacterStringLiterals = true;
+            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
 
-            var result = formatter.Format(formatWithFileBehavior, data);
-            Assert.AreEqual(string.Format(formatWithCodeBehavior.Replace("{"+ data.First().Key +"}", data.First().Value)), result);
+            var result = formatter.Format(formatWithFileBehavior);
+            Assert.AreEqual(formatWithCodeBehavior, result);
+        }
+
+        [Test]
+        public void UnsupportedCharacterLiteralEscapeSequence()
+        {
+            const string format = @"Not supported: \y - Supported: \a";
+            
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
+
+            Assert.That( () => formatter.Format(format), Throws.ArgumentException.And.Message.Contains(@"\y"));
         }
 
         [Test]
@@ -51,9 +60,9 @@ namespace SmartFormat.Tests.Core
             // a useful practical test case: separate members of a list by a new line
             var items = new[] { "one", "two", "three" };
             // Note the @ before the format string will switch off conversion of \n by the compiler
-            Smart.Default.Settings.ConvertCharacterStringLiterals = true;
+            Smart.Default.Settings.Parser.ConvertCharacterStringLiterals = true;
             var result = Smart.Default.Format(@"{0:list:{}|\n|\nand }", new object[] { items });
-            Smart.Default.Settings.ConvertCharacterStringLiterals = false;
+            Smart.Default.Settings.Parser.ConvertCharacterStringLiterals = false;
             Assert.AreEqual("one\ntwo\nand three", result);
         }
     }
