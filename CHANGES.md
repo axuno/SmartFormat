@@ -11,15 +11,20 @@ v3.0.0 (Draft)
    * Formatter.Parser.AddOperators(".,")
 2. Remove adding custom operators, can too easily break the parser
 3. Restrict custom selectors to "not reserved characters" like `{}[]().,-:\`
-4. Replace input format `string` with `ReadOnlySpan<char>` in `Parser`
+4. Add unicode escape characters PR of [@karljj1](https://github.com/karljj1)
 
 
 **Currently merged to the `version/v3.0` branch:**
 
+* `FormatItem` abstract class ([#166](https://github.com/axuno/SmartFormat/pull/166))
+  * Field `baseString` renamed to `BaseString` property
+  * Field `startIndex` renamed to `StartIndex` property
+  * Field `endIndex` renamed to `IndexIndex` property
+  * Added `Length`property (returing `EndIndex` - `StartIndex`)
 * Parser can parse any character as formatter options. This means e.g. no limitations for `RegEx` expressions used in `IsMatchFormatter`. ([#165](https://github.com/axuno/SmartFormat/pull/165)) 
-* Public property `Format.parent` renamed to `Format.Parent`
-* Public property `Placeholder.parent` renamed to `Placeholder.Parent`
-* `Placeholder` now has `FormatterOptionsRaw` with original (unescaped) string and `FormatterOptions` with the escaped string.
+  * Public property `Format.parent` renamed to `Format.Parent`
+  * Public property `Placeholder.parent` renamed to `Placeholder.Parent`
+  * `Placeholder` now has `FormatterOptionsRaw` with original (unescaped) string and `FormatterOptions` with the escaped string.
 * `EscapedLiteral`: 15% faster, 50% less GC
 * `Parser` ([#164](https://github.com/axuno/SmartFormat/pull/164)):
   * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete.
