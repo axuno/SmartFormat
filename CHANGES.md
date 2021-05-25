@@ -16,7 +16,7 @@ v3.0.0 (Draft)
 
 **Currently merged to the `version/v3.0` branch:**
 
-* `FormatItem` abstract class ([#166](https://github.com/axuno/SmartFormat/pull/166))
+* `FormatItem` abstract class ([#167](https://github.com/axuno/SmartFormat/pull/167))
   * Field `baseString` renamed to `BaseString` property
   * Field `startIndex` renamed to `StartIndex` property
   * Field `endIndex` renamed to `IndexIndex` property
