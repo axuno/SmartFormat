@@ -29,20 +29,33 @@ namespace SmartFormat.Tests.Core
             else Assert.That(found, Is.False);
         }
 
-        [TestCase(@"\\ \' abc\\", @"\ ' abc\")] // included in look-up table
-        [TestCase(@"\zabc\", @"\zabc\")] // not included in look-up table
-        public void UnEscapeCharLiterals_General_Test(string input, string expected)
+        [TestCase(@"\\ \' abc\\", @"\ ' abc\", false)] // included in look-up table
+        [TestCase(@"\zabc\", @"\z", true)] // not included in look-up table
+        public void UnEscapeCharLiterals_General_Test(string input, string expected, bool shouldThrow)
         {
-            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),false);
-            Assert.That(result.ToString(), Is.EqualTo(expected));
+            if (shouldThrow)
+            {
+                Assert.That( () => EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),true), Throws.ArgumentException.And.Message.Contains(expected));
+            }
+            else
+            {
+                var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),false);
+                Assert.That(result.ToString(), Is.EqualTo(expected));            }
         }
 
-        [TestCase(@"\{ \( abc", @"{ ( abc")] // included in look-up table
-        [TestCase(@"\zabc", @"\zabc")] // not included in look-up table
-        public void UnEscapeCharLiterals_FormatterOption_Test(string input, string expected)
+        [TestCase(@"\{ \( abc", @"{ ( abc", false)] // included in look-up table
+        [TestCase(@"\zabc", @"\z", true)] // not included in look-up table
+        public void UnEscapeCharLiterals_FormatterOption_Test(string input, string expected, bool shouldThrow)
         {
-            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),true);
-            Assert.That(result.ToString(), Is.EqualTo(expected));
+            if (shouldThrow)
+            {
+                Assert.That( () => EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),true), Throws.ArgumentException.And.Message.Contains(expected));
+            }
+            else
+            {
+                var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(),true);
+                Assert.That(result.ToString(), Is.EqualTo(expected));
+            }
         }
 
         [TestCase(@"abc", @"abc")] // not to escape
