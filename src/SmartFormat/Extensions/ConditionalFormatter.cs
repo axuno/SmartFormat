@@ -28,7 +28,7 @@ namespace SmartFormat.Extensions
 
             if (format == null) return false;
             // Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
-            if (format.baseString[format.startIndex] == ':') format = format.Substring(1);
+            if (format.BaseString[format.StartIndex] == ':') format = format.Substring(1);
 
             // See if the format string contains un-nested "|":
             var parameters = format.Split('|');
@@ -161,8 +161,8 @@ namespace SmartFormat.Extensions
         {
             conditionResult = false;
             // Let's evaluate the conditions into a boolean value:
-            var m = _complexConditionPattern.Match(parameter.baseString, parameter.startIndex,
-                parameter.endIndex - parameter.startIndex);
+            var m = _complexConditionPattern.Match(parameter.BaseString, parameter.StartIndex,
+                parameter.EndIndex - parameter.StartIndex);
             if (!m.Success)
             {
                 // Could not parse the "complex condition"
@@ -213,7 +213,7 @@ namespace SmartFormat.Extensions
 
             // Successful
             // Output the substring that doesn't contain the "complex condition"
-            var newStartIndex = m.Index + m.Length - parameter.startIndex;
+            var newStartIndex = m.Index + m.Length - parameter.StartIndex;
             outputItem = parameter.Substring(newStartIndex);
             return true;
         }

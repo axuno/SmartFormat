@@ -67,7 +67,7 @@ namespace SmartFormat.Core.Formatting
         public FormattingException FormattingException(string issue, FormatItem? problemItem = null, int startIndex = -1)
         {
             problemItem ??= Format;
-            if (startIndex == -1) startIndex = problemItem?.startIndex ?? -1;
+            if (startIndex == -1) startIndex = problemItem?.StartIndex ?? -1;
             return new FormattingException(problemItem, issue, startIndex);
         }
 

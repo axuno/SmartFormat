@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
             var current = formattingInfo.CurrentValue;
 
             // Ignore formats that start with "?" (this can be used to bypass this extension)
-            if (format == null || format.baseString[format.startIndex] == ':') return false;
+            if (format == null || format.BaseString[format.StartIndex] == ':') return false;
 
             // Extract the plural words from the format string:
             var pluralWords = format.Split('|');
@@ -66,7 +66,7 @@ namespace SmartFormat.Extensions
 
             if (pluralIndex < 0 || pluralWords.Count <= pluralIndex)
                 throw new FormattingException(format, "Invalid number of plural parameters",
-                    pluralWords.Last().endIndex);
+                    pluralWords.Last().EndIndex);
 
             // Output the selected word (allowing for nested formats):
             var pluralForm = pluralWords[pluralIndex];

@@ -14,16 +14,20 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class LiteralText : FormatItem
     {
-        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex) : base(smartSettings, parent,
-            startIndex)
+        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex) : base(smartSettings, parent.BaseString,
+            startIndex,  parent.EndIndex)
         {
         }
-        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex, int endIndex) : base(smartSettings, parent,
+        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex, int endIndex) : base(smartSettings, parent.BaseString,
             startIndex, endIndex)
         {
         }
 
-        public LiteralText(SmartSettings smartSettings, Format parent) : base(smartSettings, parent, parent.startIndex)
+        public LiteralText(SmartSettings smartSettings, Format parent) : base(smartSettings, parent.BaseString, parent.StartIndex, parent.EndIndex)
+        {
+        }
+
+        public LiteralText(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
         {
         }
 
@@ -31,12 +35,12 @@ namespace SmartFormat.Core.Parsing
         {
             return SmartSettings.Parser.ConvertCharacterStringLiterals
                 ? UnEscapeCharacterLiterals()
-                : baseString.Substring(startIndex, endIndex - startIndex);
+                : BaseString.Substring(StartIndex, EndIndex - StartIndex);
         }
 
         private string UnEscapeCharacterLiterals()
         {
-            var source = baseString.AsSpan(startIndex, endIndex - startIndex);
+            var source = BaseString.AsSpan(StartIndex, EndIndex - StartIndex);
             if (source.Length == 0) return string.Empty;
 
             return EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, source, false).ToString();
