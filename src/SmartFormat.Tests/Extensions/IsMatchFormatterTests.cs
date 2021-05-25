@@ -70,20 +70,20 @@ namespace SmartFormat.Tests.Extensions
             var variable = new { Currency = currency};
 
             // If special characters like \{}: are escaped, they can be used in format options:
-            var result = _formatter.Format("{Currency:ismatch(\\p\\{Sc\\}):Currency: {}|Unknown}", variable);
+            var result = _formatter.Format("{Currency:ismatch(\\\\p\\{Sc\\}):Currency: {}|Unknown}", variable);
             if (isMatch) Assert.IsTrue(result.Contains("Currency"), "Result contains Currency");
             if (!isMatch) Assert.IsTrue(result.Contains("Unknown"), "Result contains Unknown");
         }
         
         // Single-escaped: only for RegEx
-        [TestCase("|", @"\|", @"\|")]
-        [TestCase("?", @"\?", @"\?")]
-        [TestCase("+", @"\+", @"\+")]
-        [TestCase("*", @"\*", @"\*")]
-        [TestCase("^", @"\^", @"\^")]
-        [TestCase(".", @"\.", @"\.")]
-        [TestCase("[", @"\[", @"\[")]
-        [TestCase("]", @"\]", @"\]")]
+        [TestCase("|", @"\|", @"\\|")]
+        [TestCase("?", @"\?", @"\\?")]
+        [TestCase("+", @"\+", @"\\+")]
+        [TestCase("*", @"\*", @"\\*")]
+        [TestCase("^", @"\^", @"\\^")]
+        [TestCase(".", @"\.", @"\\.")]
+        [TestCase("[", @"\[", @"\\[")]
+        [TestCase("]", @"\]", @"\\]")]
         // Single-escaped: only for Smart.Format
         [TestCase(":", @":", @"\:")]
         // Double-escaped: once for RegEx, one for Smart.Format

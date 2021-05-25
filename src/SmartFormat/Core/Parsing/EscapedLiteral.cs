@@ -87,8 +87,7 @@ namespace SmartFormat.Core.Parsing
                     }
                     else
                     {
-                        result[resultIndex++] = input[inputIndex];
-                        result[resultIndex++] = input[nextInputIndex];
+                        throw new ArgumentException($"Unrecognized escape sequence \"{input[inputIndex]}{input[nextInputIndex]}\" in literal.");
                     }
                     inputIndex++;
                 }
