@@ -178,10 +178,12 @@ namespace SmartFormat.Core.Parsing
             /// <returns>The sum, but not more than <see cref="ObjectLength"/></returns>
             public int SafeAdd(int index, int add)
             {
-                // Todo: Index design
-                // The design is currently the way, that an end index
-                // is always 1 above the last position, like currentFormat.endIndex = inputFormat.Length;
-                return index + add < ObjectLength ? index + add : ObjectLength;
+                // The design is the way, that an end index
+                // is always 1 above the last position.
+                // Meaning that the maximum of 'FormatItem.endIndex' equals 'inputFormat.Length'
+                index += add;
+                System.Diagnostics.Debug.Assert(index >= 0);
+                return index < ObjectLength ? index : ObjectLength;
             }
         }
 
@@ -264,7 +266,7 @@ namespace SmartFormat.Core.Parsing
             {
                 parsingErrors.AddIssue(currentFormat, _parsingErrorText[ParsingError.MissingClosingBrace], inputFormat.Length,
                     inputFormat.Length);
-                currentFormat.endIndex = inputFormat.Length;
+                currentFormat.EndIndex = inputFormat.Length;
             }
             else if (index.LastEnd != inputFormat.Length)
             {
@@ -276,7 +278,7 @@ namespace SmartFormat.Core.Parsing
             while (currentFormat.Parent != null)
             {
                 currentFormat = currentFormat.Parent.Parent;
-                currentFormat.endIndex = inputFormat.Length;
+                currentFormat.EndIndex = inputFormat.Length;
             }
 
             // Check for any parsing errors:
@@ -387,8 +389,8 @@ namespace SmartFormat.Core.Parsing
             }
 
             nestedDepth--;
-            currentFormat.endIndex = index.Current;
-            currentFormat.Parent.endIndex = index.SafeAdd(index.Current, 1);
+            currentFormat.EndIndex = index.Current;
+            currentFormat.Parent.EndIndex = index.SafeAdd(index.Current, 1);
             currentFormat = currentFormat.Parent.Parent;
             index.NamedFormatterStart = index.NamedFormatterOptionsStart = index.NamedFormatterOptionsEnd = PositionUndefined; //2021-05-03 axuno
         }
@@ -501,7 +503,7 @@ namespace SmartFormat.Core.Parsing
                         if (parentPlaceholder != null) parentPlaceholder.FormatterName = formatterName;
                     }
                     else
-                        index.LastEnd = currentFormat.startIndex;
+                        index.LastEnd = currentFormat.StartIndex;
                 }
                 else
                 {
@@ -520,11 +522,13 @@ namespace SmartFormat.Core.Parsing
                     }
                     else
                     {
-                        index.LastEnd = currentFormat.startIndex;
+                        index.LastEnd = currentFormat.StartIndex;
                     }
                 }
 
-                currentFormat.startIndex = index.LastEnd;
+                // Set start index to start of formatter option arguments,
+                // with {0:default:N2} the start index is on the second colon
+                currentFormat.StartIndex = index.LastEnd;
 
                 index.NamedFormatterStart = PositionUndefined;
             }
@@ -603,7 +607,7 @@ namespace SmartFormat.Core.Parsing
 
                 // End the placeholder with no format:
                 nestedDepth--;
-                currentPlaceholder.endIndex = index.SafeAdd(index.Current, 1);
+                currentPlaceholder.EndIndex = index.SafeAdd(index.Current, 1);
                 currentFormat = currentPlaceholder.Parent;
                 currentPlaceholder = null;
             }
@@ -753,9 +757,9 @@ namespace SmartFormat.Core.Parsing
                     // Placeholder without issues are left unmodified
                     for (var i = 0; i < currentResult.Items.Count; i++)
                     {
-                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex, ph.endIndex);
+                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.BaseString), ph.StartIndex, ph.EndIndex);
                         }
                     }
                     return currentResult;
@@ -763,17 +767,14 @@ namespace SmartFormat.Core.Parsing
                     // Replace erroneous Placeholders with an empty LiteralText
                     for (var i = 0; i < currentResult.Items.Count; i++)
                     {
-                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex, ph.startIndex);
+                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.BaseString), ph.StartIndex, ph.StartIndex);
                         }
                     }
                     return currentResult;
                 case ParseErrorAction.OutputErrorInResult:
-                    var fmt = new Format(Settings, parsingErrors.Message) {
-                        startIndex = 0,
-                        endIndex = parsingErrors.Message.Length
-                    };
+                    var fmt = new Format(Settings, parsingErrors.Message, 0, parsingErrors.Message.Length);
                     fmt.Items.Add(new LiteralText(Settings, fmt));
                     return fmt;
                 default:

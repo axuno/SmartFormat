@@ -303,7 +303,7 @@ namespace SmartFormat
                 catch (Exception ex)
                 {
                     // An error occurred while evaluation selectors
-                    var errorIndex = placeholder.Format?.startIndex ?? placeholder.Selectors.Last().endIndex;
+                    var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors.Last().EndIndex;
                     FormatError(item, ex, errorIndex, childFormattingInfo);
                     continue;
                 }
@@ -315,7 +315,7 @@ namespace SmartFormat
                 catch (Exception ex)
                 {
                     // An error occurred while evaluating formatters
-                    var errorIndex = placeholder.Format?.startIndex ?? placeholder.Selectors.Last().endIndex;
+                    var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors.Last().EndIndex;
                     FormatError(item, ex, errorIndex, childFormattingInfo);
                 }
             }

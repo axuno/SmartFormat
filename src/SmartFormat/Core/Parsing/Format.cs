@@ -28,10 +28,15 @@ namespace SmartFormat.Core.Parsing
             Items = new List<FormatItem>();
         }
 
-        public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent,
-            startIndex)
+        public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent.BaseString, startIndex, parent.EndIndex)
         {
             Parent = parent;
+            Items = new List<FormatItem>();
+        }
+
+        public Format(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
+        {
+            Parent = null;
             Items = new List<FormatItem>();
         }
 
@@ -42,7 +47,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Gets the parent <see cref="Placeholder"/>.
         /// </summary>
-        [Obsolete("Use property 'Parent' instead.", true)]
+        [Obsolete("Use property 'Parent' instead.")]
         public Placeholder? parent => Parent;
 
         /// <summary>
@@ -61,42 +66,38 @@ namespace SmartFormat.Core.Parsing
         #region: Substring :
 
         /// <summary>Returns a substring of the current Format.</summary>
-        public Format Substring(int startIndex)
+        public Format Substring(int start)
         {
-            return Substring(startIndex, endIndex - this.startIndex - startIndex);
+            return Substring(start, this.EndIndex - this.StartIndex - start);
         }
 
         /// <summary>Returns a substring of the current Format.</summary>
-        public Format Substring(int startIndex, int length)
+        public Format Substring(int start, int length)
         {
-            startIndex = this.startIndex + startIndex;
-            var endIndex = startIndex + length;
+            start = this.StartIndex + start;
+            var end = start + length;
             // Validate the arguments:
-            if (startIndex < this.startIndex || startIndex > this.endIndex) // || endIndex > this.endIndex)
-                throw new ArgumentOutOfRangeException("startIndex");
-            if (endIndex > this.endIndex)
+            if (start < this.StartIndex || start > this.EndIndex) // || endIndex > this.endIndex)
+                throw new ArgumentOutOfRangeException("start");
+            if (end > this.EndIndex)
                 throw new ArgumentOutOfRangeException("length");
 
             // If startIndex and endIndex already match this item, we're done:
-            if (startIndex == this.startIndex && endIndex == this.endIndex) return this;
+            if (start == this.StartIndex && end == this.EndIndex) return this;
 
-            var substring = new Format(SmartSettings, baseString) {startIndex = startIndex, endIndex = endIndex};
+            var substring = new Format(SmartSettings, BaseString, start, end);
             foreach (var item in Items)
             {
-                if (item.endIndex <= startIndex)
+                if (item.EndIndex <= start)
                     continue; // Skip first items
-                if (endIndex <= item.startIndex)
+                if (end <= item.StartIndex)
                     break; // Done
 
                 var newItem = item;
                 if (item is LiteralText) // See if we need to slice the LiteralText:
                 {
-                    if (startIndex > item.startIndex || item.endIndex > endIndex)
-                        newItem = new LiteralText(SmartSettings, substring)
-                        {
-                            startIndex = Math.Max(startIndex, item.startIndex),
-                            endIndex = Math.Min(endIndex, item.endIndex)
-                        };
+                    if (start > item.StartIndex || item.EndIndex > end)
+                        newItem = new LiteralText(SmartSettings, substring, Math.Max(start, item.StartIndex),Math.Min(end, item.EndIndex));
                 }
                 else
                 {
@@ -129,20 +130,20 @@ namespace SmartFormat.Core.Parsing
         /// Does not search in nested placeholders.
         /// </summary>
         /// <param name="search"></param>
-        /// <param name="startIndex"></param>
-        public int IndexOf(char search, int startIndex)
+        /// <param name="start"></param>
+        public int IndexOf(char search, int start)
         {
-            startIndex = this.startIndex + startIndex;
+            start = this.StartIndex + start;
             foreach (var item in Items)
             {
-                if (item.endIndex < startIndex) continue;
+                if (item.EndIndex < start) continue;
                 var literalItem = item as LiteralText;
                 if (literalItem == null) continue;
 
-                if (startIndex < literalItem.startIndex) startIndex = literalItem.startIndex;
+                if (start < literalItem.StartIndex) start = literalItem.StartIndex;
                 var literalIndex =
-                    literalItem.baseString.IndexOf(search, startIndex, literalItem.endIndex - startIndex);
-                if (literalIndex != -1) return literalIndex - this.startIndex;
+                    literalItem.BaseString.IndexOf(search, start, literalItem.EndIndex - start);
+                if (literalIndex != -1) return literalIndex - this.StartIndex;
             }
 
             return -1;
@@ -151,11 +152,6 @@ namespace SmartFormat.Core.Parsing
         #endregion
 
         #region: FindAll :
-
-        private IList<int> FindAll(char search)
-        {
-            return FindAll(search, -1);
-        }
 
         private IList<int> FindAll(char search, int maxCount)
         {
@@ -329,7 +325,7 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public override string ToString()
         {
-            var result = new StringBuilder(endIndex - startIndex);
+            var result = new StringBuilder(EndIndex - StartIndex);
             foreach (var item in Items) result.Append(item);
             return result.ToString();
         }

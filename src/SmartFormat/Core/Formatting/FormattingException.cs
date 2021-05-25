@@ -15,7 +15,7 @@ namespace SmartFormat.Core.Formatting
     {
         public FormattingException(FormatItem? errorItem, Exception formatException, int index)
         {
-            Format = errorItem?.baseString;
+            Format = errorItem?.BaseString;
             ErrorItem = errorItem;
             Issue = formatException.Message;
             Index = index;
@@ -23,7 +23,7 @@ namespace SmartFormat.Core.Formatting
 
         public FormattingException(FormatItem? errorItem, string issue, int index)
         {
-            Format = errorItem?.baseString;
+            Format = errorItem?.BaseString;
             ErrorItem = errorItem;
             Issue = issue;
             Index = index;

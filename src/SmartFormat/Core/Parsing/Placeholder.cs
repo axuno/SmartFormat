@@ -31,7 +31,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="startIndex">The index inside the input string, where the placeholder starts.</param>
         /// <param name="nestedDepth">The nesting level of this placeholder.</param>
         public Placeholder(SmartSettings smartSettings, Format parent, int startIndex, int nestedDepth) : base(
-            smartSettings, parent, startIndex)
+            smartSettings, parent.BaseString, startIndex, parent.EndIndex)
         {
             Parent = parent;
             Selectors = new List<Selector>();
@@ -48,7 +48,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Gets the parent <see cref="Parsing.Format"/>.
         /// </summary>
-        [Obsolete("Use property 'Parent' instead", true)]
+        [Obsolete("Use property 'Parent' instead")]
         public Format parent => Parent;
 
         /// <summary>
@@ -95,9 +95,9 @@ namespace SmartFormat.Core.Parsing
         /// <returns>The string representation of the <see cref="Placeholder"/> with all parsed components.</returns>
         public override string ToString()
         {
-            var result = new StringBuilder(endIndex - startIndex);
+            var result = new StringBuilder(EndIndex - StartIndex);
             result.Append(SmartSettings.Parser.PlaceholderBeginChar);
-            foreach (var s in Selectors) result.Append(s.baseString, s.operatorStart, s.endIndex - s.operatorStart);
+            foreach (var s in Selectors) result.Append(s.BaseString, s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex);
             if (Alignment != 0)
             {
                 result.Append(SmartSettings.Parser.AlignmentOperator);
