@@ -526,6 +526,8 @@ namespace SmartFormat.Core.Parsing
                     }
                 }
 
+                // Set start index to start of formatter option arguments,
+                // with {0:default:N2} the start index is on the second colon
                 currentFormat.StartIndex = index.LastEnd;
 
                 index.NamedFormatterStart = PositionUndefined;
