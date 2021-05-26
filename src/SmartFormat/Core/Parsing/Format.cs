@@ -68,22 +68,22 @@ namespace SmartFormat.Core.Parsing
         /// <summary>Returns a substring of the current Format.</summary>
         public Format Substring(int start)
         {
-            return Substring(start, this.EndIndex - this.StartIndex - start);
+            return Substring(start, Length - start);
         }
 
         /// <summary>Returns a substring of the current Format.</summary>
         public Format Substring(int start, int length)
         {
-            start = this.StartIndex + start;
+            start = StartIndex + start;
             var end = start + length;
             // Validate the arguments:
-            if (start < this.StartIndex || start > this.EndIndex) // || endIndex > this.endIndex)
-                throw new ArgumentOutOfRangeException("start");
-            if (end > this.EndIndex)
-                throw new ArgumentOutOfRangeException("length");
+            if (start < StartIndex || start > EndIndex) // || endIndex > endIndex)
+                throw new ArgumentOutOfRangeException(nameof(start));
+            if (end > EndIndex)
+                throw new ArgumentOutOfRangeException(nameof(length));
 
             // If startIndex and endIndex already match this item, we're done:
-            if (start == this.StartIndex && end == this.EndIndex) return this;
+            if (start == StartIndex && end == EndIndex) return this;
 
             var substring = new Format(SmartSettings, BaseString, start, end);
             foreach (var item in Items)
@@ -133,7 +133,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="start"></param>
         public int IndexOf(char search, int start)
         {
-            start = this.StartIndex + start;
+            start = StartIndex + start;
             foreach (var item in Items)
             {
                 if (item.EndIndex < start) continue;
@@ -143,7 +143,7 @@ namespace SmartFormat.Core.Parsing
                 if (start < literalItem.StartIndex) start = literalItem.StartIndex;
                 var literalIndex =
                     literalItem.BaseString.IndexOf(search, start, literalItem.EndIndex - start);
-                if (literalIndex != -1) return literalIndex - this.StartIndex;
+                if (literalIndex != -1) return literalIndex - StartIndex;
             }
 
             return -1;
@@ -156,7 +156,7 @@ namespace SmartFormat.Core.Parsing
         private IList<int> FindAll(char search, int maxCount)
         {
             var results = new List<int>();
-            var index = 0; // this.startIndex;
+            var index = 0; // startIndex;
             while (maxCount != 0)
             {
                 index = IndexOf(search, index);
@@ -201,13 +201,13 @@ namespace SmartFormat.Core.Parsing
         {
             #region Constructor
 
-            private readonly Format format;
-            private readonly IList<int> splits;
+            private readonly Format _format;
+            private readonly IList<int> _splits;
 
             public SplitList(Format format, IList<int> splits)
             {
-                this.format = format;
-                this.splits = splits;
+                _format = format;
+                _splits = splits;
             }
 
             #endregion
@@ -218,28 +218,28 @@ namespace SmartFormat.Core.Parsing
             {
                 get
                 {
-                    if (index > splits.Count) throw new ArgumentOutOfRangeException("index");
+                    if (index > _splits.Count) throw new ArgumentOutOfRangeException("index");
 
-                    if (splits.Count == 0) return format;
+                    if (_splits.Count == 0) return _format;
 
-                    if (index == 0) return format.Substring(0, splits[0]);
+                    if (index == 0) return _format.Substring(0, _splits[0]);
 
-                    if (index == splits.Count) return format.Substring(splits[index - 1] + 1);
+                    if (index == _splits.Count) return _format.Substring(_splits[index - 1] + 1);
 
                     // Return the format between the splits:
-                    var startIndex = splits[index - 1] + 1;
-                    return format.Substring(startIndex, splits[index] - startIndex);
+                    var startIndex = _splits[index - 1] + 1;
+                    return _format.Substring(startIndex, _splits[index] - startIndex);
                 }
                 set => throw new NotSupportedException();
             }
 
             public void CopyTo(Format[] array, int arrayIndex)
             {
-                var length = splits.Count + 1;
+                var length = _splits.Count + 1;
                 for (var i = 0; i < length; i++) array[arrayIndex + i] = this[i];
             }
 
-            public int Count => splits.Count + 1;
+            public int Count => _splits.Count + 1;
 
             public bool IsReadOnly => true;
 
@@ -312,8 +312,7 @@ namespace SmartFormat.Core.Parsing
             var sb = new StringBuilder();
             foreach (var item in Items)
             {
-                var literalItem = item as LiteralText;
-                if (literalItem != null) sb.Append(literalItem);
+                if (item is LiteralText literalItem) sb.Append(literalItem);
             }
 
             return sb.ToString();

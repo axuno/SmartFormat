@@ -21,7 +21,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 |            Method |     Mean |    Error |   StdDev |  Gen 0 | Gen 1 | Gen 2 | Allocated |
 |------------------ |---------:|---------:|---------:|-------:|------:|------:|----------:|
 |  SmartFormat2.7.0 | 79.23 us | 0.541 us | 0.479 us | 0.8545 |     - |     - |   7.84 KB |
-|  ParseSmartFormat | 81.93 us | 1.035 us | 0.968 us | 1.0986 |     - |     - |   9.87 KB |
+|  ParseSmartFormat | 74.13 us | 1.343 us | 1.256 us | 1.0986 |     - |     - |   9.87 KB |
 | ParsePlaceholders | 38.14 us | 0.249 us | 0.220 us | 0.1831 |     - |     - |   1.53 KB |
     */
 
@@ -54,12 +54,19 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
             _inputFormatMemory = _inputFormatString.AsMemory();
         }
 
+        /// <summary>
+        /// Parse the test format string with the SmartFormat parser.
+        /// </summary>
         [Benchmark]
         public void ParseSmartFormat()
         {
             var result = _sfParser.ParseFormat(_inputFormatString, new[] {"default"});
         }
 
+        /// <summary>
+        /// This is a very simplistic parser which finds SmartFormat style {placeholders}.
+        /// It's used as a reference point for the SmartFormat parser.
+        /// </summary>
         [Benchmark]
         public void ParsePlaceholders()
         {
