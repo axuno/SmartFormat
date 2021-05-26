@@ -77,7 +77,7 @@ namespace SmartFormat.Core.Parsing
         /// To get the raw formatter option string, <see cref="FormatterOptionsRaw"/>.
         /// </summary>
         public string FormatterOptions => EscapedLiteral
-            .UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, FormatterOptionsRaw.AsSpan(), true).ToString();
+            .UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, FormatterOptionsRaw, 0, FormatterOptionsRaw.Length, true).ToString();
         
         /// <summary>
         /// Gets the raw formatter option string as in the input format string (unescaped).
