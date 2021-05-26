@@ -119,7 +119,7 @@ namespace SmartFormat.Tests.Extensions
                 fex.GetType() == typeof(IsMatchFormatter))).RegexOptions = regExOptions;
 
             var regEx = new Regex(pattern, regExOptions);
-            var optionsEscaped = new string(EscapedLiteral.EscapeCharLiterals('\\', pattern, true).ToArray());
+            var optionsEscaped = new string(EscapedLiteral.EscapeCharLiterals('\\', pattern, 0, pattern.Length, true).ToArray());
             var result = _formatter.Format("{0:ismatch(" + optionsEscaped + "):found {}|}", input);
 
             Assert.That(regEx.Match(input).Success, Is.EqualTo(shouldMatch), "RegEx pattern match");

@@ -58,25 +58,28 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         /// <param name="escapingSequenceStart"></param>
         /// <param name="input"></param>
+        /// <param name="startIndex">The start index position inside the input.</param>
+        /// <param name="length">The number of characters to escape beginning from <c>startIndex</c>.</param>
         /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
         /// <returns>The input with escaped characters with their real value.</returns>
-        public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars)
+        public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
         {
-            var length = input.Length;
-            // It's enough to have the buffer with same size as input length
+            //var length = input.Length;
+            // It's enough to have a buffer with the same size as input length
             var result = new Span<char>(new char[length]);
+            var max = startIndex + length;
             var resultIndex = 0;
-            for (var inputIndex = 0; inputIndex < length; inputIndex++)
+            for (var inputIndex = startIndex; inputIndex < max; inputIndex++)
             {
                 int nextInputIndex;
-                if (inputIndex + 1 < length)
+                if (inputIndex + 1 < max)
                 {
                     nextInputIndex = inputIndex + 1;
                 }
                 else
                 {
                     result[resultIndex++] = input[inputIndex];
-                    return (ReadOnlySpan<char>) result.Slice(0, resultIndex);
+                    return result.Slice(0, resultIndex);
                 }
 
                 if (input[inputIndex] == escapingSequenceStart)
@@ -96,7 +99,7 @@ namespace SmartFormat.Core.Parsing
                     result[resultIndex++] = input[inputIndex];
                 }
             }
-            return (ReadOnlySpan<char>) result.Slice(0, resultIndex);
+            return result.Slice(0, resultIndex);
         }
 
         /// <summary>
@@ -104,20 +107,24 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         /// <param name="escapeSequenceStart">The character starting the escape sequence.</param>
         /// <param name="input">The string to escape.</param>
+        /// <param name="startIndex"></param>
+        /// <param name="length"></param>
         /// <param name="includeFormatterOptionChars"><see langword="true"/>, if characters for formatter options should be included. Default is <see langword="false"/>.</param>
         /// <returns>Returns the escaped characters.</returns>
-        internal static IEnumerable<char> EscapeCharLiteralsAsEnumerable(char escapeSequenceStart, string input, bool includeFormatterOptionChars)
+        internal static IEnumerable<char> EscapeCharLiteralsAsEnumerable(char escapeSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
         {
-            foreach (var c in input)
+            var max = startIndex + length;
+            for (var index = startIndex; index < max; index++)
             {
-                if(GeneralLookupTable.ContainsValue(c))
+                var c = input[index];
+                if (GeneralLookupTable.ContainsValue(c))
                 {
                     yield return escapeSequenceStart;
                     yield return GeneralLookupTable.First(kv => kv.Value == c).Key;
                     continue;
                 }
 
-                if(includeFormatterOptionChars && FormatterOptionsLookupTable.ContainsValue(c))
+                if (includeFormatterOptionChars && FormatterOptionsLookupTable.ContainsValue(c))
                 {
                     yield return escapeSequenceStart;
                     yield return FormatterOptionsLookupTable.First(kv => kv.Value == c).Key;
@@ -133,11 +140,13 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         /// <param name="escapeSequenceStart">The character starting the escape sequence.</param>
         /// <param name="input">The string to escape.</param>
+        /// <param name="startIndex">This index position where to start with escaping.</param>
+        /// <param name="length">The length of the segment to escape.</param>
         /// <param name="includeFormatterOptionChars"><see langword="true"/>, if characters for formatter options should be included. Default is <see langword="false"/>.</param>
         /// <returns>Returns the string with escaped characters.</returns>
-        public static ReadOnlySpan<char> EscapeCharLiterals(char escapeSequenceStart, string input, bool includeFormatterOptionChars)
+        public static IEnumerable<char> EscapeCharLiterals(char escapeSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
         {
-            return EscapeCharLiteralsAsEnumerable(escapeSequenceStart, input, includeFormatterOptionChars).ToArray();
+            return EscapeCharLiteralsAsEnumerable(escapeSequenceStart, input, startIndex, length, includeFormatterOptionChars);
         }
     }
 }
