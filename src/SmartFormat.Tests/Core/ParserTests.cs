@@ -596,5 +596,26 @@ namespace SmartFormat.Tests.Core
             Assert.That(placeholder.Format?.Items.Count, Is.EqualTo(3));
             Assert.That(string.Concat(placeholder.Format?.Items[0].ToString(), placeholder.Format?.Items[1].ToString(), placeholder.Format?.Items[2].ToString()), Is.EqualTo(literal.Replace("\\", "")));
         }
+
+        [TestCase(@"\u1234", @"\u1234", 0, true)]
+        [TestCase(@"\u1234abc", @"\u1234", 0, true)]
+        [TestCase(@"abc\u1234", @"\u1234", 1, true)]
+        [TestCase(@"abc\u1234def", @"\u1234", 1, true)]
+        [TestCase(@"\uwxyz", @"\uwxyz", 0, false)] // Parser accepts illegal sequence
+        [TestCase(@"\uw", @"\uw", 0, false)] // Parser accepts illegal sequence, even if shorter than 4 characters
+        public void Parse_Unicode(string formatString, string unicodeLiteral, int itemIndex, bool isLegal)
+        {
+            var parser = GetRegularParser();
+            var result = parser.ParseFormat(formatString, new[] {"d"});
+
+            var literal = result.Items[itemIndex];
+            Assert.That(literal, Is.TypeOf(typeof(LiteralText)));
+            Assert.That(literal.BaseString.Substring(literal.StartIndex, literal.Length), Is.EqualTo(unicodeLiteral));
+            
+            if(isLegal) 
+                Assert.That(literal.ToString()[0], Is.EqualTo((char) int.Parse(unicodeLiteral.Substring(2), System.Globalization.NumberStyles.HexNumber)));
+            else
+                Assert.That(() => literal.ToString(), Throws.ArgumentException.And.Message.Contains(unicodeLiteral));
+        }
     }
 }
