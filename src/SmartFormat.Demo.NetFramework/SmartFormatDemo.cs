@@ -97,7 +97,7 @@ There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remainin
 "},
 
 {"List Formatting", 
-@"<!-- Pay attention to the ending |}} token -->
+@"<!-- Curly braces can be escaped with a backslash -->
 <Items count=""{Inventory.Count}"">
 {Inventory:
     <Item name=""{Name}"" price=""{Price:c}"" index=""{Index}"" components=""{Components.Count}"">
