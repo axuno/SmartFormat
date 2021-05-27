@@ -5,7 +5,7 @@
 
 using System;
 
-namespace SmartFormat.Net.Utilities
+namespace SmartFormat.Utilities
 {
     /// <summary>
     /// Used for getting DateTime.Now or DateOffset.Now. Time is changeable for unit testing
