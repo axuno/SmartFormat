@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace SmartFormat.Core.Parsing
@@ -53,6 +54,20 @@ namespace SmartFormat.Core.Parsing
                 : GeneralLookupTable.TryGetValue(input, out result);
         }
 
+        private static char GetUnicode(string input, int startIndex)
+        {
+            var unicode = input.Length - startIndex >= 4
+                ? input.Substring(startIndex, 4)
+                : input.Substring(startIndex);
+
+            if (int.TryParse(unicode, NumberStyles.HexNumber, null, out var result))
+            {
+                return (char) result;
+            }
+
+            throw new ArgumentException($"Unrecognized escape sequence in literal: \"\\u{unicode}\"");
+        }
+
         /// <summary>
         /// Converts escaped characters in input with real characters, e.g. "\\" => "\", if '\' is the escape character.
         /// </summary>
@@ -84,6 +99,14 @@ namespace SmartFormat.Core.Parsing
 
                 if (input[inputIndex] == escapingSequenceStart)
                 {
+                    if (input[nextInputIndex] == 'u')
+                    {
+                        // GetUnicode will throw if code is illegal
+                        result[resultIndex++] = GetUnicode(input, nextInputIndex + 1);
+                        inputIndex += 5;  // move to last unicode character
+                        continue;
+                    }
+
                     if (TryGetChar(input[nextInputIndex], out var realChar, includeFormatterOptionChars))
                     {
                         result[resultIndex++] = realChar;
