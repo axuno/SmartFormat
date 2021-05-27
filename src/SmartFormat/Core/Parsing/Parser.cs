@@ -408,7 +408,7 @@ namespace SmartFormat.Core.Parsing
             // index.NamedFormatterStart = PositionUndefined;
 
             // See what is the next character
-            var indexNextChar = index.Current + 1;
+            var indexNextChar = index.SafeAdd(index.Current, 1);
 
             // **** Alternative brace escaping with { or } following the escape character ****
             if (indexNextChar < inputFormat.Length && (inputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar || inputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar))
@@ -425,10 +425,20 @@ namespace SmartFormat.Core.Parsing
 
                 // Finish the last text item:
                 if (index.Current != index.LastEnd) currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, index.Current));
-                index.LastEnd = index.SafeAdd(index.Current, 2);
-                
-                // Next add the character literal INCLUDING the escape character, which LiteralText will expect
-                currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.Current, index.LastEnd));
+                                
+                // Is this a unicode escape sequence?
+                if (inputFormat[indexNextChar] == 'u')
+                {
+                    // The next 4 characters must represent the unicode 
+                    index.LastEnd = index.SafeAdd(index.Current, 6);
+                    currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.Current, index.LastEnd));
+                }
+                else
+                {
+                    // Next add the character literal INCLUDING the escape character, which LiteralText will expect
+                    index.LastEnd = index.SafeAdd(index.Current, 2);
+                    currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.Current, index.LastEnd));
+                }
 
                 index.Current = index.SafeAdd(index.Current, 1);
             }

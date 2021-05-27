@@ -33,8 +33,8 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void AllSupportedCharacterLiteralsAsUnicode()
         {
-            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v \0!";
-            const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v \0!";
+            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v \0 \u2022!";
+            const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v \0 \u2022!";
             
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
@@ -43,36 +43,27 @@ namespace SmartFormat.Tests.Core
             Assert.AreEqual(formatWithCodeBehavior, result);
         }
 
-        [Test]
-        public void UnsupportedCharacterLiteralEscapeSequence()
-        {
-            const string format = @"Not supported: \y - Supported: \a";
-            
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
-
-            Assert.That( () => formatter.Format(format), Throws.ArgumentException.And.Message.Contains(@"\y"));
-        }
-
         [TestCase(@"Some text \u2022 with the value {0}", "Some text \u2022 with the value 123")]
         [TestCase(@"\u2015 {0}", "\u2015 123")]
         [TestCase(@"\u2010 {0} \u2015", "\u2010 123 \u2015")]
         public void UnicodeEscapeSequenceIsParsed(string format, string expectedOutput)
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.ConvertCharacterStringLiterals = true;
+            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
             Assert.AreEqual(expectedOutput, formatter.Format(format, 123));
         }
 
-        [TestCase(@"Some text {0} \uABCP")]
-        [TestCase(@"Some text {0} \u-123")]
-        [TestCase(@"\u")]
-        [TestCase(@"Some text \uuuuu {0}")]
-        public void InvalidUnicodeEscapeSequenceThrowsException(string text)
+        [TestCase(@"Some text {0} \uABCP", @"\uABCP")]
+        [TestCase(@"Some text {0} \u-123", @"\u-123")]
+        [TestCase(@"\u", @"\u")]
+        [TestCase(@"\y", @"\y")]
+        [TestCase(@"Some text \uuuuu {0}", @"\uuuuu")]
+        public void UnsupportedCharacterLiteralEscapeSequence(string format, string exMessage)
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.ConvertCharacterStringLiterals = true;
-            Assert.Throws<ArgumentException>(() => formatter.Format(text, 123));
+            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
+
+            Assert.That( () => formatter.Format(format, 123), Throws.ArgumentException.And.Message.Contains(exMessage));
         }
 
         [Test]
