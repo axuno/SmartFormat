@@ -14,7 +14,6 @@ v3.0.0 (Draft)
 
 **Currently merged to the `version/v3.0` branch:**
 
-* Moved class `SmartFormat.Net.Utilities.SystemTime` to namespace `SmartFormat.Utilities`  ([#171](https://github.com/axuno/SmartFormat/pull/171)) 
 * Reduced substring usage with literal text leads to a significant reduction of GC and memory allocation ([#169](https://github.com/axuno/SmartFormat/pull/169)) 
 * Add unicode escape characters ([#166](https://github.com/axuno/SmartFormat/pull/166)). Thanks to [@karljj1](https://github.com/karljj1)
 * `FormatItem` abstract class ([#167](https://github.com/axuno/SmartFormat/pull/167))
