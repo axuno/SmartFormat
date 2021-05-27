@@ -3,8 +3,8 @@ using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
-using SmartFormat.Net.Utilities;
 using SmartFormat.Tests.TestUtils;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions
 {

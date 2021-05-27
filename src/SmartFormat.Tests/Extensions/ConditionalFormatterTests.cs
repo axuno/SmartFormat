@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
-using SmartFormat.Net.Utilities;
 using SmartFormat.Tests.TestUtils;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions
 {

@@ -6,7 +6,6 @@
 using System;
 using System.Globalization;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Net.Utilities;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
