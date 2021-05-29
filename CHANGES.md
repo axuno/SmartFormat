@@ -9,23 +9,27 @@ v3.0.0 (Draft)
    * Formatter.Parser.AddAlphanumericSelectors()
    * Formatter.Parser.AddAdditionalSelectorChars("_")
    * Formatter.Parser.AddOperators(".,")
-2. Remove adding custom operators, can too easily break the parser
-3. Restrict custom selectors to "not reserved characters" like `{}[]().,-:\`
+
 
 **Currently merged to the `version/v3.0` branch:**
 
+* Constrain custom selectors and operators ([#172](https://github.com/axuno/SmartFormat/pull/172))
+  * Custom selector chars can be added, if not disallowed or in use as an operator char
+  * Custom operator chars can be added, if not disallowed or in use as a selector char
+  * Alphanumeric selector chars are the only option now and cannot be degraded to pure numeric chars
+  * `PlaceholderBeginChar`, `PlaceholderEndChar`, `FormatterOptionsBeginChar` and `FormatterOptionsEndChar` now only have getters
 * Reduced substring usage with literal text leads to a significant reduction of GC and memory allocation ([#169](https://github.com/axuno/SmartFormat/pull/169)) 
 * Add unicode escape characters ([#166](https://github.com/axuno/SmartFormat/pull/166)). Thanks to [@karljj1](https://github.com/karljj1)
 * `FormatItem` abstract class ([#167](https://github.com/axuno/SmartFormat/pull/167))
-  * Obsoleted public field `baseString` renamed to `BaseString` property
-  * Obsoleted public field `startIndex` renamed to `StartIndex` property
-  * Obsoleted public field `endIndex` renamed to `IndexIndex` property
+  * Obsoleted public field `baseString`, changed to `BaseString` property
+  * Obsoleted public field `startIndex`, changed to `StartIndex` property
+  * Obsoleted public field `endIndex`, changed to `IndexIndex` property
   * Added `Length`property (returing `EndIndex` - `StartIndex`)
 * Parser can parse any character as formatter options. This means e.g. no limitations for `RegEx` expressions used in `IsMatchFormatter`. ([#165](https://github.com/axuno/SmartFormat/pull/165)) 
-  * Obsoleted public property `Format.parent` renamed to `Format.Parent`
-  * Obsoleted public property `Placeholder.parent` renamed to `Placeholder.Parent`
+  * Obsoleted public property `Format.parent`, changed to `Format.Parent`
+  * Obsoleted public property `Placeholder.parent`, changed to `Placeholder.Parent`
   * `Placeholder` now has `FormatterOptionsRaw` with original (unescaped) string and `FormatterOptions` with the escaped string.
-* `EscapedLiteral`: 15% faster, 50% less GC
+  * `EscapedLiteral`: 15% faster, 50% less GC
 * `Parser` ([#164](https://github.com/axuno/SmartFormat/pull/164)):
   * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete.
   * `Parser.UseAlternativeBraces(..)` is obsolete and not supported any more
@@ -34,8 +38,8 @@ v3.0.0 (Draft)
   * Operator characters `.,[]` are set by default.
 * `ErrorAction`s ([#164](https://github.com/axuno/SmartFormat/pull/164)):
    * Enum `SmartSettings.ErrorAction` is obsolete and replaced with `SmartSettings.ParseErrorAction` and `SmartSettings.FormatErrorAction`
-   * Property `SmartSettings.ParseErrorAction` is obsolete and replaced with `ParserSettings.ErrorAction`
-   * Property `SmartSettings.FormatErrorAction` is obsolete and replaced with `FormatterSettings.ErrorAction`
+   * Property `SmartSettings.ParseErrorAction` is obsolete and changed to `ParserSettings.ErrorAction`
+   * Property `SmartSettings.FormatErrorAction` is obsolete and changed to `FormatterSettings.ErrorAction`
 * Added `SmartFormat.Performance` project with benchmarks for different data sources ([#162](https://github.com/axuno/SmartFormat/pull/162))
 * Fully cover `Parser` and `ReflectionSource` with unit tests ([#160](https://github.com/axuno/SmartFormat/pull/160))
 * Removed redundant unit tests with no impact on coverage ([#159](https://github.com/axuno/SmartFormat/pull/159))
