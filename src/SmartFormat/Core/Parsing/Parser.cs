@@ -502,36 +502,32 @@ namespace SmartFormat.Core.Parsing
 
                 var parentPlaceholder = currentFormat.Parent;
 
-                if (index.NamedFormatterOptionsStart == PositionUndefined)
+                if (_parserSettings.UseStringFormatCompatibility) 
                 {
-                    var formatterName = inputFormat.Substring(index.NamedFormatterStart,
-                        index.Current - index.NamedFormatterStart);
-
-                    if (FormatterNameExists(formatterName, formatterExtensionNames))
-                    {
-                        if (parentPlaceholder != null) parentPlaceholder.FormatterName = formatterName;
-                    }
-                    else
-                        index.LastEnd = currentFormat.StartIndex;
+                    // named formatters will not be parsed with string.Format compatibility switched ON,
+                    // but we can handle e.g. Smart.Format("{Date:yyyy/MM/dd HH:mm:ss}") like string.Format
+                    index.LastEnd = currentFormat.StartIndex;
                 }
                 else
                 {
-                    var formatterName = inputFormat.Substring(index.NamedFormatterStart,
-                        index.NamedFormatterOptionsStart - index.NamedFormatterStart);
-
-                    if (FormatterNameExists(formatterName, formatterExtensionNames))
+                    if (index.NamedFormatterOptionsStart == PositionUndefined)
                     {
                         if (parentPlaceholder != null)
-                        {
-                            parentPlaceholder.FormatterName = formatterName;
-                            // Save the formatter options with CharLiteralEscapeChar removed
-                            parentPlaceholder.FormatterOptionsRaw = inputFormat.Substring(index.NamedFormatterOptionsStart + 1,
-                                    index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1));
-                        }
+                            parentPlaceholder.FormatterName = inputFormat.Substring(index.NamedFormatterStart,
+                                index.Current - index.NamedFormatterStart);
                     }
                     else
                     {
-                        index.LastEnd = currentFormat.StartIndex;
+                        if (parentPlaceholder != null)
+                        {
+                            parentPlaceholder.FormatterName = inputFormat.Substring(index.NamedFormatterStart,
+                                index.NamedFormatterOptionsStart - index.NamedFormatterStart);
+
+                            // Save the formatter options with CharLiteralEscapeChar removed
+                            parentPlaceholder.FormatterOptionsRaw = inputFormat.Substring(
+                                index.NamedFormatterOptionsStart + 1,
+                                index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1));
+                        }
                     }
                 }
 

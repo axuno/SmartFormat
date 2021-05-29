@@ -313,8 +313,6 @@ namespace SmartFormat.Tests.Core
         private static Parser GetRegularParser()
         {
             var parser = new SmartFormatter() { Settings = { Parser = {ErrorAction = ParseErrorAction.ThrowError }}}.Parser;
-            parser.AddAlphanumericSelectors();
-            parser.AddOperators(".,");
             return parser;
         }
 
@@ -478,7 +476,7 @@ namespace SmartFormat.Tests.Core
         {
             // find formatter formattername, which does not exist in the (empty) list of formatter extensions
             var placeholderWithNonExistingName = (Placeholder)Parse("{0:formattername:}", new string[] {} ).Items[0];
-            Assert.AreEqual("formattername:", placeholderWithNonExistingName.Format?.ToString()); // name is only treaded as a literal
+            Assert.AreEqual("formattername", placeholderWithNonExistingName.FormatterName); // name is only treaded as a literal
         }
 
         // Incomplete:
