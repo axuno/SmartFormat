@@ -55,10 +55,10 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Includes a-z and A-Z in the list of allowed selector chars.
         /// </summary>
-        [Obsolete("Use 'ParserSettings.AllowAlphanumericSelectors' instead.")]
+        [Obsolete("Alphanumeric selectors are always enabled")]
         public void AddAlphanumericSelectors()
         {
-            _parserSettings.AllowAlphanumericSelectors = true;
+            // Do nothing - this is the standard behavior
         }
 
         /// <summary>
@@ -116,8 +116,7 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("This feature has been removed", true)]
         public void UseAlternativeBraces(char opening, char closing)
         {
-            _parserSettings.PlaceholderBeginChar = opening;
-            _parserSettings.PlaceholderEndChar = opening;
+            throw new NotImplementedException("This feature has been removed");
         }
 
         #endregion
@@ -565,7 +564,7 @@ namespace SmartFormat.Core.Parsing
             }
 
             var inputChar = inputFormat[index.Current];
-            if (_parserSettings.OperatorChars.Contains(inputChar))
+            if (_parserSettings.OperatorChars.Contains(inputChar) || _parserSettings.CustomOperatorChars.Contains(inputChar))
             {
                 // Add the selector:
                 if (index.Current != index.LastEnd)
@@ -675,8 +674,7 @@ namespace SmartFormat.Core.Parsing
         }
 
         /// <summary>
-        /// Checks whether the selector character is valid,
-        /// depending on <see cref="ParserSettings.AllowAlphanumericSelectors"/> and <see cref="ParserSettings.CustomSelectorChars"/>.
+        /// Checks whether the selector character is valid.
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><see langword="true"/> if the character is valid, else <see langword="false"/>.</returns>
@@ -685,11 +683,10 @@ namespace SmartFormat.Core.Parsing
         {
             // C# variables: LetterOrDigit and "_"
             // Required for Alignment: "-" and ","
-            return _parserSettings.AllowAlphanumericSelectors
-                ? _parserSettings.AlphanumericSelectorChars.Contains(c) || _parserSettings.OperatorChars.Contains(c) || _parserSettings.CustomSelectorChars.Contains(c)
-                : _parserSettings.NumericSelectorChars.Contains(c) || _parserSettings.OperatorChars.Contains(c);
+            return _parserSettings.AlphanumericSelectorChars.Contains(c) || _parserSettings.OperatorChars.Contains(c) ||
+                   _parserSettings.CustomSelectorChars.Contains(c);
         }
-        
+
         private static bool FormatterNameExists(string name, string[] formatterExtensionNames)
         {
             return formatterExtensionNames.Any(n => n == name);

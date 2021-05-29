@@ -617,5 +617,55 @@ namespace SmartFormat.Tests.Core
             else
                 Assert.That(() => literal.ToString(), Throws.ArgumentException.And.Message.Contains(unicodeLiteral));
         }
+
+        [TestCase("{A }", ' ')]
+        [TestCase("{B§}", '§')]
+        [TestCase("{?C}", '?')]
+        public void Selector_With_Custom_Selector_Character(string formatString, char customChar)
+        {
+            var parser = GetRegularParser();
+            parser.Settings.Parser.AddCustomSelectorChars(new[]{customChar});
+            var result = parser.ParseFormat(formatString, new[] {"d"});
+
+            var placeholder = result.Items[0] as Placeholder;
+            Assert.That(placeholder, Is.Not.Null);
+            Assert.That(placeholder.Selectors.Count, Is.EqualTo(1));
+            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,2)));
+        }
+
+        [TestCase("{a b}", ' ')]
+        [TestCase("{a°b}", '°')]
+        public void Selectors_With_Custom_Operator_Character(string formatString, char customChar)
+        {
+            var parser = GetRegularParser();
+            parser.Settings.Parser.AddCustomOperatorChars(new[]{customChar});
+            var result = parser.ParseFormat(formatString, new[] {"d"});
+
+            var placeholder = result.Items[0] as Placeholder;
+            Assert.That(placeholder, Is.Not.Null);
+            Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
+            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
+            Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(3, 1)));
+            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,1)));
+        }
+
+        [TestCase("{C?.D}", '?')] 
+        [TestCase("{C..D}", '.')] 
+        public void Selector_With_Contiguous_Operator_Characters(string formatString, char customChar)
+        {
+            // contiguous operators '?.' are parsed as ONE
+
+            var parser = GetRegularParser();
+            // adding '.' is ignored, as it's the standard operator
+            parser.Settings.Parser.AddCustomOperatorChars(new[]{customChar});
+            var result = parser.ParseFormat(formatString, new[] {"d"});
+
+            var placeholder = result.Items[0] as Placeholder;
+            Assert.That(placeholder, Is.Not.Null);
+            Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
+            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
+            Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(4,1)));
+            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,2)));
+        }
     }
 }
