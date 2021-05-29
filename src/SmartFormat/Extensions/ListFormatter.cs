@@ -41,7 +41,7 @@ namespace SmartFormat.Extensions
 
         public ListFormatter(SmartFormatter formatter)
         {
-            formatter.Parser.AddOperators("[]()");
+            formatter.Parser.AddOperators("[]");
             _smartSettings = formatter.Settings;
         }
 
