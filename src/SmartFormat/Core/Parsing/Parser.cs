@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
@@ -276,12 +277,14 @@ namespace SmartFormat.Core.Parsing
                 currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, inputFormat.Length));
             }
             
-            // Todo v2.7.0: There is no unit test for this condition!
+            Debug.Assert(currentFormat.Parent == null);
+            /* Not hit by any unit test in v2.7.0 and v3.0.0
             while (currentFormat.Parent != null)
             {
                 currentFormat = currentFormat.Parent.Parent;
                 currentFormat.EndIndex = inputFormat.Length;
             }
+            */
 
             // Check for any parsing errors:
             if (parsingErrors.HasIssues)
