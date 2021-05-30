@@ -4,14 +4,43 @@ Latest Changes
 v3.0.0 (Draft)
 ===
 
-**Todo:**
-1. These settings are the default, remove from `ISource` extensions:
-   * Formatter.Parser.AddAlphanumericSelectors()
-   * Formatter.Parser.AddAdditionalSelectorChars("_")
-   * Formatter.Parser.AddOperators(".,")
+### Currently merged to the `version/v3.0` branch:
 
+#### Separated mode for SmartFormat features from `string.Format`compatibility ([#173](https://github.com/axuno/SmartFormat/pull/173))
+**1. `string.Format` compatibility:**
+   * SmartFormat acts as a drop-in replacement, and on top allows for named placeholders besides indexed placeholders. Example (note the colon is not escaped):
+   * ```csharp
+            var now = DateTime.Now;
+            var smartFmt = "It is now {Date:yyyy/MM/dd HH:mm:ss}";
+            var stringFmt = $"It is now {now.Date:yyyy/MM/dd HH:mm:ss}";
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.UseStringFormatCompatibility = true;
+            Assert.That(formatter.Format(smartFmt, now), Is.EqualTo(stringFmt));
+      ```
+   
+   * Custom formatters of SmartFormat are not parsed and thus cannot be used
+   * Curly braces are escaped the `string.Format` way with `{{` and `}}`
 
-**Currently merged to the `version/v3.0` branch:**
+**2. SmartFormat added feature:**
+  * As long as special characters (`(){}:\`) are escaped, any character is allowed anywhere. Now this applies also for the colon. Example (note the escaped colon):
+   * ```Csharp
+            var now = DateTime.Now;
+            var smartFmt = @"It is now {Date:yyyy/MM/dd HH\:mm\:ss}";
+            var stringFmt = $"It is now {now.Date:yyyy/MM/dd HH:mm:ss}";
+            var formatter = Smart.CreateDefaultSmartFormat();
+            formatter.Settings.UseStringFormatCompatibility = false;
+            Assert.That(formatter.Format(smartFmt, now), Is.EqualTo(stringFmt));
+      ```
+  * Tests are modified occordingly
+
+3. Moved `ParserSettings.UseStringFormatCompatibility` to `Settings.UseStringFormatCompatibility` because this does no more apply to the parser only.
+
+4. Parser does not process `string[] formatterExtensionNames` any more
+  * CTOR does not take `formatterExtensionNames` as argument
+  * `Parser.ParseFormat` does not check for a valid formatter name (it's implemented in the formatter anyway)
+
+---
+---
 
 * Constrain custom selectors and operators ([#172](https://github.com/axuno/SmartFormat/pull/172))
   * Custom selector chars can be added, if not disallowed or in use as an operator char
