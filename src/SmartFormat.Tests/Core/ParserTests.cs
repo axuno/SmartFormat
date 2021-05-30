@@ -27,7 +27,7 @@ namespace SmartFormat.Tests.Core
                 "{a}",
                 " aaa {bbb_bbb.CCC} ddd ",
             };
-            var results = formats.Select(f => new { format = f, parsed = parser.ParseFormat(f, new[] { Guid.NewGuid().ToString("N") }) }).ToArray();
+            var results = formats.Select(f => new { format = f, parsed = parser.ParseFormat(f) }).ToArray();
 
             // Verify that the reconstructed formats
             // match the original ones:
@@ -106,7 +106,7 @@ namespace SmartFormat.Tests.Core
             };
             foreach (var format in invalidFormats)
             {
-                _ = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
+                _ = parser.ParseFormat(format);
             }
         }
 
@@ -121,7 +121,7 @@ namespace SmartFormat.Tests.Core
             
             var parser = GetRegularParser();
             parser.Settings.Parser.ErrorAction = ParseErrorAction.Ignore;
-            var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
+            var parsed = parser.ParseFormat(invalidTemplate);
             
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
             Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "), "Literal text");
@@ -141,7 +141,7 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
-            var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
+            var parsed = parser.ParseFormat(invalidTemplate);
 
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
             Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "));
@@ -167,7 +167,7 @@ namespace SmartFormat.Tests.Core
             
             var parser = GetRegularParser();
             parser.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
-            var parsed = parser.ParseFormat(invalidTemplate, new[] { Guid.NewGuid().ToString("N") });
+            var parsed = parser.ParseFormat(invalidTemplate);
 
             Assert.That(parsed.Items.Count, Is.EqualTo(1));
             Assert.That(parsed.Items[0].RawText, Does.StartWith("The format string has 3 issues"));
@@ -241,7 +241,7 @@ namespace SmartFormat.Tests.Core
 ";
             var parser = GetRegularParser();
             parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
-            var parsed = parser.ParseFormat(js, new[] { Guid.NewGuid().ToString("N") });
+            var parsed = parser.ParseFormat(js);
 
             // No characters should get lost compared to the format string,
             // no matter if a Placeholder can be identified or not
@@ -290,7 +290,7 @@ namespace SmartFormat.Tests.Core
 ";
             var parser = GetRegularParser();
             parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
-            var parsed = parser.ParseFormat(css, new[] { Guid.NewGuid().ToString("N") });
+            var parsed = parser.ParseFormat(css);
 
             // No characters should get lost compared to the format string,
             // no matter if a Placeholder can be identified or not
@@ -322,7 +322,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             var formatString = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
 
-            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
+            var format = parser.ParseFormat(formatString);
 
             // Extract the substrings of literal text:
             Assert.That(format.Substring( 1, 3).ToString(), Is.EqualTo("a|a"));
@@ -362,7 +362,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             var formatString = "{0}";
 
-            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
+            var format = parser.ParseFormat(formatString);
             var placeholder = (Placeholder) format.Items[0];
             Assert.AreEqual(formatString, placeholder.ToString());
             placeholder.Alignment = 10;
@@ -375,7 +375,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             var formatString = "{0,-10}";
 
-            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
+            var format = parser.ParseFormat(formatString);
             var placeholder = (Placeholder) format.Items[0];
             Assert.That(placeholder.ToString(), Is.EqualTo(formatString));
             Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
@@ -389,7 +389,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             var formatString = "{0}";
 
-            var format = parser.ParseFormat(formatString, new[] { Guid.NewGuid().ToString("N") });
+            var format = parser.ParseFormat(formatString);
             var placeholder = (Placeholder)format.Items[0];
             placeholder.FormatterName = "test";
             Assert.AreEqual($"{{0:{placeholder.FormatterName}}}", placeholder.ToString());
@@ -402,7 +402,7 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-            var Format = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
+            var Format = parser.ParseFormat(format);
 
             Assert.That(Format.IndexOf('|'), Is.EqualTo(2));
             Assert.That(Format.IndexOf('|', 3), Is.EqualTo(43));
@@ -425,7 +425,7 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-            var parsedFormat = parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") });
+            var parsedFormat = parser.ParseFormat(format);
             var splits = parsedFormat.Split('|');
 
             Assert.That(splits.Count, Is.EqualTo(3));
@@ -447,7 +447,7 @@ namespace SmartFormat.Tests.Core
 
         private Format Parse(string format, string[] formatterExentionNames )
         {
-            return GetRegularParser().ParseFormat(format, formatterExentionNames);
+            return GetRegularParser().ParseFormat(format);
         }
 
         [TestCase("{0:name:}", "name", "", "")]
@@ -526,7 +526,7 @@ namespace SmartFormat.Tests.Core
             parser.UseAlternativeEscapeChar('\\');
             parser.Settings.ConvertCharacterStringLiterals = false;
 
-            var placeholder = (Placeholder) parser.ParseFormat(format, new[] { Guid.NewGuid().ToString("N") }).Items[0];
+            var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
             Assert.IsEmpty(placeholder.FormatterName);
             Assert.IsEmpty(placeholder.FormatterOptions);
             var literalText = placeholder.Format?.GetLiteralText();
@@ -551,7 +551,7 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             parser.UseAlternativeEscapeChar('\\');
-            Assert.That(parser.ParseFormat("\\{\\}", Array.Empty<string>()).ToString(), Is.EqualTo("{}"));
+            Assert.That(parser.ParseFormat("\\{\\}").ToString(), Is.EqualTo("{}"));
         }
 
         [Test]
@@ -560,7 +560,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             // necessary because of the consecutive }}}, which would otherwise be escaped as }} and lead to "missing brace" exception:
             parser.UseAlternativeEscapeChar('\\'); 
-            var placeholders = parser.ParseFormat("{c1:{c2:{c3}}}", new[] {Guid.NewGuid().ToString("N")});
+            var placeholders = parser.ParseFormat("{c1:{c2:{c3}}}");
 
             var c1 = (Placeholder) placeholders.Items[0];
             var c2 = (Placeholder) c1.Format?.Items[0]!;
@@ -583,7 +583,7 @@ namespace SmartFormat.Tests.Core
             // The literal may also contain escaped characters
             var literal = "one|two|th\\} \\{ree|other";
 
-            var format = parser.ParseFormat($"{{{selector}:{formatterName}({options}):{literal}}}", new[] {formatterName});
+            var format = parser.ParseFormat($"{{{selector}:{formatterName}({options}):{literal}}}");
             var placeholder = (Placeholder) format.Items[0];
             
             Assert.That(format.Items.Count, Is.EqualTo(1));
@@ -604,7 +604,7 @@ namespace SmartFormat.Tests.Core
         public void Parse_Unicode(string formatString, string unicodeLiteral, int itemIndex, bool isLegal)
         {
             var parser = GetRegularParser();
-            var result = parser.ParseFormat(formatString, new[] {"d"});
+            var result = parser.ParseFormat(formatString);
 
             var literal = result.Items[itemIndex];
             Assert.That(literal, Is.TypeOf(typeof(LiteralText)));
@@ -623,7 +623,7 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             parser.Settings.Parser.AddCustomSelectorChars(new[]{customChar});
-            var result = parser.ParseFormat(formatString, new[] {"d"});
+            var result = parser.ParseFormat(formatString);
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
@@ -637,7 +637,7 @@ namespace SmartFormat.Tests.Core
         {
             var parser = GetRegularParser();
             parser.Settings.Parser.AddCustomOperatorChars(new[]{customChar});
-            var result = parser.ParseFormat(formatString, new[] {"d"});
+            var result = parser.ParseFormat(formatString);
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
@@ -656,7 +656,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             // adding '.' is ignored, as it's the standard operator
             parser.Settings.Parser.AddCustomOperatorChars(new[]{customChar});
-            var result = parser.ParseFormat(formatString, new[] {"d"});
+            var result = parser.ParseFormat(formatString);
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);

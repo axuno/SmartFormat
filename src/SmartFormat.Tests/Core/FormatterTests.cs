@@ -194,7 +194,7 @@ namespace SmartFormat.Tests.Core
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
             formatter.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
             formatter.Parser.AddAlphanumericSelectors(); // required for this test
-            var formatParsed = formatter.Parser.ParseFormat(format, new []{string.Empty});
+            var formatParsed = formatter.Parser.ParseFormat(format);
             var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
             
             Assert.AreEqual(args, formatDetails.OriginalArgs);

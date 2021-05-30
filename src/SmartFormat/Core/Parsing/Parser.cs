@@ -190,9 +190,8 @@ namespace SmartFormat.Core.Parsing
         /// Parses a format string.
         /// </summary>
         /// <param name="inputFormat"></param>
-        /// <param name="formatterExtensionNames"></param>
         /// <returns>The <see cref="Format"/> for the parsed string.</returns>
-        public Format ParseFormat(string inputFormat, string[] formatterExtensionNames)
+        public Format ParseFormat(string inputFormat)
         {
             var index = new IndexContainer {
                 ObjectLength = inputFormat.Length,
@@ -247,7 +246,7 @@ namespace SmartFormat.Core.Parsing
                     }
                     else if (index.NamedFormatterStart != PositionUndefined)
                     {
-                        if(!ParseNamedFormatter(inputFormat, currentFormat, ref index, formatterExtensionNames)) continue;
+                        if(!ParseNamedFormatter(inputFormat, currentFormat, ref index)) continue;
                     }
                 }
                 else
@@ -449,9 +448,8 @@ namespace SmartFormat.Core.Parsing
         /// <param name="inputFormat">The input format string.</param>
         /// <param name="currentFormat">The current <see cref="Format"/>.</param>
         /// <param name="index">The <see cref="IndexContainer"/>.</param>
-        /// <param name="formatterExtensionNames">The registered formatter names</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool ParseNamedFormatter(string inputFormat, Format currentFormat, ref IndexContainer index, string[] formatterExtensionNames)
+        private bool ParseNamedFormatter(string inputFormat, Format currentFormat, ref IndexContainer index)
         {
             var inputChar = inputFormat[index.Current];
             if (inputChar == _parserSettings.FormatterOptionsBeginChar)
