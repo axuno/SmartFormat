@@ -47,7 +47,7 @@ namespace SmartFormat.Core.Parsing
         /// Creates a new instance of a <see cref="Parser"/>.
         /// </summary>
         /// <param name="smartSettings"></param>
-        public Parser(SmartSettings smartSettings)
+        internal Parser(SmartSettings smartSettings)
         {
             Settings = smartSettings;
             _parserSettings = Settings.Parser;
