@@ -38,7 +38,7 @@ namespace SmartFormat.Tests.Core
             var data = new {Name = "Joe", City = "Melbourne"};
             var formatter = GetSimpleFormatter();
             var formatString = "{Name}, {City}";
-            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
+            var format = formatter.Parser.ParseFormat(formatString);
             var cache = new FormatCache(format);
             Assert.That(formatter.FormatWithCache(ref cache, formatString, data), Is.EqualTo($"{data.Name}, {data.City}"));
         }
@@ -49,7 +49,7 @@ namespace SmartFormat.Tests.Core
             var data = new {Name = "Joe", City = "Melbourne"};
             var formatter = GetSimpleFormatter();
             var formatString = "{Name}, {City}";
-            var format = formatter.Parser.ParseFormat(formatString, formatter.FormatterExtensions[0].Names);
+            var format = formatter.Parser.ParseFormat(formatString);
             var cache = new FormatCache(format);
             var output = new StringOutput();
             formatter.FormatWithCacheInto(ref cache, output, formatString, data);

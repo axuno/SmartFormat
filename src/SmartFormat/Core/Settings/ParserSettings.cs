@@ -95,12 +95,6 @@ namespace SmartFormat.Core.Settings
         }
 
         /// <summary>
-        /// Uses <c>string.Format</c>-compatible escaping of curly braces, {{ and }},
-        /// instead of the <c>Smart.Format</c> default escaping, \{ and \},
-        /// </summary>
-        public bool UseStringFormatCompatibility { get; set; } = false;
-
-        /// <summary>
         /// This setting is relevant for the <see cref="LiteralText" />.
         /// If <see langword="true"/> (the default), character string literals are treated like in "normal" string.Format:
         /// string.Format("\t")   will return a "TAB" character

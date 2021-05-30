@@ -109,15 +109,22 @@ namespace SmartFormat.Tests.Core
             var data = new {Person = new {FirstName = "John", LastName = "Long"}, Address = new {City = "London"}};
             var formatter = Smart.CreateDefaultSmartFormat();
             
-            // This is necessary to avoid undesired trailing blanks:
-            // }}} are now considered as 3 different closing braces
-            formatter.Parser.UseAlternativeEscapeChar('\\');
-            
             // This allows a nested template to access outer scopes.
             // Here, {City} will come from Address, but {FirstName} will come from Person:
-            var result = formatter.Format("{Person:{Address:City: {City}, Name: {FirstName}}}", data);
+            var result = formatter.Format("{Person:{Address:City\\: {City}, Name\\: {FirstName}}}", data);
             
             Assert.That(result, Is.EqualTo("City: London, Name: John"));
+        }
+
+        [TestCase("({.Joe.})", ":{Joe}:")]
+        [TestCase("Kate", ":{(.Not:Joe.)}:")]
+        public void Any_Character_Anywhere_If_Escaped(string name, string expected)
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            var arg = new {Name = name};
+            // {} and () must and can only be escaped inside options
+            var format = @":\{{Name:choose(\(\{.Joe.\}\)):Joe|(.Not\:Joe.)}\}:";
+            Assert.That(smart.Format(format, arg), Is.EqualTo(expected));
         }
 
         [TestCase(1)]
@@ -153,7 +160,7 @@ namespace SmartFormat.Tests.Core
         {
             var smart = Smart.CreateDefaultSmartFormat();
             smart.Settings.Parser.ConvertCharacterStringLiterals = false;
-            smart.Settings.Parser.UseStringFormatCompatibility = true;
+            smart.Settings.UseStringFormatCompatibility = true;
 
             var expected = "\\Hello";
             var actual = smart.Format("\\{Test}", new { Test = "Hello" });
@@ -187,7 +194,7 @@ namespace SmartFormat.Tests.Core
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
             formatter.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
             formatter.Parser.AddAlphanumericSelectors(); // required for this test
-            var formatParsed = formatter.Parser.ParseFormat(format, new []{string.Empty});
+            var formatParsed = formatter.Parser.ParseFormat(format);
             var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
             
             Assert.AreEqual(args, formatDetails.OriginalArgs);

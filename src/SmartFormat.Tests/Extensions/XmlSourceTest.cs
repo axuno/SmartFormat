@@ -75,7 +75,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_SingleLevelXml_TemplateWithCurlyBraces_Escaped()
         {
             var sf = Smart.CreateDefaultSmartFormat();
-            sf.Settings.Parser.UseStringFormatCompatibility = true;
+            sf.Settings.UseStringFormatCompatibility = true;
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
