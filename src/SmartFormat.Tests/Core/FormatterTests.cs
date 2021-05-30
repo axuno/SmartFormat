@@ -160,7 +160,7 @@ namespace SmartFormat.Tests.Core
         {
             var smart = Smart.CreateDefaultSmartFormat();
             smart.Settings.Parser.ConvertCharacterStringLiterals = false;
-            smart.Settings.Parser.UseStringFormatCompatibility = true;
+            smart.Settings.UseStringFormatCompatibility = true;
 
             var expected = "\\Hello";
             var actual = smart.Format("\\{Test}", new { Test = "Hello" });

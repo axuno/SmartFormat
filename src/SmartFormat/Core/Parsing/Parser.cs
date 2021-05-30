@@ -97,7 +97,7 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Use 'Settings.Parser.UseStringFormatCompatibility' instead.")]
         public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
         {
-            _parserSettings.UseStringFormatCompatibility = false;
+            Settings.UseStringFormatCompatibility = false;
             _parserSettings.CharLiteralEscapeChar = alternativeEscapeChar;
         }
 
@@ -110,7 +110,7 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Use 'Settings.Parser.UseStringFormatCompatibility' instead.")]
         public void UseBraceEscaping()
         {
-            _parserSettings.UseStringFormatCompatibility = true;
+            Settings.UseStringFormatCompatibility = true;
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace SmartFormat.Core.Parsing
                         FinishPlaceholderFormat(ref currentFormat, ref nestedDepth, ref index);
                     }
                     else if (inputChar == _parserSettings.CharLiteralEscapeChar && _parserSettings.ConvertCharacterStringLiterals ||
-                             !_parserSettings.UseStringFormatCompatibility && inputChar == _parserSettings.CharLiteralEscapeChar)
+                             !Settings.UseStringFormatCompatibility && inputChar == _parserSettings.CharLiteralEscapeChar)
                     {
                         ParseAlternativeEscaping(inputFormat, currentFormat, ref index);
                     }
@@ -348,7 +348,7 @@ namespace SmartFormat.Core.Parsing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool EscapeLikeStringFormat(string inputFormat, ref IndexContainer index, char brace)
         {
-            if (!_parserSettings.UseStringFormatCompatibility) return false;
+            if (!Settings.UseStringFormatCompatibility) return false;
 
             if (index.LastEnd < inputFormat.Length && inputFormat[index.LastEnd] == brace)
             {
@@ -507,7 +507,7 @@ namespace SmartFormat.Core.Parsing
 
                 var parentPlaceholder = currentFormat.Parent;
 
-                if (_parserSettings.UseStringFormatCompatibility) 
+                if (Settings.UseStringFormatCompatibility) 
                 {
                     // named formatters will not be parsed with string.Format compatibility switched ON,
                     // but we can handle e.g. Smart.Format("{Date:yyyy/MM/dd HH:mm:ss}") like string.Format

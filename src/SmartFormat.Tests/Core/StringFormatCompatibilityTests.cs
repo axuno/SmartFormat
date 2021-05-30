@@ -16,7 +16,7 @@ namespace SmartFormat.Tests.Core
         [SetUp]
         public void Setup()
         {
-            _formatter.Settings.Parser.UseStringFormatCompatibility = true;
+            _formatter.Settings.UseStringFormatCompatibility = true;
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void NamedPlaceholder_DecimalArg()
         {
-            _formatter.Settings.Parser.UseStringFormatCompatibility = false;
+            _formatter.Settings.UseStringFormatCompatibility = false;
             var pricePerOunce = 17.36m;
             var format = "The current price is {0} per ounce.";
 
@@ -122,7 +122,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void NamedPlaceholder_DecimalCurrencyArg()
         {
-            _formatter.Settings.Parser.UseStringFormatCompatibility = false;
+            _formatter.Settings.UseStringFormatCompatibility = false;
             var pricePerOunce = 17.36m;
             var format = "The current price is {0:C2} per ounce.";
 
