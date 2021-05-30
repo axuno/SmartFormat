@@ -21,6 +21,13 @@ namespace SmartFormat.Core.Settings
         }
 
         /// <summary>
+        /// Uses <c>string.Format</c>-compatible escaping of curly braces, {{ and }},
+        /// instead of the <c>Smart.Format</c> default escaping, \{ and \}.
+        /// Custom formatters cannot be parsed.
+        /// </summary>
+        public bool UseStringFormatCompatibility { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
         /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>

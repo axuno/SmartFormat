@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
@@ -42,6 +43,10 @@ namespace SmartFormat.Core.Parsing
 
         #region: Constructor :
 
+        /// <summary>
+        /// Creates a new instance of a <see cref="Parser"/>.
+        /// </summary>
+        /// <param name="smartSettings"></param>
         internal Parser(SmartSettings smartSettings)
         {
             Settings = smartSettings;
@@ -92,7 +97,7 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Use 'Settings.Parser.UseStringFormatCompatibility' instead.")]
         public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
         {
-            _parserSettings.UseStringFormatCompatibility = false;
+            Settings.UseStringFormatCompatibility = false;
             _parserSettings.CharLiteralEscapeChar = alternativeEscapeChar;
         }
 
@@ -105,7 +110,7 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Use 'Settings.Parser.UseStringFormatCompatibility' instead.")]
         public void UseBraceEscaping()
         {
-            _parserSettings.UseStringFormatCompatibility = true;
+            Settings.UseStringFormatCompatibility = true;
         }
 
         /// <summary>
@@ -190,9 +195,8 @@ namespace SmartFormat.Core.Parsing
         /// Parses a format string.
         /// </summary>
         /// <param name="inputFormat"></param>
-        /// <param name="formatterExtensionNames"></param>
         /// <returns>The <see cref="Format"/> for the parsed string.</returns>
-        public Format ParseFormat(string inputFormat, string[] formatterExtensionNames)
+        public Format ParseFormat(string inputFormat)
         {
             var index = new IndexContainer {
                 ObjectLength = inputFormat.Length,
@@ -241,13 +245,13 @@ namespace SmartFormat.Core.Parsing
                         FinishPlaceholderFormat(ref currentFormat, ref nestedDepth, ref index);
                     }
                     else if (inputChar == _parserSettings.CharLiteralEscapeChar && _parserSettings.ConvertCharacterStringLiterals ||
-                             !_parserSettings.UseStringFormatCompatibility && inputChar == _parserSettings.CharLiteralEscapeChar)
+                             !Settings.UseStringFormatCompatibility && inputChar == _parserSettings.CharLiteralEscapeChar)
                     {
                         ParseAlternativeEscaping(inputFormat, currentFormat, ref index);
                     }
                     else if (index.NamedFormatterStart != PositionUndefined)
                     {
-                        if(!ParseNamedFormatter(inputFormat, currentFormat, ref index, formatterExtensionNames)) continue;
+                        if(!ParseNamedFormatter(inputFormat, currentFormat, ref index)) continue;
                     }
                 }
                 else
@@ -273,12 +277,14 @@ namespace SmartFormat.Core.Parsing
                 currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, inputFormat.Length));
             }
             
-            // Todo v2.7.0: There is no unit test for this condition!
+            Debug.Assert(currentFormat.Parent == null);
+            /* Not hit by any unit test in v2.7.0 and v3.0.0
             while (currentFormat.Parent != null)
             {
                 currentFormat = currentFormat.Parent.Parent;
                 currentFormat.EndIndex = inputFormat.Length;
             }
+            */
 
             // Check for any parsing errors:
             if (parsingErrors.HasIssues)
@@ -342,7 +348,7 @@ namespace SmartFormat.Core.Parsing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool EscapeLikeStringFormat(string inputFormat, ref IndexContainer index, char brace)
         {
-            if (!_parserSettings.UseStringFormatCompatibility) return false;
+            if (!Settings.UseStringFormatCompatibility) return false;
 
             if (index.LastEnd < inputFormat.Length && inputFormat[index.LastEnd] == brace)
             {
@@ -449,9 +455,8 @@ namespace SmartFormat.Core.Parsing
         /// <param name="inputFormat">The input format string.</param>
         /// <param name="currentFormat">The current <see cref="Format"/>.</param>
         /// <param name="index">The <see cref="IndexContainer"/>.</param>
-        /// <param name="formatterExtensionNames">The registered formatter names</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool ParseNamedFormatter(string inputFormat, Format currentFormat, ref IndexContainer index, string[] formatterExtensionNames)
+        private bool ParseNamedFormatter(string inputFormat, Format currentFormat, ref IndexContainer index)
         {
             var inputChar = inputFormat[index.Current];
             if (inputChar == _parserSettings.FormatterOptionsBeginChar)
@@ -502,36 +507,32 @@ namespace SmartFormat.Core.Parsing
 
                 var parentPlaceholder = currentFormat.Parent;
 
-                if (index.NamedFormatterOptionsStart == PositionUndefined)
+                if (Settings.UseStringFormatCompatibility) 
                 {
-                    var formatterName = inputFormat.Substring(index.NamedFormatterStart,
-                        index.Current - index.NamedFormatterStart);
-
-                    if (FormatterNameExists(formatterName, formatterExtensionNames))
-                    {
-                        if (parentPlaceholder != null) parentPlaceholder.FormatterName = formatterName;
-                    }
-                    else
-                        index.LastEnd = currentFormat.StartIndex;
+                    // named formatters will not be parsed with string.Format compatibility switched ON,
+                    // but we can handle e.g. Smart.Format("{Date:yyyy/MM/dd HH:mm:ss}") like string.Format
+                    index.LastEnd = currentFormat.StartIndex;
                 }
                 else
                 {
-                    var formatterName = inputFormat.Substring(index.NamedFormatterStart,
-                        index.NamedFormatterOptionsStart - index.NamedFormatterStart);
-
-                    if (FormatterNameExists(formatterName, formatterExtensionNames))
+                    if (index.NamedFormatterOptionsStart == PositionUndefined)
                     {
                         if (parentPlaceholder != null)
-                        {
-                            parentPlaceholder.FormatterName = formatterName;
-                            // Save the formatter options with CharLiteralEscapeChar removed
-                            parentPlaceholder.FormatterOptionsRaw = inputFormat.Substring(index.NamedFormatterOptionsStart + 1,
-                                    index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1));
-                        }
+                            parentPlaceholder.FormatterName = inputFormat.Substring(index.NamedFormatterStart,
+                                index.Current - index.NamedFormatterStart);
                     }
                     else
                     {
-                        index.LastEnd = currentFormat.StartIndex;
+                        if (parentPlaceholder != null)
+                        {
+                            parentPlaceholder.FormatterName = inputFormat.Substring(index.NamedFormatterStart,
+                                index.NamedFormatterOptionsStart - index.NamedFormatterStart);
+
+                            // Save the formatter options with CharLiteralEscapeChar removed
+                            parentPlaceholder.FormatterOptionsRaw = inputFormat.Substring(
+                                index.NamedFormatterOptionsStart + 1,
+                                index.NamedFormatterOptionsEnd - (index.NamedFormatterOptionsStart + 1));
+                        }
                     }
                 }
 
