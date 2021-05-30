@@ -27,7 +27,8 @@ namespace SmartFormat.Core.Parsing
             {'n', '\n'},
             {'r', '\r'},
             {'t', '\t'},
-            {'v', '\v'}
+            {'v', '\v'},
+            {':', ':'} // escaped colons can be used anywhere in the format string
         };
 
         private static readonly Dictionary<char, char> FormatterOptionsLookupTable = new() {
@@ -35,8 +36,7 @@ namespace SmartFormat.Core.Parsing
             {'(', '('},
             {')', ')'},
             {'{', '{'},
-            {'}', '}'},
-            {':', ':'}
+            {'}', '}'}
         };
 
         /// <summary>
@@ -79,7 +79,6 @@ namespace SmartFormat.Core.Parsing
         /// <returns>The input with escaped characters with their real value.</returns>
         public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
         {
-            //var length = input.Length;
             // It's enough to have a buffer with the same size as input length
             var result = new Span<char>(new char[length]);
             var max = startIndex + length;

@@ -60,7 +60,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         [Benchmark]
         public void ParseSmartFormat()
         {
-            var result = _sfParser.ParseFormat(_inputFormatString, new[] {"default"});
+            var result = _sfParser.ParseFormat(_inputFormatString);
         }
 
         /// <summary>

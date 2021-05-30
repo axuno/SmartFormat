@@ -109,11 +109,10 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
             );
 
             // Cache the parsing result, so we don't include parsing performance
-            var format = _jsonFormatter.Parser.ParseFormat(_format, _jsonFormatter.FormatterExtensions[0].Names);
+            var format = _jsonFormatter.Parser.ParseFormat(_format);
             _formatCache = new FormatCache(format);
 
-            var formatForLiteral = _jsonFormatter.Parser.ParseFormat(_formatForLiteral,
-                _jsonFormatter.FormatterExtensions[0].Names);
+            var formatForLiteral = _jsonFormatter.Parser.ParseFormat(_formatForLiteral);
             _formatCacheLiteral = new FormatCache(formatForLiteral);
 
         }

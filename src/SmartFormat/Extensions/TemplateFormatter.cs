@@ -70,7 +70,7 @@ namespace SmartFormat.Extensions
         /// <param name="template">The string to be used as a template.</param>
         public void Register(string templateName, string template)
         {
-            var parsed = _formatter.Parser.ParseFormat(template, _formatter.GetNotEmptyFormatterExtensionNames());
+            var parsed = _formatter.Parser.ParseFormat(template);
             _templates.Add(templateName, parsed);
         }
 
