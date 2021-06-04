@@ -6,6 +6,17 @@ v3.0.0 (Draft)
 
 ### Currently merged to the `version/v3.0` branch:
 
+#### Refactored implementation for string alignment ([#174](https://github.com/axuno/SmartFormat/pull/174))
+Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
+
+* Aligment is now implemented into class `FormattingInfo`, so it is **always available**. 
+* Introduced `FormatterSettings.AlignmentFillCharacter`, to the the fill character can be customized. Default is space (0x20), like with `string.Format`.
+* Former implementation in `DefaultFormatter` is removed.
+* Modified `ListFormatter` so that items can be aligned, but the spacers stay untouched
+* `IFormattingInfo.Alignment` now returns the alignment of the current `Placeholder`, or - if this is null - the `Alignment` of any parent `IFormattingInfo` that is not zero.
+* Renamed `IFormattingInfo.Write(Format format, object value)` to `FormatAsChild(Format format, object value)` to make clear that nothing is written to `IOutput` (this happens in a next step).
+* Added dedicated AlignmentTests
+
 #### Separated mode for SmartFormat features from `string.Format`compatibility ([#173](https://github.com/axuno/SmartFormat/pull/173))
 **1. `string.Format` compatibility:**
    * SmartFormat acts as a drop-in replacement, and on top allows for named placeholders besides indexed placeholders. Example (note the colon is not escaped):
