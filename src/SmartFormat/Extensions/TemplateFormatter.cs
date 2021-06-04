@@ -59,7 +59,7 @@ namespace SmartFormat.Extensions
                 return false;
             }
 
-            formattingInfo.Write(template, formattingInfo.CurrentValue ?? string.Empty);
+            formattingInfo.FormatAsChild(template, formattingInfo.CurrentValue ?? string.Empty);
             return true;
         }
 

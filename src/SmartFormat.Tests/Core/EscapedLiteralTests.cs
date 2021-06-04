@@ -35,7 +35,7 @@ namespace SmartFormat.Tests.Core
         {
             if (shouldThrow)
             {
-                Assert.That( () => EscapedLiteral.UnEscapeCharLiterals('\\', input, 0, input.Length, true), Throws.ArgumentException.And.Message.Contains(expected));
+                Assert.That( () => EscapedLiteral.UnEscapeCharLiterals('\\', input, 0, input.Length, false), Throws.ArgumentException.And.Message.Contains(expected));
             }
             else
             {

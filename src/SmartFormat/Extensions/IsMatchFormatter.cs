@@ -39,9 +39,9 @@ namespace SmartFormat.Extensions
             var regEx = new Regex(expression, RegexOptions);
 
             if (formattingInfo.CurrentValue != null && regEx.IsMatch(formattingInfo.CurrentValue.ToString()!))
-                formattingInfo.Write(formats[0], formattingInfo.CurrentValue);
+                formattingInfo.FormatAsChild(formats[0], formattingInfo.CurrentValue);
             else if (formats.Count == 2)
-                formattingInfo.Write(formats[1], formattingInfo.CurrentValue ?? string.Empty);
+                formattingInfo.FormatAsChild(formats[1], formattingInfo.CurrentValue ?? string.Empty);
 
             return true;
         }

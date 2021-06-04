@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -14,7 +13,7 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class FormatterTests
     {
-        private object[] errorArgs = new object[]{ new FormatDelegate(format => { throw new Exception("ERROR!"); } ) };
+        private readonly object[] _errorArgs = { new FormatDelegate(format => throw new Exception("ERROR!")) };
 
         private SmartFormatter GetSimpleFormatter()
         {
@@ -22,7 +21,6 @@ namespace SmartFormat.Tests.Core
             formatter.FormatterExtensions.Add(new DefaultFormatter());
             formatter.SourceExtensions.Add(new ReflectionSource(formatter));
             formatter.SourceExtensions.Add(new DefaultSource(formatter));
-            formatter.Parser.AddAlphanumericSelectors();
             return formatter;
         }
 
@@ -47,7 +45,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
 
-            Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--"));
+            Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", _errorArgs, "--ERROR!--ERROR!--"));
         }
 
         [Test]
@@ -56,7 +54,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--ERROR!--ERROR!--");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "--ERROR!--ERROR!--");
         }
 
         [Test]
@@ -65,7 +63,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "------");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "------");
         }
 
         [Test]
@@ -74,7 +72,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.MaintainTokens;
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--{0}--{0:ZZZZ}--");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "--{0}--{0:ZZZZ}--");
         }
 
         [Test]
@@ -82,25 +80,7 @@ namespace SmartFormat.Tests.Core
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.MaintainTokens;
-            formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
-        }
-
-        [Test]
-        public void Formatter_Align()
-        {
-            string name = "Joe";
-            var obj = new { name = name };
-            var str2 = GetSimpleFormatter().Format("Name: {name,10}| Column 2", obj);
-            Assert.That(str2, Is.EqualTo("Name:        Joe| Column 2"));
-        }
-
-        [Test]
-        public void Formatter_AlignNull()
-        {
-            string? name = null;
-            var obj = new { name = name };
-            var str2 = GetSimpleFormatter().Format("Name: {name,-10}| Column 2", obj);
-            Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
+            formatter.Test("--{Object.Thing}--", _errorArgs, "--{Object.Thing}--");
         }
 
         [Test]

@@ -11,6 +11,7 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 
 namespace SmartFormat
 {
@@ -360,12 +361,15 @@ namespace SmartFormat
         private void EvaluateSelectors(FormattingInfo formattingInfo)
         {
             if (formattingInfo.Placeholder is null) return;
-
+           
             var firstSelector = true;
             foreach (var selector in formattingInfo.Placeholder.Selectors)
             {
                 formattingInfo.Selector = selector;
+                // If we have an alignment selector, we set Alignment for its placeholder and move on
+                if (TrySetPlaceholderAlignment(formattingInfo)) continue;
                 formattingInfo.Result = null;
+                
                 var handled = InvokeSourceExtensions(formattingInfo);
                 if (handled) formattingInfo.CurrentValue = formattingInfo.Result;
 
@@ -431,6 +435,28 @@ namespace SmartFormat
                 if (!formatterExtension.Names.Contains(formatterName)) continue;
                 var handled = formatterExtension.TryEvaluateFormat(formattingInfo);
                 if (handled) return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Process pure alignment selectors.
+        /// E.g. {Number,10} has an alignment selector containing ',10'
+        /// </summary>
+        /// <param name="selectorInfo">The <see cref="ISelectorInfo"/> to process.</param>
+        /// <returns><see langword="true"/>, if the selector contains valid alignment, else <see langword="false"/>.</returns>
+        private bool TrySetPlaceholderAlignment(ISelectorInfo selectorInfo)
+        {
+            // 1. The current selector belongs to a placeholder
+            // 2. The operator character must have a value, usually ','
+            // 3. The alignment is an integer value
+            if (selectorInfo.Placeholder != null && 
+                selectorInfo.SelectorOperator?.FirstOrDefault() == Settings.Parser.AlignmentOperator &&
+                int.TryParse(selectorInfo.SelectorText, out var selectorValue))
+            {
+                selectorInfo.Placeholder.Alignment = selectorValue;
+                return true;
             }
 
             return false;

@@ -21,6 +21,10 @@ namespace SmartFormat.Extensions
         /// If no CultureInfo is supplied to the formatter, the
         /// default language rules will be used by default.
         /// </summary>
+        /// <remarks>
+        /// Language Plural Rules are described at
+        /// https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html
+        /// </remarks>
         public PluralLocalizationFormatter(string defaultTwoLetterIsoLanguageName)
         {
             DefaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
@@ -72,7 +76,7 @@ namespace SmartFormat.Extensions
 
             // Output the selected word (allowing for nested formats):
             var pluralForm = pluralWords[pluralIndex];
-            formattingInfo.Write(pluralForm, current);
+            formattingInfo.FormatAsChild(pluralForm, current);
             return true;
         }
 

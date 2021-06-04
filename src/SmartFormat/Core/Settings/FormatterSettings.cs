@@ -19,5 +19,11 @@ namespace SmartFormat.Core.Settings
         /// The default is <see cref="FormatErrorAction.ThrowError"/>.
         /// </summary>
         public FormatErrorAction ErrorAction { get; set; } = FormatErrorAction.ThrowError;
+
+        /// <summary>
+        /// Gets or sets the character which is used for pre-aligning or post-aligning items (e.g.: {Placeholder,10} for an alignment width of 10).
+        /// Default is the space character (0x20).
+        /// </summary>
+        public char AlignmentFillCharacter { get; set; } = ' ';
     }
 }
