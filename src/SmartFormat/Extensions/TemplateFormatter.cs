@@ -46,7 +46,7 @@ namespace SmartFormat.Extensions
             var templateName = formattingInfo.FormatterOptions ?? string.Empty;
             if (templateName == string.Empty)
             {
-                if (formattingInfo.Format != null && formattingInfo.Format.HasNested) return false;
+                if (formattingInfo.Format is {HasNested: true}) return false;
                 templateName = formattingInfo.Format?.RawText;
             }
 

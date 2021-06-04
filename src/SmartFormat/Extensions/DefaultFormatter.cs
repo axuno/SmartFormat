@@ -46,8 +46,7 @@ namespace SmartFormat.Extensions
 
             //  We will try using IFormatProvider, IFormattable, and if all else fails, ToString.
             string result; 
-            if (provider != null &&
-                provider.GetFormat(typeof(ICustomFormatter)) is ICustomFormatter cFormatter)
+            if (provider?.GetFormat(typeof(ICustomFormatter)) is ICustomFormatter cFormatter)
             {
                 var formatText = format?.GetLiteralText();
                 result = cFormatter.Format(formatText, current, provider);

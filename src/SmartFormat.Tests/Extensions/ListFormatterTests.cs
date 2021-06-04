@@ -49,7 +49,7 @@ namespace SmartFormat.Tests.Extensions
                 Persons = data.Where(p => p.Gender == "M")
             };
 
-            Smart.Default.Settings.UseStringFormatCompatibility = false; // mandatory for this test case because of consecutive curly braces
+            Smart.Default.Settings.StringFormatCompatibility = false; // mandatory for this test case because of consecutive curly braces
             Smart.Default.Settings.Formatter.ErrorAction = SmartFormat.Core.Settings.FormatErrorAction.ThrowError;
             Smart.Default.Settings.Parser.ErrorAction = SmartFormat.Core.Settings.ParseErrorAction.ThrowError;
 
