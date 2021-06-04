@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 //
 
+using System;
 using System.ComponentModel;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
@@ -68,9 +69,10 @@ namespace SmartFormat.Core.Extensions
         void Write(string text, int startIndex, int length);
 
         /// <summary>
-        /// Writes the nested format to the output.
+        /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance
+        /// and invokes formatting with <see cref="SmartFormatter"/> with the child as parameter.
         /// </summary>
-        void Write(Format format, object value);
+        void FormatAsChild(Format format, object value);
 
         /// <summary>
         /// Creates a <see cref="FormattingException" /> associated with the <see cref="IFormattingInfo.Format" />.

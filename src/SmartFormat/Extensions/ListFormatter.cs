@@ -6,8 +6,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 
@@ -110,10 +112,16 @@ namespace SmartFormat.Extensions
         /// </remarks>
         private static int CollectionIndex
         {
-            get { return _collectionIndex.Value ?? -1; }
-            set { _collectionIndex.Value = value; }
+            get => _collectionIndex.Value ?? -1;
+            set => _collectionIndex.Value = value;
         }    
 
+        /// <summary>
+        /// Writes the given <see cref="IFormattingInfo"/> to the <see cref="Core.Output.IOutput"/>
+        /// if it can be processed by the formatter.
+        /// </summary>
+        /// <param name="formattingInfo">The <see cref="IFormattingInfo"/> to process.</param>
+        /// <returns>Returns <see langword="true"/> if processing was possible, else <see langword="false"/>.</returns>
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
@@ -145,7 +153,7 @@ namespace SmartFormat.Extensions
             var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : "";
             var lastSpacer = parameters.Count >= 3 ? parameters[2].GetLiteralText() : spacer;
             var twoSpacer = parameters.Count >= 4 ? parameters[3].GetLiteralText() : lastSpacer;
-
+            
             if (!itemFormat.HasNested)
             {
                 // The format is not nested,
@@ -157,27 +165,26 @@ namespace SmartFormat.Extensions
                 var newPlaceholder = new Placeholder(_smartSettings, newItemFormat, itemFormat.StartIndex, 0)
                 {
                     Format = itemFormat,
-                    EndIndex = itemFormat.EndIndex
+                    EndIndex = itemFormat.EndIndex,
                 };
                 newItemFormat.Items.Add(newPlaceholder);
                 itemFormat = newItemFormat;
             }
 
             // Let's buffer all items from the enumerable (to ensure the Count without double-enumeration):
-            var items = current as ICollection;
-            if (items == null)
+            if (current is not ICollection items)
             {
-                var allItems = new List<object>();
-                foreach (var item in enumerable) allItems.Add(item);
-                items = allItems;
+                items = enumerable.Cast<object?>().ToList();
             }
 
-            var oldCollectionIndex =
-                CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
+            // In case we have nested arrays, we might need to restore the CollectionIndex
+            var savedCollectionIndex = CollectionIndex; 
             CollectionIndex = -1;
             foreach (var item in items)
             {
                 CollectionIndex += 1; // Keep track of the index
+                
+                var spacerFormattingInfo = new FormattingInfo(null, formattingInfo.FormatDetails, format, null);
 
                 // Determine which spacer to write:
                 if (spacer == null || CollectionIndex == 0)
@@ -186,22 +193,22 @@ namespace SmartFormat.Extensions
                 }
                 else if (CollectionIndex < items.Count - 1)
                 {
-                    formattingInfo.Write(spacer);
+                    spacerFormattingInfo.Write(spacer);
                 }
                 else if (CollectionIndex == 1)
                 {
-                    formattingInfo.Write(twoSpacer);
+                    spacerFormattingInfo.Write(twoSpacer);
                 }
                 else
                 {
-                    formattingInfo.Write(lastSpacer);
+                    spacerFormattingInfo.Write(lastSpacer);
                 }
 
                 // Output the nested format for this item:
-                formattingInfo.Write(itemFormat, item);
+                formattingInfo.FormatAsChild(itemFormat, item);
             }
 
-            CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex
+            CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
 
             return true;
         }

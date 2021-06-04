@@ -24,7 +24,7 @@ namespace SmartFormat.Extensions
 
             var chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
 
-            formattingInfo.Write(chosenFormat, formattingInfo.CurrentValue ?? string.Empty);
+            formattingInfo.FormatAsChild(chosenFormat, formattingInfo.CurrentValue ?? string.Empty);
 
             return true;
         }
