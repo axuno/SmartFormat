@@ -25,7 +25,7 @@ namespace SmartFormat.Core.Settings
         /// instead of the <c>Smart.Format</c> default escaping, \{ and \}.
         /// Custom formatters cannot be parsed.
         /// </summary>
-        public bool UseStringFormatCompatibility { get; set; } = false;
+        public bool StringFormatCompatibility { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.

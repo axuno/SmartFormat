@@ -429,12 +429,23 @@ namespace SmartFormat
 
             var formatterName = formattingInfo.Placeholder.FormatterName;
 
-            // Evaluate the named formatter (or, evaluate all "" formatters)
-            foreach (var formatterExtension in FormatterExtensions)
+            // Compatibility mode does not support formatter extensions
+            if (Settings.StringFormatCompatibility)
             {
-                if (!formatterExtension.Names.Contains(formatterName)) continue;
-                var handled = formatterExtension.TryEvaluateFormat(formattingInfo);
-                if (handled) return true;
+                return 
+                    FormatterExtensions.First(fe => fe.GetType() == typeof(DefaultFormatter))
+                    .TryEvaluateFormat(formattingInfo);
+            }
+
+            // Try to evaluate using the not empty formatter name from the format string
+            var extension = FormatterExtensions.FirstOrDefault(fe => !string.IsNullOrEmpty(formatterName) && fe.Names.Contains(formatterName));
+            if (extension != null) return extension.TryEvaluateFormat(formattingInfo);
+
+            // Go through all (implicit) formatters which contain an empty name
+            foreach (var formatterExtension in FormatterExtensions.Where(fe => fe.Names.Contains(string.Empty)))
+            {
+                // Return true if handled by the extension
+                if (formatterExtension.TryEvaluateFormat(formattingInfo)) return true;
             }
 
             return false;
