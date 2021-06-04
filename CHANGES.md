@@ -17,7 +17,7 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
 * Renamed `IFormattingInfo.Write(Format format, object value)` to `FormatAsChild(Format format, object value)` to make clear that nothing is written to `IOutput` (this happens in a next step).
 * Added dedicated AlignmentTests
 
-#### Separated mode for SmartFormat features from `string.Format`compatibility ([#173](https://github.com/axuno/SmartFormat/pull/173))
+#### Separated mode for SmartFormat features from `string.Format`compatibility ([#173](https://github.com/axuno/SmartFormat/pull/173), [#175](https://github.com/axuno/SmartFormat/pull/175))
 **1. `string.Format` compatibility:**
    * SmartFormat acts as a drop-in replacement, and on top allows for named placeholders besides indexed placeholders. Example (note the colon is not escaped):
    * ```csharp
@@ -29,8 +29,13 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
             Assert.That(formatter.Format(smartFmt, now), Is.EqualTo(stringFmt));
       ```
    
-   * Custom formatters of SmartFormat are not parsed and thus cannot be used
+   * The `Parser` will not include the formatter name or formatting options. Like with `string.Format`, everything after the `Selector` separator (colon) is considered as format specifier.
    * Curly braces are escaped the `string.Format` way with `{{` and `}}`
+   * `DefaultFormatter` is the only formatter which will be invoked.
+   * Even in compatibility mode, *SmartFormat* will
+     * Process named `Placeholder`s (beside indexed `Placeholder`s)
+     * have `ISource`s available for `Placeholder`s.
+     * be able to process escaped string literals like \n, \U1234 etc.
 
 **2. SmartFormat added feature:**
   * As long as special characters (`(){}:\`) are escaped, any character is allowed anywhere. Now this applies also for the colon. Example (note the escaped colon):
@@ -44,9 +49,14 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
       ```
   * Tests are modified occordingly
 
-3. Moved `ParserSettings.UseStringFormatCompatibility` to `Settings.UseStringFormatCompatibility` because this does no more apply to the parser only.
+**3. All modes**
 
-4. Parser does not process `string[] formatterExtensionNames` any more
+* It is possible to use a `System.IFormatProvider` as argument to `Smart.Format` - same as with `string.Format`. This custom format provider can in turn call a `System.ICustomFormatter` for special formatting needs.
+* This feature is implemented in the `DefaultFormatter`.
+
+4. Moved `ParserSettings.UseStringFormatCompatibility` to `Settings.UseStringFormatCompatibility` because this does no more apply to the parser only.
+
+5. Parser does not process `string[] formatterExtensionNames` any more
   * CTOR does not take `formatterExtensionNames` as argument
   * `Parser.ParseFormat` does not check for a valid formatter name (it's implemented in the formatter anyway)
 
