@@ -154,13 +154,6 @@ namespace SmartFormat.Core.Formatting
             // recursive method call
             FormatDetails.Formatter.Format(nestedFormatInfo);
         }
-
-        [Obsolete("Use method 'FormattingInfo.FormatAsChild(...)' instead.")]
-        public void Write(Format format, object value)
-        {
-            // Name "Write" does not describe what is actually happening.
-            FormatAsChild(format, value);
-        }
         
         /// <summary>
         /// Creates a new <see cref="FormattingException"/>.
