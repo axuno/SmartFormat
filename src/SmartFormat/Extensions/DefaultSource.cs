@@ -18,7 +18,7 @@ namespace SmartFormat.Extensions
         }
 
         /// <summary>
-        /// Performs the default index-based selector, same as String.Format.
+        /// Performs the default index-based selector, same as string.Format.
         /// </summary>
         public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {

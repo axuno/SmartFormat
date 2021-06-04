@@ -16,7 +16,7 @@ namespace SmartFormat.Tests.Core
         [SetUp]
         public void Setup()
         {
-            _formatter.Settings.UseStringFormatCompatibility = true;
+            _formatter.Settings.StringFormatCompatibility = true;
         }
 
         [Test]
@@ -58,7 +58,6 @@ namespace SmartFormat.Tests.Core
             var smartFmt = "It is now {Date:yyyy/MM/dd HH:mm:ss}";
             var stringFmt = $"It is now {now.Date:yyyy/MM/dd HH:mm:ss}";
             Assert.That(_formatter.Format(smartFmt, now), Is.EqualTo(stringFmt));
-            
         }
 
         [Test]
@@ -92,7 +91,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void NamedPlaceholderDateTime()
         {
-            var now = DateTime.Now;
+            var now = new DateTime(2021, 12, 22, 14, 18, 12);
             var smartFmt = "It is now {Date:d} at {Date:t}";
             var stringFmt = $"It is now {now.Date:d} at {now.Date:t}";
             
@@ -112,7 +111,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void NamedPlaceholder_DecimalArg()
         {
-            _formatter.Settings.UseStringFormatCompatibility = false;
+            _formatter.Settings.StringFormatCompatibility = false;
             var pricePerOunce = 17.36m;
             var format = "The current price is {0} per ounce.";
 
@@ -122,7 +121,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void NamedPlaceholder_DecimalCurrencyArg()
         {
-            _formatter.Settings.UseStringFormatCompatibility = false;
+            _formatter.Settings.StringFormatCompatibility = false;
             var pricePerOunce = 17.36m;
             var format = "The current price is {0:C2} per ounce.";
 
@@ -134,9 +133,18 @@ namespace SmartFormat.Tests.Core
         /// </summary>
         [TestCase("{0:FormatterName(true|false):one|two|default}", true)]
         [TestCase("{0:FormatterName(string|String):one|two|default}", "String")]
-        public void Choose_should_be_case_sensitive(string format, object arg0)
+        [TestCase("{0,10:FormatterName(string|String):one|two|default}", "value")]
+        [TestCase("{0:d:FormatterName(string|String):one|two|default}", "2021-12-01")]
+        public void FormatterName_And_Options_Should_Be_Ignored(string format, object arg0)
         {
-            Assert.That(_formatter.Format(format, arg0), Does.StartWith("FormatterName"));
+            Assert.That(_formatter.Format(format, arg0), Is.EqualTo(string.Format(format, arg0)));
+        }
+
+        [TestCase("{0:yyyy/MM/dd HH:mm:ss FormatterName(string|String):one|two|default}", "2021-12-01")] // results in "nonsense"
+        [TestCase("{0:yyyy/MM/dd HH:mm:ss}", "2021-12-01")]
+        public void FormatterName_And_Options_Should_Be_Ignored2(string format, DateTime arg0)
+        {
+            Assert.That(_formatter.Format(format, arg0), Is.EqualTo(string.Format(format, arg0)));
         }
     }
 }
