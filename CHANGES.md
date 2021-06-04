@@ -54,7 +54,7 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
 * It is possible to use a `System.IFormatProvider` as argument to `Smart.Format` - same as with `string.Format`. This custom format provider can in turn call a `System.ICustomFormatter` for special formatting needs.
 * This feature is implemented in the `DefaultFormatter`.
 
-4. Moved `ParserSettings.UseStringFormatCompatibility` to `Settings.UseStringFormatCompatibility` because this does no more apply to the parser only.
+4. Moved `ParserSettings.StringFormatCompatibility` to `Settings.StringFormatCompatibility` because this does no more apply to the parser only.
 
 5. Parser does not process `string[] formatterExtensionNames` any more
   * CTOR does not take `formatterExtensionNames` as argument
@@ -83,7 +83,7 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
 * `Parser` ([#164](https://github.com/axuno/SmartFormat/pull/164)):
   * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete.
   * `Parser.UseAlternativeBraces(..)` is obsolete and not supported any more
-  * Default character for escaping curly braces is now `\`, i.e. `\{` and `\}` instead of `{{` and `}}`. The latter are used if `ParserSettings.UseStringFormatCompatibility` is `true`.
+  * Default character for escaping curly braces is now `\`, i.e. `\{` and `\}` instead of `{{` and `}}`. The latter are used if `SmartSettings.StringFormatCompatibility` is `true`.
   * Alphanumeric selector characters are enabled by default.
   * Operator characters `.,[]` are set by default.
 * `ErrorAction`s ([#164](https://github.com/axuno/SmartFormat/pull/164)):
