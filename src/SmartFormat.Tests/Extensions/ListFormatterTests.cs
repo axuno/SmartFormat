@@ -5,11 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
-using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -51,7 +49,7 @@ namespace SmartFormat.Tests.Extensions
                 Persons = data.Where(p => p.Gender == "M")
             };
 
-            Smart.Default.Parser.UseAlternativeEscapeChar('\\'); // mandatory for this test case because of consecutive curly braces
+            Smart.Default.Settings.UseStringFormatCompatibility = false; // mandatory for this test case because of consecutive curly braces
             Smart.Default.Settings.Formatter.ErrorAction = SmartFormat.Core.Settings.FormatErrorAction.ThrowError;
             Smart.Default.Settings.Parser.ErrorAction = SmartFormat.Core.Settings.ParseErrorAction.ThrowError;
 
@@ -66,68 +64,38 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual("Person A, Person C", result);
         }
 
-        [Test]
-        public void FormatTest()
+        [TestCase("{4}", "System.Int32[]")]
+        [TestCase("{4:|}","12345")]
+        [TestCase("{4:00|}","0102030405")]
+        [TestCase("{4:|,}","1,2,3,4,5")]
+        [TestCase("{4:|, |, and }","1, 2, 3, 4, and 5")]
+        [TestCase("{4:N2|, |, and }","1.00, 2.00, 3.00, 4.00, and 5.00")]
+        public void FormatTest(string format, string expected)
         {
-            var formats = new string[] {
-                "{4}",
-                "{4:|}",
-                "{4:00|}",
-                "{4:|,}",
-                "{4:|, |, and }",
-                "{4:N2|, |, and }",
-            };
-            var expected = new string[] {
-                "System.Int32[]",
-                "12345",
-                "0102030405",
-                "1,2,3,4,5",
-                "1, 2, 3, 4, and 5",
-                "1.00, 2.00, 3.00, 4.00, and 5.00",
-            };
-
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            Smart.Default.Test(new[] {format}, args, new[] {expected});
 
         }
-        [Test]
-        public void NestedFormatTest()
-        {
-            var formats = new string[] {
-                "{0:{}-|}",
-                "{0:{}|-}",
-                "{0:{}|-|+}",
-                "{0:({})|, |, and }",
-            };
-            var expected = new string[] {
-                "A-B-C-D-E-",
-                "A-B-C-D-E",
-                "A-B-C-D+E",
-                "(A), (B), (C), (D), and (E)",
-            };
 
+        [TestCase("{0:{}-|}", "A-B-C-D-E-")]
+        [TestCase("{0:{}|-}", "A-B-C-D-E")]
+        [TestCase("{0:{}|-|+}", "A-B-C-D+E")]
+        [TestCase("{0:({})|, |, and }", "(A), (B), (C), (D), and (E)")]
+        public void NestedFormatTest(string format, string expected)
+        {
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            Smart.Default.Test(new[] {format}, args, new[] {expected});
         }
-        [Test]
-        public void NestedArraysTest()
+        [TestCase("{2:{:{FirstName}}|, }", "Jim, Pam, Dwight")]
+        [TestCase("{3:{:M/d/yyyy} |}", "1/1/2000 10/10/2010 5/5/5555 ")]
+        [TestCase("{2:{:{FirstName}'s friends: {Friends:{FirstName}|, }}|; }", "Jim's friends: Dwight, Michael; Pam's friends: Dwight, Michael; Dwight's friends: Michael")]
+        public void NestedArraysTest(string format, string expected)
         {
-            var formats = new string[] {
-                "{2:{:{FirstName}}|, }",
-                "{3:{:M/d/yyyy} |}",
-                "{2:{:{FirstName}'s friends: {Friends:{FirstName}|, } }|; }",
-            };
-            var expected = new string[] {
-                "Jim, Pam, Dwight",
-                "1/1/2000 10/10/2010 5/5/5555 ",
-                "Jim's friends: Dwight, Michael ; Pam's friends: Dwight, Michael ; Dwight's friends: Michael ",
-            };
-
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            Smart.Default.Test(new[] {format}, args, new[] {expected});
         }
 
-        [Test] /* added due to problems with [ThreadStatic] see: https://github.com/scottrippey/SmartFormat.NET/pull/23 */
+        [Test] /* added due to problems with [ThreadStatic] see: https://github.com/axuno/SmartFormat.NET/pull/23 */
         public void WithThreadPool_ShouldNotMixupCollectionIndex()
         {
             // Old test did not show wrong Index value - it ALWAYS passed even when using ThreadLocal<int> or [ThreadStatic] respectively:
@@ -181,24 +149,14 @@ namespace SmartFormat.Tests.Extensions
                 });
         }
 
-        [Test]
-        public void TestIndex()
+        [TestCase("{0:{} = {Index}|, }", "A = 0, B = 1, C = 2, D = 3, E = 4")] // Index holds the current index of the iteration
+        [TestCase("{1:{Index}: {ToCharArray:{} = {Index}|, }|; }", "0: O = 0, n = 1, e = 2; 1: T = 0, w = 1, o = 2; 2: T = 0, h = 1, r = 2, e = 3, e = 4; 3: F = 0, o = 1, u = 2, r = 3; 4: F = 0, i = 1, v = 2, e = 3")] // Index can be nested
+        [TestCase("{0:{} = {1.Index}|, }", "A = One, B = Two, C = Three, D = Four, E = Five")] // Index is used to synchronize 2 lists
+        [TestCase("{Index}", "-1")] // Index can be used out-of-context, but should always be -1
+        public void TestIndex(string format, string expected)
         {
-            var formats = new string[] {
-                "{0:{} = {Index}|, }", // Index holds the current index of the iteration
-                "{1:{Index}: {ToCharArray:{} = {Index}|, }|; }", // Index can be nested
-                "{0:{} = {1.Index}|, }", // Index is used to synchronize 2 lists
-                "{Index}", // Index can be used out-of-context, but should always be -1
-            };
-            var expected = new string[] {
-                "A = 0, B = 1, C = 2, D = 3, E = 4",
-                "0: O = 0, n = 1, e = 2; 1: T = 0, w = 1, o = 2; 2: T = 0, h = 1, r = 2, e = 3, e = 4; 3: F = 0, o = 1, u = 2, r = 3; 4: F = 0, i = 1, v = 2, e = 3",
-                "A = One, B = Two, C = Three, D = Four, E = Five",
-                "-1",
-                };
-
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            Smart.Default.Test(new[] {format}, args, new[] {expected});
         }
     }
 }
