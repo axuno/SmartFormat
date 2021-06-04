@@ -25,7 +25,7 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
             var smartFmt = "It is now {Date:yyyy/MM/dd HH:mm:ss}";
             var stringFmt = $"It is now {now.Date:yyyy/MM/dd HH:mm:ss}";
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.UseStringFormatCompatibility = true;
+            formatter.Settings.StringFormatCompatibility = true;
             Assert.That(formatter.Format(smartFmt, now), Is.EqualTo(stringFmt));
       ```
    
@@ -44,7 +44,7 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
             var smartFmt = @"It is now {Date:yyyy/MM/dd HH\:mm\:ss}";
             var stringFmt = $"It is now {now.Date:yyyy/MM/dd HH:mm:ss}";
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.UseStringFormatCompatibility = false;
+            formatter.Settings.StringFormatCompatibility = false;
             Assert.That(formatter.Format(smartFmt, now), Is.EqualTo(stringFmt));
       ```
   * Tests are modified occordingly
