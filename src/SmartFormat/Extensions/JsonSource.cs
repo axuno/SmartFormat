@@ -11,29 +11,50 @@ using System.Linq;
 
 namespace SmartFormat.Extensions
 {
-    public class JsonSource : ISource
+    /// <summary>
+    /// Class to evaluate <see cref="Newtonsoft.Json"/> and <see cref="System.Text.Json"/>  JSON sources
+    /// of type <see cref="JObject"/> and <see cref="JsonElement"/>.
+    /// </summary>
+    public class JsonSource : Source
     {
-        public JsonSource(SmartFormatter formatter)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
+        public JsonSource(SmartFormatter formatter) : base(formatter)
         {
-            // Note: We only have ONE parser at a time.
-            // These settings will affect all extensions loaded at the same time
-
-            // Escaped JSON property names and special characters are not supported in
-            // order to avoid interference with other extensions
-            formatter.Parser.AddAlphanumericSelectors(); // (A-Z + a-z)
-            formatter.Parser.AddAdditionalSelectorChars("_");
             // For JsonSource it would be optimal not to have any operators in place,
             // but we have a workaround, if they are set by other extensions
-            formatter.Parser.AddOperators("."); 
         }
 
-        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
+        /// <inheritdoc />
+        public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
+            // Check for nullable and null value
+            var current = selectorInfo.CurrentValue switch
+            {
+                // NewtonSoftJson
+                JObject jsonObject => jsonObject.HasValues ? jsonObject : null,
+                JValue jasonValue => jasonValue.Value,
+                // System.Text.Json
+                JsonElement jsonElement => jsonElement.ValueKind == JsonValueKind.Null ? null : jsonElement,
+                _ => selectorInfo.CurrentValue
+            };
+            
+            if (current is null && HasNullableOperator(selectorInfo))
+            {
+                selectorInfo.Result = null;
+                return true;
+            }
+            
             // Note: Operators are processed by ListFormatter
             return selectorInfo.CurrentValue switch
             {
-                JObject _ => NewtonSoftJson.TryEvaluateSelector(selectorInfo),
-                JsonElement _ => SystemTextJson.TryEvaluateSelector(selectorInfo),
+                // NewtonSoftJson
+                JObject => NewtonSoftJson.TryEvaluateSelector(selectorInfo),
+                JValue => NewtonSoftJson.TryEvaluateSelector(selectorInfo),
+                // System.Text.Json
+                JsonElement => SystemTextJson.TryEvaluateSelector(selectorInfo),
                 _ => false
             };
         }

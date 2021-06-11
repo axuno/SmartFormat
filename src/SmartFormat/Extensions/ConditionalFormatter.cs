@@ -19,7 +19,7 @@ namespace SmartFormat.Extensions
                 //   Description:      and/or    comparator     value
                 RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        public string[] Names { get; set; } = {"conditional", "cond", ""};
+        public string[] Names { get; set; } = {"conditional", "cond", string.Empty};
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
@@ -71,7 +71,7 @@ namespace SmartFormat.Extensions
                     // If the conditional statement was true, then we can break.
                     if (conditionWasTrue)
                     {
-                        formattingInfo.FormatAsChild(outputItem, current ?? string.Empty);
+                        formattingInfo.FormatAsChild(outputItem, current);
                         return true;
                     }
                 }
@@ -143,7 +143,7 @@ namespace SmartFormat.Extensions
             var selectedParameter = parameters[paramIndex];
 
             // Output the selectedParameter:
-            formattingInfo.FormatAsChild(selectedParameter, current ?? string.Empty);
+            formattingInfo.FormatAsChild(selectedParameter, current);
             return true;
         }
 

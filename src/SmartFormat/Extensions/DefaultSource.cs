@@ -4,23 +4,29 @@
 //
 
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
-    public class DefaultSource : ISource
+    /// <summary>
+    /// Class to evaluate an index-based <see cref="Selector"/>.
+    /// </summary>
+    public class DefaultSource : Source
     {
         private readonly SmartSettings _settings;
 
-        public DefaultSource(SmartFormatter formatter)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
+        public DefaultSource(SmartFormatter formatter) : base(formatter)
         {
             _settings = formatter.Settings;
         }
 
-        /// <summary>
-        /// Performs the default index-based selector, same as string.Format.
-        /// </summary>
-        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
+        /// <inheritdoc />
+        public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             var selector = selectorInfo.SelectorText;
             var formatDetails = selectorInfo.FormatDetails;
@@ -29,7 +35,7 @@ namespace SmartFormat.Extensions
             {
                 // Argument Index:
                 // Just like string.Format, the arg index must be in-range,
-                // should be the first item, and shouldn't have any operator:
+                // must be the first item, and shouldn't have any operator
                 if (selectorInfo.SelectorIndex == 0
                     && selectorValue < formatDetails.OriginalArgs.Count
                     && selectorInfo.SelectorOperator == string.Empty)

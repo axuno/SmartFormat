@@ -11,31 +11,40 @@ using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions
 {
-    public class ReflectionSource : ISource
+    /// <summary>
+    /// Class to evaluate sources using <see cref="System.Reflection"/>.
+    /// A type cache is used in order to reduce reflection calls.
+    /// </summary>
+    public class ReflectionSource : Source
     {
         private static readonly object[] Empty = Array.Empty<object>();
 
         private readonly Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> _typeCache = new();
 
-        public ReflectionSource(SmartFormatter formatter)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
+        public ReflectionSource(SmartFormatter formatter) : base(formatter)
         {
-            // Add some special info to the parser:
-            formatter.Parser.AddAlphanumericSelectors(); // (A-Z + a-z)
-            formatter.Parser.AddAdditionalSelectorChars("_");
-            formatter.Parser.AddOperators(".");
         }
 
-        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
+        /// <inheritdoc />
+        public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
-
             var current = selectorInfo.CurrentValue;
+
+            if (current is null && HasNullableOperator(selectorInfo))
+            {
+                selectorInfo.Result = null;
+                return true;
+            }
+            
+            if (current is null) return false;
+            
             var selector = selectorInfo.SelectorText;
-
-            if (current == null) return false;
-
-            // REFLECTION:
-            // Let's see if the argSelector is a Selectors/Field/ParseFormat:
+            
             var sourceType = current.GetType();
 
             // Check the type cache

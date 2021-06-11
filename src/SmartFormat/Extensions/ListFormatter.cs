@@ -39,11 +39,14 @@ namespace SmartFormat.Extensions
     {
         private readonly SmartSettings _smartSettings;
 
-        public string[] Names { get; set; } = {"list", "l", ""};
+        public string[] Names { get; set; } = {"list", "l", string.Empty};
 
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
         public ListFormatter(SmartFormatter formatter)
         {
-            formatter.Parser.AddOperators("[]");
             _smartSettings = formatter.Settings;
         }
 
@@ -58,10 +61,17 @@ namespace SmartFormat.Extensions
             var current = selectorInfo.CurrentValue;
             var selector = selectorInfo.SelectorText;
 
-            if (!(current is IList currentList)) return false;
+            // E.g. if list Numbers is null in case of "{Numbers?[0].ToString}"
+            if (current is null && HasNullableOperator(selectorInfo))
+            {
+                selectorInfo.Result = null;
+                return true;
+            }
+
+            if (current is not IList currentList) return false;
 
             // See if we're trying to access a specific index:
-            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator?.Length == 0;
+            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
             if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
                 itemIndex < currentList.Count)
             {
@@ -150,7 +160,7 @@ namespace SmartFormat.Extensions
             // itemFormat|spacer|lastSpacer
             // itemFormat|spacer|lastSpacer|twoSpacer
             var itemFormat = parameters[0];
-            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : "";
+            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : string.Empty;
             var lastSpacer = parameters.Count >= 3 ? parameters[2].GetLiteralText() : spacer;
             var twoSpacer = parameters.Count >= 4 ? parameters[3].GetLiteralText() : lastSpacer;
             
@@ -211,6 +221,23 @@ namespace SmartFormat.Extensions
             CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
 
             return true;
+        }
+
+        /// <summary>
+        /// Checks if any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </summary>
+        /// <param name="selectorInfo"></param>
+        /// <returns>
+        /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </returns>
+        /// <remarks>
+        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
+        /// </remarks>
+        private bool HasNullableOperator(ISelectorInfo selectorInfo)
+        {
+            return selectorInfo.Placeholder != null &&
+                   selectorInfo.Placeholder.Selectors.Any(s =>
+                       s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
         }
     }
 }

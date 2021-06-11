@@ -365,7 +365,12 @@ namespace SmartFormat
             var firstSelector = true;
             foreach (var selector in formattingInfo.Placeholder.Selectors)
             {
+                // Don't evaluate selectors empty
+                // (used e.g. for Settings.Parser.NullableOperator and Settings.Parser.ListIndexEndChar final operators)
+                if(selector.Length == 0) continue;
+                
                 formattingInfo.Selector = selector;
+
                 // If we have an alignment selector, we set Alignment for its placeholder and move on
                 if (TrySetPlaceholderAlignment(formattingInfo)) continue;
                 formattingInfo.Result = null;

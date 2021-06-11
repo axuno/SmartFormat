@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -157,6 +159,41 @@ namespace SmartFormat.Tests.Extensions
         {
             var args = GetArgs();
             Smart.Default.Test(new[] {format}, args, new[] {expected});
+        }
+
+        [TestCase("one", "one")]
+        [TestCase(null, "")]
+        public void Should_Return_Indexed_List_Element(string? listElement, string expected)
+        {
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ISource[] { new ListFormatter(smart), new DefaultSource(smart), new ReflectionSource(smart) });
+            smart.AddExtensions(new IFormatter[] {new ListFormatter(smart), new DefaultFormatter()});
+            smart = Smart.CreateDefaultSmartFormat();
+
+            var numbers = new List<string?> {"dummy", listElement};
+
+            var data = new {Numbers = numbers};
+            var indexResult1 = smart.Format(">{Numbers.1}<", data); // index method 1
+            var indexResult2 = smart.Format(">{Numbers[1]}<", data); // index method 2
+            
+            Assert.That(indexResult1, Is.EqualTo($">{expected}<"));
+            Assert.That(indexResult2, Is.EqualTo($">{expected}<"));
+        }
+
+        [Test]
+        public void Null_IList_Nullable_Should_Return_Null()
+        {
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ISource[] { new ListFormatter(smart), new DefaultSource(smart), new ReflectionSource(smart) });
+            smart.AddExtensions(new IFormatter[] {new ListFormatter(smart), new DefaultFormatter()});
+            smart = Smart.CreateDefaultSmartFormat();
+            
+            var data = new {Numbers = default(object)};
+            var indexResult1 = smart.Format(">{Numbers?.0}<", data); // index method 1
+            var indexResult2 = smart.Format(">{Numbers?[0]}<", data); // index method 2
+
+            Assert.That(indexResult1, Is.EqualTo("><"));
+            Assert.That(indexResult2, Is.EqualTo("><"));
         }
     }
 }

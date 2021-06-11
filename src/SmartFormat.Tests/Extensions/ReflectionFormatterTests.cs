@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -29,15 +30,15 @@ namespace SmartFormat.Tests.Extensions
                 "{0} {0.Length} {Length}",
                 "{2.Year} {2.Month:00}-{2.Day:00}",
                 "{3.Value} {3.Anon}",
-                "Chained: {4.FirstName} {4.FirstName.Length} {4.Address.City} {4.Address.State}  ",
-                "Nested: {4:{FirstName:{} {Length} }{Address:{City} {State} } }", // Due to double-brace escaping, the spacing in this nested format is irregular
+                "Chained: {4.FirstName} {4.FirstName.Length} {4.Address.City} {4.Address.State}",
+                "Nested: {4:{FirstName:{} {Length} }{Address:{City} {State}}}"
             };
             var expected = new string[] {
                 "Zero 4 4",
                 "2222 02-02",
                 "3 True",
-                "Chained: Michael 7 Scranton Pennsylvania  ",
-                "Nested: Michael 7 Scranton Pennsylvania  ",
+                "Chained: Michael 7 Scranton Pennsylvania",
+                "Nested: Michael 7 Scranton Pennsylvania"
             };
             var args = GetArgs();
             Smart.Default.Test(formats, args, expected);
@@ -168,12 +169,25 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
             Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out var found), Is.True);
             Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
-
+            
             // Invoke formatter 2nd time
             obj.Obj.Field = "Another Field Value";
             Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
             Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out found), Is.True);
-            Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));       }
+            Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
+        }
+
+        [Test]
+        public void Nullable_Property_Should_Return_Null()
+        {
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ISource[] { new DefaultSource(smart), new ReflectionSource(smart) });
+            smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
+            var data = new {Person = new Person()};
+
+            var result = smart.Format("{Person.Address?.City}", data);
+
+        }
 
         public class MiscObject
         {
@@ -210,6 +224,19 @@ namespace SmartFormat.Tests.Extensions
                                               | BindingFlags.Static;
             var field = type.GetField(fieldName, bindingFlags);
             return field?.GetValue(instance);
+        }
+
+        internal class Address
+        {
+            public string Country;
+            public string City;
+        }
+
+        internal class Person
+        {
+            public string FirstName = "first";
+            public string LastName = "last";
+            public Address? Address;
         }
     }
 }
