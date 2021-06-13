@@ -60,11 +60,11 @@ namespace SmartFormat
             // Note, the order is important; the extensions
             // will be executed in this order:
 
-            var listFormatter = new ListFormatter(formatter);
+            var listSourceAndFormatter = new ListFormatter(formatter);
 
             // sources for specific types must be in the list before ReflectionSource
             formatter.AddExtensions(
-                (ISource) listFormatter, // ListFormatter MUST be first
+                (ISource) listSourceAndFormatter, // ListFormatter MUST be the first source extension
                 new DictionarySource(formatter),
                 new ValueTupleSource(formatter),
                 new JsonSource(formatter),
@@ -75,7 +75,8 @@ namespace SmartFormat
                 new DefaultSource(formatter)
             );
             formatter.AddExtensions(
-                (IFormatter) listFormatter,
+                new NullFormatter(),
+                (IFormatter) listSourceAndFormatter,
                 new PluralLocalizationFormatter("en"),
                 new ConditionalFormatter(),
                 new TimeFormatter("en"),

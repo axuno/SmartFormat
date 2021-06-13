@@ -35,10 +35,14 @@ namespace SmartFormat.Extensions
     /// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
     /// In this example, format = "{Width}x{Height}".  Notice the nested braces.
     /// </summary>
+    /// <remarks>
+    /// The <see cref="ListFormatter"/> PluralLocalizationExtension and ConditionalExtension
+    /// </remarks>
     public class ListFormatter : IFormatter, ISource
     {
         private readonly SmartSettings _smartSettings;
 
+        ///<inheritdoc />
         public string[] Names { get; set; } = {"list", "l", string.Empty};
 
         /// <summary>
@@ -60,13 +64,6 @@ namespace SmartFormat.Extensions
         {
             var current = selectorInfo.CurrentValue;
             var selector = selectorInfo.SelectorText;
-
-            // E.g. if list Numbers is null in case of "{Numbers?[0].ToString}"
-            if (current is null && HasNullableOperator(selectorInfo))
-            {
-                selectorInfo.Result = null;
-                return true;
-            }
 
             if (current is not IList currentList) return false;
 
@@ -137,7 +134,12 @@ namespace SmartFormat.Extensions
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
 
-            // This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
+            // If the ListFormatter is called explicitly, null with nullable must be handled here
+            if (current is null && HasNullableOperator(formattingInfo))
+            {
+                formattingInfo.Write(string.Empty);
+                return true;
+            }
 
             // This extension requires at least IEnumerable
             var enumerable = current as IEnumerable;
@@ -146,7 +148,7 @@ namespace SmartFormat.Extensions
             // This issue might actually need a solution
             // for other objects that are IEnumerable.
             if (current is string) return false;
-            // If the object is IFormattable, ignore it
+            // If the object is IFormattable, will be handled with DefaultFormatter
             if (current is IFormattable) return false;
 
             // This extension requires a | to specify the spacer:
@@ -237,6 +239,23 @@ namespace SmartFormat.Extensions
         {
             return selectorInfo.Placeholder != null &&
                    selectorInfo.Placeholder.Selectors.Any(s =>
+                       s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
+        }
+
+        /// <summary>
+        /// Checks if any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </summary>
+        /// <param name="formattingInfo"></param>
+        /// <returns>
+        /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </returns>
+        /// <remarks>
+        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
+        /// </remarks>
+        private bool HasNullableOperator(IFormattingInfo formattingInfo)
+        {
+            return formattingInfo.Placeholder != null &&
+                   formattingInfo.Placeholder.Selectors.Any(s =>
                        s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
         }
     }

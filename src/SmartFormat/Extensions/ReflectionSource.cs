@@ -14,6 +14,7 @@ namespace SmartFormat.Extensions
     /// <summary>
     /// Class to evaluate sources using <see cref="System.Reflection"/>.
     /// A type cache is used in order to reduce reflection calls.
+    /// Note: Reflection is also used for strings to invoke parameterless methods like ToLower().
     /// </summary>
     public class ReflectionSource : Source
     {
@@ -34,7 +35,7 @@ namespace SmartFormat.Extensions
         {
             const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
             var current = selectorInfo.CurrentValue;
-
+            
             if (current is null && HasNullableOperator(selectorInfo))
             {
                 selectorInfo.Result = null;

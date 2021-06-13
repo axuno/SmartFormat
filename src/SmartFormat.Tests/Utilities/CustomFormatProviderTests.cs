@@ -15,7 +15,6 @@ namespace SmartFormat.Tests.Utilities
         {
             var formatter = new SmartFormatter(); 
             formatter.FormatterExtensions.Add(new DefaultFormatter());
-            formatter.SourceExtensions.Add(new ReflectionSource(formatter));
             formatter.SourceExtensions.Add(new DefaultSource(formatter));
             return formatter;
         }

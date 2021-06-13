@@ -365,13 +365,13 @@ namespace SmartFormat
             var firstSelector = true;
             foreach (var selector in formattingInfo.Placeholder.Selectors)
             {
-                // Don't evaluate selectors empty
+                // Don't evaluate empty selectors
                 // (used e.g. for Settings.Parser.NullableOperator and Settings.Parser.ListIndexEndChar final operators)
                 if(selector.Length == 0) continue;
                 
                 formattingInfo.Selector = selector;
 
-                // If we have an alignment selector, we set Alignment for its placeholder and move on
+                // If we have an alignment selector, we set the Alignment for its placeholder and move on
                 if (TrySetPlaceholderAlignment(formattingInfo)) continue;
                 formattingInfo.Result = null;
                 
@@ -434,7 +434,7 @@ namespace SmartFormat
 
             var formatterName = formattingInfo.Placeholder.FormatterName;
 
-            // Compatibility mode does not support formatter extensions
+            // Compatibility mode does not support formatter extensions except this one:
             if (Settings.StringFormatCompatibility)
             {
                 return 
@@ -445,6 +445,13 @@ namespace SmartFormat
             // Try to evaluate using the not empty formatter name from the format string
             var extension = FormatterExtensions.FirstOrDefault(fe => !string.IsNullOrEmpty(formatterName) && fe.Names.Contains(formatterName));
             if (extension != null) return extension.TryEvaluateFormat(formattingInfo);
+
+            // Try to evaluate the format using the NullFormatter
+            if (formattingInfo.CurrentValue is null)
+            {
+                extension = FormatterExtensions.FirstOrDefault(fe => fe.GetType() == typeof(NullFormatter));
+                if (extension != null) return extension.TryEvaluateFormat(formattingInfo);
+            }
 
             // Go through all (implicit) formatters which contain an empty name
             foreach (var formatterExtension in FormatterExtensions.Where(fe => fe.Names.Contains(string.Empty)))
@@ -468,7 +475,7 @@ namespace SmartFormat
             // 2. The operator character must have a value, usually ','
             // 3. The alignment is an integer value
             if (selectorInfo.Placeholder != null && 
-                selectorInfo.SelectorOperator?.FirstOrDefault() == Settings.Parser.AlignmentOperator &&
+                selectorInfo.SelectorOperator.FirstOrDefault() == Settings.Parser.AlignmentOperator &&
                 int.TryParse(selectorInfo.SelectorText, out var selectorValue))
             {
                 selectorInfo.Placeholder.Alignment = selectorValue;

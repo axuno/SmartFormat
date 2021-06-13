@@ -37,6 +37,21 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
+        public void Empty_List()
+        {
+            var items = Array.Empty<string>();
+            var result = Smart.Default.Format("{0:list:{}|, |, and }", new object[] { items });
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
+        public void Null_List()
+        {
+            var result = Smart.Default.Format("{TheList?:list:{}|, |, and }", new { TheList = default(object)});
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
         public void List_of_anonymous_types_and_enumerables()
         {
             var data = new[]
@@ -143,12 +158,7 @@ namespace SmartFormat.Tests.Extensions
             formatter.SourceExtensions.Add(new DefaultSource(formatter));
             formatter.FormatterExtensions.Add(new DefaultFormatter());
 
-            Assert.Multiple(
-                () =>
-                {
-                    Assert.AreEqual("one, two, and three", formatter.Format("{0:list:{}|, |, and }", new object[] { items }));
-                    Assert.Throws<FormattingException>(() => formatter.Format("{0:list:{}|, |, and }", new { Index = 100 })); // no formatter found
-                });
+            Assert.AreEqual("one, two, and three", formatter.Format("{0:list:{}|, |, and }", new object[] { items }));
         }
 
         [TestCase("{0:{} = {Index}|, }", "A = 0, B = 1, C = 2, D = 3, E = 4")] // Index holds the current index of the iteration
@@ -159,6 +169,14 @@ namespace SmartFormat.Tests.Extensions
         {
             var args = GetArgs();
             Smart.Default.Test(new[] {format}, args, new[] {expected});
+        }
+
+        [Test]
+        public void Test_Not_An_IList_Argument()
+        {
+            Assert.That(() => Smart.Format("{0:list:{}|, |, and }", "not a list"),
+                Throws.Exception.TypeOf<FormattingException>().And.Message
+                    .Contains("No suitable Formatter"));
         }
 
         [TestCase("one", "one")]

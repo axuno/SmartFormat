@@ -50,7 +50,7 @@ namespace SmartFormat.Tests.Extensions
   ]
 }";
 
-        private SmartFormatter GetJsonFormatter()
+        private SmartFormatter GetFormatterWithJsonSource()
         {
             var smart = new SmartFormatter();
             // JsonSource MUST be registered before ReflectionSource (which is not required here)
@@ -65,7 +65,7 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_Null_Json()
         {
             var jObject = JObject.Parse(JsonNull);
-            var result = GetJsonFormatter().Format("{Name}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name}", jObject);
             Assert.AreEqual("", result);
         }
 
@@ -73,7 +73,7 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_OneLevel_Json()
         {
             var jObject = JObject.Parse(JsonOneLevel);
-            var result = GetJsonFormatter().Format("{Name}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name}", jObject);
             Assert.AreEqual("Doe", result);
         }
 
@@ -81,7 +81,7 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_TwoLevel_Json()
         {
             var jObject = JObject.Parse(JsonTwoLevel);
-            var result = GetJsonFormatter().Format("{Name.First}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name.First}", jObject);
             Assert.AreEqual("Joe", result);
         }
 
@@ -89,7 +89,7 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_TwoLevel_Nullable_Json()
         {
             var jObject = JObject.Parse(JsonNull);
-            var result = GetJsonFormatter().Format("{Name?.First}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name?.First}", jObject);
             Assert.AreEqual("", result);
         }
 
@@ -97,7 +97,7 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_Complex_Json()
         {
             var jObject = JObject.Parse(JsonComplex);
-            var smart = GetJsonFormatter();
+            var smart = GetFormatterWithJsonSource();
             smart.Settings.CaseSensitivity = CaseSensitivityType.CaseSensitive;
             Assert.Multiple(() =>
             {
@@ -111,7 +111,7 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_Complex_Json_CaseInsensitive()
         {
             var jObject = JObject.Parse(JsonComplex);
-            var smart = GetJsonFormatter();
+            var smart = GetFormatterWithJsonSource();
             smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
             var result = smart.Format(CultureInfo.InvariantCulture, "{MaNuFaCtUrErS[0].PrOdUcTs[0].PrIcE:0.00}", jObject);
             Assert.AreEqual("50.00", result);
@@ -121,14 +121,14 @@ namespace SmartFormat.Tests.Extensions
         public void NS_Format_List_Json()
         {
             var jObject = JObject.Parse(JsonComplex);
-            var result = GetJsonFormatter().Format("{Stores:list:{}|, |, and }", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Stores:list:{}|, |, and }", jObject);
             Assert.AreEqual("Lambton Quay, and Willis Street", result);
         }
 
         [Test]
         public void NS_Format_Exception_Json()
         {
-            var smart = GetJsonFormatter();
+            var smart = GetFormatterWithJsonSource();
             smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             var jObject = JObject.Parse(JsonOneLevel);
             Assert.Throws<FormattingException>(() => smart.Format("{Dummy}", jObject));
@@ -142,7 +142,7 @@ namespace SmartFormat.Tests.Extensions
         public void ST_Format_Null_Json()
         {
             var jObject = JsonDocument.Parse(JsonNull.Replace("'", "\"")).RootElement;
-            var result = GetJsonFormatter().Format("{Name}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name}", jObject);
             Assert.AreEqual("", result);
         }
 
@@ -150,7 +150,7 @@ namespace SmartFormat.Tests.Extensions
         public void ST_Format_OneLevel_Json()
         {
             var jObject = JsonDocument.Parse(JsonOneLevel.Replace("'", "\"")).RootElement;
-            var result = GetJsonFormatter().Format("{Name}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name}", jObject);
             Assert.AreEqual("Doe", result);
         }
 
@@ -158,7 +158,7 @@ namespace SmartFormat.Tests.Extensions
         public void ST_Format_TwoLevel_Json()
         {
             var jObject = JsonDocument.Parse(JsonTwoLevel.Replace("'", "\"")).RootElement;
-            var result = GetJsonFormatter().Format("{Name.First}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name.First}", jObject);
             Assert.AreEqual("Joe", result);
         }
 
@@ -166,7 +166,7 @@ namespace SmartFormat.Tests.Extensions
         public void ST_Format_TwoLevel_Nullable_Json()
         {
             var jObject = JsonDocument.Parse(JsonNull.Replace("'", "\"")).RootElement;
-            var result = GetJsonFormatter().Format("{Name?.First}", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Name?.First}", jObject);
             Assert.AreEqual("", result);
         }
 
@@ -178,7 +178,7 @@ namespace SmartFormat.Tests.Extensions
             Smart.Default.Settings.CaseSensitivity = CaseSensitivityType.CaseSensitive;
             Assert.Multiple(() =>
             {
-                var smart = GetJsonFormatter();
+                var smart = GetFormatterWithJsonSource();
                 Assert.AreEqual("50.00", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[0].Products[0].Price:0.00}", jObject));
                 Assert.AreEqual("True", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[0].OnStock}", jObject));
                 Assert.AreEqual("False", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[1].OnStock}", jObject));
@@ -190,7 +190,7 @@ namespace SmartFormat.Tests.Extensions
         public void ST_Format_Complex_Json_CaseInsensitive()
         {
             var jObject = JsonDocument.Parse(JsonComplex.Replace("'", "\"")).RootElement;
-            var smart = GetJsonFormatter();
+            var smart = GetFormatterWithJsonSource();
             smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
             var result = smart.Format(CultureInfo.InvariantCulture, "{MaNuFaCtUrErS[0].PrOdUcTs[0].PrIcE:0.00}", jObject);
             Assert.AreEqual("50.00", result);
@@ -200,14 +200,14 @@ namespace SmartFormat.Tests.Extensions
         public void ST_Format_List_Json()
         {
             var jObject = JsonDocument.Parse(JsonComplex.Replace("'", "\"")).RootElement;
-            var result = GetJsonFormatter().Format("{Stores:list:{}|, |, and }", jObject);
+            var result = GetFormatterWithJsonSource().Format("{Stores:list:{}|, |, and }", jObject);
             Assert.AreEqual("Lambton Quay, and Willis Street", result);
         }
 
         [Test]
         public void ST_Format_Exception_Json()
         {
-            var smart = GetJsonFormatter();
+            var smart = GetFormatterWithJsonSource();
             smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             var jObject = JsonDocument.Parse(JsonOneLevel.Replace("'", "\"")).RootElement;
             Assert.Throws<FormattingException>(() => smart.Format("{Dummy}", jObject));

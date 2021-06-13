@@ -31,7 +31,7 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
    
    * The `Parser` will not include the formatter name or formatting options. Like with `string.Format`, everything after the `Selector` separator (colon) is considered as format specifier.
    * Curly braces are escaped the `string.Format` way with `{{` and `}}`
-   * `DefaultFormatter` is the only formatter which will be invoked.
+   * `DefaultFormatter` is the only formatter which will be invoked. `null` will be output as `string.Empty`.
    * Even in compatibility mode, *SmartFormat* will
      * Process named `Placeholder`s (beside indexed `Placeholder`s)
      * have `ISource`s available for `Placeholder`s.

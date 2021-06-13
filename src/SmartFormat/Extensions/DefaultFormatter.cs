@@ -13,9 +13,7 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class DefaultFormatter : IFormatter
     {
-        /// <summary>
-        /// Gets or set the names of the <see cref="DefaultFormatter"/>.
-        /// </summary>
+        /// <inheritdoc/>>
         public string[] Names { get; set; } = {"default", "d", string.Empty};
 
         /// <summary>
@@ -29,8 +27,8 @@ namespace SmartFormat.Extensions
             var current = formattingInfo.CurrentValue;
 
             // If the format has nested placeholders, we process those first
-            // instead of formatting the item:
-            if (format != null && format.HasNested)
+            // instead of formatting the item.
+            if (format is {HasNested: true})
             {
                 formattingInfo.FormatAsChild(format, current);
                 return true;

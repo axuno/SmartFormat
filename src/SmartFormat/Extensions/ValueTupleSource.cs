@@ -37,11 +37,6 @@ namespace SmartFormat.Extensions
             foreach (var obj in formattingInfo.CurrentValue.GetValueTupleItemObjectsFlattened())
             {
                 formattingInfo.CurrentValue = obj;
-                if (obj is null && HasNullableOperator(selectorInfo))
-                {
-                    selectorInfo.Result = null;
-                    return true;
-                }
 
                 foreach (var sourceExtension in _formatter.SourceExtensions)
                 {

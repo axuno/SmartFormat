@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -33,10 +36,9 @@ namespace SmartFormat.Tests.Extensions
 
         [TestCase("Name: {Person.FirstName} {City?.AreaCode}", true)]
         [TestCase("Name: {Person.FirstName} {City.AreaCode}", false)]
-        public void Format_With_Nullable_ValueTuples(string format, bool shouldSucceed)
+        public void Format_With_Null_Values_In_ValueTuples(string format, bool shouldSucceed)
         {
-            var addr = new DictionaryFormatterTests.Address();
-            addr.City = null;
+            var addr = new DictionaryFormatterTests.Address {City = null};
 
             var dict1 = new Dictionary<string, string> { {"dict1key", "dict1 Value"} };
             var dict2 = new Dictionary<string, string> { { "dict2key", "dict2 Value" } };
@@ -76,6 +78,16 @@ namespace SmartFormat.Tests.Extensions
             var result = formatter.Format(format, null!, (addr, dict1, dict2));
 
             Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void Test_Nested_Tuples()
+        {
+            var child = (Child: "The child", ChildName: "Child name");
+            var mainWithChild = (Main: "Main", child);
+            var expected = new List<object?> { mainWithChild.Item1, child.Child, child.ChildName};
+
+            Assert.That(mainWithChild.GetValueTupleItemObjectsFlattened().ToList(), Is.EqualTo(expected));
         }
 
         [Test]

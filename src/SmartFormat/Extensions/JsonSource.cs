@@ -12,7 +12,7 @@ using System.Linq;
 namespace SmartFormat.Extensions
 {
     /// <summary>
-    /// Class to evaluate <see cref="Newtonsoft.Json"/> and <see cref="System.Text.Json"/>  JSON sources
+    /// Class to evaluate <see cref="Newtonsoft.Json"/> and <see cref="System.Text.Json"/> JSON sources
     /// of type <see cref="JObject"/> and <see cref="JsonElement"/>.
     /// </summary>
     public class JsonSource : Source
@@ -35,7 +35,7 @@ namespace SmartFormat.Extensions
             {
                 // NewtonSoftJson
                 JObject jsonObject => jsonObject.HasValues ? jsonObject : null,
-                JValue jasonValue => jasonValue.Value,
+                JValue jsonValue => jsonValue.Value,
                 // System.Text.Json
                 JsonElement jsonElement => jsonElement.ValueKind == JsonValueKind.Null ? null : jsonElement,
                 _ => selectorInfo.CurrentValue
@@ -46,7 +46,9 @@ namespace SmartFormat.Extensions
                 selectorInfo.Result = null;
                 return true;
             }
-            
+
+            if (current is null) return false;
+
             // Note: Operators are processed by ListFormatter
             return selectorInfo.CurrentValue switch
             {
@@ -85,9 +87,7 @@ namespace SmartFormat.Extensions
             // Note: Operators are processed by ListFormatter
             public static bool TryEvaluateSelector(ISelectorInfo selectorInfo)
             {
-                if (selectorInfo.CurrentValue is null) return false;
-
-                var jsonElement = (JsonElement) selectorInfo.CurrentValue;
+                if (selectorInfo.CurrentValue is not JsonElement jsonElement) return false;
             
                 var je = jsonElement.Clone();
                 JsonElement targetElement;
