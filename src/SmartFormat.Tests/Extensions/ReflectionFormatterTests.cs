@@ -228,15 +228,15 @@ namespace SmartFormat.Tests.Extensions
 
         internal class Address
         {
-            public string Country;
-            public string City;
+            public readonly string Country = string.Empty;
+            public readonly string City = string.Empty;
         }
 
         internal class Person
         {
             public string FirstName = "first";
             public string LastName = "last";
-            public Address? Address;
+            public Address? Address = null;
         }
     }
 }

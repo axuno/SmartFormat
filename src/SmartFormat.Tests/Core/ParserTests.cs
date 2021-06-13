@@ -650,7 +650,7 @@ namespace SmartFormat.Tests.Core
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
-            Assert.That(placeholder.Selectors.Count, Is.EqualTo(1));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(1));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,2)));
         }
 
@@ -664,7 +664,7 @@ namespace SmartFormat.Tests.Core
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
-            Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(3, 1)));
             Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,1)));
@@ -690,7 +690,7 @@ namespace SmartFormat.Tests.Core
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
-            Assert.That(placeholder.Selectors.Count, Is.EqualTo(numOfSelectors));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(numOfSelectors));
             if (numOfSelectors == 2)
             {
                 Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
@@ -723,7 +723,7 @@ namespace SmartFormat.Tests.Core
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
-            Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(4,1)));
             Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,2)));

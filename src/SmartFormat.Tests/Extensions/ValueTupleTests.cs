@@ -118,7 +118,7 @@ namespace SmartFormat.Tests.Extensions
             public object? CurrentValue { get; }
             public string? SelectorText { get; }
             public int SelectorIndex { get; }
-            public string SelectorOperator { get; }
+            public string SelectorOperator { get; } = string.Empty;
             public object? Result { get; set; }
             public Placeholder? Placeholder { get; }
             public FormatDetails FormatDetails { get; } = (FormatDetails) null!; // dummy

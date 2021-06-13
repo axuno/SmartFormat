@@ -123,7 +123,7 @@ namespace SmartFormat.Tests.Extensions
             const string format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
                                   "Name: {Person.FirstName} {Person.LastName}";
 
-            var expected = $"Address: {addr.City.ZipCode} {addr.City.Name}, {addr.City.AreaCode}\n" +
+            var expected = $"Address: {addr.City?.ZipCode} {addr.City?.Name}, {addr.City?.AreaCode}\n" +
                          $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
 
             var formatter = Smart.CreateDefaultSmartFormat();
