@@ -42,7 +42,7 @@ namespace SmartFormat.Tests.Utilities
         /// </summary>
         public class ReverseFormatProvider : IFormatProvider
         {
-            public object GetFormat(Type formatType)
+            public object GetFormat(Type? formatType)
             {
                 if (formatType == typeof(ICustomFormatter)) return new ReverseFormatAndArgumentFormatter();
                 
@@ -55,9 +55,9 @@ namespace SmartFormat.Tests.Utilities
         /// </summary>
         public class ReverseFormatAndArgumentFormatter : ICustomFormatter
         {
-            public string Format(string format, object arg, IFormatProvider formatProvider)
+            public string Format(string? format, object? arg, IFormatProvider? formatProvider)
             {
-                return new string(format.Reverse().Select(c => c).ToArray()) + ": " +
+                return new string(format?.Reverse().Select(c => c).ToArray()) + ": " +
                        new string((arg as string ?? "?").Reverse().Select(c => c).ToArray());
             }
         }
