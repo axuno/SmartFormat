@@ -55,18 +55,6 @@ namespace SmartFormat
         public List<IFormatter> FormatterExtensions { get; }
 
         /// <summary>
-        /// Gets all names of registered formatter extensions which are not empty.
-        /// </summary>
-        /// <returns></returns>
-        public string[] GetNotEmptyFormatterExtensionNames()
-        {
-            var names = new List<string>();
-            foreach (var extension in FormatterExtensions)
-                names.AddRange(extension.Names.Where(n => n != string.Empty).ToArray());
-            return names.ToArray();
-        }
-
-        /// <summary>
         /// Adds each extensions to this formatter.
         /// Each extension must implement ISource.
         /// </summary>
@@ -85,7 +73,6 @@ namespace SmartFormat
         {
             FormatterExtensions.InsertRange(0, formatterExtensions);
         }
-
 
         /// <summary>
         /// Searches for a Source Extension of the given type, and returns it.
