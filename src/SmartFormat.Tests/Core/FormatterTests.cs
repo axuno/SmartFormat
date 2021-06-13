@@ -171,10 +171,8 @@ namespace SmartFormat.Tests.Core
             var output = new StringOutput();
             var formatter = new SmartFormatter();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-            formatter.Settings.ConvertCharacterStringLiterals = true;
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
             formatter.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
-            formatter.Parser.AddAlphanumericSelectors(); // required for this test
             var formatParsed = formatter.Parser.ParseFormat(format);
             var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
             
