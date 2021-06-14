@@ -9,25 +9,30 @@ using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions
 {
-    public class XmlSource : ISource
+    /// <summary>
+    /// Class to evaluate sources of type <see cref="XElement"/>.
+    /// </summary>
+    public class XmlSource : Source
     {
-        public XmlSource(SmartFormatter formatter)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
+        public XmlSource(SmartFormatter formatter) : base(formatter)
         {
-            // Add some special info to the parser:
-            formatter.Parser.AddAlphanumericSelectors(); // (A-Z + a-z)
-            formatter.Parser.AddAdditionalSelectorChars("_");
-            formatter.Parser.AddOperators(".");
         }
 
-        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
+        /// <inheritdoc />
+        public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
-            var element = selectorInfo.CurrentValue as XElement;
-            if (element != null)
+            if (selectorInfo.CurrentValue is XElement element)
             {
                 var selector = selectorInfo.SelectorText;
                 // Find elements that match a selector
-                var selectorMatchedElements = element.Elements()
-                    .Where(x => x.Name.LocalName == selector).ToList();
+                var selectorMatchedElements =
+                    element.Elements()
+                        .Where(x => x.Name.LocalName == selector)
+                        .ToList();
                 if (selectorMatchedElements.Any())
                 {
                     selectorInfo.Result = selectorMatchedElements;

@@ -171,10 +171,8 @@ namespace SmartFormat.Tests.Core
             var output = new StringOutput();
             var formatter = new SmartFormatter();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-            formatter.Settings.ConvertCharacterStringLiterals = true;
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
             formatter.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
-            formatter.Parser.AddAlphanumericSelectors(); // required for this test
             var formatParsed = formatter.Parser.ParseFormat(format);
             var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
             
@@ -207,6 +205,13 @@ namespace SmartFormat.Tests.Core
         {
             var formatter = GetSimpleFormatter();
             Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));  ;
+        }
+
+        [Test]
+        public void Not_Existing_Formatter_Name_Should_Throw()
+        {
+            var smart = GetSimpleFormatter();
+            Assert.That(() => smart.Format("{0:not_existing_formatter_name:}", new object()), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("not_existing_formatter_name"));
         }
     }
 }

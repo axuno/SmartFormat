@@ -16,7 +16,6 @@ namespace SmartFormat.Tests.Core
             formatter.FormatterExtensions.Add(new DefaultFormatter());
             formatter.SourceExtensions.Add(new ReflectionSource(formatter));
             formatter.SourceExtensions.Add(new DefaultSource(formatter));
-            formatter.Parser.AddAlphanumericSelectors();
             return formatter;
         }
 

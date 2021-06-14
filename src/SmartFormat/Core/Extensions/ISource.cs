@@ -14,10 +14,11 @@ namespace SmartFormat.Core.Extensions
     {
         /// <summary>
         /// Evaluates the <see cref="Selector" /> based on the <see cref="ISelectorInfo.CurrentValue" />.
-        /// If this extension cannot evaluate the Selector, returns False.
-        /// Otherwise, sets the <see cref="ISelectorInfo.Result" /> and returns true.
         /// </summary>
         /// <param name="selectorInfo"></param>
+        /// <returns>If the <see cref="Selector"/> could be evaluated,
+        /// the <see cref="ISelectorInfo.Result" /> will be set and <see langword="true"/> will be returned.
+        /// </returns>
         bool TryEvaluateSelector(ISelectorInfo selectorInfo);
     }
 }

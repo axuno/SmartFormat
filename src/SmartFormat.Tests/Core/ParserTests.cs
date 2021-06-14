@@ -5,6 +5,7 @@ using SmartFormat.Tests.Common;
 using SmartFormat.Tests.TestUtils;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SmartFormat.Tests.Core
 {
@@ -640,7 +641,7 @@ namespace SmartFormat.Tests.Core
 
         [TestCase("{A }", ' ')]
         [TestCase("{B§}", '§')]
-        [TestCase("{?C}", '?')]
+        [TestCase("{%C}", '%')]
         public void Selector_With_Custom_Selector_Character(string formatString, char customChar)
         {
             var parser = GetRegularParser();
@@ -649,7 +650,7 @@ namespace SmartFormat.Tests.Core
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
-            Assert.That(placeholder.Selectors.Count, Is.EqualTo(1));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(1));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,2)));
         }
 
@@ -663,26 +664,66 @@ namespace SmartFormat.Tests.Core
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
-            Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(3, 1)));
             Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,1)));
         }
 
-        [TestCase("{C?.D}", '?')] 
-        [TestCase("{C..D}", '.')] 
-        public void Selector_With_Contiguous_Operator_Characters(string formatString, char customChar)
+        [TestCase("{A?.B}")]
+        [TestCase("{Selector0?.Selector1}")]
+        [TestCase("{A?[1].B}")]
+        [TestCase("{List?[123].Selector}")]
+        public void Selector_With_Nullable_Operator_Character(string formatString)
         {
-            // contiguous operators '?.' are parsed as ONE
+            // contiguous operator characters are parsed as "ONE operator string"
+
+            var regex = new Regex(@"\{(?<Sel_0>[a-zA-Z0-9]+)(?<Sel_1_Op>[\?\.|\[]+)(?<Sel_1>\d*)(?<Sel_2_Op>[\?|\.|\]]+)(?<Sel_2>[a-zA-Z0-9]+)\}",
+                RegexOptions.None);
+            var reMatches = regex.Matches(formatString);
+            var numOfSelectors = (reMatches[0].Groups["Sel_0"].Value == string.Empty ? 0 : 1) +
+                (reMatches[0].Groups["Sel_1"].Value == string.Empty ? 0 : 1) +
+                (reMatches[0].Groups["Sel_2"].Value == string.Empty ? 0 : 1);
 
             var parser = GetRegularParser();
-            // adding '.' is ignored, as it's the standard operator
+            var result = parser.ParseFormat(formatString);
+
+            var placeholder = result.Items[0] as Placeholder;
+            Assert.That(placeholder, Is.Not.Null);
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(numOfSelectors));
+            if (numOfSelectors == 2)
+            {
+                Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
+                // Group Sel_1 is empty
+                Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
+                // Concatenate because of regex simplification for 2 selectors
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value + reMatches[0].Groups["Sel_2_Op"].Value));
+            }
+            else
+            {
+                Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1"].Value));
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[2].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
+            }
+        }
+
+        [TestCase("{A?.B}", '.')] // with "nullable" operator
+        [TestCase("{C%.D}", '%')] 
+        [TestCase("{C..D}", '.')] 
+        public void Selector_With_Other_Contiguous_Operator_Characters(string formatString, char customChar)
+        {
+            // contiguous operator characters are parsed as "ONE operator string"
+
+            var parser = GetRegularParser();
+            // adding '.' is ignored, as it's a standard operator
             parser.Settings.Parser.AddCustomOperatorChars(new[]{customChar});
             var result = parser.ParseFormat(formatString);
 
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
-            Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(4,1)));
             Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,2)));

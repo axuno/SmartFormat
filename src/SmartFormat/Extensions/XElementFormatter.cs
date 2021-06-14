@@ -11,7 +11,7 @@ namespace SmartFormat.Extensions
 {
     public class XElementFormatter : IFormatter
     {
-        public string[] Names { get; set; } = {"xelement", "xml", "x", ""};
+        public string[] Names { get; set; } = {"xelement", "xml", "x", string.Empty};
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {

@@ -27,13 +27,13 @@ namespace SmartFormat.Core.Parsing
         public bool HasIssues => Issues.Count > 0;
 
         public string MessageShort =>
-            $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? "" : "s")}: {string.Join(", ", Issues.Select(i => i.Issue).ToArray())}";
+            $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? string.Empty : "s")}: {string.Join(", ", Issues.Select(i => i.Issue).ToArray())}";
 
         public override string Message
         {
             get
             {
-                var arrows = "";
+                var arrows = string.Empty;
                 var lastArrow = 0;
                 foreach (var issue in Issues)
                 {
@@ -51,7 +51,7 @@ namespace SmartFormat.Core.Parsing
                 }
 
                 return
-                    $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? "" : "s")}:\n{string.Join(", ", Issues.Select(i => i.Issue).ToArray())}\nIn: \"{result.BaseString}\"\nAt:  {arrows} ";
+                    $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? string.Empty : "s")}:\n{string.Join(", ", Issues.Select(i => i.Issue).ToArray())}\nIn: \"{result.BaseString}\"\nAt:  {arrows} ";
             }
         }
 

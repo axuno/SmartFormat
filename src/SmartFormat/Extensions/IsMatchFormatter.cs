@@ -41,7 +41,7 @@ namespace SmartFormat.Extensions
             if (formattingInfo.CurrentValue != null && regEx.IsMatch(formattingInfo.CurrentValue.ToString()!))
                 formattingInfo.FormatAsChild(formats[0], formattingInfo.CurrentValue);
             else if (formats.Count == 2)
-                formattingInfo.FormatAsChild(formats[1], formattingInfo.CurrentValue ?? string.Empty);
+                formattingInfo.FormatAsChild(formats[1], formattingInfo.CurrentValue);
 
             return true;
         }

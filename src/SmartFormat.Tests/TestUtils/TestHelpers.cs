@@ -80,51 +80,5 @@ namespace SmartFormat.Tests.TestUtils
 
             allErrors.ThrowIfNotEmpty();
         }
-
-        public static TimeSpan[] PerformanceTest(Func<string, object[], string>[] doFormats, string format, object[] args, int iterations)
-        {
-            // Do a warmup and make sure output matches:
-            string[] actuals = new string[doFormats.Length];
-            for (int i = 0; i < doFormats.Length; i++)
-            {
-                actuals[i] = doFormats[i](format, args);
-            }
-            for (int i = 0; i < doFormats.Length - 1; i++)
-            {
-                Assert.AreEqual(actuals[i], actuals[i+1],"Results don't match.");
-            }
-
-
-            // Do all the performance tests:
-            Stopwatch timer;
-            string discard;
-            TimeSpan[] results = new TimeSpan[doFormats.Length];
-            for (int i = 0; i < doFormats.Length; i++)
-            {
-                var doFormat = doFormats[i];
-                timer = new Stopwatch();
-                timer.Start();
-                for (int j = 0; j < iterations; j++)
-                {
-                    discard = doFormat(format, args);
-                }
-                timer.Stop();
-
-                results[i] = timer.Elapsed;
-            }
-            //// Do one final (empty) control test:
-            //timer = new Stopwatch();
-            //timer.Start();
-            //for (int j = 0; j < iterations; j++)
-            //{
-            //    discard = format;
-            //}
-            //timer.Stop();
-            //results[doFormats.Length] = timer.Elapsed;
-
-
-            // Return the results:
-            return results;
-        }
     }
 }

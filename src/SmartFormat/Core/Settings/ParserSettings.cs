@@ -119,7 +119,7 @@ namespace SmartFormat.Core.Settings
         /// The standard operator characters.
         /// Contiguous operator characters are parsed as one operator (e.g. '?.').
         /// </summary>
-        internal IReadOnlyList<char> OperatorChars => new List<char> {SelectorOperator, AlignmentOperator, '[', ']'};
+        internal IReadOnlyList<char> OperatorChars => new List<char> {SelectorOperator, NullableOperator, AlignmentOperator, ListIndexBeginChar, ListIndexEndChar};
 
         /// <summary>
         /// The character which separates the selector for alignment. <c>E.g.: Smart.Format("Name: {name,10}")</c>
@@ -130,6 +130,13 @@ namespace SmartFormat.Core.Settings
         /// The character which separates two or more selectors <c>E.g.: "First.Second.Third"</c>
         /// </summary>
         internal char SelectorOperator { get; } = '.';
+
+        /// <summary>
+        /// The character which flags the selector as <see langword="nullable"/>.
+        /// The character after <see cref="NullableOperator"/> must be the <see cref="SelectorOperator"/>.
+        /// <c>E.g.: "First?.Second"</c>
+        /// </summary>
+        internal char NullableOperator { get; } = '?';
 
         /// <summary>
         /// Gets the character indicating the start of a <see cref="Placeholder"/>.
@@ -150,6 +157,16 @@ namespace SmartFormat.Core.Settings
         /// Gets the character indicating the end of formatter options.
         /// </summary>
         public char FormatterOptionsEndChar { get; } = ')';
+
+        /// <summary>
+        /// Gets the character indicating the begin of a list index, like in "{Numbers[0]}"
+        /// </summary>
+        internal char ListIndexBeginChar { get; } = '[';
+
+        /// <summary>
+        /// Gets the character indicating the end of a list index, like in "{Numbers[0]}"
+        /// </summary>
+        internal char ListIndexEndChar { get; } = ']';
 
         /// <summary>
         /// Characters which terminate parsing of format options.

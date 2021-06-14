@@ -68,7 +68,6 @@ namespace SmartFormat.Tests.Core
         {
             // Removing the spaces from Nesting_can_access_outer_scopes requires alternative escaping of { and }!
             var sf = Smart.CreateDefaultSmartFormat();
-            sf.Parser.UseAlternativeEscapeChar('\\');
             var actual = sf.Format(format, data);
             Assert.AreEqual(expectedOutput, actual);
         }

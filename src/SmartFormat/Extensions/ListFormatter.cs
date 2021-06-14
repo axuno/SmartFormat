@@ -35,15 +35,22 @@ namespace SmartFormat.Extensions
     /// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
     /// In this example, format = "{Width}x{Height}".  Notice the nested braces.
     /// </summary>
+    /// <remarks>
+    /// The <see cref="ListFormatter"/> PluralLocalizationExtension and ConditionalExtension
+    /// </remarks>
     public class ListFormatter : IFormatter, ISource
     {
         private readonly SmartSettings _smartSettings;
 
-        public string[] Names { get; set; } = {"list", "l", ""};
+        ///<inheritdoc />
+        public string[] Names { get; set; } = {"list", "l", string.Empty};
 
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
         public ListFormatter(SmartFormatter formatter)
         {
-            formatter.Parser.AddOperators("[]");
             _smartSettings = formatter.Settings;
         }
 
@@ -58,10 +65,10 @@ namespace SmartFormat.Extensions
             var current = selectorInfo.CurrentValue;
             var selector = selectorInfo.SelectorText;
 
-            if (!(current is IList currentList)) return false;
+            if (current is not IList currentList) return false;
 
             // See if we're trying to access a specific index:
-            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator?.Length == 0;
+            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
             if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
                 itemIndex < currentList.Count)
             {
@@ -127,7 +134,12 @@ namespace SmartFormat.Extensions
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
 
-            // This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
+            // If the ListFormatter is called explicitly, null with nullable must be handled here
+            if (current is null && HasNullableOperator(formattingInfo))
+            {
+                formattingInfo.Write(string.Empty);
+                return true;
+            }
 
             // This extension requires at least IEnumerable
             var enumerable = current as IEnumerable;
@@ -136,7 +148,7 @@ namespace SmartFormat.Extensions
             // This issue might actually need a solution
             // for other objects that are IEnumerable.
             if (current is string) return false;
-            // If the object is IFormattable, ignore it
+            // If the object is IFormattable, will be handled with DefaultFormatter
             if (current is IFormattable) return false;
 
             // This extension requires a | to specify the spacer:
@@ -150,7 +162,7 @@ namespace SmartFormat.Extensions
             // itemFormat|spacer|lastSpacer
             // itemFormat|spacer|lastSpacer|twoSpacer
             var itemFormat = parameters[0];
-            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : "";
+            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : string.Empty;
             var lastSpacer = parameters.Count >= 3 ? parameters[2].GetLiteralText() : spacer;
             var twoSpacer = parameters.Count >= 4 ? parameters[3].GetLiteralText() : lastSpacer;
             
@@ -211,6 +223,40 @@ namespace SmartFormat.Extensions
             CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
 
             return true;
+        }
+
+        /// <summary>
+        /// Checks if any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </summary>
+        /// <param name="selectorInfo"></param>
+        /// <returns>
+        /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </returns>
+        /// <remarks>
+        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
+        /// </remarks>
+        private bool HasNullableOperator(ISelectorInfo selectorInfo)
+        {
+            return selectorInfo.Placeholder != null &&
+                   selectorInfo.Placeholder.Selectors.Any(s =>
+                       s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
+        }
+
+        /// <summary>
+        /// Checks if any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </summary>
+        /// <param name="formattingInfo"></param>
+        /// <returns>
+        /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </returns>
+        /// <remarks>
+        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
+        /// </remarks>
+        private bool HasNullableOperator(IFormattingInfo formattingInfo)
+        {
+            return formattingInfo.Placeholder != null &&
+                   formattingInfo.Placeholder.Selectors.Any(s =>
+                       s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
         }
     }
 }
