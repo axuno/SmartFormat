@@ -6,7 +6,7 @@ v3.0.0 (Draft)
 
 ### Currently merged to the `version/v3.0` branch:
 
-#### Introduced Nullable Notation
+#### Introduced Nullable Notation ([#176](https://github.com/axuno/SmartFormat/pull/176))
 
 The C# like `nullable` notation allows to display `Nullable<T>` types, depending on whether a variable contains the underlying type's value or `null`. The SmartFormat notation is `"{SomeNullable?.Property}"`. If `SomeNullable` is null, the expression is evaluated as `string.empty`.
 
