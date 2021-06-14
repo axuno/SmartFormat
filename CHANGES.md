@@ -6,6 +6,48 @@ v3.0.0 (Draft)
 
 ### Currently merged to the `version/v3.0` branch:
 
+#### Introduced Nullable Notation
+
+The C# like `nullable` notation allows to display `Nullable<T>` types, depending on whether a variable contains the underlying type's value or `null`. The SmartFormat notation is `"{SomeNullable?.Property}"`. If `SomeNullable` is null, the expression is evaluated as `string.empty`.
+
+In this context the `NullFormatter` was introduced. It outputs a custom string literal, if the variable is `null`, else `string.empty`.
+
+Putting both together:
+
+```Csharp
+var smart = new SmartFormatter();
+smart.AddExtensions(new IFormatter[] { new NullFormatter() });
+```
+The variable is `null`:
+```Csharp
+// nullResult: "This value is null"
+var nullResult = smart.Format("{TheValue:isnull:This value is null}", new {TheValue = null});
+// valueResult: string.Empty
+var valueResult = smart.Format("{TheValue?}", new {TheValue = null});
+```
+The variable is a `string` value:
+```Csharp
+// nullResult: string.Empty
+nullResult = smart.Format("{TheValue:isnull:This value is null}", new {TheValue = "My string value"});
+// valueResult: "My string value"
+valueResult = smart.Format("{TheValue?}", new {TheValue = "My string value"});
+```
+In the most simple scenario, both evaluations can be combined with the `ChooseFormatter`:
+```Csharp
+// result: "This value is null" or the string value
+var result = smart.Format("{TheValue?choose(null):This value is null|{}}}", new {TheValue = null});
+```
+In more complex scenarios, you will, however, use the nullable notation together with other extensions, like a `ListFormatter`.
+
+**Note:** Trying to evaluate `null` without the nullable operator will result in a formatting exception. This is the same behavior as in SmartFormat 2.x.
+
+Changes connected to nullable notation:
+* Source extension should have `Source` as the abstract base class, instead of `ISource`.
+* Source extensions should check for `null` values with the nullable operator and return `true` in the `bool TryEvaluateSelector(ISelectorInfo selectorInfo)` method.
+* The `Parser` accepts `?` as another standard operator.
+* The `NullFormatter` is invoked implicitly before any other `IFormatter`. `null` will be output as `string.Empty`. This behavior can be overridden in a derived class.
+* The nullable operator can also be used evaluating a list index, e.g. `"{TheList?[1]}"`.
+
 #### Refactored implementation for string alignment ([#174](https://github.com/axuno/SmartFormat/pull/174))
 Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
 
