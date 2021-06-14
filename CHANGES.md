@@ -32,7 +32,7 @@ nullResult = smart.Format("{TheValue:isnull:This value is null}", new {TheValue 
 // valueResult: "My string value"
 valueResult = smart.Format("{TheValue?}", new {TheValue = "My string value"});
 ```
-In the most simple scenario, both evaluations can also be combined with the `ChooseFormatter`:
+In the most simple scenario, both evaluations can also be combined with the `ChooseFormatter` (but 35% more slow):
 ```Csharp
 // result: "This value is null" or the string value
 var result = smart.Format("{TheValue?:choose(null):This value is null|{}}}", new {TheValue = null});
