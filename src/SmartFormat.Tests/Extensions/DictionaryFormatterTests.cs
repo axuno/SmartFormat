@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
 using Newtonsoft.Json.Linq;
-#if NET45
-using System.Runtime.Remoting.Messaging;
-#endif
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -37,7 +34,7 @@ namespace SmartFormat.Tests.Extensions
             };
 
             return new object[] {
-                d,
+                d
             };
         }
 
@@ -59,20 +56,19 @@ namespace SmartFormat.Tests.Extensions
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.AddExtensions(new DictionarySource(formatter));
-            formatter.Parser.UseAlternativeEscapeChar(); // curly braces MUST be escaped with \{ and \} instead of {{ and }} for this complex test
 
-            var formats = new string[] {
+            var formats = new[]
+            {
                 "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1}",
-                "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}}" 
+                "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}}"
             };
-            var expected = new string[] {
+            var expected = new[]
+            {
                 "Chained: 1 2 a a",
                 "Nested: 1 2 a a"
             };
             var args = GetArgs();
             formatter.Test(formats, args, expected);
-
-            formatter.Parser.UseBraceEscaping(); // reset to string.Format brace escaping
         }
 
         [Test]
@@ -80,20 +76,19 @@ namespace SmartFormat.Tests.Extensions
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.AddExtensions(new DictionarySource(formatter));
-            formatter.Parser.UseAlternativeEscapeChar(); // curly braces MUST be escaped with \{ and \} instead of {{ and }} for this complex test
 
-            var formats = new string[] {
+            var formats = new[]
+            {
                 "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.X}",
                 "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{X}}"
             };
-            var expected = new string[] {
+            var expected = new[]
+            {
                 "Chained: 1 2 a a z",
                 "Nested: 1 2 a a z"
             };
             var args = (object[])GetDynamicArgs();
             formatter.Test(formats, args, expected);
-
-            formatter.Parser.UseBraceEscaping(); // reset to string.Format brace escaping
         }
 
         [Test]
@@ -102,20 +97,19 @@ namespace SmartFormat.Tests.Extensions
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
             formatter.AddExtensions(new DictionarySource(formatter));
-            formatter.Parser.UseAlternativeEscapeChar(); // curly braces MUST be escaped with \{ and \} instead of {{ and }} for this complex test
 
-            var formats = new string[] {
+            var formats = new string[]
+            {
                 "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.x}",
                 "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{x}}"
             };
-            var expected = new string[] {
+            var expected = new string[]
+            {
                 "Chained: 1 2 a a z",
                 "Nested: 1 2 a a z"
             };
             var args = (object[])GetDynamicArgs();
             formatter.Test(formats, args, expected);
-
-            formatter.Parser.UseBraceEscaping(); // reset to string.Format brace escaping
         }
 
         [Test]
@@ -129,7 +123,7 @@ namespace SmartFormat.Tests.Extensions
             const string format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
                                   "Name: {Person.FirstName} {Person.LastName}";
 
-            var expected = $"Address: {addr.City.ZipCode} {addr.City.Name}, {addr.City.AreaCode}\n" +
+            var expected = $"Address: {addr.City?.ZipCode} {addr.City?.Name}, {addr.City?.AreaCode}\n" +
                          $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
 
             var formatter = Smart.CreateDefaultSmartFormat();
@@ -138,25 +132,44 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual(expected, result);
         }
 
+        [Test]
+        public void Dictionary_Dot_Notation_Nullable()
+        {
+            // Process properties of a class instance type-safe and without the need for reflection
+            // and with nullable dot notation for dictionaries
+
+            var addr = new Address {City = null};
+
+            var addrDict = addr.ToDictionary();
+
+            const string format = "Address: {City?.ZipCode} {City?.Name} {City?.AreaCode}\n" +
+                                  "Name: {Person.FirstName} {Person.LastName}";
+
+            var expected = $"Address: {addr.City?.ZipCode} {addr.City?.Name} {addr.City?.AreaCode}\n" +
+                           $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
+
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ISource[] { new DefaultSource(smart), new DictionarySource(smart) });
+            smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
+            
+            var result = smart.Format(format, addrDict);
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
 
         public class Address
         {
-            public CityDetails City { get; set; } = new CityDetails();
-            public PersonDetails Person { get; set; } = new PersonDetails();
+            public CityDetails? City { get; set; } = new();
+            public PersonDetails Person { get; set; } = new();
 
-            public Dictionary<string, object> ToDictionary()
+            public Dictionary<string, object?> ToDictionary()
             {
-                var d = new Dictionary<string, object>
+                var d = new Dictionary<string, object?>
                 {
-                    { nameof(City), City.ToDictionary() },
+                    { nameof(City), City?.ToDictionary() },
                     { nameof(Person), Person.ToDictionary() }
                 };
                 return d;
-            }
-
-            public JObject ToJson()
-            {
-                return JObject.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(this));
             }
 
             public class CityDetails
@@ -165,9 +178,9 @@ namespace SmartFormat.Tests.Extensions
                 public string ZipCode { get; set; } = "00501";
                 public string AreaCode { get; set; } = "631";
 
-                public Dictionary<string, string> ToDictionary()
+                public Dictionary<string, string?> ToDictionary()
                 {
-                    return new Dictionary<string, string>
+                    return new()
                     {
                         {nameof(Name), Name},
                         {nameof(ZipCode), ZipCode},
@@ -182,10 +195,10 @@ namespace SmartFormat.Tests.Extensions
                 public string LastName { get; set; } = "Doe";
                 public Dictionary<string, string> ToDictionary()
                 {
-                    return new Dictionary<string, string>
+                    return new()
                     {
                         {nameof(FirstName), FirstName},
-                        {nameof(LastName), LastName}
+                        {nameof(LastName), LastName},
                     };
                 }
             }

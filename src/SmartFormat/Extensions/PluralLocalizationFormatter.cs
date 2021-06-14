@@ -32,7 +32,7 @@ namespace SmartFormat.Extensions
 
         public string DefaultTwoLetterISOLanguageName { get; set; }
 
-        public string[] Names { get; set; } = {"plural", "p", ""};
+        public string[] Names { get; set; } = {"plural", "p", string.Empty};
 
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {

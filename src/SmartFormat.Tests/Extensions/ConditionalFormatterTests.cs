@@ -8,31 +8,13 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class ConditionalFormatterTests
     {
-        private object[] GetArgs()
-        {
-            return new object[] {
-                0,1,2,3,
-                -1,-2, // {4},{5}
-                TestFactory.GetPerson(), // {6}
-                false,true, // {7},{8}
-                // Note: only the date part will be compared:
-                new DateTime(1111,1,1,1,1,1),SystemTime.Now(),new DateTime(5555,5,5,5,5,5), // {9},{10},{11}
-                new TimeSpan(-1,-1,-1,-1,-1), TimeSpan.Zero,new TimeSpan(5,5,5,5,5), // {12},{13},{14}
-                "Hello", "", // {15},{16}
-                new {NotNull = true}, null!, // {17},{18}
-                // Note: only the date part will be compared:
-                SystemTime.OffsetNow().AddDays(-1),SystemTime.OffsetNow(),SystemTime.OffsetNow().AddDays(1) // {19},{20},{21}
-            };
-        }
-
         [Test]
         public void Test_Numbers()
         {
-            // Note: the "::" is necessary to bypass the PluralLocalizationExtension, and will be ignored in the output
             var formats = new[] {
-                "{0::Zero|Other} {1::Zero|Other} {2::Zero|Other} {3::Zero|Other} {4::Zero|Other} {5::Zero|Other}",
-                "{0::Zero|One|Other} {1::Zero|One|Other} {2::Zero|One|Other} {3::Zero|One|Other} {4::Zero|One|Other} {5::Zero|One|Other}",
-                "{0::Zero|One|Two|Other} {1::Zero|One|Two|Other} {2::Zero|One|Two|Other} {3::Zero|One|Two|Other} {4::Zero|One|Two|Other} {5::Zero|One|Two|Other}",
+                "{0:cond:Zero|Other} {1:cond:Zero|Other} {2:cond:Zero|Other} {3:cond:Zero|Other} {4:cond:Zero|Other} {5:cond:Zero|Other}",
+                "{0:cond:Zero|One|Other} {1:cond:Zero|One|Other} {2:cond:Zero|One|Other} {3:cond:Zero|One|Other} {4:cond:Zero|One|Other} {5:cond:Zero|One|Other}",
+                "{0:cond:Zero|One|Two|Other} {1:cond:Zero|One|Two|Other} {2:cond:Zero|One|Two|Other} {3:cond:Zero|One|Two|Other} {4:cond:Zero|One|Two|Other} {5:cond:Zero|One|Two|Other}",
             };
             var expected = new[] {
                 "Zero Other Other Other Other Other",
@@ -40,16 +22,16 @@ namespace SmartFormat.Tests.Extensions
                 "Zero One Two Other Other Other",
             };
 
-            var args = GetArgs();
+            var args = new object[] {0, 1, 2, 3, -1, -2};
             Smart.Default.Test(formats, args, expected);
         }
         [Test]
         public void Test_Enum()
         {
             var formats = new[] {
-                "{6.Friends.0:{FirstName} is a {Gender:man|woman}.}",
-                "{6.Friends.1:{FirstName} is a {Gender:man|woman}.}",
-                "{9.DayOfWeek:Sunday|Monday|Some other day} / {11.DayOfWeek:Sunday|Monday|Some other day}",
+                "{0.Friends.0:{FirstName} is a {Gender:man|woman}.}",
+                "{0.Friends.1:{FirstName} is a {Gender:man|woman}.}",
+                "{2.DayOfWeek:Sunday|Monday|Some other day} / {3.DayOfWeek:Sunday|Monday|Some other day}",
             };
             var expected = new[] {
                 "Jim is a man.",
@@ -57,52 +39,57 @@ namespace SmartFormat.Tests.Extensions
                 "Sunday / Some other day",
             };
 
-            var args = GetArgs();
+            var args = new object[] {TestFactory.GetPerson(), TestFactory.GetPerson(), new DateTime(1111,1,1,1,1,1), new DateTime(5555,5,5,5,5,5)};
             Smart.Default.Test(formats, args, expected);
         }
+
         [Test]
         public void Test_Bool()
         {
             var formats = new[] {
-                "{7:Yes|No}",
-                "{8:Yes|No}",
+                "{0:Yes|No}",
+                "{1:Yes|No}",
             };
             var expected = new[] {
                 "No",
                 "Yes",
             };
 
-            var args = GetArgs();
+            var args = new object[]{false, true};
             Smart.Default.Test(formats, args, expected);
         }
+
         [Test]
         public void Test_Dates()
         {
             var formats = new[] {
-                "{9:Past|Future} {10:Past|Future} {11:Past|Future}",
-                "{9:Past|Present|Future} {10:Past|Present|Future} {11:Past|Present|Future}",
+                "{0:Past|Future} {1:Past|Future} {2:Past|Future}",
+                "{0:Past|Present|Future} {1:Past|Present|Future} {2:Past|Present|Future}",
             };
             var expected = new[] {
                 "Past Past Future",
                 "Past Present Future",
             };
 
-            var args = GetArgs();
+            // only the date part will be compared
+            var args = new object[] {new DateTime(1111,1,1,1,1,1),SystemTime.Now(),new DateTime(5555,5,5,5,5,5)};
             Smart.Default.Test(formats, args, expected);
         }
         [Test]
         public void Test_DateTimeOffset_Dates()
         {
             var formats = new[] {
-                "{19:Past|Future} {20:Past|Future} {21:Past|Future}",
-                "{19:Past|Present|Future} {20:Past|Present|Future} {21:Past|Present|Future}",
+                "{0:Past|Future} {1:Past|Future} {2:Past|Future}",
+                "{0:Past|Present|Future} {1:Past|Present|Future} {2:Past|Present|Future}",
             };
             var expected = new[] {
                 "Past Past Future",
                 "Past Present Future",
             };
 
-            var args = GetArgs();
+            // only the date part will be compared
+            var args = new object[]
+                {SystemTime.OffsetNow().AddDays(-1), SystemTime.OffsetNow(), SystemTime.OffsetNow().AddDays(1)};
             Smart.Default.Test(formats, args, expected);
         }
 
@@ -110,42 +97,33 @@ namespace SmartFormat.Tests.Extensions
         public void Test_TimeSpan()
         {
             var formats = new[] {
-                "{12:Past|Future} {13:Past|Future} {14:Past|Future}",
-                "{12:Past|Zero|Future} {13:Past|Zero|Future} {14:Past|Zero|Future}",
+                "{0:Past|Future} {1:Past|Future} {2:Past|Future}",
+                "{0:Past|Zero|Future} {1:Past|Zero|Future} {2:Past|Zero|Future}",
             };
             var expected = new[] {
                 "Past Past Future",
                 "Past Zero Future",
             };
 
-            var args = GetArgs();
+            var args = new object[] {new TimeSpan(-1,-1,-1,-1,-1), TimeSpan.Zero,new TimeSpan(5,5,5,5,5)};
             Smart.Default.Test(formats, args, expected);
         }
-        [Test]
-        public void Test_Strings()
-        {
-            var formats = new[] {
-                "{15:{}|Empty} {16:{}|Empty} {18:{}|Null}",
-            };
-            var expected = new[] {
-                "Hello Empty Null",
-            };
 
-            var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+        [TestCase("{0:cond:{}|Empty}", "Hello")]
+        [TestCase("{1:cond:{}|Empty}", "Empty")]
+        [TestCase("{2:cond:{}|Null}", "Null")]
+        public void Test_Strings(string format, string expected)
+        {
+            var args = new object[] { "Hello", "", null! };
+            Smart.Default.Test(format, args, expected);
         }
-        [Test]
-        public void Test_Object()
-        {
-            var formats = new[] {
-                "{17:{}|Null}; {18:{}|Null}",
-            };
-            var expected = new[] {
-                "{ NotNull = True }; Null",
-            };
 
-            var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+        [TestCase("{0:cond:{}|Null}", "{ NotNull = True }")] // 'expected' comes from the default formatter, writing the anonymous type with 'ToString()'
+        [TestCase("{1:cond:{}|Null}", "Null")]
+        public void Test_Object(string format, string expected)
+        {
+            var args = new object[] {new {NotNull = true}, null!};
+            Smart.Default.Test(format, args, expected);
         }
 
         [Test]

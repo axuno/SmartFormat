@@ -145,32 +145,32 @@ namespace SmartFormat.Core.Parsing
             public int Current;
 
             /// <summary>
-            /// The index after an item (like <see cref="Placeholder"/>, <see cref="Selector"/>, <see cref="LiteralText"/> etc.) was added.
+            /// The index within the input format after an item (like <see cref="Placeholder"/>, <see cref="Selector"/>, <see cref="LiteralText"/> etc.) was added.
             /// </summary>
             public int LastEnd;
 
             /// <summary>
-            /// The start index of the formatter name
+            /// The start index of the formatter name within the input format.
             /// </summary>
             public int NamedFormatterStart;
 
             /// <summary>
-            /// The start index of the formatter options.
+            /// The start index of the formatter options within the input format.
             /// </summary>
             public int NamedFormatterOptionsStart;
 
             /// <summary>
-            /// The end index of the formatter options.
+            /// The end index of the formatter options within the input format.
             /// </summary>
             public int NamedFormatterOptionsEnd;
 
             /// <summary>
-            /// The index of the operator.
+            /// The index of the operator within the input format.
             /// </summary>
             public int Operator;
 
             /// <summary>
-            /// The current index of the selector.
+            /// The current index of the selector <b>across all</b> <see cref="Placeholder"/>.
             /// </summary>
             public int Selector;
 
@@ -184,7 +184,7 @@ namespace SmartFormat.Core.Parsing
             {
                 // The design is the way, that an end index
                 // is always 1 above the last position.
-                // Meaning that the maximum of 'FormatItem.endIndex' equals 'inputFormat.Length'
+                // Meaning that the maximum of 'FormatItem.EndIndex' equals 'inputFormat.Length'
                 index += add;
                 System.Diagnostics.Debug.Assert(index >= 0);
                 return index < ObjectLength ? index : ObjectLength;
@@ -396,7 +396,7 @@ namespace SmartFormat.Core.Parsing
             currentFormat.EndIndex = index.Current;
             currentFormat.Parent.EndIndex = index.SafeAdd(index.Current, 1);
             currentFormat = currentFormat.Parent.Parent;
-            index.NamedFormatterStart = index.NamedFormatterOptionsStart = index.NamedFormatterOptionsEnd = PositionUndefined; //2021-05-03 axuno
+            index.NamedFormatterStart = index.NamedFormatterOptionsStart = index.NamedFormatterOptionsEnd = PositionUndefined;
         }
 
         /// <summary>
@@ -558,7 +558,7 @@ namespace SmartFormat.Core.Parsing
             if (_parserSettings.OperatorChars.Contains(inputChar) || _parserSettings.CustomOperatorChars.Contains(inputChar))
             {
                 // Add the selector:
-                if (index.Current != index.LastEnd)
+                if (index.Current != index.LastEnd) // if equal, we're already parsing a selector
                 {
                     currentPlaceholder.Selectors.Add(new Selector(Settings, inputFormat, index.LastEnd, index.Current,
                         index.Operator,
@@ -572,16 +572,7 @@ namespace SmartFormat.Core.Parsing
             else if (inputChar == _parserSettings.FormatterNameSeparator)
             {
                 // Add the selector:
-                if (index.Current != index.LastEnd)
-                    currentPlaceholder.Selectors.Add(new Selector(Settings, inputFormat, index.LastEnd, index.Current,
-                        index.Operator,
-                        index.Selector));
-                else if (index.Operator != index.Current)
-                    parsingErrors.AddIssue(currentFormat,
-                        $"'0x{Convert.ToByte(inputChar):X}': " +
-                        _parsingErrorText[ParsingError.TrailingOperatorsInSelector],
-                        index.Operator, index.Current);
-                index.LastEnd = index.SafeAdd(index.Current, 1);
+                AddLastSelector(inputFormat, ref currentFormat, ref index, ref currentPlaceholder, parsingErrors);
 
                 // Start the format:
                 currentPlaceholder.Format = new Format(Settings, currentPlaceholder, index.Current + 1);
@@ -595,17 +586,7 @@ namespace SmartFormat.Core.Parsing
             }
             else if (inputChar == _parserSettings.PlaceholderEndChar)
             {
-                // Add the selector:
-                if (index.Current != index.LastEnd)
-                    currentPlaceholder.Selectors.Add(new Selector(Settings, inputFormat, index.LastEnd, index.Current,
-                        index.Operator,
-                        index.Selector));
-                else if (index.Operator != index.Current)
-                    parsingErrors.AddIssue(currentFormat,
-                        $"'0x{Convert.ToByte(inputChar):X}': " +
-                        _parsingErrorText[ParsingError.TrailingOperatorsInSelector],
-                        index.Operator, index.Current);
-                index.LastEnd = index.SafeAdd(index.Current, 1);
+                AddLastSelector(inputFormat, ref currentFormat, ref index, ref currentPlaceholder, parsingErrors);
 
                 // End the placeholder with no format:
                 nestedDepth--;
@@ -622,6 +603,35 @@ namespace SmartFormat.Core.Parsing
                         _parsingErrorText[ParsingError.InvalidCharactersInSelector],
                         index.Current, index.SafeAdd(index.Current, 1));
             }
+        }
+
+        /// <summary>
+        /// Adds a <see cref="Selector"/> to the current <see cref="Placeholder"/>
+        /// because the current character ':' or '}' indicates the end of a selector.
+        /// </summary>
+        /// <param name="inputFormat">The input format string.</param>
+        /// <param name="currentFormat">The current <see cref="Format"/>.</param>
+        /// <param name="index">The <see cref="IndexContainer"/>.</param>
+        /// <param name="currentPlaceholder"></param>
+        /// <param name="parsingErrors"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AddLastSelector(string inputFormat, ref Format currentFormat, ref IndexContainer index,
+            ref Placeholder currentPlaceholder, ParsingErrors parsingErrors)
+        {
+            if (index.Current != index.LastEnd ||
+                currentPlaceholder.Selectors.Count > 0 && currentPlaceholder.Selectors.Last().Length > 0 &&
+                index.Current - index.Operator == 1 &&
+                (inputFormat[index.Operator] == _parserSettings.ListIndexEndChar ||
+                 inputFormat[index.Operator] == _parserSettings.NullableOperator))
+                currentPlaceholder.Selectors.Add(new Selector(Settings, inputFormat, index.LastEnd, index.Current,
+                    index.Operator,
+                    index.Selector));
+            else if (index.Operator != index.Current) // the selector only contains illegal ("trailing") operator characters
+                parsingErrors.AddIssue(currentFormat,
+                    $"'0x{Convert.ToByte(inputFormat[index.Operator]):X}': " +
+                    _parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                    index.Operator, index.Current);
+            index.LastEnd = index.SafeAdd(index.Current, 1);
         }
 
         /// <summary>
@@ -712,10 +722,9 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public class ParsingErrorText
         {
-            private readonly Dictionary<ParsingError, string> _errors = new Dictionary<ParsingError, string>
-            {
+            private readonly Dictionary<ParsingError, string> _errors = new() {
                 {ParsingError.TooManyClosingBraces, "Format string has too many closing braces"},
-                {ParsingError.TrailingOperatorsInSelector, "There are trailing operators in the selector"},
+                {ParsingError.TrailingOperatorsInSelector, "There are illegal trailing operators in the selector"},
                 {ParsingError.InvalidCharactersInSelector, "Invalid character in the selector"},
                 {ParsingError.MissingClosingBrace, "Format string is missing a closing brace"}
             };

@@ -72,7 +72,7 @@ namespace SmartFormat.Core.Extensions
         /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance
         /// and invokes formatting with <see cref="SmartFormatter"/> with the child as parameter.
         /// </summary>
-        void FormatAsChild(Format format, object value);
+        void FormatAsChild(Format format, object? value);
 
         /// <summary>
         /// Creates a <see cref="FormattingException" /> associated with the <see cref="IFormattingInfo.Format" />.

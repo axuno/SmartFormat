@@ -12,6 +12,9 @@ using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class to format primitive types with condition patterns.
+    /// </summary>
     public class ConditionalFormatter : IFormatter
     {
         private static readonly Regex _complexConditionPattern
@@ -19,8 +22,10 @@ namespace SmartFormat.Extensions
                 //   Description:      and/or    comparator     value
                 RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        public string[] Names { get; set; } = {"conditional", "cond", ""};
+        ///<inheritdoc />
+        public string[] Names { get; set; } = {"conditional", "cond", string.Empty};
 
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
@@ -40,7 +45,6 @@ namespace SmartFormat.Extensions
                     or Enum;
 
             // An Enum is a number too:
-
             if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
                 currentIsNumber = true;
 
@@ -72,7 +76,7 @@ namespace SmartFormat.Extensions
                     // If the conditional statement was true, then we can break.
                     if (conditionWasTrue)
                     {
-                        formattingInfo.FormatAsChild(outputItem, current ?? string.Empty);
+                        formattingInfo.FormatAsChild(outputItem, current);
                         return true;
                     }
                 }
@@ -144,13 +148,13 @@ namespace SmartFormat.Extensions
             var selectedParameter = parameters[paramIndex];
 
             // Output the selectedParameter:
-            formattingInfo.FormatAsChild(selectedParameter, current ?? string.Empty);
+            formattingInfo.FormatAsChild(selectedParameter, current);
             return true;
         }
 
         /// <summary>
         /// Evaluates a conditional format.
-        /// Each condition must start with a comparor: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
+        /// Each condition must start with a comparer: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
         /// Conditions must be separated by either "&amp;" (AND) or "/" (OR).
         /// The conditional statement must end with a "?".
         /// Examples:

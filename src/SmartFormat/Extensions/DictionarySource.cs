@@ -10,19 +10,31 @@ using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions
 {
-    public class DictionarySource : ISource
+    /// <summary>
+    /// Class to evaluate sources using <see cref="IDictionary"/>s.
+    /// </summary>
+    public class DictionarySource : Source
     {
-        public DictionarySource(SmartFormatter formatter)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="formatter"></param>
+        public DictionarySource(SmartFormatter formatter) : base(formatter)
         {
-            // Add some special info to the parser:
-            formatter.Parser.AddAlphanumericSelectors(); // (A-Z + a-z)
-            formatter.Parser.AddAdditionalSelectorChars("_");
-            formatter.Parser.AddOperators(".");
         }
 
-        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
+        /// <inheritdoc />>
+        public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             var current = selectorInfo.CurrentValue;
+            if (current is null && HasNullableOperator(selectorInfo))
+            {
+                selectorInfo.Result = null;
+                return true;
+            }
+            
+            if (current is null) return false;
+
             var selector = selectorInfo.SelectorText;
 
             // See if current is a IDictionary and contains the selector:

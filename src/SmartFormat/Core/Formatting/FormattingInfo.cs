@@ -148,7 +148,7 @@ namespace SmartFormat.Core.Formatting
         /// </summary>
         /// <param name="format">The <see cref="Format"/> to use.</param>
         /// <param name="value">The value for the item in the format.</param>
-        public void FormatAsChild(Format format, object value)
+        public void FormatAsChild(Format format, object? value)
         {
             var nestedFormatInfo = CreateChild(format, value);
             // recursive method call
@@ -182,14 +182,14 @@ namespace SmartFormat.Core.Formatting
         /// <summary>
         /// Gets the operator string of the <see cref="Parsing.Selector"/> (e.g.: comma, dot).
         /// </summary>
-        public string? SelectorOperator => Selector?.Operator;
+        public string SelectorOperator => Selector?.Operator ?? string.Empty;
 
         /// <summary>
         /// Gets the result after formatting is completed.
         /// </summary>
         public object? Result { get; set; }
 
-        private FormattingInfo CreateChild(Format format, object currentValue)
+        private FormattingInfo CreateChild(Format format, object? currentValue)
         {
             return new FormattingInfo(this, FormatDetails, format, currentValue);
         }

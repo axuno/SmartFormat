@@ -67,11 +67,11 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual(expectedResult, _formatter.Format(format, arg0));
         }
         
-        [TestCase("{0:choose(null):nothing|{} }", null, "nothing")]
-        [TestCase("{0:choose(null):nothing|{} }", 5, "5 ")]
-        [TestCase("{0:choose(null|5):nothing|five|{} }", null, "nothing")]
-        [TestCase("{0:choose(null|5):nothing|five|{} }", 5, "five")]
-        [TestCase("{0:choose(null|5):nothing|five|{} }", 6, "6 ")]
+        [TestCase("{0:choose(null):nothing|{}}", null, "nothing")]
+        [TestCase("{0:choose(null):nothing|{}}", 5, "5")]
+        [TestCase("{0:choose(null|5):nothing|five|{}}", null, "nothing")]
+        [TestCase("{0:choose(null|5):nothing|five|{}}", 5, "five")]
+        [TestCase("{0:choose(null|5):nothing|five|{}}", 6, "6")]
         public void Choose_has_a_special_case_for_null(string format, object arg0, string expectedResult)
         {
             Assert.AreEqual(expectedResult, _formatter.Format(format, arg0));

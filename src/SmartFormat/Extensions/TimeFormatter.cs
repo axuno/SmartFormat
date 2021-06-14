@@ -12,7 +12,7 @@ namespace SmartFormat.Extensions
 {
     public class TimeFormatter : IFormatter
     {
-        public string[] Names { get; set; } = {"timespan", "time", "t", ""};
+        public string[] Names { get; set; } = {"timespan", "time", "t", string.Empty};
 
         #region Constructors
 

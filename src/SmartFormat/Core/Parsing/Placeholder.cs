@@ -36,8 +36,8 @@ namespace SmartFormat.Core.Parsing
             Parent = parent;
             Selectors = new List<Selector>();
             NestedDepth = nestedDepth;
-            FormatterName = "";
-            FormatterOptionsRaw = "";
+            FormatterName = string.Empty;
+            FormatterOptionsRaw = string.Empty;
         }
 
         /// <summary>
@@ -104,11 +104,11 @@ namespace SmartFormat.Core.Parsing
                 result.Append(Alignment);
             }
 
-            if (FormatterName != "")
+            if (FormatterName != string.Empty)
             {
                 result.Append(SmartSettings.Parser.FormatterNameSeparator);
                 result.Append(FormatterName);
-                if (FormatterOptions != "")
+                if (FormatterOptions != string.Empty)
                 {
                     result.Append(SmartSettings.Parser.FormatterOptionsBeginChar);
                     result.Append(FormatterOptions);
