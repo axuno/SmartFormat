@@ -28,13 +28,11 @@ namespace SmartFormat.Extensions
             {
                 case null when format is not null:
                     formattingInfo.Write(format.GetLiteralText());
-                    break;
-                case null:
+                    return true;
+                default:
                     formattingInfo.Write(string.Empty);
-                    break;
+                    return true;
             }
-
-            return true;
         }
     }
 }

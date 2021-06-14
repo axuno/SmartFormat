@@ -41,7 +41,7 @@ namespace SmartFormat.Tests.Extensions
         public void Null_With_Format_Should_Be_Format_String(string format)
         {
             var smart = GetFormatter();
-            Assert.That(smart.Format($"{{JustNull:{format}}}", new { JustNull = default(object)} ), Is.EqualTo(format));
+            Assert.That(smart.Format($"{{JustNull:isnull:{format}}}", new { JustNull = default(object)} ), Is.EqualTo(format));
         }
 
         [TestCase("")] // empty format

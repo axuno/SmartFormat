@@ -206,5 +206,12 @@ namespace SmartFormat.Tests.Core
             var formatter = GetSimpleFormatter();
             Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));  ;
         }
+
+        [Test]
+        public void Not_Existing_Formatter_Name_Should_Throw()
+        {
+            var smart = GetSimpleFormatter();
+            Assert.That(() => smart.Format("{0:not_existing_formatter_name:}", new object()), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("not_existing_formatter_name"));
+        }
     }
 }

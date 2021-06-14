@@ -75,7 +75,6 @@ namespace SmartFormat
                 new DefaultSource(formatter)
             );
             formatter.AddExtensions(
-                new NullFormatter(),
                 (IFormatter) listSourceAndFormatter,
                 new PluralLocalizationFormatter("en"),
                 new ConditionalFormatter(),
