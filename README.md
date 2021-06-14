@@ -22,22 +22,8 @@ See [changelog](CHANGES.md) for changes.
 
 # Version 3.0
 
-<hr>
-
 **See the [list of changes](https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md) already merged into branch `version/v3`**
 
-<hr>
+First `3.0-alpha` will be published soon.
 
 We have started to work on a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**.
-
-* Improve management of extensions for better performance:
-  * make named formatters obligatory instead of iterating through all formatters
-  * the sequence, how extensions are loaded should not have an impact on identifying the right formatter
-* Make caching of ```Parser.ParseFormat``` results the standard behavior
-* Rewrite the parser
-* Performance improvements
-*  less generated garbage 
-* Remove ```public``` properties/methods which should better be ```internal``` or even ```privat```
-* Code clean-up: Make use of current C# features, add missing comments
-* Re-organize unit tests
-* ... ?
