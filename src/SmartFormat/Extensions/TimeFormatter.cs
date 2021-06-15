@@ -10,8 +10,12 @@ using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class to format and output <see cref="TimeSpan"/> values.
+    /// </summary>
     public class TimeFormatter : IFormatter
     {
+        ///<inheritdoc />
         public string[] Names { get; set; } = {"timespan", "time", "t", string.Empty};
 
         #region Constructors
@@ -47,6 +51,7 @@ namespace SmartFormat.Extensions
 
         #region IFormatter
 
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;

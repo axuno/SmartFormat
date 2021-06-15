@@ -11,6 +11,9 @@ using System.Text.RegularExpressions;
 
 namespace SmartFormat.Utilities
 {
+    /// <summary>
+    /// Utility class to format a <see cref="TimeSpan"/> as a <see langword="string"/>.
+    /// </summary>
     public static class TimeSpanUtility
     {
         #region: ToTimeString :

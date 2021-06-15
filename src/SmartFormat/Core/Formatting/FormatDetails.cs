@@ -17,6 +17,15 @@ namespace SmartFormat.Core.Formatting
     /// </summary>
     public class FormatDetails
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="FormatDetails"/>
+        /// </summary>
+        /// <param name="formatter"></param>
+        /// <param name="originalFormat">The the original <see cref="Format"/> returned by the <see cref="Parser"/>.</param>
+        /// <param name="originalArgs">The original set of arguments passed to the format method.</param>
+        /// <param name="formatCache">This to cache resources between formatting calls.</param>
+        /// <param name="provider">The <see cref="IFormatProvider"/> that can be used to determine how to format items.</param>
+        /// <param name="output">The <see cref="IOutput"/> where the result is written.</param>
         public FormatDetails(SmartFormatter formatter, Format originalFormat, IList<object> originalArgs,
             FormatCache? formatCache, IFormatProvider? provider, IOutput output)
         {
@@ -35,12 +44,12 @@ namespace SmartFormat.Core.Formatting
         public SmartFormatter Formatter { get; }
 
         /// <summary>
-        /// Gets the original <see cref="Format"/> returned by the parser.
+        /// Gets the original <see cref="Format"/> returned by the <see cref="Parser"/>.
         /// </summary>
         public Format OriginalFormat { get; }
 
         /// <summary>
-        /// The original set of arguments passed to the format function.
+        /// The original set of arguments passed to the format method.
         /// These provide global-access to the original arguments.
         /// </summary>
         public IList<object> OriginalArgs { get; }
@@ -52,7 +61,7 @@ namespace SmartFormat.Core.Formatting
         public FormatCache? FormatCache { get; }
 
         /// <summary>
-        /// The Format Provider that can be used to determine how to
+        /// The <see cref="IFormatProvider"/> that can be used to determine how to
         /// format items such as numbers, dates, and anything else that
         /// might be culture-specific.
         /// </summary>
@@ -70,7 +79,7 @@ namespace SmartFormat.Core.Formatting
         public FormattingException? FormattingException { get; set; }
 
         /// <summary>
-        /// Contains case-sensitivity settings
+        /// Contains case-sensitivity and other settings.
         /// </summary>
         public SmartSettings Settings => Formatter.Settings;
     }

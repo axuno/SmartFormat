@@ -13,6 +13,9 @@ using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class for format following culture specific pluralization rules.
+    /// </summary>
     public class PluralLocalizationFormatter : IFormatter
     {
 
@@ -32,8 +35,10 @@ namespace SmartFormat.Extensions
 
         public string DefaultTwoLetterISOLanguageName { get; set; }
 
+        ///<inheritdoc />
         public string[] Names { get; set; } = {"plural", "p", string.Empty};
 
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;

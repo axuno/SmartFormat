@@ -31,16 +31,10 @@ namespace SmartFormat.Extensions
             _templates = new Dictionary<string, Format>(stringComparer);
         }
 
-        /// <summary>
-        /// Gets or sets the name of the extension.
-        /// </summary>
+        ///<inheritdoc />
         public string[] Names { get; set; } = {"template", "t"};
 
-        /// <summary>
-        /// This method is called by the <see cref="SmartFormatter" /> to obtain the formatting result of this extension.
-        /// </summary>
-        /// <param name="formattingInfo"></param>
-        /// <returns>Returns true if successful, else false.</returns>
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var templateName = formattingInfo.FormatterOptions ?? string.Empty;

@@ -13,6 +13,12 @@ namespace SmartFormat.Core.Formatting
     /// </summary>
     public class FormattingException : Exception
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="FormattingException"/>.
+        /// </summary>
+        /// <param name="errorItem">The <see cref="FormatItem"/> which caused the <see cref="Exception"/>.</param>
+        /// <param name="formatException">The <see cref="Exception"/> that was caused by the <see cref="FormatItem"/>.</param>
+        /// <param name="index">The index inside the format string, where the error occurred.</param>
         public FormattingException(FormatItem? errorItem, Exception formatException, int index)
         {
             Format = errorItem?.BaseString;
@@ -21,6 +27,12 @@ namespace SmartFormat.Core.Formatting
             Index = index;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="FormattingException"/>.
+        /// </summary>
+        /// <param name="errorItem">The <see cref="FormatItem"/> which caused the <see cref="Exception"/>.</param>
+        /// <param name="issue">The description of the error.</param>
+        /// <param name="index">The index inside the format string, where the error occurred.</param>
         public FormattingException(FormatItem? errorItem, string issue, int index)
         {
             Format = errorItem?.BaseString;
@@ -29,15 +41,30 @@ namespace SmartFormat.Core.Formatting
             Index = index;
         }
 
+        /// <summary>
+        /// Get the base format string of the <see cref="FormatItem"/> causing the <see cref="Exception"/>.
+        /// </summary>
         public string? Format { get; }
+
+        /// <summary>
+        /// Get the <see cref="FormatItem"/> which caused the <see cref="Exception"/>.
+        /// </summary>
         public FormatItem? ErrorItem { get; }
+        
+        /// <summary>
+        /// Gets the description of the error.
+        /// </summary>
         public string Issue { get; }
+
+        /// <summary>
+        /// The index inside the format string, where the error occurred.
+        /// </summary>
         public int Index { get; }
 
-        public override string Message => string.Format("Error parsing format string: {0} at {1}\n{2}\n{3}",
-            Issue,
-            Index,
-            Format,
-            new string('-', Index) + "^");
+        /// <summary>
+        /// Gets the error message, indicating the position within the format string, where the error occurred.
+        /// </summary>
+        public override string Message =>
+            $"Error parsing format string: {Issue} at {Index}\n{Format}\n{new string('-', Index) + "^"}";
     }
 }
