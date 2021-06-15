@@ -10,11 +10,20 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class to output literals depending on the value of the input variable.
+    /// </summary>
     public class ChooseFormatter : IFormatter
     {
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
         public char SplitChar { get; set; } = '|';
+        
+        ///<inheritdoc />
         public string[] Names { get; set; } = {"choose", "c"};
 
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             if (string.IsNullOrEmpty(formattingInfo.FormatterOptions)) return false;

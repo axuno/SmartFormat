@@ -21,8 +21,10 @@ namespace SmartFormat.Extensions
     /// </remarks>
     public class IsMatchFormatter : IFormatter
     {
+        ///<inheritdoc />
         public string[] Names { get; set; } = { "ismatch" };
 
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var expression = formattingInfo.FormatterOptions ?? string.Empty;
@@ -46,6 +48,9 @@ namespace SmartFormat.Extensions
             return true;
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="RegexOptions"/> for the <see cref="Regex"/> expression.
+        /// </summary>
         public RegexOptions RegexOptions { get; set; }
     }
 }

@@ -12,9 +12,7 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class SubStringFormatter : IFormatter
     {
-        /// <summary>
-        /// The names for this Formatter.
-        /// </summary>
+        ///<inheritdoc />
         public string[] Names { get; set; } = {"substr"};
 
         /// <summary>
@@ -32,11 +30,7 @@ namespace SmartFormat.Extensions
         /// </summary>
         public SubStringOutOfRangeBehavior OutOfRangeBehavior { get; set; } = SubStringOutOfRangeBehavior.ReturnEmptyString;
 
-        /// <summary>
-        /// Tries to process the given <see cref="IFormattingInfo"/>.
-        /// </summary>
-        /// <param name="formattingInfo">Returns true if processed, otherwise false.</param>
-        /// <returns></returns>
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             if (string.IsNullOrEmpty(formattingInfo.FormatterOptions)) return false;

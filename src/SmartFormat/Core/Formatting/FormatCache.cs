@@ -10,10 +10,14 @@ namespace SmartFormat.Core.Formatting
 {
     /// <summary>
     /// Caches information about a format operation
-    /// so that repeat calls can be optimized to run faster.
+    /// so that repeating calls can be optimized to run faster.
     /// </summary>
     public class FormatCache
     {
+        /// <summary>
+        /// Creates a new instance of type <see cref="FormatCache"/>.
+        /// </summary>
+        /// <param name="format">The result from <see cref="Parser.ParseFormat"/>.</param>
         public FormatCache(Format format)
         {
             Format = format;

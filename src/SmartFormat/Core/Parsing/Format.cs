@@ -21,6 +21,11 @@ namespace SmartFormat.Core.Parsing
     {
         #region: Constructors :
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Format"/>.
+        /// </summary>
+        /// <param name="smartSettings"></param>
+        /// <param name="baseString"></param>
         public Format(SmartSettings smartSettings, string baseString) : base(smartSettings, baseString, 0,
             baseString.Length)
         {
@@ -28,12 +33,25 @@ namespace SmartFormat.Core.Parsing
             Items = new List<FormatItem>();
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Format"/>.
+        /// </summary>
+        /// <param name="smartSettings"></param>
+        /// <param name="parent">The parent <see cref="Placeholder"/>.</param>
+        /// <param name="startIndex">The start index within the format base string.</param>
         public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent.BaseString, startIndex, parent.EndIndex)
         {
             Parent = parent;
             Items = new List<FormatItem>();
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Format"/>.
+        /// </summary>
+        /// <param name="smartSettings"></param>
+        /// <param name="baseString">The base format string-</param>
+        /// <param name="startIndex">The start index within the format base string.</param>
+        /// <param name="endIndex">The end index within the format base string.</param>
         public Format(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
         {
             Parent = null;
@@ -55,8 +73,14 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public Placeholder? Parent { get; }
 
+        /// <summary>
+        /// Gets the <see cref="List{T}"/> of <see cref="FormatItem"/>s.
+        /// </summary>
         public List<FormatItem> Items { get; }
 
+        /// <summary>
+        /// Returns <see langword="true"/>, if the <see cref="Format"/> is nested.
+        /// </summary>
         public bool HasNested { get; set; }
 
         #endregion
@@ -65,13 +89,22 @@ namespace SmartFormat.Core.Parsing
 
         #region: Substring :
 
-        /// <summary>Returns a substring of the current Format.</summary>
+        /// <summary>
+        /// Gets a substring of the current <see cref="Format"/>.
+        /// </summary>
+        /// <param name="start">The start index of the substring.</param>
+        /// <returns>The substring of the current <see cref="Format"/>.</returns>
         public Format Substring(int start)
         {
             return Substring(start, Length - start);
         }
 
-        /// <summary>Returns a substring of the current Format.</summary>
+        /// <summary>
+        /// Gets a substring of the current <see cref="Format"/>.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="length"></param>
+        /// <returns>The substring of the current <see cref="Format"/>.</returns>
         public Format Substring(int start, int length)
         {
             start = StartIndex + start;
@@ -173,20 +206,31 @@ namespace SmartFormat.Core.Parsing
 
         #region: Split :
 
-        private char splitCacheChar;
+        private char _splitCacheChar;
         private IList<Format>? splitCache;
 
+        /// <summary>
+        /// Splits the <see cref="Format"/> items by the given search character.
+        /// </summary>
+        /// <param name="search">The search character used to split.</param>
+        /// <returns></returns>
         public IList<Format> Split(char search)
         {
-            if (splitCache == null || splitCacheChar != search)
+            if (splitCache == null || _splitCacheChar != search)
             {
-                splitCacheChar = search;
+                _splitCacheChar = search;
                 splitCache = Split(search, -1);
             }
 
             return splitCache;
         }
 
+        /// <summary>
+        /// Splits the <see cref="Format"/> items by the given search character.
+        /// </summary>
+        /// <param name="search">e search character used to split.</param>
+        /// <param name="maxCount">The maximum number of <see cref="IList"/> of type <see cref="Format"/>.</param>
+        /// <returns></returns>
         public IList<Format> Split(char search, int maxCount)
         {
             var splits = FindAll(search, maxCount);
@@ -247,46 +291,73 @@ namespace SmartFormat.Core.Parsing
 
             #region NotSupported IList Interface
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public int IndexOf(Format item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public void Insert(int index, Format item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public void RemoveAt(int index)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public void Add(Format item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public void Clear()
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public bool Contains(Format item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public bool Remove(Format item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             public IEnumerator<Format> GetEnumerator()
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// This method is not implemented.
+            /// </summary>
             IEnumerator IEnumerable.GetEnumerator()
             {
                 throw new NotSupportedException();
@@ -304,7 +375,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Retrieves the literal text contained in this format.
         /// Excludes escaped chars, and does not include the text
-        /// of placeholders
+        /// of placeholders.
         /// </summary>
         /// <returns></returns>
         public string GetLiteralText()

@@ -9,10 +9,15 @@ using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class used to format and output <see cref="XElement"/>s.
+    /// </summary>
     public class XElementFormatter : IFormatter
     {
+        ///<inheritdoc />
         public string[] Names { get; set; } = {"xelement", "xml", "x", string.Empty};
 
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
