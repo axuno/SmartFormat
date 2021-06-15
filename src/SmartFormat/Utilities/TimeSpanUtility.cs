@@ -106,17 +106,11 @@ namespace SmartFormat.Utilities
 
                 //Determine whether to display this value
                 var displayThisValue = false;
-                var breakFor =
-                    false; // I wish C# supported "break for;" (like how VB supports "Exit For" from within a "Select Case" statement)
+
                 switch (truncate)
                 {
                     case TimeSpanFormatOptions.TruncateShortest:
-                        if (textStarted)
-                        {
-                            breakFor = true;
-                            break;
-                        }
-
+                        if (textStarted) continue; // continue with next for
                         if (value > 0) displayThisValue = true;
                         break;
                     case TimeSpanFormatOptions.TruncateAuto:
@@ -130,9 +124,7 @@ namespace SmartFormat.Utilities
                         break;
                 }
 
-                if (breakFor) break;
-
-                //we need to display SOMETHING (even if it's zero)
+                // we need to display SOMETHING (even if it's zero)
                 if (i == rangeMin && textStarted == false)
                 {
                     displayThisValue = true;
