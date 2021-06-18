@@ -35,14 +35,15 @@ namespace SmartFormat.Utilities
             // If there are any missing options, merge with the defaults:
             // Also, as a safeguard against missing DefaultFormatOptions, let's also merge with the AbsoluteDefaults:
             options = options.Merge(DefaultFormatOptions).Merge(AbsoluteDefaults);
+            
             // Extract the individual options:
             var rangeMax = options.Mask(TimeSpanFormatOptions._Range).AllFlags().Last();
             var rangeMin = options.Mask(TimeSpanFormatOptions._Range).AllFlags().First();
             var truncate = options.Mask(TimeSpanFormatOptions._Truncate).AllFlags().First();
             var lessThan = options.Mask(TimeSpanFormatOptions._LessThan) != TimeSpanFormatOptions.LessThanOff;
             var abbreviate = options.Mask(TimeSpanFormatOptions._Abbreviate) != TimeSpanFormatOptions.AbbreviateOff;
-
             var round = lessThan ? (Func<double, double>) Math.Floor : Math.Ceiling;
+
             switch (rangeMin)
             {
                 case TimeSpanFormatOptions.RangeWeeks:
@@ -182,16 +183,16 @@ namespace SmartFormat.Utilities
         #region: TimeSpan Rounding :
 
         /// <summary>
-        /// <para>Returns the <c>TimeSpan</c> closest to the specified interval.</para>
+        /// <para>Returns the <see cref="TimeSpan"/> closest to the specified interval.</para>
         /// <para>For example: <c>Round("00:57:00", TimeSpan.TicksPerMinute * 5) =&gt; "00:55:00"</c></para>
         /// </summary>
-        /// <param name="FromTime">A <c>TimeSpan</c> to be rounded.</param>
-        /// <param name="intervalTicks">Specifies the interval for rounding.  Use <c>TimeSpan.TicksPer____</c>.</param>
-        public static TimeSpan Round(this TimeSpan FromTime, long intervalTicks)
+        /// <param name="fromTime">A <see cref="TimeSpan"/> to be rounded.</param>
+        /// <param name="intervalTicks">Specifies the interval for rounding. Use <c>TimeSpan.TicksPer...</c> constants.</param>
+        public static TimeSpan Round(this TimeSpan fromTime, long intervalTicks)
         {
-            var extra = FromTime.Ticks % intervalTicks;
+            var extra = fromTime.Ticks % intervalTicks;
             if (extra >= intervalTicks >> 1) extra -= intervalTicks;
-            return TimeSpan.FromTicks(FromTime.Ticks - extra);
+            return TimeSpan.FromTicks(fromTime.Ticks - extra);
         }
 
         #endregion
@@ -459,93 +460,142 @@ namespace SmartFormat.Utilities
     /// </summary>
     public class TimeTextInfo
     {
-        private readonly string[] d;
-        private readonly string[] day;
-        private readonly string[] h;
-        private readonly string[] hour;
-        private readonly string lessThan;
-        private readonly string[] m;
-        private readonly string[] millisecond;
-        private readonly string[] minute;
-        private readonly string[] ms;
-        private readonly PluralRules.PluralRuleDelegate PluralRule;
-        private readonly string[] s;
-        private readonly string[] second;
-        private readonly string[] w;
-        private readonly string[] week;
+        private readonly string[] _d;
+        private readonly string[] _day;
+        private readonly string[] _h;
+        private readonly string[] _hour;
+        private readonly string _lessThan;
+        private readonly string[] _m;
+        private readonly string[] _millisecond;
+        private readonly string[] _minute;
+        private readonly string[] _ms;
+        private readonly PluralRules.PluralRuleDelegate _pluralRule;
+        private readonly string[] _s;
+        private readonly string[] _second;
+        private readonly string[] _w;
+        private readonly string[] _week;
 
+        /// <summary>
+        /// Creates a new instance of type <see cref="TimeTextInfo"/>.
+        /// </summary>
+        /// <param name="pluralRule"></param>
+        /// <param name="week"></param>
+        /// <param name="day"></param>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <param name="second"></param>
+        /// <param name="millisecond"></param>
+        /// <param name="w"></param>
+        /// <param name="d"></param>
+        /// <param name="h"></param>
+        /// <param name="m"></param>
+        /// <param name="s"></param>
+        /// <param name="ms"></param>
+        /// <param name="lessThan"></param>
         public TimeTextInfo(PluralRules.PluralRuleDelegate pluralRule, string[] week, string[] day, string[] hour,
             string[] minute, string[] second, string[] millisecond, string[] w, string[] d, string[] h, string[] m,
             string[] s, string[] ms, string lessThan)
         {
-            PluralRule = pluralRule;
+            _pluralRule = pluralRule;
 
-            this.week = week;
-            this.day = day;
-            this.hour = hour;
-            this.minute = minute;
-            this.second = second;
-            this.millisecond = millisecond;
+            _week = week;
+            _day = day;
+            _hour = hour;
+            _minute = minute;
+            _second = second;
+            _millisecond = millisecond;
 
-            this.w = w;
-            this.d = d;
-            this.h = h;
-            this.m = m;
-            this.s = s;
-            this.ms = ms;
+            _w = w;
+            _d = d;
+            _h = h;
+            _m = m;
+            _s = s;
+            _ms = ms;
 
-            this.lessThan = lessThan;
+            _lessThan = lessThan;
         }
 
+        /// <summary>
+        /// Creates a new instance of type <see cref="TimeTextInfo"/>.
+        /// </summary>
+        /// <param name="week"></param>
+        /// <param name="day"></param>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <param name="second"></param>
+        /// <param name="millisecond"></param>
+        /// <param name="lessThan"></param>
         public TimeTextInfo(string week, string day, string hour, string minute, string second, string millisecond,
             string lessThan)
         {
             // must not be null here
-            this.d = this.h = this.m = this.ms = this.s = this.w = new string[] { }; 
+            _d = _h = _m = _ms = _s = _w = Array.Empty<string>(); 
 
             // Always use singular:
-            PluralRule = (d, c) => 0;
-            this.week = new[] {week};
-            this.day = new[] {day};
-            this.hour = new[] {hour};
-            this.minute = new[] {minute};
-            this.second = new[] {second};
-            this.millisecond = new[] {millisecond};
-            this.lessThan = lessThan;
+            _pluralRule = (d, c) => 0;
+            _week = new[] {week};
+            _day = new[] {day};
+            _hour = new[] {hour};
+            _minute = new[] {minute};
+            _second = new[] {second};
+            _millisecond = new[] {millisecond};
+            _lessThan = lessThan;
         }
 
-        private static string GetValue(PluralRules.PluralRuleDelegate pluralRule, int value, string[] units)
+        private static string GetValue(PluralRules.PluralRuleDelegate pluralRule, int value, IReadOnlyList<string> units)
         {
             // Get the plural index from the plural rule,
             // unless there's only 1 unit in the first place:
-            var pluralIndex = units.Length == 1 ? 0 : pluralRule(value, units.Length);
+            var pluralIndex = units.Count == 1 ? 0 : pluralRule(value, units.Count);
             return string.Format(units[pluralIndex], value);
         }
 
+        /// <summary>
+        /// Gets the "less than" text for the given threshold.
+        /// </summary>
+        /// <param name="minimumValue"></param>
+        /// <returns>The "less than" text for the given threshold.</returns>
         public string GetLessThanText(string minimumValue)
         {
-            return string.Format(lessThan, minimumValue);
+            return string.Format(_lessThan, minimumValue);
         }
 
+        /// <summary>
+        /// Gets the text for <see cref="TimeSpanFormatOptions"/> ranges,
+        /// that correspond to a certain value.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <param name="value"></param>
+        /// <param name="abbr"></param>
+        /// <returns>
+        /// The text for <see cref="TimeSpanFormatOptions"/> ranges,
+        /// that correspond to a certain value.
+        /// </returns>
         public virtual string GetUnitText(TimeSpanFormatOptions unit, int value, bool abbr)
         {
             return unit switch
             {
-                TimeSpanFormatOptions.RangeWeeks => GetValue(PluralRule, value, abbr ? w : week),
-                TimeSpanFormatOptions.RangeDays => GetValue(PluralRule, value, abbr ? d : day),
-                TimeSpanFormatOptions.RangeHours => GetValue(PluralRule, value, abbr ? h : hour),
-                TimeSpanFormatOptions.RangeMinutes => GetValue(PluralRule, value, abbr ? m : minute),
-                TimeSpanFormatOptions.RangeSeconds => GetValue(PluralRule, value, abbr ? s : second),
-                TimeSpanFormatOptions.RangeMilliSeconds => GetValue(PluralRule, value, abbr ? ms : millisecond),
+                TimeSpanFormatOptions.RangeWeeks => GetValue(_pluralRule, value, abbr ? _w : _week),
+                TimeSpanFormatOptions.RangeDays => GetValue(_pluralRule, value, abbr ? _d : _day),
+                TimeSpanFormatOptions.RangeHours => GetValue(_pluralRule, value, abbr ? _h : _hour),
+                TimeSpanFormatOptions.RangeMinutes => GetValue(_pluralRule, value, abbr ? _m : _minute),
+                TimeSpanFormatOptions.RangeSeconds => GetValue(_pluralRule, value, abbr ? _s : _second),
+                TimeSpanFormatOptions.RangeMilliSeconds => GetValue(_pluralRule, value, abbr ? _ms : _millisecond),
                 // (should be unreachable)
                 _ => string.Empty
             };
         }
     }
 
+    /// <summary>
+    /// The class contains <see cref="TimeTextInfo"/> definitions for common languages.
+    /// </summary>
     public static class CommonLanguagesTimeTextInfo
     {
-        public static TimeTextInfo English => new TimeTextInfo(
+        /// <summary>
+        /// Gets the <see cref="TimeTextInfo"/> for the English language.
+        /// </summary>
+        public static TimeTextInfo English => new (
             PluralRules.GetPluralRule("en"),
             new[] {"{0} week", "{0} weeks"},
             new[] {"{0} day", "{0} days"},
@@ -562,6 +612,15 @@ namespace SmartFormat.Utilities
             "less than {0}"
         );
 
+        /// <summary>
+        /// Gets the <see cref="TimeTextInfo"/> for a certain language.
+        /// If the language is not implemented, the result will be <see langword="null"/>.
+        /// </summary>
+        /// <param name="twoLetterISOLanguageName"></param>
+        /// <returns>
+        /// The <see cref="TimeTextInfo"/> for a certain language.
+        /// If the language is not implemented, the result will be <see langword="null"/>.
+        /// </returns>
         public static TimeTextInfo? GetTimeTextInfo(string twoLetterISOLanguageName)
         {
             return twoLetterISOLanguageName switch

@@ -17,28 +17,36 @@ namespace SmartFormat.Utilities
     /// </summary>
     public class FormatDelegate : IFormattable
     {
-        private readonly Func<string?, string>? getFormat1;
-        private readonly Func<string?, IFormatProvider?, string>? getFormat2;
+        private readonly Func<string?, string>? _getFormat1;
+        private readonly Func<string?, IFormatProvider?, string>? _getFormat2;
 
+        /// <summary>
+        /// Creates a new instance of a <see cref="FormatDelegate"/>.
+        /// </summary>
+        /// <param name="getFormat"></param>
         public FormatDelegate(Func<string?, string> getFormat)
         {
-            getFormat1 = getFormat;
-        }
-
-        public FormatDelegate(Func<string?, IFormatProvider?, string> getFormat)
-        {
-            getFormat2 = getFormat;
+            _getFormat1 = getFormat;
         }
 
         /// <summary>
-        /// Implements System.IFormattable
+        /// Creates a new instance of a <see cref="FormatDelegate"/>.
+        /// </summary>
+        /// <param name="getFormat"></param>
+        public FormatDelegate(Func<string?, IFormatProvider?, string> getFormat)
+        {
+            _getFormat2 = getFormat;
+        }
+
+        /// <summary>
+        /// Implements <see cref="IFormattable"/>.
         /// </summary>
         /// <param name="format"></param>
         /// <param name="formatProvider"></param>
         /// <returns></returns>
         string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
         {
-            return getFormat1 != null ? getFormat1(format) : getFormat2 != null ? getFormat2(format, formatProvider) : string.Empty;
+            return _getFormat1 != null ? _getFormat1(format) : _getFormat2 != null ? _getFormat2(format, formatProvider) : string.Empty;
         }
     }
 }

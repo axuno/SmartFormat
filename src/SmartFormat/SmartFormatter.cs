@@ -33,6 +33,9 @@ namespace SmartFormat
 
         #region: Constructor :
 
+        /// <summary>
+        /// Creates a new instance of a <see cref="SmartFormatter"/>.
+        /// </summary>
         public SmartFormatter()
         {
             Settings = new SmartSettings();
