@@ -14,7 +14,7 @@ using SmartFormat.Utilities;
 namespace SmartFormat.Extensions
 {
     /// <summary>
-    /// A class for format following culture specific pluralization rules.
+    /// A class to format following culture specific pluralization rules.
     /// </summary>
     public class PluralLocalizationFormatter : IFormatter
     {
@@ -33,6 +33,9 @@ namespace SmartFormat.Extensions
             DefaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
         }
 
+        /// <summary>
+        /// Gets or sets the two letter ISO language name.
+        /// </summary>
         public string DefaultTwoLetterISOLanguageName { get; set; }
 
         ///<inheritdoc />
@@ -57,7 +60,7 @@ namespace SmartFormat.Extensions
             // We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
             // in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
             // 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
-            if (current is byte or short or ushort or int or uint  or long or ulong or float or double or decimal)
+            if (current is byte or short or int or long or float or double or decimal or ushort or uint or ulong)
                 value = Convert.ToDecimal(current);
             else if (current is IEnumerable<object> objects)
                 value = objects.Count();
@@ -65,10 +68,8 @@ namespace SmartFormat.Extensions
                 return false;
 
 
-            // Get the plural rule:
+            // Get the specific plural rule, or the default rule:
             var pluralRule = GetPluralRule(formattingInfo);
-
-            if (pluralRule == null) return false;
 
             var pluralCount = pluralWords.Count;
             var pluralIndex = pluralRule(value, pluralCount);
@@ -83,7 +84,7 @@ namespace SmartFormat.Extensions
             return true;
         }
 
-        private PluralRules.PluralRuleDelegate? GetPluralRule(IFormattingInfo formattingInfo)
+        private PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
         {
             // See if the language was explicitly passed:
             var pluralOptions = formattingInfo.FormatterOptions;
@@ -114,16 +115,29 @@ namespace SmartFormat.Extensions
     {
         private readonly PluralRules.PluralRuleDelegate _pluralRule;
 
+        /// <summary>
+        /// Creates a new instance of a <see cref="CustomPluralRuleProvider"/>.
+        /// </summary>
+        /// <param name="pluralRule">The delegate for plural rules.</param>
         public CustomPluralRuleProvider(PluralRules.PluralRuleDelegate pluralRule)
         {
             _pluralRule = pluralRule;
         }
 
+        /// <summary>
+        /// Gets the format <see cref="object"/> for a <see cref="CustomPluralRuleProvider"/>.
+        /// </summary>
+        /// <param name="formatType"></param>
+        /// <returns>The format <see cref="object"/> for a <see cref="CustomPluralRuleProvider"/> or <see langword="null"/>.</returns>
         public object? GetFormat(Type? formatType)
         {
             return formatType == typeof(CustomPluralRuleProvider) ? this : default;
         }
 
+        /// <summary>
+        /// Gets the <see cref="PluralRules.PluralRuleDelegate"/> of the current <see cref="CustomPluralRuleProvider"/> instance.
+        /// </summary>
+        /// <returns></returns>
         public PluralRules.PluralRuleDelegate GetPluralRule()
         {
             return _pluralRule;

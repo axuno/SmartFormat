@@ -14,6 +14,9 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public abstract class FormatItem
     {
+        /// <summary>
+        /// Obsolete. Gets the base format string.
+        /// </summary>
         [Obsolete("Use property 'BaseString' instead")]
         public string baseString => BaseString;
 
@@ -22,6 +25,9 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public string BaseString { get; }
         
+        /// <summary>
+        /// Obsolete. The end index is pointing to ONE POSITION AFTER the last character of item.
+        /// </summary>
         [Obsolete("Use property 'EndIndex' instead")]
         public int endIndex
         {
@@ -31,7 +37,7 @@ namespace SmartFormat.Core.Parsing
 
         /// <summary>
         /// The end index is pointing to ONE POSITION AFTER the last character of item.
-        ///  </summary>
+        /// </summary>
         /// <example>
         /// Format string: {0}{1}ABC
         /// Index:         012345678
@@ -40,6 +46,9 @@ namespace SmartFormat.Core.Parsing
         /// </example>
         public int EndIndex { get; set; }
         
+        /// <summary>
+        /// Obsolete. The start index is pointing to the first character of item.
+        /// </summary>
         [Obsolete("Use property 'StartIndex' instead")]
         public int startIndex
         {
@@ -49,7 +58,7 @@ namespace SmartFormat.Core.Parsing
 
         /// <summary>
         /// The start index is pointing to the first character of item.
-        ///  </summary>
+        /// </summary>
         /// <example>
         /// Format string: {0}{1}ABC
         /// Index:         012345678

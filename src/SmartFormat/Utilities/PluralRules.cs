@@ -14,10 +14,10 @@ namespace SmartFormat.Utilities
     public static class PluralRules
     {
         /// <summary>
-        /// Holds the ISO langue code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
+        /// Holds the ISO language code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
         /// </summary>
         public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate =
-            new Dictionary<string, PluralRuleDelegate>
+            new() 
             {
                 // Singular
                 {"az", Singular}, // Azerbaijani
@@ -315,7 +315,7 @@ namespace SmartFormat.Utilities
         }
 
         /// <summary>
-        /// Returns True if the value is inclusively between the min and max and has no fraction.
+        /// Returns <see langword="true"/> if the value is inclusively between the min and max and has no fraction.
         /// </summary>
         private static bool Between(this decimal value, decimal min, decimal max)
         {

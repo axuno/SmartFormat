@@ -10,6 +10,9 @@ using SmartFormat.Core.Output;
 
 namespace SmartFormat
 {
+    /// <summary>
+    /// The class contains extension methods for <see cref="StringBuilder"/>, <see cref="TextWriter"/> and <see cref="string"/>.
+    /// </summary>
     public static class SmartExtensions
     {
         #region: StringBuilder :
