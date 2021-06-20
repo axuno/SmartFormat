@@ -57,5 +57,15 @@ namespace SmartFormat.Tests.Extensions
         {
             Assert.That(GetSimpleFormatter().Format(CultureInfo.InvariantCulture, format, arg), Is.EqualTo(expected));
         }
+
+        [Test]
+        public void String_ToCharArray_Should_Be_Formattable_As_List()
+        {
+            var smart = GetSimpleFormatter();
+            smart.SourceExtensions.Add(new ListFormatter(smart));
+            smart.FormatterExtensions.Add(new ListFormatter(smart));
+           
+            Assert.That(smart.Format("{0.ToCharArray:list:{}|, |, and }", "xyz"), Is.EqualTo("x, y, and z"));
+        }
     }
 }
