@@ -6,7 +6,7 @@ v3.0.0-alpha-14
 
 ### Current changes merged into the `version/v3.0` branch:
 
-#### JSON Source
+#### JSON Source ([#177](https://github.com/axuno/SmartFormat/pull/177))
 
 Separation of `JsonSource` into 2 `ISource` extensions:
 * `NewtonSoftJsonSource`
