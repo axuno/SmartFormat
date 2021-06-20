@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -26,14 +30,15 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Properties()
         {
-            var formats = new string[] {
+            // Length property for a string comes from StringSource
+            var formats = new[] {
                 "{0} {0.Length} {Length}",
                 "{2.Year} {2.Month:00}-{2.Day:00}",
                 "{3.Value} {3.Anon}",
                 "Chained: {4.FirstName} {4.FirstName.Length} {4.Address.City} {4.Address.State}",
                 "Nested: {4:{FirstName:{} {Length} }{Address:{City} {State}}}"
             };
-            var expected = new string[] {
+            var expected = new[] {
                 "Zero 4 4",
                 "2222 02-02",
                 "3 True",
@@ -50,46 +55,84 @@ namespace SmartFormat.Tests.Extensions
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
             
-            var formats = new string[]
+            // Length property for a string comes from StringSource
+            var formats = new []
                 {
                     "{0} {0.lenGth} {length}", "{2.YEar} {2.MoNth:00}-{2.daY:00}", "{3.Value} {3.AnoN}",
-                    "Chained: {4.fIrstName} {4.Firstname.Length} {4.Address.City} {4.aDdress.StAte}  ",
-                    "Nested: {4:{FirstName:{} {Length} }{Address:{City} {StaTe} } }",
+                    "Chained: {4.fIrstName} {4.Firstname.Length} {4.Address.City} {4.aDdress.StAte}",
+                    "Nested: {4:{FirstName:{} {Length} }{Address:{City} {StaTe}}}",
                     // Due to double-brace escaping, the spacing in this nested format is irregular
                 };
-            var expected = new string[]
+            var expected = new []
                 {
-                    "Zero 4 4", "2222 02-02", "3 True", "Chained: Michael 7 Scranton Pennsylvania  ",
-                    "Nested: Michael 7 Scranton Pennsylvania  ",
+                    "Zero 4 4", "2222 02-02", "3 True", "Chained: Michael 7 Scranton Pennsylvania",
+                    "Nested: Michael 7 Scranton Pennsylvania",
                 };
             var args = GetArgs();
             formatter.Test(formats, args, expected);
         }
 
+        /// <summary>
+        /// system.string methods are processed by <see cref="StringSource"/> since v3.0
+        /// </summary>
         [Test]
         public void Test_Methods()
         {
-            var formats = new string[] {
-                "{0} {0.ToLower} {ToLower} {ToUpper}",
-            };
-            var expected = new string[] {
-                "Zero zero zero ZERO",
-            };
+            var format = "{0} {0.ToLower} {ToLower} {ToUpper}";
+            //var expected = "Zero zero zero ZERO";
+
+            var smart = new SmartFormatter();
+            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
+            smart.FormatterExtensions.Add(new DefaultFormatter());
+
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("ToLower"));
         }
 
+        /// <summary>
+        /// system.string methods are processed by <see cref="StringSource"/> since v3.0
+        /// </summary>
         [Test]
         public void Test_Methods_CaseInsensitive()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            var smart = new SmartFormatter();
+            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart)});
+            smart.FormatterExtensions.Add(new DefaultFormatter());
+            smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
 
-            var formats = new string[] { "{0} {0.ToLower} {toloWer} {touPPer}", };
-            var expected = new string[] { "Zero zero zero ZERO", };
+            var format = "{0} {0.ToLower} {toloWer} {touPPer}";
+            //var expected = "Zero zero zero ZERO";
             var args = GetArgs();
-            formatter.Test(formats, args, expected);
+            Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("ToLower"));
         }
+
+        [Test]
+        public void Void_Methods_Should_Just_Be_Ignored()
+        {
+            var smart = new SmartFormatter();
+            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
+            smart.FormatterExtensions.Add(new DefaultFormatter());
+            Assert.That(() => smart.Format("{0.Clear}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Clear"));
+        }
+
+        [Test]
+        public void Methods_With_Parameter_Should_Just_Be_Ignored()
+        {
+            var smart = new SmartFormatter();
+            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
+            smart.FormatterExtensions.Add(new DefaultFormatter());
+            Assert.That(() => smart.Format("{0.Add}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Add"));
+        }
+
+        [Test]
+        public void Properties_With_No_Getter_Should_Just_Be_Ignored()
+        {
+            var smart = new SmartFormatter();
+            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
+            smart.FormatterExtensions.Add(new DefaultFormatter());
+            Assert.That(() => smart.Format("{Misc.OnlySetterProperty}", new { Misc = new MiscObject() }), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("OnlySetterProperty"));
+        }
+        
 
         [Test]
         public void Test_Fields()
@@ -198,6 +241,7 @@ namespace SmartFormat.Tests.Extensions
                 MethodReturnValue = "Method";
             }
             public string Field;
+            public string OnlySetterProperty { set { } }
             public string ReadonlyProperty { get; private set; }
             public virtual string Property { get; set; } = "Property";
             public string Method()

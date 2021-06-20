@@ -28,7 +28,7 @@ namespace SmartFormat.Extensions
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
-            var selector = selectorInfo.SelectorText;
+            var selector = selectorInfo.SelectorText ?? string.Empty;
             var formatDetails = selectorInfo.FormatDetails;
 
             if (int.TryParse(selector, out var selectorValue))
