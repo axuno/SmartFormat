@@ -1,10 +1,62 @@
 Latest Changes
 ====
 
-v3.0.0-alpha-14
+v3.0.0-alpha-15
 ===
 
 ### Current changes merged into the `version/v3.0` branch:
+
+#### Added `StringSource` as another `ISource`
+
+`StringSource` adds the following selector names, which have before been implemented with `ReflectionSource`:
+* Length
+* ToUpper
+* ToUpperInvariant
+* ToLower
+* ToLowerInvariant
+* Trim
+* TrimStart
+* TrimEnd
+* ToCharArray
+
+Additionally, the following selector names are implemented:
+* Capitalize
+* CapitalizeWords
+* FromBase64
+* ToBase64
+
+All these selector names may linked. Example with indexed placeholders:
+```CSharp
+Smart.Format("{0.ToLower.TrimStart.TrimEnd.ToBase64}", " ABCDE ");
+// result: "YWJjZGU="
+```
+This also works for named placeholders.
+
+**Note**: `ReflectionSource` does not evaluate `string`s any more.
+
+The new formatter privates additional funcionality and with with reflection caching, performance is 13% better.
+
+```
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19042
+AMD Ryzen 9 3900X, 1 CPU, 24 logical and 12 physical cores
+.NET Core SDK=5.0.202
+  [Host]        : .NET Core 5.0.5 (CoreCLR 5.0.521.16609, CoreFX 5.0.521.16609), X64 RyuJIT
+  .NET Core 5.0 : .NET Core 5.0.5 (CoreCLR 5.0.521.16609, CoreFX 5.0.521.16609), X64 RyuJIT
+
+Job=.NET Core 5.0  Runtime=.NET Core 5.0
+
+|             Method |     N |        Mean |     Error |    StdDev |     Gen 0 | Gen 1 | Gen 2 |   Allocated |
+|------------------- |------ |------------:|----------:|----------:|----------:|------:|------:|------------:|
+| DirectMemberAccess |  1000 |    261.5 us |   5.13 us |   8.71 us |   20.9961 |     - |     - |   171.88 KB |
+|     SfStringSource |  1000 |  2,727.5 us |  10.42 us |   9.75 us |    207.03 |     - |     - |  1695.31 KB |
+|  SfCacheReflection |  1000 |  3,712.0 us |  67.06 us |  62.73 us |  214.8438 |     - |     - |  1757.81 KB |
+|SfNoCacheReflection |  1000 | 13,091.9 us | 129.38 us | 121.02 us |  781.2500 |     - |     - |  6468.75 KB |
+|                    |       |             |           |           |           |       |       |             |
+| DirectMemberAccess | 10000 |  2,519.2 us |  49.85 us |  53.34 us |  207.0313 |     - |     - |  1718.75 KB |
+|     SfStringSource | 10000 | 27,612.5 us |  68.50 us |  64.08 us | 2062.5000 |     - |     - | 16953.13 KB |
+|  SfCacheReflection | 10000 | 36,312.6 us | 438.96 us |  389.12us | 2142.8571 |     - |     - | 17578.13 KB |
+|SfNoCacheReflection | 10000 |130,049.2 us |1,231.06us |1,027.99us | 7750.0000 |     - |     - | 64687.81 KB |
+```
 
 #### JSON Source ([#177](https://github.com/axuno/SmartFormat/pull/177))
 
