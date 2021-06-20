@@ -112,7 +112,8 @@ namespace SmartFormat
                 (ISource) listSourceAndFormatter, // ListFormatter MUST be the first source extension
                 new DictionarySource(formatter),
                 new ValueTupleSource(formatter),
-                new JsonSource(formatter),
+                new SystemTextJsonSource(formatter),
+                new NewtonsoftJsonSource(formatter),
                 new XmlSource(formatter),
                 new ReflectionSource(formatter),
 
