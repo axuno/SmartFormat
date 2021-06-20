@@ -6,7 +6,7 @@ v3.0.0-alpha-15
 
 ### Current changes merged into the `version/v3.0` branch:
 
-#### Added `StringSource` as another `ISource`
+#### Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178))
 
 `StringSource` adds the following selector names, which have before been implemented with `ReflectionSource`:
 * Length
