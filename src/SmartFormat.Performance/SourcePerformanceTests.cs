@@ -72,8 +72,6 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         public SourcePerformanceTests()
         {
             _literalFormatter = new SmartFormatter();
-            _literalFormatter.Parser.AddAlphanumericSelectors();
-            _literalFormatter.Parser.AddAdditionalSelectorChars("._");
             _literalFormatter.AddExtensions(
                 new DefaultSource(_literalFormatter)
             );
@@ -101,7 +99,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _jsonFormatter = new SmartFormatter();
             _jsonFormatter.AddExtensions(
-                new JsonSource(_jsonFormatter),
+                new SystemTextJsonSource(_jsonFormatter),
                 new DefaultSource(_jsonFormatter)
             );
             _jsonFormatter.AddExtensions(

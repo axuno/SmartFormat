@@ -1,10 +1,16 @@
 Latest Changes
 ====
 
-v3.0.0 (Draft)
+v3.0.0-alpha-14
 ===
 
-### Currently merged to the `version/v3.0` branch:
+### Current changes merged into the `version/v3.0` branch:
+
+#### JSON Source
+
+Separation of `JsonSource` into 2 `ISource` extensions:
+* `NewtonSoftJsonSource`
+* `SystemTextJsonSource`
 
 #### Introduced Nullable Notation ([#176](https://github.com/axuno/SmartFormat/pull/176))
 
@@ -109,6 +115,7 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
   * Custom operator chars can be added, if not disallowed or in use as a selector char
   * Alphanumeric selector chars are the only option now and cannot be degraded to pure numeric chars
   * `PlaceholderBeginChar`, `PlaceholderEndChar`, `FormatterOptionsBeginChar` and `FormatterOptionsEndChar` now only have getters
+* Exact control of whitespace text output
 * Reduced substring usage with literal text leads to a significant reduction of GC and memory allocation ([#169](https://github.com/axuno/SmartFormat/pull/169)) 
 * Add unicode escape characters ([#166](https://github.com/axuno/SmartFormat/pull/166)). Thanks to [@karljj1](https://github.com/karljj1)
 * `FormatItem` abstract class ([#167](https://github.com/axuno/SmartFormat/pull/167))
