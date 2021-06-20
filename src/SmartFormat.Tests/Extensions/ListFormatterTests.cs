@@ -162,7 +162,7 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [TestCase("{0:{} = {Index}|, }", "A = 0, B = 1, C = 2, D = 3, E = 4")] // Index holds the current index of the iteration
-        [TestCase("{1:{Index}: {ToCharArray:{} = {Index}|, }|; }", "0: O = 0, n = 1, e = 2; 1: T = 0, w = 1, o = 2; 2: T = 0, h = 1, r = 2, e = 3, e = 4; 3: F = 0, o = 1, u = 2, r = 3; 4: F = 0, i = 1, v = 2, e = 3")] // Index can be nested
+        [TestCase("{1:{Index}: {ToCharArray:{} = {Index}|, }|; }", "0: O = 0, n = 1, e = 2; 1: T = 0, w = 1, o = 2; 2: T = 0, h = 1, r = 2, e = 3, e = 4; 3: F = 0, o = 1, u = 2, r = 3; 4: F = 0, i = 1, v = 2, e = 3")] // Index can be nested, ToCharArray() requires StringSource or ReflectionSource
         [TestCase("{0:{} = {1.Index}|, }", "A = One, B = Two, C = Three, D = Four, E = Five")] // Index is used to synchronize 2 lists
         [TestCase("{Index}", "-1")] // Index can be used out-of-context, but should always be -1
         public void TestIndex(string format, string expected)

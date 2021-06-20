@@ -41,8 +41,9 @@ namespace SmartFormat.Extensions
                 selectorInfo.Result = null;
                 return true;
             }
-            
-            if (current is null) return false;
+
+            // strings are processed by StringSource which should be evaluated before ReflectionSource
+            if (current is null or string) return false; 
             
             var selector = selectorInfo.SelectorText;
             
