@@ -36,11 +36,21 @@ for:
       - cmd: dotnet test --no-build --framework net5.0 --test-adapter-path:. --logger:Appveyor SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net5.0.xml" -n net5.0win
+    artifacts:
+      - path: 'artifacts\*.nupkg'
+      - path: 'artifacts\*.snupkg'
+    deploy:
+      - provider: NuGet
+        api_key:
+          secure: OxZeF53X5DcHmg+t3zMNZP9NhlpSJHEQN6O4zuz6/FT3SCaBh8kp+tbftzt+nlhi
+        on:
+          branch: main
   -
     matrix:
       only:
         - job_name: linux
     build_script:
+      - md $APPVEYOR_BUILD_FOLDER/Src
       - cd $APPVEYOR_BUILD_FOLDER/Src
       - dotnet --version
       - dotnet restore --verbosity quiet
