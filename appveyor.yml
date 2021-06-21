@@ -50,7 +50,7 @@ for:
       only:
         - job_name: linux
     build_script:
-      - md $APPVEYOR_BUILD_FOLDER/Src
+      - mkdir $APPVEYOR_BUILD_FOLDER/Src
       - cd $APPVEYOR_BUILD_FOLDER/Src
       - dotnet --version
       - dotnet restore --verbosity quiet
