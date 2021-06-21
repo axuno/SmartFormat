@@ -34,6 +34,11 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         private SmartFormatter _smartNullFormatter, _smartChooseFormatter;
         private FormatCache _nullFormatCache, _chooseFormatCache;
 
+        public NullFormatterChooseFormatterTests()
+        {
+            Setup();
+        }
+
         [GlobalSetup]
         public void Setup()
         {
@@ -52,13 +57,13 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         [Benchmark]
         public void ChooseFormatTest()
         {
-            var result = _smartChooseFormatter.FormatWithCache(ref _chooseFormatCache, "", new List<object?> {null});
+            var result = _smartChooseFormatter.FormatWithCache(ref _chooseFormatCache, "", new List<object> {null});
         }
 
         [Benchmark]
         public void NullFormatTest()
         {
-            var result = _smartNullFormatter.FormatWithCache(ref _nullFormatCache, "", new List<object?> {null});
+            var result = _smartNullFormatter.FormatWithCache(ref _nullFormatCache, "", new List<object> {null});
         }
     }
 }
