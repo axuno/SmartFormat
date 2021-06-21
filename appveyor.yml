@@ -50,8 +50,7 @@ for:
       only:
         - job_name: linux
     build_script:
-      - mkdir $APPVEYOR_BUILD_FOLDER/Src
-      - cd $APPVEYOR_BUILD_FOLDER/Src
+      - cd $APPVEYOR_BUILD_FOLDER
       - dotnet --version
       - dotnet restore --verbosity quiet
       - dotnet add ./SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
