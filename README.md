@@ -2,7 +2,9 @@
 
 [![GitHub release](https://img.shields.io/github/release/axuno/smartformat.net.svg)](https://github.com/axuno/SmartFormat.Net/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/blob/main/License.txt)
-[![Build status](https://ci.appveyor.com/api/projects/status/g27r62fm9c7e0ctv?svg=true)](https://ci.appveyor.com/project/axuno/smartformat)
+[![AppVeyor build status windows](https://img.shields.io/appveyor/job/build/axuno/smartformat/windows/version/v3.0?label=windows%20build)](https://ci.appveyor.com/project/axuno/smartformat/branch/version/v3.0)
+[![AppVeyor build status linux](https://img.shields.io/appveyor/job/build/axuno/smartformat/linux/version/v3.0?label=linux%20build)](https://ci.appveyor.com/project/axuno/smartformat/branch/version/v3.0)
+
 [![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/SmartFormat.svg)](https://ci.appveyor.com/project/axuno/SmartFormat/branch/main/tests)
 [![codecov](https://codecov.io/gh/axuno/SmartFormat/branch/main/graph/badge.svg)](https://codecov.io/gh/axuno/SmartFormat)
 
