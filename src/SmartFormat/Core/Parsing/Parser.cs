@@ -94,7 +94,7 @@ namespace SmartFormat.Core.Parsing
         /// specified character. The only allowed escape character is the backslash '\'.
         /// </summary>
         /// <param name="alternativeEscapeChar">Defaults to backslash</param>
-        [Obsolete("Use 'Settings.Parser.StringFormatCompatibility' instead.")]
+        [Obsolete("Use 'Settings.StringFormatCompatibility' instead.")]
         public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
         {
             if (alternativeEscapeChar != _parserSettings.CharLiteralEscapeChar)
@@ -111,7 +111,7 @@ namespace SmartFormat.Core.Parsing
         /// so it is recommended to use an 'alternative' escape char, which is the
         /// backslash.
         /// </summary>
-        [Obsolete("Use 'Settings.Parser.StringFormatCompatibility' instead.")]
+        [Obsolete("Use 'Settings.StringFormatCompatibility' instead.")]
         public void UseBraceEscaping()
         {
             Settings.StringFormatCompatibility = true;
