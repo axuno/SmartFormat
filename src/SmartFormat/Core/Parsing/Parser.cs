@@ -91,21 +91,25 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Sets the AlternativeEscaping option to True
         /// so that braces will only be escaped after the
-        /// specified character.
+        /// specified character. The only allowed escape character is the backslash '\'.
         /// </summary>
         /// <param name="alternativeEscapeChar">Defaults to backslash</param>
         [Obsolete("Use 'Settings.Parser.StringFormatCompatibility' instead.")]
         public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
         {
+            if (alternativeEscapeChar != _parserSettings.CharLiteralEscapeChar)
+            {
+                throw new ArgumentException("Cannot set an escape character other than '\\'",
+                    nameof(alternativeEscapeChar));
+            }
             Settings.StringFormatCompatibility = false;
-            _parserSettings.CharLiteralEscapeChar = alternativeEscapeChar;
         }
 
         /// <summary>
-        /// [Default]
-        /// Uses {{ and }} for escaping braces for compatibility with String.Format.
+        /// Uses {{ and }} for escaping braces for compatibility with string.Format.
         /// However, this does not work very well with nested placeholders,
-        /// so it is recommended to use an alternative escape char.
+        /// so it is recommended to use an 'alternative' escape char, which is the
+        /// backslash.
         /// </summary>
         [Obsolete("Use 'Settings.Parser.StringFormatCompatibility' instead.")]
         public void UseBraceEscaping()

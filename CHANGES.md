@@ -181,9 +181,9 @@ Example: `Smart.Format("{placeholder,15}")` where ",15" is the string alignment
   * `Placeholder` now has `FormatterOptionsRaw` with original (unescaped) string and `FormatterOptions` with the escaped string.
   * `EscapedLiteral`: 15% faster, 50% less GC
 * `Parser` ([#164](https://github.com/axuno/SmartFormat/pull/164)):
-  * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete.
+  * Moved settings from class `Parser` to class `ParserSettings` and corresponding members in `Parser` are marked as obsolete. Calling `UseAlternativeEscapeChar()` with argument, which is not a backslash, will throw an `ArgumentException`.
   * `Parser.UseAlternativeBraces(..)` is obsolete and not supported any more
-  * Default character for escaping curly braces is now `\`, i.e. `\{` and `\}` instead of `{{` and `}}`. The latter are used if `SmartSettings.StringFormatCompatibility` is `true`.
+  * The only 'alternative' character for escaping curly braces is now `\`, i.e. `\{` and `\}` instead of `{{` and `}}`. The latter are used if `SmartSettings.StringFormatCompatibility` is `true`.
   * Alphanumeric selector characters are enabled by default.
   * Operator characters `.,[]` are set by default.
 * `ErrorAction`s ([#164](https://github.com/axuno/SmartFormat/pull/164)):
