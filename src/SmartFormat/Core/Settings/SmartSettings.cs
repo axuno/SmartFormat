@@ -71,34 +71,16 @@ namespace SmartFormat.Core.Settings
 
         internal IEqualityComparer<string> GetCaseSensitivityComparer()
         {
-            {
-                switch (CaseSensitivity)
-                {
-                    case CaseSensitivityType.CaseSensitive:
-                        return StringComparer.Ordinal;
-                    case CaseSensitivityType.CaseInsensitive:
-                        return StringComparer.OrdinalIgnoreCase;
-                    default:
-                        throw new InvalidOperationException(
-                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
-                }
-            }
+            return CaseSensitivity == CaseSensitivityType.CaseSensitive
+                ? StringComparer.Ordinal
+                : StringComparer.OrdinalIgnoreCase;
         }
 
         internal StringComparison GetCaseSensitivityComparison()
         {
-            {
-                switch (CaseSensitivity)
-                {
-                    case CaseSensitivityType.CaseSensitive:
-                        return StringComparison.Ordinal;
-                    case CaseSensitivityType.CaseInsensitive:
-                        return StringComparison.OrdinalIgnoreCase;
-                    default:
-                        throw new InvalidOperationException(
-                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
-                }
-            }
+            return CaseSensitivity == CaseSensitivityType.CaseSensitive
+                ? StringComparison.Ordinal
+                : StringComparison.OrdinalIgnoreCase;
         }
 
         /// <summary>

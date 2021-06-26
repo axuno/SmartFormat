@@ -5,6 +5,7 @@
 
 using System;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
 namespace SmartFormat
@@ -96,11 +97,13 @@ namespace SmartFormat
         /// For optimized performance, create a <see cref="SmartFormatter"/> instance and register the
         /// particular extensions that are needed.
         /// </summary>
+        /// <param name="settings">The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.</param>
         /// <returns>A <see cref="SmartFormatter"/> with all extensions registered.</returns>
-        public static SmartFormatter CreateDefaultSmartFormat()
+        public static SmartFormatter CreateDefaultSmartFormat(SmartSettings? settings = null)
         {
             // Register all default extensions here:
-            var formatter = new SmartFormatter();
+            var formatter = new SmartFormatter(settings);
+            
             // Add all extensions:
             // Note, the order is important; the extensions
             // will be executed in this order:

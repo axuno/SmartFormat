@@ -20,13 +20,13 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 |             Method |     N |        Mean |     Error |    StdDev |     Gen 0 | Gen 1 | Gen 2 |   Allocated |
 |------------------- |------ |------------:|----------:|----------:|----------:|------:|------:|------------:|
 | DirectMemberAccess |  1000 |    261.5 us |   5.13 us |   8.71 us |   20.9961 |     - |     - |   171.88 KB |
-|     SfStringSource |  1000 |  2,727.5 us |  10.42 us |   9.75 us |    207.03 |     - |     - |  1695.31 KB |
-|  SfCacheReflection |  1000 |  3,712.0 us |  67.06 us |  62.73 us |  214.8438 |     - |     - |  1757.81 KB |
+| SfWithStringSource |  1000 |  1,792.1 us |   9.97 us |   9.32 us |  167.9688 |     - |     - |  1382.81 KB |
+|  SfCacheReflection |  1000 |  2,026.1 us |  20.62 us |  19.29 us |  179.6875 |     - |     - |  1476.56 KB |
 |SfNoCacheReflection |  1000 | 13,091.9 us | 129.38 us | 121.02 us |  781.2500 |     - |     - |  6468.75 KB |
 |                    |       |             |           |           |           |       |       |             |
 | DirectMemberAccess | 10000 |  2,519.2 us |  49.85 us |  53.34 us |  207.0313 |     - |     - |  1718.75 KB |
-|     SfStringSource | 10000 | 27,612.5 us |  68.50 us |  64.08 us | 2062.5000 |     - |     - | 16953.13 KB |
-|  SfCacheReflection | 10000 | 36,312.6 us | 438.96 us |  389.12us | 2142.8571 |     - |     - | 17578.13 KB |
+| SfWithStringSource | 10000 | 17,886.7 us | 151.64 us | 141.84 us | 1687.5000 |     - |     - | 13828.13 KB |
+|  SfCacheReflection | 10000 | 20,918.6 us | 166.88 us | 156.10 us | 1781.2500 |     - |     - | 14765.63 KB |
 |SfNoCacheReflection | 10000 |130,049.2 us |1,231.06us |1,027.99us | 7750.0000 |     - |     - | 64687.81 KB |
 
 * Legends *
@@ -46,7 +46,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
     [SimpleJob(RuntimeMoniker.NetCoreApp50)]
     [MemoryDiagnoser]
     // [RPlotExporter]
-    public class ReflectionVsStringSource
+    public class ReflectionVsStringSourceTests
     {
         private const string _formatString = "Address: {0.ToUpper} {1.ToLower}, {2.Trim}";
 
@@ -57,7 +57,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
         private FormatCache _formatCacheLiteral;
 
-        public ReflectionVsStringSource()
+        public ReflectionVsStringSourceTests()
         {
             _reflectionSourceFormatter = new SmartFormatter();
             _reflectionSourceFormatter.AddExtensions(

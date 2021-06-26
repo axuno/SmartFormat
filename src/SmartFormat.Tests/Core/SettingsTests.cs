@@ -49,34 +49,6 @@ namespace SmartFormat.Tests.Core
             Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == '°'), Is.EqualTo(1));
         }
 
-        [Test]
-        public void GetCaseSensitivityComparison()
-        {
-            var settings = new SmartSettings();
-            foreach (var name in Enum.GetNames(typeof(CaseSensitivityType)))
-            {
-                settings.CaseSensitivity = (CaseSensitivityType) Enum.Parse(typeof(CaseSensitivityType), name);
-                Assert.DoesNotThrow(() => settings.GetCaseSensitivityComparison());
-            }
-
-            settings.CaseSensitivity = (CaseSensitivityType) int.MaxValue;
-            Assert.Throws<InvalidOperationException>(() => settings.GetCaseSensitivityComparison());
-        }
-
-        [Test]
-        public void CaseSensitivityComparer()
-        {
-            var settings = new SmartSettings();
-            foreach (var name in Enum.GetNames(typeof(CaseSensitivityType)))
-            {
-                settings.CaseSensitivity = (CaseSensitivityType) Enum.Parse(typeof(CaseSensitivityType), name);
-                Assert.DoesNotThrow(() => settings.GetCaseSensitivityComparer());
-            }
-
-            settings.CaseSensitivity = (CaseSensitivityType) int.MaxValue;
-            Assert.Throws<InvalidOperationException>(() => settings.GetCaseSensitivityComparer());
-        }
-
         [TestCase('°')] // a custom char
         [TestCase('A')] // a standard selector char
         public void Add_CustomOperator_Used_As_Seperator_Should_Throw(char operatorChar)
