@@ -42,7 +42,7 @@ namespace SmartFormat.Extensions
                 return true;
             }
 
-            // strings are processed by StringSource which should be evaluated before ReflectionSource
+            // strings are processed by StringSource
             if (current is null or string) return false; 
             
             var selector = selectorInfo.SelectorText;

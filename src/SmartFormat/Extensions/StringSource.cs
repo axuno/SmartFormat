@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -20,7 +21,7 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class StringSource : Source
     {
-        private readonly SmartSettings _settings;
+        private CultureInfo _cultureInfo = CultureInfo.CurrentCulture;
 
         /// <summary>
         /// CTOR.
@@ -28,7 +29,37 @@ namespace SmartFormat.Extensions
         /// <param name="formatter"></param>
         public StringSource(SmartFormatter formatter) : base(formatter)
         {
-            _settings = formatter.Settings;
+            var comparer = new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive}
+                .GetCaseSensitivityComparer();
+            SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, (bool Evaluated, object? Result)>>(comparer);
+            AddMethods();
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Dictionary{TKey,TValue}"/> of methods that can be used as selectors.
+        /// </summary>
+        protected Dictionary<string, Func<ISelectorInfo, string, (bool Evaluated, object? Result)>> SelectorMethods
+        {
+            get;
+        }
+
+        private void AddMethods()
+        {
+            // built-in string methods
+            SelectorMethods.Add(nameof(Length), Length);
+            SelectorMethods.Add(nameof(ToUpper), ToUpper);
+            SelectorMethods.Add(nameof(ToUpperInvariant), ToUpperInvariant);
+            SelectorMethods.Add(nameof(ToLower), ToLower);
+            SelectorMethods.Add(nameof(ToLowerInvariant), ToLowerInvariant);
+            SelectorMethods.Add(nameof(Trim), Trim);
+            SelectorMethods.Add(nameof(TrimStart), TrimStart);
+            SelectorMethods.Add(nameof(TrimEnd), TrimEnd);
+            SelectorMethods.Add(nameof(ToCharArray), ToCharArray);
+            // Smart.Format string methods
+            SelectorMethods.Add(nameof(Capitalize), Capitalize);
+            SelectorMethods.Add(nameof(CapitalizeWords), CapitalizeWords);
+            SelectorMethods.Add(nameof(ToBase64), ToBase64);
+            SelectorMethods.Add(nameof(FromBase64), FromBase64);
         }
 
         /// <inheritdoc />
@@ -40,75 +71,91 @@ namespace SmartFormat.Extensions
                 return true;
             }
 
+            if (selectorInfo.CurrentValue is not string currentValue) return false;
             var selector = selectorInfo.SelectorText ?? string.Empty;
-            if (selectorInfo.CurrentValue is not string current) return false;
+            _cultureInfo = GetCulture(selectorInfo.FormatDetails);
+            
+            // Search is case-insensitive
+            if (!SelectorMethods.TryGetValue(selector, out var method)) return false;
 
-            switch (selector)
-            {
-                // build-in string methods
-                case { } when string.Equals("Length", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.Length;
-                    return true;
-                case { } when string.Equals("ToUpper", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.ToUpper(GetCulture(selectorInfo.FormatDetails));
-                    return true;
-                case { } when string.Equals("ToUpperInvariant", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.ToUpperInvariant();
-                    return true;
-                case { } when string.Equals("ToLower", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.ToLower(GetCulture(selectorInfo.FormatDetails));
-                    return true;
-                case { } when string.Equals("ToLowerInvariant", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.ToLowerInvariant();
-                    return true;
-                case { } when string.Equals("Trim", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.Trim();
-                    return true;
-                case { } when string.Equals("TrimStart", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.TrimStart();
-                    return true;
-                case { } when string.Equals("TrimEnd", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.TrimEnd();
-                    return true;
-                case { } when string.Equals("ToCharArray", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = current.ToCharArray();
-                    return true;
-                
-                // Smart.Format methods
-                case { } when string.Equals("Capitalize", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    if (current.Length < 1 || char.IsUpper(current[0]))
-                        selectorInfo.Result = current;
-                    else if (current.Length < 2)
-                        selectorInfo.Result = char.ToUpper(current[0], GetCulture(selectorInfo.FormatDetails));
-                    else
-                        selectorInfo.Result = char.ToUpper(current[0], GetCulture(selectorInfo.FormatDetails)) + current.Substring(1);
-                    
-                    return true;
-                case { } when string.Equals("CapitalizeWords", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = CapitalizeWords(current, selectorInfo);
-                    return true;
-                case { } when string.Equals("ToBase64", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = Convert.ToBase64String(Encoding.UTF8.GetBytes(current));
-                    return true;
-                case { } when string.Equals("FromBase64", selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()):
-                    selectorInfo.Result = Encoding.UTF8.GetString(Convert.FromBase64String(current));
-                    return true;
-            }
+            // Check if selector must match case-sensitive
+            var caseComparison = selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison();
+            if (selectorInfo.FormatDetails.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive && !SelectorMethods.Keys.Any(k => k.Equals(selector, caseComparison)))
+                return false;
+            
+            var (evaluated, result) = method.Invoke(selectorInfo, currentValue);
+            if (!evaluated) return false;
 
-            return false;
+            selectorInfo.Result = result;
+            return true;
+        }
+
+        private (bool Evaluated, object? Result) Length(ISelectorInfo _, string currentValue)
+        {
+            return (true, currentValue.Length);
+        }
+
+        private (bool Evaluated, object? Result) ToUpper(ISelectorInfo selectorInfo, string currentValue)
+        {
+            return (true, currentValue.ToUpper(_cultureInfo));
+        }
+
+        private (bool Evaluated, object? Result) ToUpperInvariant(ISelectorInfo _, string currentValue)
+        {
+            return (true, currentValue.ToUpperInvariant());
+        }
+
+        private (bool Evaluated, object? Result) ToLower(ISelectorInfo selectorInfo, string currentValue)
+        {
+            return (true, currentValue.ToLower(_cultureInfo));
+        }
+
+        private (bool Evaluated, object? Result) ToLowerInvariant(ISelectorInfo _,string currentValue)
+        {
+            return (true, currentValue.ToLowerInvariant());
+        }
+
+        private (bool Evaluated, object? Result) Trim(ISelectorInfo _, string currentValue)
+        {
+            return (true, currentValue.Trim());
+        }
+
+        private (bool Evaluated, object? Result) TrimStart(ISelectorInfo _, string currentValue)
+        {
+            return (true, currentValue.TrimStart());
+        }
+
+        private (bool Evaluated, object? Result) TrimEnd(ISelectorInfo _, string currentValue)
+        {
+            return (true, currentValue.TrimEnd());
+        }
+        private (bool Evaluated, object? Result) ToCharArray(ISelectorInfo _, string currentValue)
+        {
+            return (true, currentValue.ToCharArray());
+        }
+
+        private (bool Evaluated, object? Result) Capitalize(ISelectorInfo selectorInfo, string currentValue)
+        {
+            if (currentValue.Length < 1 || char.IsUpper(currentValue[0]))
+                return (true, currentValue);
+            
+            if (currentValue.Length < 2)
+                return (true, char.ToUpper(currentValue[0], _cultureInfo));
+            
+            return (true, char.ToUpper(currentValue[0], _cultureInfo) + currentValue.Substring(1));
         }
 
         /// <summary>
         /// Converts the first character of each word to an uppercase character.
         /// </summary>
-        private static string CapitalizeWords(string text, ISelectorInfo selectorInfo)
+        private (bool Evaluated, object? Result) CapitalizeWords(ISelectorInfo selectorInfo, string currentValue)
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(currentValue))
             {
-                return text;
+                return (true, currentValue);
             }
 
-            var textArray = text.ToCharArray();
+            var textArray = currentValue.ToCharArray();
             var previousSpace = true;
             for (var i = 0; i < textArray.Length; i++)
             {
@@ -119,12 +166,22 @@ namespace SmartFormat.Extensions
                 }
                 else if (previousSpace && char.IsLetter(c))
                 {
-                    textArray[i] = char.ToUpper(c, GetCulture(selectorInfo.FormatDetails));
+                    textArray[i] = char.ToUpper(c, _cultureInfo);
                     previousSpace = false;
                 }
             }
 
-            return new string(textArray);
+            return (true, new string(textArray));
+        }
+
+        private (bool Evaluated, object? Result) ToBase64(ISelectorInfo _, string currentValue)
+        {
+            return (true, Convert.ToBase64String(Encoding.UTF8.GetBytes(currentValue)));
+        }
+
+        private (bool Evaluated, object? Result) FromBase64(ISelectorInfo _, string currentValue)
+        {
+            return (true, Encoding.UTF8.GetString(Convert.FromBase64String(currentValue)));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

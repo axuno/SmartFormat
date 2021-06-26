@@ -36,10 +36,11 @@ namespace SmartFormat
         /// <summary>
         /// Creates a new instance of a <see cref="SmartFormatter"/>.
         /// </summary>
-        public SmartFormatter()
+        /// <param name="settings">The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.</param>
+        public SmartFormatter(SmartSettings? settings = null)
         {
-            Settings = new SmartSettings();
-            Parser = new SmartFormat.Core.Parsing.Parser(Settings);
+            Settings = settings ?? new SmartSettings();
+            Parser = new Parser(Settings);
             SourceExtensions = new List<ISource>();
             FormatterExtensions = new List<IFormatter>();
         }
