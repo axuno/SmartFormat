@@ -31,14 +31,14 @@ namespace SmartFormat.Extensions
         {
             var comparer = new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive}
                 .GetCaseSensitivityComparer();
-            SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, (bool Evaluated, object? Result)>>(comparer);
+            SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, bool>>(comparer);
             AddMethods();
         }
 
         /// <summary>
         /// Gets a <see cref="Dictionary{TKey,TValue}"/> of methods that can be used as selectors.
         /// </summary>
-        protected Dictionary<string, Func<ISelectorInfo, string, (bool Evaluated, object? Result)>> SelectorMethods
+        protected Dictionary<string, Func<ISelectorInfo, string, bool>> SelectorMethods
         {
             get;
         }
@@ -83,76 +83,89 @@ namespace SmartFormat.Extensions
             if (selectorInfo.FormatDetails.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive && !SelectorMethods.Keys.Any(k => k.Equals(selector, caseComparison)))
                 return false;
             
-            var (evaluated, result) = method.Invoke(selectorInfo, currentValue);
-            if (!evaluated) return false;
+            return method.Invoke(selectorInfo, currentValue);
+        }
 
-            selectorInfo.Result = result;
+        private bool Length(ISelectorInfo selectorInfo, string currentValue)
+        {
+            selectorInfo.Result = currentValue.Length;
             return true;
         }
 
-        private (bool Evaluated, object? Result) Length(ISelectorInfo _, string currentValue)
+        private bool ToUpper(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, currentValue.Length);
+            selectorInfo.Result = currentValue.ToUpper(_cultureInfo);
+            return true;
         }
 
-        private (bool Evaluated, object? Result) ToUpper(ISelectorInfo selectorInfo, string currentValue)
+        private bool ToUpperInvariant(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, currentValue.ToUpper(_cultureInfo));
+            selectorInfo.Result = currentValue.ToUpperInvariant();
+            return true;
         }
 
-        private (bool Evaluated, object? Result) ToUpperInvariant(ISelectorInfo _, string currentValue)
+        private bool ToLower(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, currentValue.ToUpperInvariant());
+            selectorInfo.Result = currentValue.ToLower(_cultureInfo);
+            return true;
         }
 
-        private (bool Evaluated, object? Result) ToLower(ISelectorInfo selectorInfo, string currentValue)
+        private bool ToLowerInvariant(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, currentValue.ToLower(_cultureInfo));
+            selectorInfo.Result = currentValue.ToLowerInvariant();
+            return true;
         }
 
-        private (bool Evaluated, object? Result) ToLowerInvariant(ISelectorInfo _,string currentValue)
+        private bool Trim(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, currentValue.ToLowerInvariant());
+            selectorInfo.Result = currentValue.Trim();
+            return true;
         }
 
-        private (bool Evaluated, object? Result) Trim(ISelectorInfo _, string currentValue)
+        private bool TrimStart(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, currentValue.Trim());
+            selectorInfo.Result = currentValue.TrimStart();
+            return true;
         }
 
-        private (bool Evaluated, object? Result) TrimStart(ISelectorInfo _, string currentValue)
+        private bool TrimEnd(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, currentValue.TrimStart());
+            selectorInfo.Result = currentValue.TrimEnd();
+            return true;
+        }
+        private bool ToCharArray(ISelectorInfo selectorInfo, string currentValue)
+        {
+            selectorInfo.Result =currentValue.ToCharArray();
+            return true;
         }
 
-        private (bool Evaluated, object? Result) TrimEnd(ISelectorInfo _, string currentValue)
-        {
-            return (true, currentValue.TrimEnd());
-        }
-        private (bool Evaluated, object? Result) ToCharArray(ISelectorInfo _, string currentValue)
-        {
-            return (true, currentValue.ToCharArray());
-        }
-
-        private (bool Evaluated, object? Result) Capitalize(ISelectorInfo selectorInfo, string currentValue)
+        private bool Capitalize(ISelectorInfo selectorInfo, string currentValue)
         {
             if (currentValue.Length < 1 || char.IsUpper(currentValue[0]))
-                return (true, currentValue);
+            {
+                selectorInfo.Result = currentValue;
+                return true;
+            }
             
             if (currentValue.Length < 2)
-                return (true, char.ToUpper(currentValue[0], _cultureInfo));
+            {
+                selectorInfo.Result = char.ToUpper(currentValue[0], _cultureInfo);
+                return true;
+            }
             
-            return (true, char.ToUpper(currentValue[0], _cultureInfo) + currentValue.Substring(1));
+            selectorInfo.Result = char.ToUpper(currentValue[0], _cultureInfo) + currentValue.Substring(1);
+            return true;
         }
 
         /// <summary>
         /// Converts the first character of each word to an uppercase character.
         /// </summary>
-        private (bool Evaluated, object? Result) CapitalizeWords(ISelectorInfo selectorInfo, string currentValue)
+        private bool CapitalizeWords(ISelectorInfo selectorInfo, string currentValue)
         {
             if (string.IsNullOrEmpty(currentValue))
             {
-                return (true, currentValue);
+                selectorInfo.Result = currentValue;
+                return true;
             }
 
             var textArray = currentValue.ToCharArray();
@@ -171,17 +184,20 @@ namespace SmartFormat.Extensions
                 }
             }
 
-            return (true, new string(textArray));
+            selectorInfo.Result = new string(textArray);
+            return true;
         }
 
-        private (bool Evaluated, object? Result) ToBase64(ISelectorInfo _, string currentValue)
+        private bool ToBase64(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, Convert.ToBase64String(Encoding.UTF8.GetBytes(currentValue)));
+            selectorInfo.Result = Convert.ToBase64String(Encoding.UTF8.GetBytes(currentValue));
+            return true;
         }
 
-        private (bool Evaluated, object? Result) FromBase64(ISelectorInfo _, string currentValue)
+        private bool FromBase64(ISelectorInfo selectorInfo, string currentValue)
         {
-            return (true, Encoding.UTF8.GetString(Convert.FromBase64String(currentValue)));
+            selectorInfo.Result = Encoding.UTF8.GetString(Convert.FromBase64String(currentValue));
+            return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
