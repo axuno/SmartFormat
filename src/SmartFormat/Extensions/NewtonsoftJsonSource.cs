@@ -12,6 +12,7 @@ namespace SmartFormat.Extensions
     /// <summary>
     /// Class to evaluate <see cref="Newtonsoft.Json"/> JSON sources
     /// of type <see cref="JObject"/> and <see cref="JValue"/>.
+    /// Include this source, if any of these types shall be used.
     /// </summary>
     public class NewtonsoftJsonSource : Source
     {

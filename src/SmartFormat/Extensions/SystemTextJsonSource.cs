@@ -12,7 +12,8 @@ namespace SmartFormat.Extensions
 {
     /// <summary>
     /// Class to evaluate <see cref="System.Text.Json"/> JSON sources
-    /// of type <see cref="JsonElement"/>.
+    /// of type <see cref="JsonElement"/> of any <see cref="JsonValueKind"/>.
+    /// Include this source, if any of this type shall be used.
     /// </summary>
     public class SystemTextJsonSource : Source
     {
