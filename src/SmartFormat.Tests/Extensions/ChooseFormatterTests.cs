@@ -3,6 +3,7 @@ using FluentAssertions.Formatting;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
 {
