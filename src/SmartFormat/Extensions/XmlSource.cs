@@ -11,6 +11,7 @@ namespace SmartFormat.Extensions
 {
     /// <summary>
     /// Class to evaluate sources of type <see cref="XElement"/>.
+    /// Include this source, if this type shall be used.
     /// </summary>
     public class XmlSource : Source
     {

@@ -11,7 +11,11 @@ namespace SmartFormat.Extensions
 {
     /// <summary>
     /// Class to evaluate an index-based <see cref="Selector"/>.
+    /// Include this source, if an indexed source shall be used just the way string.Format does.
     /// </summary>
+    /// <example>
+    /// Smart.Format("{0}-{1}", 1234, 5678);
+    /// </example>
     public class DefaultSource : Source
     {
         private readonly SmartSettings _settings;
@@ -41,6 +45,7 @@ namespace SmartFormat.Extensions
                     && selectorInfo.SelectorOperator == string.Empty)
                 {
                     // This selector is an argument index.
+                    // Get the value from arguments.
                     selectorInfo.Result = formatDetails.OriginalArgs[selectorValue];
                     return true;
                 }

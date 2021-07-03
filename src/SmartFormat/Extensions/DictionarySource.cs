@@ -11,7 +11,9 @@ using SmartFormat.Core.Extensions;
 namespace SmartFormat.Extensions
 {
     /// <summary>
-    /// Class to evaluate sources using <see cref="IDictionary"/>s.
+    /// Class to evaluate sources of types <see cref="IDictionary"/>,
+    /// generic <see cref="IDictionary{TKey,TValue}"/> and dynamic <see cref="System.Dynamic.ExpandoObject"/>.
+    /// Include this source, if any of these types shall be used.
     /// </summary>
     public class DictionarySource : Source
     {
@@ -37,7 +39,7 @@ namespace SmartFormat.Extensions
 
             var selector = selectorInfo.SelectorText;
 
-            // See if current is a IDictionary and contains the selector:
+            // See if current is an IDictionary and contains the selector:
             if (current is IDictionary rawDict)
                 foreach (DictionaryEntry entry in rawDict)
                 {

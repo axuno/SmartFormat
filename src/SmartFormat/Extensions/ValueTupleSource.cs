@@ -15,7 +15,8 @@ namespace SmartFormat.Extensions
     /// With ValueTuples
     /// a) all objects used for Smart.Format can be collected in one place as the first argument
     /// b) the format string can be written like each object would be the first argument of Smart.Format
-    /// c) there is no need to bother from which argument a value should come from 
+    /// c) there is no need to bother from which argument a value should come from
+    /// Include this source, if this type shall be used.
     /// </summary>
     public class ValueTupleSource : Source
     {

@@ -12,9 +12,9 @@ using SmartFormat.Core.Extensions;
 namespace SmartFormat.Extensions
 {
     /// <summary>
-    /// Class to evaluate sources using <see cref="System.Reflection"/>.
+    /// Class to evaluate any <see cref="object"/> using <see cref="System.Reflection"/>.
     /// A type cache is used in order to reduce reflection calls.
-    /// Note: Reflection is also used for strings to invoke parameterless methods like ToLower().
+    /// Include this source, if any of these types shall be used.
     /// </summary>
     public class ReflectionSource : Source
     {

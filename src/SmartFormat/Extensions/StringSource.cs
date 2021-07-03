@@ -18,6 +18,7 @@ namespace SmartFormat.Extensions
 {
     /// <summary>
     /// Class to evaluate a <see cref="Selector"/> with a <see langword="string"/> as <see cref="ISelectorInfo.CurrentValue"/>.
+    /// Include this source for handling <see langword="string"/>s and its extension methods.
     /// </summary>
     public class StringSource : Source
     {

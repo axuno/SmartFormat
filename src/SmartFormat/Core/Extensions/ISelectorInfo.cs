@@ -42,7 +42,7 @@ namespace SmartFormat.Core.Extensions
         string SelectorOperator { get; }
 
         /// <summary>
-        /// Sets the result of evaluating the selector.
+        /// Gets or sets the result of evaluating the selector.
         /// </summary>
         object? Result { get; set; }
 
