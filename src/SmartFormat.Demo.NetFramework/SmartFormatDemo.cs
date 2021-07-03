@@ -9,8 +9,8 @@ using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Demo.Sample_Extensions;
 using SmartFormat.Tests;
-using SmartFormat.Tests.Common;
 using SmartFormat.Tests.Extensions;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Demo
 {
