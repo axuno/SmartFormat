@@ -208,7 +208,7 @@ namespace SmartFormat.Core.Parsing
         #region: Split :
 
         private char _splitCacheChar;
-        private IList<Format>? splitCache;
+        private IList<Format>? _splitCache;
 
         /// <summary>
         /// Splits the <see cref="Format"/> items by the given search character.
@@ -217,13 +217,13 @@ namespace SmartFormat.Core.Parsing
         /// <returns></returns>
         public IList<Format> Split(char search)
         {
-            if (splitCache == null || _splitCacheChar != search)
+            if (_splitCache == null || _splitCacheChar != search)
             {
                 _splitCacheChar = search;
-                splitCache = Split(search, -1);
+                _splitCache = Split(search, -1);
             }
 
-            return splitCache;
+            return _splitCache;
         }
 
         /// <summary>
