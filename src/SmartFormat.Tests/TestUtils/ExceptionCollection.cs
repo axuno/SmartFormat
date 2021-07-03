@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-namespace SmartFormat.Tests.Common
+namespace SmartFormat.Tests.TestUtils
 {
     public class ExceptionCollection : AggregateException
     {

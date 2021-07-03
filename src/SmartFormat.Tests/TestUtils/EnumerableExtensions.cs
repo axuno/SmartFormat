@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 // This file is for any extensions that might apply to IEnumerable, ICollection, or IList.
-namespace SmartFormat.Tests.Common
+namespace SmartFormat.Tests.TestUtils
 {
     public static class EnumerableExtensions
     {

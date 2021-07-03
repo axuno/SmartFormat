@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using NUnit.Framework;
-using SmartFormat.Tests.Common;
 
 namespace SmartFormat.Tests.TestUtils
 {
