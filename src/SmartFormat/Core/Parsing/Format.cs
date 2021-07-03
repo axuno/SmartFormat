@@ -110,7 +110,7 @@ namespace SmartFormat.Core.Parsing
             start = StartIndex + start;
             var end = start + length;
             // Validate the arguments:
-            if (start < StartIndex || start > EndIndex) // || endIndex > endIndex)
+            if (start < StartIndex || start > EndIndex)
                 throw new ArgumentOutOfRangeException(nameof(start));
             if (end > EndIndex)
                 throw new ArgumentOutOfRangeException(nameof(length));
@@ -127,8 +127,9 @@ namespace SmartFormat.Core.Parsing
                     break; // Done
 
                 var newItem = item;
-                if (item is LiteralText) // See if we need to slice the LiteralText:
+                if (item is LiteralText)
                 {
+                    // See if we need to slice the LiteralText:
                     if (start > item.StartIndex || item.EndIndex > end)
                         newItem = new LiteralText(SmartSettings, substring, Math.Max(start, item.StartIndex),Math.Min(end, item.EndIndex));
                 }
