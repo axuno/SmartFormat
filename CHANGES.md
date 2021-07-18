@@ -6,7 +6,7 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
-#### Refactored handling of source and formatter extensions ([#179](https://github.com/axuno/SmartFormat/pull/179))
+#### Refactored handling of source and formatter extensions ([#180](https://github.com/axuno/SmartFormat/pull/180))
 
 SmartFormatter:
 * `SourceExtensions` is a `IReadOnlyList<ISource>`, and can only be manipulated with the methods below. `ISource` instances will be added only once per type.
