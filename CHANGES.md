@@ -24,6 +24,7 @@ Extensions:
 * Neither `ISource` nore `IFormatter` extensions have a CTOR with an argument. This allows for adding extension instances to different `SmartFormatter`s.
 * Any exensions can implement `IInitializer`. If this is implemented, the `SmartFormatter` will call the method `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
 * The `Source` abstract class implements `IInitializer`. The `SmartFormatter` and the `SmartSettings` are accessible for classes with `Source` as the base class.
+* `TimeFormatter` and `TemplateFormatter` had both used the same short name `'t'` up to v2.7.x. `'t'` is removed from `TimeFormatter`.
 
 #### Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178))
 
