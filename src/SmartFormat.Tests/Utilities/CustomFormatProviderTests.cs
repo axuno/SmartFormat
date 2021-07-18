@@ -14,8 +14,8 @@ namespace SmartFormat.Tests.Utilities
         private SmartFormatter GetSimpleFormatter()
         {
             var formatter = new SmartFormatter(); 
-            formatter.FormatterExtensions.Add(new DefaultFormatter());
-            formatter.SourceExtensions.Add(new DefaultSource(formatter));
+            formatter.AddExtensions(new DefaultFormatter());
+            formatter.AddExtensions(new DefaultSource());
             return formatter;
         }
 

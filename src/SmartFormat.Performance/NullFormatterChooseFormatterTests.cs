@@ -43,11 +43,11 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         public void Setup()
         {
             _smartNullFormatter = new SmartFormatter();
-            _smartNullFormatter.AddExtensions(new ISource[] { new DefaultSource(_smartNullFormatter) });
+            _smartNullFormatter.AddExtensions(new ISource[] { new DefaultSource() });
             _smartNullFormatter.AddExtensions(new IFormatter[] { new NullFormatter(), new DefaultFormatter()});
 
             _smartChooseFormatter = new SmartFormatter();
-            _smartChooseFormatter.AddExtensions(new ISource[] { new DefaultSource(_smartChooseFormatter) });
+            _smartChooseFormatter.AddExtensions(new ISource[] { new DefaultSource() });
             _smartChooseFormatter.AddExtensions(new IFormatter[] { new ChooseFormatter(), new DefaultFormatter()});
 
             _nullFormatCache = new FormatCache(_smartNullFormatter.Parser.ParseFormat("{0:isnull:nothing}"));

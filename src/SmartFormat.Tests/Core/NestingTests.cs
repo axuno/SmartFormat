@@ -32,17 +32,6 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        [TestCase("{ChildOne.ChildTwo.ChildThree: {Four} {One} }", " 4 1 ")]
-        [TestCase("{ChildOne: {ChildTwo: {ChildThree: {Four} {Three} {Two} {One} } } }", "   4 3 2 1   ")]
-        [TestCase("{ChildOne: {ChildTwo: {ChildThree: {Four} {ChildTwo.Three} {ChildOne.Two} {One} } } }", "   4 3 2 1   ")]
-        [TestCase("{ChildOne: {ChildTwo: {ChildThree: {ChildOne: {ChildTwo: {ChildThree: {Four} } } } } } }", "      4      ")]
-        public void Nesting_can_access_outer_scopes(string format, string expectedOutput)
-        {
-            var actual = Smart.Format(format, data);
-            Assert.AreEqual(expectedOutput, actual);
-        }
-
-        [Test]
         public void Nesting_CurrentScope_propertyName_outrules_OuterScope_propertyName()
         {
             var nestedObject = new

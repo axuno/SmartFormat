@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -19,9 +20,8 @@ namespace SmartFormat.Tests.Core
         private SmartFormatter GetSimpleFormatter()
         {
             var formatter = new SmartFormatter(); 
-            formatter.FormatterExtensions.Add(new DefaultFormatter());
-            formatter.SourceExtensions.Add(new ReflectionSource(formatter));
-            formatter.SourceExtensions.Add(new DefaultSource(formatter));
+            formatter.AddExtensions(new DefaultFormatter());
+            formatter.AddExtensions(new ReflectionSource(), new DefaultSource());
             return formatter;
         }
 
@@ -185,19 +185,71 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Missing_FormatExtensions_Should_Throw()
         {
-            var formatter = GetSimpleFormatter();
+            var formatter = new SmartFormatter();
+            // make sure we test against missing format extensions
+            formatter.AddExtensions(new DefaultSource());
 
-            formatter.FormatterExtensions.Clear();
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
             Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
         }
 
         [Test]
         public void Missing_SourceExtensions_Should_Throw()
         {
-            var formatter = GetSimpleFormatter();
+            var formatter = new SmartFormatter();
+            // make sure we test against missing source extensions
+            formatter.AddExtensions(new DefaultFormatter());
 
-            formatter.SourceExtensions.Clear();
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
             Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
+        }
+
+        [Test]
+        public void Adding_FormatExtension_With_Existing_Name_Should_Throw()
+        {
+            var formatter = new SmartFormatter();
+            var firstExtension = new DefaultFormatter();
+            formatter.AddExtensions(firstExtension);
+            var dupeExtension = new NullFormatter {Names = firstExtension.Names};
+            Assert.That(() => formatter.AddExtensions(dupeExtension), Throws.TypeOf(typeof(ArgumentException)));
+        }
+
+        [Test]
+        public void Remove_None_Existing_Source()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+            Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void Remove_Existing_Source()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+            formatter.AddExtensions(new StringSource());
+            Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(true));
+        }
+
+        [Test]
+        public void Remove_None_Existing_Formatter()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+            Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void Remove_Existing_Formatter()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+            formatter.AddExtensions(new DefaultFormatter());
+            Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(true));
         }
 
         [Test]

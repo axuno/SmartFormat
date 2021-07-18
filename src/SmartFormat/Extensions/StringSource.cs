@@ -27,13 +27,9 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// CTOR.
         /// </summary>
-        /// <param name="formatter"></param>
-        public StringSource(SmartFormatter formatter) : base(formatter)
+        public StringSource() : base()
         {
-            var comparer = new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive}
-                .GetCaseSensitivityComparer();
-            SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, bool>>(comparer);
-            AddMethods();
+            SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, bool>>();
         }
 
         /// <summary>
@@ -42,10 +38,23 @@ namespace SmartFormat.Extensions
         protected Dictionary<string, Func<ISelectorInfo, string, bool>> SelectorMethods
         {
             get;
+            private set;
+        }
+
+        /// <inheritdoc />
+        public override void Initialize(SmartFormatter formatter)
+        {
+            base.Initialize(formatter);
+            var comparer = new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive}
+                .GetCaseSensitivityComparer();
+            SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, bool>>(comparer);
+            AddMethods();
         }
 
         private void AddMethods()
         {
+            if (SelectorMethods is null) return;
+
             // built-in string methods
             SelectorMethods.Add(nameof(Length), Length);
             SelectorMethods.Add(nameof(ToUpper), ToUpper);

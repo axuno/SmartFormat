@@ -16,14 +16,6 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class NewtonsoftJsonSource : Source
     {
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="formatter"></param>
-        public NewtonsoftJsonSource(SmartFormatter formatter) : base(formatter)
-        {
-        }
-
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {

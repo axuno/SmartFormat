@@ -16,7 +16,7 @@ namespace SmartFormat.Extensions
     public class TimeFormatter : IFormatter
     {
         ///<inheritdoc />
-        public string[] Names { get; set; } = {"timespan", "time", "t", string.Empty};
+        public string[] Names { get; set; } = {"timespan", "time", string.Empty};
 
         #region Constructors
 

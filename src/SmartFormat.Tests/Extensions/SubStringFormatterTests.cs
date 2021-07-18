@@ -20,7 +20,7 @@ namespace SmartFormat.Tests.Extensions
 
             if (_smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("substr")) == null)
             {
-                _smart.FormatterExtensions.Add(new SubStringFormatter());
+                _smart.AddExtensions(new SubStringFormatter());
             }
 
             _people = new List<object>

@@ -55,7 +55,7 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Dictionary()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.AddExtensions(new DictionarySource(formatter));
+            formatter.AddExtensions(new DictionarySource());
 
             var formats = new[]
             {
@@ -75,7 +75,7 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Dynamic()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.AddExtensions(new DictionarySource(formatter));
+            formatter.AddExtensions(new DictionarySource());
 
             var formats = new[]
             {
@@ -96,7 +96,7 @@ namespace SmartFormat.Tests.Extensions
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-            formatter.AddExtensions(new DictionarySource(formatter));
+            formatter.AddExtensions(new DictionarySource());
 
             var formats = new string[]
             {
@@ -149,7 +149,7 @@ namespace SmartFormat.Tests.Extensions
                            $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
 
             var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new DefaultSource(smart), new DictionarySource(smart) });
+            smart.AddExtensions(new ISource[] { new DefaultSource(), new DictionarySource() });
             smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
             
             var result = smart.Format(format, addrDict);

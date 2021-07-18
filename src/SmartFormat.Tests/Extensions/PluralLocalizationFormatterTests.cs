@@ -28,7 +28,7 @@ namespace SmartFormat.Tests.Extensions
         {
             TestAllResults(
                 new CultureInfo("en-US"),
-                "There {0:is|are} {0} {0:item|items} remaining",
+                "There {0:plural:is|are} {0} {0:plural:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},
                     {   0, "There are 0 items remaining"},
@@ -45,7 +45,7 @@ namespace SmartFormat.Tests.Extensions
         {
             TestAllResults(
                 new CultureInfo("en-US"),
-                "There {0:is|are} {0} {0:item|items} remaining",
+                "There {0:plural:is|are} {0} {0:plural:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},
                     {   0, "There are 0 items remaining"},
@@ -108,7 +108,7 @@ namespace SmartFormat.Tests.Extensions
 
             TestAllResults(
                 new CultureInfo("tr"),
-                "Seçili {0:nesneyi|nesneleri} silmek istiyor musunuz?",
+                "Seçili {0:plural:nesneyi|nesneleri} silmek istiyor musunuz?",
                 new ExpectedResults {
                     {  -1, "Seçili nesneleri silmek istiyor musunuz?"},
                     {   0, "Seçili nesneleri silmek istiyor musunuz?"},
@@ -125,7 +125,7 @@ namespace SmartFormat.Tests.Extensions
         {
             TestAllResults(
                 new CultureInfo("ru-RU"),
-                "Я купил {0} {0:банан|банана|бананов}.",
+                "Я купил {0} {0:plural:банан|банана|бананов}.",
                 new ExpectedResults {
                     {   0, "Я купил 0 бананов."},
                     {   1, "Я купил 1 банан."},
@@ -147,7 +147,7 @@ namespace SmartFormat.Tests.Extensions
         {
             TestAllResults(
                 new CultureInfo("pl"),
-                "{0} {0:miesiąc|miesiące|miesięcy} temu",
+                "{0} {0:plural:miesiąc|miesiące|miesięcy} temu",
                 new ExpectedResults {
                     {   0, "0 miesięcy temu"},
                     {   1, "1 miesiąc temu"},

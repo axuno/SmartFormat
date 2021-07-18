@@ -82,8 +82,8 @@ namespace SmartFormat.Tests.Extensions
             //var expected = "Zero zero zero ZERO";
 
             var smart = new SmartFormatter();
-            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
-            smart.FormatterExtensions.Add(new DefaultFormatter());
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
 
             var args = GetArgs();
             Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("ToLower"));
@@ -96,8 +96,8 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Methods_CaseInsensitive()
         {
             var smart = new SmartFormatter();
-            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart)});
-            smart.FormatterExtensions.Add(new DefaultFormatter());
+            smart.AddExtensions(new ReflectionSource());
+            smart.AddExtensions(new DefaultFormatter());
             smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
 
             var format = "{0} {0.ToLower} {toloWer} {touPPer}";
@@ -110,8 +110,8 @@ namespace SmartFormat.Tests.Extensions
         public void Void_Methods_Should_Just_Be_Ignored()
         {
             var smart = new SmartFormatter();
-            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
-            smart.FormatterExtensions.Add(new DefaultFormatter());
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
             Assert.That(() => smart.Format("{0.Clear}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Clear"));
         }
 
@@ -119,8 +119,8 @@ namespace SmartFormat.Tests.Extensions
         public void Methods_With_Parameter_Should_Just_Be_Ignored()
         {
             var smart = new SmartFormatter();
-            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
-            smart.FormatterExtensions.Add(new DefaultFormatter());
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
             Assert.That(() => smart.Format("{0.Add}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Add"));
         }
 
@@ -128,8 +128,8 @@ namespace SmartFormat.Tests.Extensions
         public void Properties_With_No_Getter_Should_Just_Be_Ignored()
         {
             var smart = new SmartFormatter();
-            smart.SourceExtensions.AddRange(new ISource[]{new ReflectionSource(smart), new DefaultSource(smart)});
-            smart.FormatterExtensions.Add(new DefaultFormatter());
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
             Assert.That(() => smart.Format("{Misc.OnlySetterProperty}", new { Misc = new MiscObject() }), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("OnlySetterProperty"));
         }
         
@@ -224,7 +224,7 @@ namespace SmartFormat.Tests.Extensions
         public void Nullable_Property_Should_Return_Null()
         {
             var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new DefaultSource(smart), new ReflectionSource(smart) });
+            smart.AddExtensions(new ISource[] { new DefaultSource(), new ReflectionSource() });
             smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
             var data = new {Person = new Person()};
 

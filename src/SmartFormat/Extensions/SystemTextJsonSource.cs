@@ -17,14 +17,6 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class SystemTextJsonSource : Source
     {
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="formatter"></param>
-        public SystemTextJsonSource(SmartFormatter formatter) : base(formatter)
-        {
-        }
-
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {

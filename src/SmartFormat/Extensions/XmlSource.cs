@@ -15,14 +15,6 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class XmlSource : Source
     {
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="formatter"></param>
-        public XmlSource(SmartFormatter formatter) : base(formatter)
-        {
-        }
-
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
