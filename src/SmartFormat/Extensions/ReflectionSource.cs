@@ -22,14 +22,6 @@ namespace SmartFormat.Extensions
 
         private readonly Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> _typeCache = new();
 
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="formatter"></param>
-        public ReflectionSource(SmartFormatter formatter) : base(formatter)
-        {
-        }
-
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {

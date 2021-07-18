@@ -6,6 +6,25 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
+#### Refactored handling of source and formatter extensions ([#179](https://github.com/axuno/SmartFormat/pull/179))
+
+SmartFormatter:
+* `SourceExtensions` is a `IReadOnlyList<ISource>`, and can only be manipulated with the methods below. `ISource` instances will be added only once per type.
+* `FormatterExtensions` is a `IReadOnlyList<IFormatter>`, and can only be manipulated with the methods below. `IFormatter` instances will be added only once per type. Trying to add a formatter with an existing name will throw.
+* Extension can be added and removed using 
+  * `AddExtensions(params ISource[] sourceExtensions)`
+  * `AddExtensions(int position, params ISource[] sourceExtensions)`
+  * `AddExtensions(params IFormatter[] formatterExtensions)`
+  * `AddExtensions(int position, params IFormatter[] formatterExtensions)`
+  * `RemoveSourceExtension<T>()`
+  * `RemoveFormatterExtension<T>()`
+
+Extensions:
+* For performance it is highly recommended to only add such `ISource` and `IFormatter` extensions that are actually required. `Smart.Format(...)` uses all available extensions as the default. Also, use explicit formatter names instead of letting the `SmartFormatter` implicitly find a matching formatter.
+* Neither `ISource` nore `IFormatter` extensions have a CTOR with an argument. This allows for adding extension instances to different `SmartFormatter`s.
+* Any exensions can implement `IInitializer`. If this is implemented, the `SmartFormatter` will call the method `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
+* The `Source` abstract class implements `IInitializer`. The `SmartFormatter` and the `SmartSettings` are accessible for classes with `Source` as the base class.
+
 #### Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178))
 
 `StringSource` adds the following selector names, which have before been implemented with `ReflectionSource`:

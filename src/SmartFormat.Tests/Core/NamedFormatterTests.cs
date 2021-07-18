@@ -121,7 +121,7 @@ namespace SmartFormat.Tests.Core
         {
             var testFormatter = new SmartFormatter();
             testFormatter.AddExtensions(new TestExtension1(), new TestExtension2(), new DefaultFormatter());
-            testFormatter.AddExtensions(new DefaultSource(testFormatter));
+            testFormatter.AddExtensions(new DefaultSource());
             testFormatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             return testFormatter;
         }

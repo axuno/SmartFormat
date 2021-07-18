@@ -22,6 +22,9 @@ namespace SmartFormat
     /// </summary>
     public class SmartFormatter
     {
+        private readonly List<ISource> _sourceExtensions = new();
+        private readonly List<IFormatter> _formatterExtensions = new();
+
         #region : EventHandlers :
 
         /// <summary>
@@ -41,8 +44,6 @@ namespace SmartFormat
         {
             Settings = settings ?? new SmartSettings();
             Parser = new Parser(Settings);
-            SourceExtensions = new List<ISource>();
-            FormatterExtensions = new List<IFormatter>();
         }
 
         #endregion
@@ -52,55 +53,139 @@ namespace SmartFormat
         /// <summary>
         /// Gets the list of <see cref="ISource" /> source extensions.
         /// </summary>
-        public List<ISource> SourceExtensions { get; }
+        public IReadOnlyList<ISource> SourceExtensions => _sourceExtensions;
 
         /// <summary>
         /// Gets the list of <see cref="IFormatter" /> formatter extensions.
         /// </summary>
-        public List<IFormatter> FormatterExtensions { get; }
+        public IReadOnlyList<IFormatter> FormatterExtensions => _formatterExtensions;
 
         /// <summary>
-        /// Adds each extensions to this formatter.
-        /// Each extension must implement ISource.
+        /// Adds the extensions at the beginning of the <see cref="SourceExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="ISource"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
         /// </summary>
-        /// <param name="sourceExtensions"></param>
         public void AddExtensions(params ISource[] sourceExtensions)
         {
-            SourceExtensions.InsertRange(0, sourceExtensions);
+            AddExtensions(0, sourceExtensions);
         }
 
         /// <summary>
-        /// Adds each extensions to this formatter.
-        /// Each extension must implement IFormatter.
+        /// Adds the extensions at the <paramref name="position"/> of the <see cref="SourceExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="ISource"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </summary>
+        /// <param name="position">The position in the <see cref="SourceExtensions"/> list where new extensions will be added.</param>
+        /// <param name="sourceExtensions"></param>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        ///        <paramref name="position" /> is less than 0.
+        ///         -or-
+        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
+        /// </exception>
+        public void AddExtensions(int position, params ISource[] sourceExtensions)
+        {
+            foreach (var source in sourceExtensions)
+            {
+                if (_sourceExtensions.All(sx => sx.GetType() != source.GetType()))
+                {
+                    if(source is IInitializer sourceToInitialize) 
+                        sourceToInitialize.Initialize(this);
+                    
+                    _sourceExtensions.Insert(position, source);
+                    position++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds the extensions at the beginning of the <see cref="FormatterExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="IFormatter"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
         /// </summary>
         /// <param name="formatterExtensions"></param>
+        /// <exception cref="T:System.ArgumentException">
+        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Names"/> that already exist.
+        /// </exception>
         public void AddExtensions(params IFormatter[] formatterExtensions)
         {
-            FormatterExtensions.InsertRange(0, formatterExtensions);
+            AddExtensions(0, formatterExtensions);
+        }
+
+        /// <summary>
+        /// Adds the extensions at the <paramref name="position"/> of the <see cref="FormatterExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="IFormatter"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </summary>
+        /// <param name="formatterExtensions"></param>
+        /// <param name="position">The position in the <see cref="FormatterExtensions"/> list where new extensions will be added.</param>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        ///        <paramref name="position" /> is less than 0.
+        ///         -or-
+        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Names"/> that already exist.
+        /// </exception>
+        public void AddExtensions(int position, params IFormatter[] formatterExtensions)
+        {
+            foreach (var format in formatterExtensions)
+            {
+                if (_formatterExtensions.All(fx => fx.GetType() != format.GetType()))
+                {
+                    if(_formatterExtensions.Any(fx => fx.Names.Where(n => n != string.Empty).Intersect(format.Names.Where(n => n != string.Empty)).Any()))
+                        throw new ArgumentException($"Formatter '{format.GetType().Name}' uses existing name.", nameof(formatterExtensions));
+
+                    if(format is IInitializer sourceToInitialize) 
+                        sourceToInitialize.Initialize(this);
+
+                    _formatterExtensions.Insert(position, format);
+                    position++;
+                }
+            }
         }
 
         /// <summary>
         /// Searches for a Source Extension of the given type, and returns it.
-        /// This can be used to easily find and configure extensions.
-        /// Returns null if the type cannot be found.
+        /// Returns <see langword="null"/> if the type cannot be found.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <returns>The class implementing <see cref="ISource"/> if found, else <see langword="null"/>.</returns>
         public T? GetSourceExtension<T>() where T : class, ISource
         {
-            return SourceExtensions.OfType<T>().FirstOrDefault();
+            return _sourceExtensions.OfType<T>().FirstOrDefault();
         }
 
         /// <summary>
         /// Searches for a Formatter Extension of the given type, and returns it.
-        /// This can be used to easily find and configure extensions.
-        /// Returns null if the type cannot be found.
+        /// Returns <see langword="null"/> if the type cannot be found.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <returns>The class implementing <see cref="IFormatter"/> if found, else <see langword="null"/>.</returns>
         public T? GetFormatterExtension<T>() where T : class, IFormatter
         {
-            return FormatterExtensions.OfType<T>().FirstOrDefault();
+            return _formatterExtensions.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Removes Source Extension of the given type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns><see langword="true"/>, if the extension was found and could be removed.</returns>
+        public bool RemoveSourceExtension<T>() where T : class, ISource
+        {
+            var source = _sourceExtensions.OfType<T>().FirstOrDefault();
+            return source is not null && _sourceExtensions.Remove(source);
+        }
+
+        /// <summary>
+        /// Removes the Formatter Extension of the given type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns><see langword="true"/>, if the extension was found and could be removed.</returns>
+        public bool RemoveFormatterExtension<T>() where T : class, IFormatter
+        {
+            var format = _formatterExtensions.OfType<T>().FirstOrDefault();
+            return format is not null && _formatterExtensions.Remove(format);
         }
 
         #endregion
@@ -110,10 +195,10 @@ namespace SmartFormat
         /// <summary>
         /// Gets or set the instance of the <see cref="Core.Parsing.Parser" />
         /// </summary>
-        public SmartFormat.Core.Parsing.Parser Parser { get; }
+        public Parser Parser { get; }
 
         /// <summary>
-        /// Get the <see cref="Core.Settings.SmartSettings" /> for Smart.Format
+        /// Get the <see cref="SmartSettings" /> for Smart.Format
         /// </summary>
         public SmartSettings Settings { get; }
 
@@ -342,10 +427,10 @@ namespace SmartFormat
 
         private void CheckForExtensions()
         {
-            if (SourceExtensions.Count == 0)
+            if (_sourceExtensions.Count == 0)
                 throw new InvalidOperationException(
                     "No source extensions are available. Please add at least one source extension, such as the DefaultSource.");
-            if (FormatterExtensions.Count == 0)
+            if (_formatterExtensions.Count == 0)
                 throw new InvalidOperationException(
                     "No formatter extensions are available. Please add at least one formatter extension, such as the DefaultFormatter.");
         }
@@ -422,9 +507,14 @@ namespace SmartFormat
         /// <returns>True if an FormatterExtension was found, else False.</returns>
         private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
         {
-            if (formattingInfo.Placeholder is null) return false;
+            if (formattingInfo.Placeholder is null)
+            {
+                throw new ArgumentException(
+                    $"{nameof(formattingInfo)}.{nameof(formattingInfo.Placeholder)} must not be null.");
+            }
 
             var formatterName = formattingInfo.Placeholder.FormatterName;
+            var comparer = Settings.GetCaseSensitivityComparer();
 
             // Compatibility mode does not support formatter extensions except this one:
             if (Settings.StringFormatCompatibility)
@@ -438,7 +528,7 @@ namespace SmartFormat
             if (!string.IsNullOrEmpty(formatterName))
             {
                 var extension = FormatterExtensions.FirstOrDefault(fe =>
-                    fe.Names.Contains(formatterName));
+                    fe.Names.Contains(formatterName, comparer));
                 if (extension is null)
                     throw formattingInfo.FormattingException($"No formatter with name '{formatterName}' found",
                         formattingInfo.Format, formattingInfo.Selector?.SelectorIndex ?? -1);
@@ -447,12 +537,12 @@ namespace SmartFormat
             }
             
             // Go through all (implicit) formatters which contain an empty name
-            foreach (var formatterExtension in FormatterExtensions.Where(fe => fe.Names.Contains(string.Empty)))
+            foreach (var formatterExtension in FormatterExtensions.Where(fe => fe.Names.Contains(string.Empty, comparer)))
             {
-                // Return true if handled by the extension
+                // Return true if handled by an extension
                 if (formatterExtension.TryEvaluateFormat(formattingInfo)) return true;
             }
-
+ 
             return false;
         }
 

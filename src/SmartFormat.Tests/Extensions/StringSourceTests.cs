@@ -18,8 +18,8 @@ namespace SmartFormat.Tests.Extensions
         private SmartFormatter GetSimpleFormatter()
         {
             var smart = new SmartFormatter();
-            smart.SourceExtensions.AddRange(new ISource[]{new StringSource(smart), new DefaultSource(smart)});
-            smart.FormatterExtensions.AddRange(new IFormatter[] {new DefaultFormatter()});
+            smart.AddExtensions(new StringSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
             return smart;
         }
 
@@ -93,8 +93,9 @@ namespace SmartFormat.Tests.Extensions
         public void String_ToCharArray_Should_Be_Formattable_As_List(string arg, string expected)
         {
             var smart = GetSimpleFormatter();
-            smart.SourceExtensions.Add(new ListFormatter(smart));
-            smart.FormatterExtensions.Add(new ListFormatter(smart));
+            var listSourceAndFormatter = new ListFormatter();
+            smart.AddExtensions((ISource) listSourceAndFormatter);
+            smart.AddExtensions((IFormatter) listSourceAndFormatter);
            
             Assert.That(smart.Format("{0.ToCharArray:list:{}|, |, and }", arg), Is.EqualTo(expected));
         }

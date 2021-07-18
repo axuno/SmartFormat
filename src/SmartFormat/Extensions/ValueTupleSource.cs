@@ -20,14 +20,6 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class ValueTupleSource : Source
     {
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="formatter"></param>
-        public ValueTupleSource(SmartFormatter formatter) : base(formatter)
-        {
-        }
-
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
@@ -39,7 +31,7 @@ namespace SmartFormat.Extensions
             {
                 formattingInfo.CurrentValue = obj;
 
-                foreach (var sourceExtension in _formatter.SourceExtensions)
+                foreach (var sourceExtension in selectorInfo.FormatDetails.Formatter.SourceExtensions)
                 {
                     var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
                     if (handled)

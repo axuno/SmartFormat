@@ -15,8 +15,8 @@ namespace SmartFormat.Tests.Extensions
         private SmartFormatter GetFormatter()
         {
             var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new ListFormatter(smart), new DefaultSource(smart), new ReflectionSource(smart) });
-            smart.AddExtensions(new IFormatter[] { new NullFormatter(), new ListFormatter(smart), new DefaultFormatter()});
+            smart.AddExtensions(new ISource[] { new ListFormatter(), new DefaultSource(), new ReflectionSource() });
+            smart.AddExtensions(new IFormatter[] { new NullFormatter(), new ListFormatter(), new DefaultFormatter()});
             return smart;
         }
 
@@ -68,7 +68,7 @@ namespace SmartFormat.Tests.Extensions
         public void Combine_NullFormatter_With_Other_Formatter(object value, string expected)
         {
             var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new DefaultSource(smart) });
+            smart.AddExtensions(new ISource[] { new DefaultSource() });
             smart.AddExtensions(new IFormatter[] { new NullFormatter(), new DefaultFormatter()});
             
             // NullFormatter will output only, if value is null

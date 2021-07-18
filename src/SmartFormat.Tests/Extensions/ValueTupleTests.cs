@@ -110,7 +110,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Not_Invoked_With_FormattingInfo()
         {
-            Assert.IsFalse(new ValueTupleSource(new SmartFormatter()).TryEvaluateSelector(new PureSelectorInfo()));
+            Assert.IsFalse(new ValueTupleSource().TryEvaluateSelector(new PureSelectorInfo()));
         }
 
         private class PureSelectorInfo : ISelectorInfo

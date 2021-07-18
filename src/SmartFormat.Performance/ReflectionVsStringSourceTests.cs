@@ -61,8 +61,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             _reflectionSourceFormatter = new SmartFormatter();
             _reflectionSourceFormatter.AddExtensions(
-                new ReflectionSource(_reflectionSourceFormatter),
-                new DefaultSource(_reflectionSourceFormatter)
+                new ReflectionSource(),
+                new DefaultSource()
             );
             _reflectionSourceFormatter.AddExtensions(
                 new DefaultFormatter()
@@ -70,8 +70,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _stringSourceFormatter = new SmartFormatter();
             _stringSourceFormatter.AddExtensions(
-                new StringSource(_stringSourceFormatter),
-                new DefaultSource(_stringSourceFormatter)
+                new StringSource(),
+                new DefaultSource()
             );
             _stringSourceFormatter.AddExtensions(
                 new DefaultFormatter()

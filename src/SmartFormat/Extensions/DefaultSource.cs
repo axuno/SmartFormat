@@ -18,17 +18,6 @@ namespace SmartFormat.Extensions
     /// </example>
     public class DefaultSource : Source
     {
-        private readonly SmartSettings _settings;
-
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="formatter"></param>
-        public DefaultSource(SmartFormatter formatter) : base(formatter)
-        {
-            _settings = formatter.Settings;
-        }
-
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
