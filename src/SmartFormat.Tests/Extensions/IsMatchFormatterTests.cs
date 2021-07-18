@@ -20,7 +20,7 @@ namespace SmartFormat.Tests.Extensions
         public IsMatchFormatterTests()
         {
             _formatter = Smart.CreateDefaultSmartFormat();
-            _formatter.FormatterExtensions.Add(new IsMatchFormatter {RegexOptions = RegexOptions.CultureInvariant});
+            _formatter.AddExtensions(new IsMatchFormatter {RegexOptions = RegexOptions.CultureInvariant});
             _formatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
         }
         

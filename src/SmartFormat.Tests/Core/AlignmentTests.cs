@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Extensions;
 using SmartFormat.Utilities;
 
@@ -16,9 +17,8 @@ namespace SmartFormat.Tests.Core
         private SmartFormatter GetSimpleFormatter()
         {
             var formatter = new SmartFormatter(); 
-            formatter.FormatterExtensions.Add(new DefaultFormatter());
-            formatter.SourceExtensions.Add(new ReflectionSource(formatter));
-            formatter.SourceExtensions.Add(new DefaultSource(formatter));
+            formatter.AddExtensions(new DefaultFormatter());
+            formatter.AddExtensions(new ReflectionSource(), new DefaultSource());
             return formatter;
         }
 
@@ -69,7 +69,7 @@ namespace SmartFormat.Tests.Core
         public void ChooseFormatter_Alignment(int alignment)
         {
             var smart = GetSimpleFormatter();
-            smart.FormatterExtensions.Add(new ChooseFormatter());
+            smart.AddExtensions(new ChooseFormatter());
 
             var data = new {Number = 2};
             var format = $"{{Number,{alignment}:choose(1|2|3):one|two|three}}";
@@ -90,7 +90,7 @@ namespace SmartFormat.Tests.Core
         public void ListFormatter_NestedFormats_Alignment(int alignment)
         {
             var smart = GetSimpleFormatter();
-            smart.FormatterExtensions.Add(new ListFormatter(smart));
+            smart.AddExtensions((IFormatter) new ListFormatter());
 
             var items = new [] { "one", "two", "three" };
             var result = smart.Format($"{{items,{alignment}:list:{{}}|, |, and }}", new { items }); // important: not only "items" as the parameter
@@ -112,7 +112,7 @@ namespace SmartFormat.Tests.Core
         public void ListFormatter_UnnestedFormats_Alignment(string format, string expected)
         {
             var smart = GetSimpleFormatter();
-            smart.FormatterExtensions.Add(new ListFormatter(smart));
+            smart.AddExtensions((IFormatter) new ListFormatter());
 
             var args = new[] {1, 2, 3, 4, 5};
             var result = smart.Format(CultureInfo.InvariantCulture, format, args);

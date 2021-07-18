@@ -38,21 +38,12 @@ namespace SmartFormat.Extensions
     /// <remarks>
     /// The <see cref="ListFormatter"/> PluralLocalizationExtension and ConditionalExtension
     /// </remarks>
-    public class ListFormatter : IFormatter, ISource
+    public class ListFormatter : IFormatter, ISource, IInitializer
     {
-        private readonly SmartSettings _smartSettings;
+        private SmartSettings _smartSettings = new();
 
         ///<inheritdoc />
         public string[] Names { get; set; } = {"list", "l", string.Empty};
-
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="formatter"></param>
-        public ListFormatter(SmartFormatter formatter)
-        {
-            _smartSettings = formatter.Settings;
-        }
 
         /// <summary>
         /// This allows an integer to be used as a selector to index an array (or list).
@@ -257,6 +248,12 @@ namespace SmartFormat.Extensions
             return formattingInfo.Placeholder != null &&
                    formattingInfo.Placeholder.Selectors.Any(s =>
                        s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
+        }
+
+        ///<inheritdoc />
+        public void Initialize(SmartFormatter smartFormatter)
+        {
+            _smartSettings = smartFormatter.Settings;
         }
     }
 }

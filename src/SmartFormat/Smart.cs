@@ -108,21 +108,21 @@ namespace SmartFormat
             // Note, the order is important; the extensions
             // will be executed in this order:
 
-            var listSourceAndFormatter = new ListFormatter(formatter);
+            var listSourceAndFormatter = new ListFormatter();
 
             // sources for specific types must be in the list before ReflectionSource
             formatter.AddExtensions(
-                new StringSource(formatter),
+                new StringSource(),
                 (ISource) listSourceAndFormatter, // ListFormatter MUST be the second source extension
-                new DictionarySource(formatter),
-                new ValueTupleSource(formatter),
-                new SystemTextJsonSource(formatter),
-                new NewtonsoftJsonSource(formatter),
-                new XmlSource(formatter),
-                new ReflectionSource(formatter),
+                new DictionarySource(),
+                new ValueTupleSource(),
+                new SystemTextJsonSource(),
+                new NewtonsoftJsonSource(),
+                new XmlSource(),
+                new ReflectionSource(),
 
                 // The DefaultSource reproduces the string.Format behavior:
-                new DefaultSource(formatter)
+                new DefaultSource()
             );
             formatter.AddExtensions(
                 (IFormatter) listSourceAndFormatter,

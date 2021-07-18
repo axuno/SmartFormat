@@ -5,6 +5,7 @@
 
 using System;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
@@ -25,7 +26,6 @@ namespace SmartFormat.Extensions
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
-
             // If the format has nested placeholders, we process those first
             // instead of formatting the item.
             if (format is {HasNested: true})

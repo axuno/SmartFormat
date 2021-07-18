@@ -73,7 +73,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             _literalFormatter = new SmartFormatter();
             _literalFormatter.AddExtensions(
-                new DefaultSource(_literalFormatter)
+                new DefaultSource()
             );
             _literalFormatter.AddExtensions(
                 new DefaultFormatter()
@@ -81,8 +81,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _reflectionFormatter = new SmartFormatter();
             _reflectionFormatter.AddExtensions(
-                new ReflectionSource(_reflectionFormatter),
-                new DefaultSource(_reflectionFormatter)
+                new ReflectionSource(),
+                new DefaultSource()
             );
             _reflectionFormatter.AddExtensions(
                 new DefaultFormatter()
@@ -90,8 +90,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _dictionaryFormatter = new SmartFormatter();
             _dictionaryFormatter.AddExtensions(
-                new DictionarySource(_dictionaryFormatter),
-                new DefaultSource(_dictionaryFormatter)
+                new DictionarySource(),
+                new DefaultSource()
             );
             _dictionaryFormatter.AddExtensions(
                 new DefaultFormatter()
@@ -99,8 +99,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _jsonFormatter = new SmartFormatter();
             _jsonFormatter.AddExtensions(
-                new SystemTextJsonSource(_jsonFormatter),
-                new DefaultSource(_jsonFormatter)
+                new SystemTextJsonSource(),
+                new DefaultSource()
             );
             _jsonFormatter.AddExtensions(
                 new DefaultFormatter()

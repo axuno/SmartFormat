@@ -29,9 +29,9 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Enum()
         {
             var formats = new[] {
-                "{0.Friends.0:{FirstName} is a {Gender:man|woman}.}",
-                "{0.Friends.1:{FirstName} is a {Gender:man|woman}.}",
-                "{2.DayOfWeek:Sunday|Monday|Some other day} / {3.DayOfWeek:Sunday|Monday|Some other day}",
+                "{0.Friends.0:{FirstName} is a {Gender:cond:man|woman}.}",
+                "{0.Friends.1:{FirstName} is a {Gender:cond:man|woman}.}",
+                "{2.DayOfWeek:cond:Sunday|Monday|Some other day} / {3.DayOfWeek:cond:Sunday|Monday|Some other day}",
             };
             var expected = new[] {
                 "Jim is a man.",
@@ -47,8 +47,8 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Bool()
         {
             var formats = new[] {
-                "{0:Yes|No}",
-                "{1:Yes|No}",
+                "{0:cond:Yes|No}",
+                "{1:cond:Yes|No}",
             };
             var expected = new[] {
                 "No",
@@ -63,8 +63,8 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Dates()
         {
             var formats = new[] {
-                "{0:Past|Future} {1:Past|Future} {2:Past|Future}",
-                "{0:Past|Present|Future} {1:Past|Present|Future} {2:Past|Present|Future}",
+                "{0:cond:Past|Future} {1:cond:Past|Future} {2:cond:Past|Future}",
+                "{0:cond:Past|Present|Future} {1:cond:Past|Present|Future} {2:cond:Past|Present|Future}",
             };
             var expected = new[] {
                 "Past Past Future",
@@ -79,8 +79,8 @@ namespace SmartFormat.Tests.Extensions
         public void Test_DateTimeOffset_Dates()
         {
             var formats = new[] {
-                "{0:Past|Future} {1:Past|Future} {2:Past|Future}",
-                "{0:Past|Present|Future} {1:Past|Present|Future} {2:Past|Present|Future}",
+                "{0:cond:Past|Future} {1:cond:Past|Future} {2:cond:Past|Future}",
+                "{0:cond:Past|Present|Future} {1:cond:Past|Present|Future} {2:cond:Past|Present|Future}",
             };
             var expected = new[] {
                 "Past Past Future",
@@ -97,8 +97,8 @@ namespace SmartFormat.Tests.Extensions
         public void Test_TimeSpan()
         {
             var formats = new[] {
-                "{0:Past|Future} {1:Past|Future} {2:Past|Future}",
-                "{0:Past|Zero|Future} {1:Past|Zero|Future} {2:Past|Zero|Future}",
+                "{0:cond:Past|Future} {1:cond:Past|Future} {2:cond:Past|Future}",
+                "{0:cond:Past|Zero|Future} {1:cond:Past|Zero|Future} {2:cond:Past|Zero|Future}",
             };
             var expected = new[] {
                 "Past Past Future",

@@ -8,41 +8,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Extensions
 {
     /// <summary>
     /// The base class for <see cref="ISource"/> extension classes.
     /// </summary>
-    public abstract class Source : ISource
+    public abstract class Source : ISource, IInitializer
     {
         /// <summary>
         /// The instance of the current <see cref="SmartFormatter"/>.
         /// </summary>
-        protected readonly SmartFormatter _formatter;
+        protected SmartFormatter? _formatter;
 
         /// <summary>
-        /// The operator character used to indicate <c>nullable</c>.
+        /// The instance of the current <see cref="SmartSettings"/>.
         /// </summary>
-        protected readonly char _nullableOperator;
-
-        /// <summary>
-        /// The general operator character used to separate <see cref="Selector"/>s.
-        /// </summary>
-        protected readonly char _selectorOperator;
-
-        /// <inheritdoc cref="ISource" />
-        protected Source(SmartFormatter formatter)
-        {
-            _formatter = formatter;
-            _nullableOperator = formatter.Settings.Parser.NullableOperator;
-            _selectorOperator = formatter.Settings.Parser.SelectorOperator;
-        }
+        protected SmartSettings? _smartSettings;
 
         /// <inheritdoc />
         public virtual bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             return false;
+        }
+
+        /// <inheritdoc />
+        public virtual void Initialize(SmartFormatter formatter)
+        {
+            _formatter = formatter;
+            _smartSettings = formatter.Settings;
         }
 
         /// <summary>
@@ -57,9 +52,9 @@ namespace SmartFormat.Core.Extensions
         /// </remarks>
         protected virtual bool HasNullableOperator(ISelectorInfo selectorInfo)
         {
-            return selectorInfo.Placeholder != null &&
+            return _smartSettings != null && selectorInfo.Placeholder != null &&
                    selectorInfo.Placeholder.Selectors.Any(s =>
-                       s.OperatorLength > 1 && s.BaseString[s.OperatorStartIndex] == _nullableOperator);
+                       s.OperatorLength > 1 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
         }
     }
 }

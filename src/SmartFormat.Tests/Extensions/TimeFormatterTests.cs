@@ -23,7 +23,7 @@ namespace SmartFormat.Tests.Extensions
             if (timeFormatter == null)
             {
                 timeFormatter = new TimeFormatter("en");
-                _smart.FormatterExtensions.Add(timeFormatter);
+                _smart.AddExtensions(timeFormatter);
             }
         }
 
@@ -58,12 +58,12 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Defaults()
         {
             var formats = new string[] {
-                "{0}",
-                "{1}",
-                "{2}",
-                "{3}",
-                "{4}",
-                "{5}",
+                "{0:time:}",
+                "{1:time:}",
+                "{2:time:}",
+                "{3:time:}",
+                "{4:time:}",
+                "{5:time:}",
             };
             var expected = new string[] {
                 "less than 1 second",
@@ -81,15 +81,15 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Options()
         {
             var formats = new string[] {
-                "{0:noless}",
-                "{1:hours}",
-                "{1:hours minutes}",
-                "{2:days milliseconds}",
-                "{2:days milliseconds auto}",
-                "{2:days milliseconds short}",
-                "{2:days milliseconds fill}",
-                "{2:days milliseconds full}",
-                "{3:abbr}",
+                "{0:time:noless}",
+                "{1:time:hours}",
+                "{1:time:hours minutes}",
+                "{2:time:days milliseconds}",
+                "{2:time:days milliseconds auto}",
+                "{2:time:days milliseconds short}",
+                "{2:time:days milliseconds fill}",
+                "{2:time:days milliseconds full}",
+                "{3:time:abbr}",
             };
             var expected = new string[] {
                 "0 seconds",

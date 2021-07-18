@@ -53,8 +53,8 @@ namespace SmartFormat.Tests.Extensions
             var smart = new SmartFormatter();
             // SystemTextJsonSource MUST be registered before ReflectionSource (which is not required here)
             // We also need the ListFormatter to process arrays
-            smart.AddExtensions(new ISource[] { new ListFormatter(smart), new DefaultSource(smart), new SystemTextJsonSource(smart) });
-            smart.AddExtensions(new IFormatter[] {new ListFormatter(smart), new DefaultFormatter()});
+            smart.AddExtensions(new ISource[] { new ListFormatter(), new DefaultSource(), new SystemTextJsonSource() });
+            smart.AddExtensions(new IFormatter[] {new ListFormatter(), new DefaultFormatter()});
             return smart;
         }
 

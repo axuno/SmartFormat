@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -44,7 +45,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
-            var res = Smart.Format("Mr. {FirstName} {LastName}", xmlEl);
+            var res = Smart.Format("Mr. {FirstName:xml:} {LastName:xml:}", xmlEl);
             // assert
             Assert.AreEqual("Mr. Joe Doe", res);
         }
@@ -55,7 +56,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
-            var res = Smart.Format("Mr. {FirstName.0}", xmlEl);
+            var res = Smart.Format("Mr. {FirstName.0:xml:}", xmlEl);
             // assert
             Assert.AreEqual("Mr. Joe", res);
         }
@@ -66,7 +67,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(OneLevelXmlWithNameSpaces);
             // act
-            var res = Smart.Format("Mr. {FirstName} {LastName}", xmlEl);
+            var res = Smart.Format("Mr. {FirstName:xml:} {LastName:xml:}", xmlEl);
             // assert
             Assert.AreEqual("Mr. Joe Doe", res);
         }
@@ -79,7 +80,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
-            var res = sf.Format("Mr. \\{{LastName}\\}", xmlEl);
+            var res = sf.Format("Mr. \\{{LastName:xml:}\\}", xmlEl);
             // assert
             Assert.AreEqual("Mr. {Doe}", res);
         }
@@ -90,7 +91,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
-            var res = Smart.Format("Mr. {FirstName.1} {LastName}", xmlEl);
+            var res = Smart.Format("Mr. {FirstName.1:xml:} {LastName:xml:}", xmlEl);
             // assert
             Assert.AreEqual("Mr. Jack Doe", res);
         }
@@ -101,7 +102,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
-            var res = Smart.Format("Mr. {FirstName}", xmlEl);
+            var res = Smart.Format("Mr. {FirstName:xml:}", xmlEl);
             // assert
             Assert.AreEqual("Mr. Joe", res);
         }
@@ -112,7 +113,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
-            var res = Smart.Format("There{FirstName.Count: is {} Doe | are {} Does}", xmlEl);
+            var res = Smart.Format("There{FirstName.Count:cond: is {} Doe | are {} Does}", xmlEl);
             // assert
             Assert.AreEqual("There are 3 Does", res);
         }
@@ -123,7 +124,7 @@ namespace SmartFormat.Tests.Extensions
             // arrange
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
-            var res = Smart.Format("There are{FirstName: {}|,|, and} Doe", xmlEl);
+            var res = Smart.Format("There are{FirstName:list: {}|,|, and} Doe", xmlEl);
             // assert
             Assert.AreEqual("There are Joe, Jack, and Jim Doe", res);
         }

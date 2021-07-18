@@ -54,8 +54,8 @@ namespace SmartFormat.Tests.Extensions
             var smart = new SmartFormatter();
             // NewtonsoftJsonSource MUST be registered before ReflectionSource (which is not required here)
             // We also need the ListFormatter to process arrays
-            smart.AddExtensions(new ISource[] { new ListFormatter(smart), new DefaultSource(smart), new NewtonsoftJsonSource(smart) });
-            smart.AddExtensions(new IFormatter[] {new ListFormatter(smart), new DefaultFormatter()});
+            smart.AddExtensions(new ISource[] { new ListFormatter(), new DefaultSource(), new NewtonsoftJsonSource() });
+            smart.AddExtensions(new IFormatter[] {new ListFormatter(), new DefaultFormatter()});
             return smart;
         }
 
@@ -72,7 +72,7 @@ namespace SmartFormat.Tests.Extensions
         {
             var smart = new SmartFormatter();
             // removed DefaultSource in order to evaluate JValue
-            smart.AddExtensions(new ISource[] { new NewtonsoftJsonSource(smart) });
+            smart.AddExtensions(new ISource[] { new NewtonsoftJsonSource() });
             smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
             var result = smart.Format("{0}", new JValue('v'));
             Assert.AreEqual("v", result);

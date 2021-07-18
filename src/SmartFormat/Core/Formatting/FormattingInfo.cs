@@ -80,7 +80,7 @@ namespace SmartFormat.Core.Formatting
         /// <summary>
         /// Gets the <see cref="Placeholder"/>.
         /// </summary>
-        public Placeholder? Placeholder { get; }
+        public Placeholder? Placeholder { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="Alignment"/> of the current <see cref="Placeholder"/>,

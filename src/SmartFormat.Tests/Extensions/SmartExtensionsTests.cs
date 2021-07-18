@@ -27,21 +27,23 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_AppendLine()
         {
-            var formats = new string[] {
-                "{0}",
-                "{1}",
-                "{2}",
-                "{3}",
-                "{4}",
-                "{5}",
+            var formats = new[]
+            {
+                "{0:time:}",
+                "{1:time:}",
+                "{2:time:}",
+                "{3:time:}",
+                "{4:time:}",
+                "{5:time:}"
             };
-            var expected = new string[] {
-                "less than 1 second"+Environment.NewLine,
-                "1 day 1 hour 1 minute 1 second"+Environment.NewLine,
-                "2 hours 2 seconds"+Environment.NewLine,
-                "3 days 3 seconds"+Environment.NewLine,
-                "less than 1 second"+Environment.NewLine,
-                "5 days"+Environment.NewLine,
+            var expected = new[]
+            {
+                "less than 1 second" + Environment.NewLine,
+                "1 day 1 hour 1 minute 1 second" + Environment.NewLine,
+                "2 hours 2 seconds" + Environment.NewLine,
+                "3 days 3 seconds" + Environment.NewLine,
+                "less than 1 second" + Environment.NewLine,
+                "5 days" + Environment.NewLine
             };
             var args = GetArgs();
 
@@ -51,18 +53,18 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Append()
         {
-            var formats = new string[] {
-                "{0:noless}",
-                "{1:hours}",
-                "{1:hours minutes}",
-                "{2:days milliseconds}",
-                "{2:days milliseconds auto}",
-                "{2:days milliseconds short}",
-                "{2:days milliseconds fill}",
-                "{2:days milliseconds full}",
-                "{3:abbr}",
+            var formats = new [] {
+                "{0:time:noless}",
+                "{1:time:hours}",
+                "{1:time:hours minutes}",
+                "{2:time:days milliseconds}",
+                "{2:time:days milliseconds auto}",
+                "{2:time:days milliseconds short}",
+                "{2:time:days milliseconds fill}",
+                "{2:time:days milliseconds full}",
+                "{3:time:abbr}",
             };
-            var expected = new string[] {
+            var expected = new [] {
                 "0 seconds",
                 "25 hours",
                 "25 hours 1 minute",
