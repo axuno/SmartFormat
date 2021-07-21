@@ -202,6 +202,10 @@ namespace SmartFormat.Core.Parsing
         /// <returns>The <see cref="Format"/> for the parsed string.</returns>
         public Format ParseFormat(string inputFormat)
         {
+            // Note:
+            // Because of recursion, inputFormat and IndexContainer
+            // must be method local variables.
+
             var index = new IndexContainer {
                 ObjectLength = inputFormat.Length,
                 Current = PositionUndefined, LastEnd = 0, NamedFormatterStart = PositionUndefined,
