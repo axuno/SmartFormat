@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
@@ -218,9 +217,7 @@ namespace SmartFormat.Core.Parsing
 
             // Store parsing errors until parsing is finished:
             var parsingErrors = new ParsingErrors(resultFormat);
-            
 
-            var currentFormat = resultFormat;
             Placeholder? currentPlaceholder = null;
 
             // Used for nested placeholders
@@ -233,65 +230,64 @@ namespace SmartFormat.Core.Parsing
                 {
                     if (inputChar == _parserSettings.PlaceholderBeginChar)
                     {
-                        AddLiteralCharsParsedBefore(currentFormat, ref index);
+                        AddLiteralCharsParsedBefore(resultFormat, ref index);
 
                         if (EscapeLikeStringFormat(inputFormat, ref index, _parserSettings.PlaceholderBeginChar)) continue;
 
-                        currentPlaceholder = CreateNewPlaceholder(currentFormat, ref nestedDepth, ref index);
+                        currentPlaceholder = CreateNewPlaceholder(resultFormat, ref nestedDepth, ref index);
 
                     }
                     else if (inputChar == _parserSettings.PlaceholderEndChar)
                     {
-                        AddLiteralCharsParsedBefore(currentFormat, ref index);
+                        AddLiteralCharsParsedBefore(resultFormat, ref index);
 
                         if(EscapeLikeStringFormat(inputFormat, ref index, _parserSettings.PlaceholderEndChar)) continue;
 
                         // Make sure that this is a nested placeholder before we un-nest it:
-                        if (HasProcessedTooMayClosingBraces(currentFormat, parsingErrors, ref index)) continue;
+                        if (HasProcessedTooMayClosingBraces(resultFormat, parsingErrors, ref index)) continue;
 
                         // End of the placeholder's Format, currentFormat will change to parent.parent
-                        FinishPlaceholderFormat(ref currentFormat, ref nestedDepth, ref index);
+                        FinishPlaceholderFormat(ref resultFormat, ref nestedDepth, ref index);
                     }
                     else if (inputChar == _parserSettings.CharLiteralEscapeChar && _parserSettings.ConvertCharacterStringLiterals ||
                              !Settings.StringFormatCompatibility && inputChar == _parserSettings.CharLiteralEscapeChar)
                     {
-                        ParseAlternativeEscaping(inputFormat, currentFormat, ref index);
+                        ParseAlternativeEscaping(inputFormat, resultFormat, ref index);
                     }
                     else if (index.NamedFormatterStart != PositionUndefined)
                     {
-                        if(!ParseNamedFormatter(inputFormat, currentFormat, ref index)) continue;
+                        if(!ParseNamedFormatter(inputFormat, resultFormat, ref index)) continue;
                     }
                 }
                 else
                 {
                     // Placeholder is NOT null, so that means 
                     // we're parsing the selectors:
-                    ParseSelector(inputFormat, ref currentFormat, ref index, ref currentPlaceholder, parsingErrors, ref nestedDepth);
+                    ParseSelector(inputFormat, ref resultFormat, ref index, ref currentPlaceholder, parsingErrors, ref nestedDepth);
                 }
             }
 
             // We're at the end of the input string
             
             // 1. Is the last item a placeholder, that is not finished yet?
-            if (currentFormat.Parent != null || currentPlaceholder != null)
+            if (resultFormat.Parent != null || currentPlaceholder != null)
             {
-                parsingErrors.AddIssue(currentFormat, _parsingErrorText[ParsingError.MissingClosingBrace], inputFormat.Length,
+                parsingErrors.AddIssue(resultFormat, _parsingErrorText[ParsingError.MissingClosingBrace], inputFormat.Length,
                     inputFormat.Length);
-                currentFormat.EndIndex = inputFormat.Length;
+                resultFormat.EndIndex = inputFormat.Length;
             }
             else if (index.LastEnd != inputFormat.Length)
             {
                 // 2. The last item must be a literal, so add it
-                currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, inputFormat.Length));
+                resultFormat.Items.Add(new LiteralText(Settings, resultFormat, index.LastEnd, inputFormat.Length));
             }
             
             // This may happen with a missing closing brace, e.g. "{0:yyyy/MM/dd HH:mm:ss"
-            while (currentFormat.Parent != null)
+            while (resultFormat.Parent != null)
             {
-                currentFormat = currentFormat.Parent.Parent;
-                currentFormat.EndIndex = inputFormat.Length;
+                resultFormat = resultFormat.Parent.Parent;
+                resultFormat.EndIndex = inputFormat.Length;
             }
-            
 
             // Check for any parsing errors:
             if (parsingErrors.HasIssues)
