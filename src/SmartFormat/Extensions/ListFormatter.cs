@@ -72,7 +72,7 @@ namespace SmartFormat.Extensions
             }
 
             // We want to see if there is an "Index" property that was supplied.
-            if (selector != null && selector.Equals("index", StringComparison.OrdinalIgnoreCase))
+            if (selector.Equals("index", StringComparison.OrdinalIgnoreCase))
             {
                 // Looking for "{Index}"
                 if (selectorInfo.SelectorIndex == 0)
