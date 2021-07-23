@@ -82,7 +82,7 @@ namespace SmartFormat.Extensions
             }
 
             if (selectorInfo.CurrentValue is not string currentValue) return false;
-            var selector = selectorInfo.SelectorText ?? string.Empty;
+            var selector = selectorInfo.SelectorText;
             _cultureInfo = GetCulture(selectorInfo.FormatDetails);
             
             // Search is case-insensitive

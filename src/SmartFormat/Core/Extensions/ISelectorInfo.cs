@@ -27,7 +27,7 @@ namespace SmartFormat.Core.Extensions
         /// <summary>
         /// The selector to evaluate
         /// </summary>
-        string? SelectorText { get; }
+        string SelectorText { get; }
 
         /// <summary>
         /// The index of the selector in a multi-part selector.

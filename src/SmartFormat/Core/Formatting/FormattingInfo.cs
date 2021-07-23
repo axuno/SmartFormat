@@ -172,7 +172,7 @@ namespace SmartFormat.Core.Formatting
         /// <summary>
         /// Gets the (raw) text of the <see cref="Parsing.Selector"/>.
         /// </summary>
-        public string? SelectorText => Selector?.RawText;
+        public string SelectorText => Selector?.RawText ?? string.Empty;
         
         /// <summary>
         /// Gets index of the <see cref="Parsing.Selector"/> in the selector list.

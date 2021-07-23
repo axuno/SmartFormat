@@ -116,7 +116,7 @@ namespace SmartFormat.Tests.Extensions
         private class PureSelectorInfo : ISelectorInfo
         {
             public object? CurrentValue { get; }
-            public string? SelectorText { get; }
+            public string SelectorText { get; }
             public int SelectorIndex { get; }
             public string SelectorOperator { get; } = string.Empty;
             public object? Result { get; set; }
