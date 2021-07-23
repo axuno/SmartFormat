@@ -201,7 +201,16 @@ namespace SmartFormat.Utilities
             return -1;
         };// Dual: one (n == 1), other
         private static PluralRuleDelegate DualWithZero => (n, c) => n == 0 || n == 1 ? 0 : 1; // DualWithZero: one (n == 0..1), other
-        private static PluralRuleDelegate DualFromZeroToTwo => (n, c) => n == 0 || n == 1 ? 0 : 1; // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+        private static PluralRuleDelegate DualFromZeroToTwo => (n, c) => 
+        {
+            return c switch {
+                2 => n < 2 ? 0 : 1,
+                3 => n == 0 ? 0 : n < 2 ? 1 : 2,
+                4 => n < 0 ? 0 : n == 0 ? 1 : n < 2 ? 2 : 3,
+                _ => -1
+            };
+        };// DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+
         private static PluralRuleDelegate TripleOneTwoOther => (n, c) => n == 1 ? 0 : n == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
         private static PluralRuleDelegate RussianSerboCroatian => (n, c) =>
             n % 10 == 1 && n % 100 != 11 ? 0 : // one
