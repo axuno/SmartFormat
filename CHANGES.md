@@ -6,6 +6,9 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
+#### Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
+* Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood
+
 #### Refactored handling of source and formatter extensions ([#180](https://github.com/axuno/SmartFormat/pull/180))
 
 SmartFormatter:
