@@ -21,7 +21,7 @@ namespace SmartFormat.Core.Formatting
         /// Creates a new instance of <see cref="FormatDetails"/>
         /// </summary>
         /// <param name="formatter"></param>
-        /// <param name="originalFormat">The the original <see cref="Format"/> returned by the <see cref="Parser"/>.</param>
+        /// <param name="originalFormat">The the original <see cref="Format"/> returned by the <see cref="Parser"/> or a <see cref="Formatting.FormatCache"/>.</param>
         /// <param name="originalArgs">The original set of arguments passed to the format method.</param>
         /// <param name="formatCache">This to cache resources between formatting calls.</param>
         /// <param name="provider">The <see cref="IFormatProvider"/> that can be used to determine how to format items.</param>
@@ -44,7 +44,7 @@ namespace SmartFormat.Core.Formatting
         public SmartFormatter Formatter { get; }
 
         /// <summary>
-        /// Gets the original <see cref="Format"/> returned by the <see cref="Parser"/>.
+        /// Gets the <see cref="Format"/> returned by the <see cref="Parser"/> or which is coming from <see cref="Formatting.FormatCache"/>.
         /// </summary>
         public Format OriginalFormat { get; }
 
