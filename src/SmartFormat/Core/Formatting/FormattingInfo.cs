@@ -30,14 +30,14 @@ namespace SmartFormat.Core.Formatting
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="formatDetails"></param>
-        /// <param name="format"></param>
+        /// <param name="format">The <see cref="Parsing.Format"/> argument is used with <see cref="CreateChild(Parsing.Format,object?)"/></param>
         /// <param name="currentValue"></param>
         public FormattingInfo(FormattingInfo? parent, FormatDetails formatDetails, Format format, object? currentValue)
         {
             Parent = parent;
             CurrentValue = currentValue;
-            Format = format;
             FormatDetails = formatDetails;
+            Format = format;
         }
 
         /// <summary>

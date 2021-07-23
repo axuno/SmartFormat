@@ -253,7 +253,7 @@ namespace SmartFormat
             var formatParsed = Parser.ParseFormat(format);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, formatParsed, args, null, provider, output);
-            Format(formatDetails, formatParsed, current);
+            Format(formatDetails, current);
 
             return output.ToString();
         }
@@ -280,7 +280,7 @@ namespace SmartFormat
             var formatParsed = Parser.ParseFormat(format);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, formatParsed, args, null, null, output);
-            Format(formatDetails, formatParsed, current);
+            Format(formatDetails, current);
         }
 
         /// <summary>
@@ -311,7 +311,7 @@ namespace SmartFormat
             cache ??= new FormatCache(Parser.ParseFormat(format));
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
-            Format(formatDetails, cache.Format, current);
+            Format(formatDetails, current);
 
             return output.ToString();
         }
@@ -340,12 +340,12 @@ namespace SmartFormat
             cache ??= new FormatCache(Parser.ParseFormat(format));
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
-            Format(formatDetails, cache.Format, current);
+            Format(formatDetails, current);
         }
 
-        private void Format(FormatDetails formatDetails, Format format, object current)
+        private void Format(FormatDetails formatDetails, object current)
         {
-            var formattingInfo = new FormattingInfo(formatDetails, format, current);
+            var formattingInfo = new FormattingInfo(formatDetails, formatDetails.OriginalFormat, current);
             Format(formattingInfo);
         }
 
