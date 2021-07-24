@@ -19,26 +19,13 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Create_Cache()
-        {
-            var sf = new SmartFormatter();
-            var format = new Format(sf.Settings, "the base string");
-            var fc = new FormatCache(format);
-            Assert.AreEqual(format, fc.Format);
-            Assert.IsAssignableFrom<Dictionary<string,object>>(fc.CachedObjects);
-            fc.CachedObjects.Add("key", "value");
-            Assert.IsTrue(fc.CachedObjects["key"].ToString() == "value");
-        }
-
-        [Test]
         public void Format_WithCache()
         {
             var data = new {Name = "Joe", City = "Melbourne"};
             var formatter = GetSimpleFormatter();
             var formatString = "{Name}, {City}";
             var format = formatter.Parser.ParseFormat(formatString);
-            var cache = new FormatCache(format);
-            Assert.That(formatter.FormatWithCache(ref cache, formatString, data), Is.EqualTo($"{data.Name}, {data.City}"));
+            Assert.That(formatter.Format(format, data), Is.EqualTo($"{data.Name}, {data.City}"));
         }
 
         [Test]
@@ -48,9 +35,8 @@ namespace SmartFormat.Tests.Core
             var formatter = GetSimpleFormatter();
             var formatString = "{Name}, {City}";
             var format = formatter.Parser.ParseFormat(formatString);
-            var cache = new FormatCache(format);
             var output = new StringOutput();
-            formatter.FormatWithCacheInto(ref cache, output, formatString, data);
+            formatter.FormatInto(output, format, data);
             Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
         }
     }
