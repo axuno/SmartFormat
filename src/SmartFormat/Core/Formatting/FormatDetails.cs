@@ -21,18 +21,16 @@ namespace SmartFormat.Core.Formatting
         /// Creates a new instance of <see cref="FormatDetails"/>
         /// </summary>
         /// <param name="formatter"></param>
-        /// <param name="originalFormat">The the original <see cref="Format"/> returned by the <see cref="Parser"/> or a <see cref="Formatting.FormatCache"/>.</param>
+        /// <param name="originalFormat">The the original <see cref="Format"/> returned by the <see cref="Parser"/>.</param>
         /// <param name="originalArgs">The original set of arguments passed to the format method.</param>
-        /// <param name="formatCache">This to cache resources between formatting calls.</param>
         /// <param name="provider">The <see cref="IFormatProvider"/> that can be used to determine how to format items.</param>
         /// <param name="output">The <see cref="IOutput"/> where the result is written.</param>
         public FormatDetails(SmartFormatter formatter, Format originalFormat, IList<object> originalArgs,
-            FormatCache? formatCache, IFormatProvider? provider, IOutput output)
+            IFormatProvider? provider, IOutput output)
         {
             Formatter = formatter;
             OriginalFormat = originalFormat;
             OriginalArgs = originalArgs;
-            FormatCache = formatCache;
             Provider = provider;
             Output = output;
         }
@@ -44,7 +42,7 @@ namespace SmartFormat.Core.Formatting
         public SmartFormatter Formatter { get; }
 
         /// <summary>
-        /// Gets the <see cref="Format"/> returned by the <see cref="Parser"/> or which is coming from <see cref="Formatting.FormatCache"/>.
+        /// Gets the <see cref="Format"/> returned by the <see cref="Parser"/>.
         /// </summary>
         public Format OriginalFormat { get; }
 
@@ -53,12 +51,6 @@ namespace SmartFormat.Core.Formatting
         /// These provide global-access to the original arguments.
         /// </summary>
         public IList<object> OriginalArgs { get; }
-
-        /// <summary>
-        /// This object can be used to cache resources between formatting calls.
-        /// It will be null unless FormatWithCache is called.
-        /// </summary>
-        public FormatCache? FormatCache { get; }
 
         /// <summary>
         /// The <see cref="IFormatProvider"/> that can be used to determine how to
