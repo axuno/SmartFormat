@@ -32,7 +32,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
     public class NullFormatterChooseFormatterTests
     {
         private SmartFormatter _smartNullFormatter, _smartChooseFormatter;
-        private FormatCache _nullFormatCache, _chooseFormatCache;
+        private Format _nullFormatCache, _chooseFormatCache;
 
         public NullFormatterChooseFormatterTests()
         {
@@ -43,27 +43,27 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         public void Setup()
         {
             _smartNullFormatter = new SmartFormatter();
-            _smartNullFormatter.AddExtensions(new ISource[] { new DefaultSource() });
-            _smartNullFormatter.AddExtensions(new IFormatter[] { new NullFormatter(), new DefaultFormatter()});
+            _smartNullFormatter.AddExtensions(new DefaultSource());
+            _smartNullFormatter.AddExtensions(new NullFormatter(), new DefaultFormatter());
 
             _smartChooseFormatter = new SmartFormatter();
-            _smartChooseFormatter.AddExtensions(new ISource[] { new DefaultSource() });
-            _smartChooseFormatter.AddExtensions(new IFormatter[] { new ChooseFormatter(), new DefaultFormatter()});
+            _smartChooseFormatter.AddExtensions(new DefaultSource());
+            _smartChooseFormatter.AddExtensions(new ChooseFormatter(), new DefaultFormatter());
 
-            _nullFormatCache = new FormatCache(_smartNullFormatter.Parser.ParseFormat("{0:isnull:nothing}"));
-            _chooseFormatCache = new FormatCache(_smartChooseFormatter.Parser.ParseFormat("{0:choose(null):nothing|}"));
+            _nullFormatCache = _smartNullFormatter.Parser.ParseFormat("{0:isnull:nothing}");
+            _chooseFormatCache = _smartChooseFormatter.Parser.ParseFormat("{0:choose(null):nothing|}");
         }
 
         [Benchmark]
         public void ChooseFormatTest()
         {
-            var result = _smartChooseFormatter.FormatWithCache(ref _chooseFormatCache, "", new List<object> {null});
+            var result = _smartChooseFormatter.Format(_chooseFormatCache, "", new List<object> {null});
         }
 
         [Benchmark]
         public void NullFormatTest()
         {
-            var result = _smartNullFormatter.FormatWithCache(ref _nullFormatCache, "", new List<object> {null});
+            var result = _smartNullFormatter.Format(_nullFormatCache, "", new List<object> {null});
         }
     }
 }
