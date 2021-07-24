@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Newtonsoft.Json.Linq;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Performance
@@ -55,7 +56,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         
         private readonly Address _address = new Address();
 
-        private FormatCache _formatCacheLiteral;
+        private Format _formatCacheLiteral;
 
         public ReflectionVsStringSourceTests()
         {
@@ -78,14 +79,14 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
             );
 
             var parsedFormat = _stringSourceFormatter.Parser.ParseFormat(_formatString);
-            _formatCache = new FormatCache(parsedFormat);
+            _formatCache = parsedFormat;
 
         }
 
         [Params(1000, 10000)]
         public int N;
 
-        private readonly FormatCache _formatCache;
+        private readonly Format _formatCache;
 
         [GlobalSetup]
         public void Setup()
@@ -107,7 +108,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _reflectionSourceFormatter.FormatWithCache(ref _formatCacheLiteral,"Address: {0} {1}, {2}", _address.City.ZipCode,
+                _ = _reflectionSourceFormatter.Format(_formatCacheLiteral,"Address: {0} {1}, {2}", _address.City.ZipCode,
                     _address.City.Name, _address.City.AreaCode);
             }
         }
@@ -117,7 +118,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _stringSourceFormatter.FormatWithCache(ref _formatCacheLiteral,"Address: {0} {1}, {2}", _address.City.ZipCode,
+                _ = _stringSourceFormatter.Format(_formatCacheLiteral,"Address: {0} {1}, {2}", _address.City.ZipCode,
                     _address.City.Name, _address.City.AreaCode);
             }
         }
