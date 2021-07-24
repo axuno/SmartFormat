@@ -174,12 +174,11 @@ namespace SmartFormat.Tests.Core
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
             formatter.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
             var formatParsed = formatter.Parser.ParseFormat(format);
-            var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
+            var formatDetails = new FormatDetails(formatter, formatParsed, args, null, output);
             
             Assert.AreEqual(args, formatDetails.OriginalArgs);
             Assert.AreEqual(format, formatDetails.OriginalFormat.RawText);
             Assert.AreEqual(formatter.Settings, formatDetails.Settings);
-            Assert.IsTrue(formatDetails.FormatCache == null);
         }
 
         [Test]

@@ -6,6 +6,22 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
+#### `Format` replaces `FormatCache`
+
+In v2.x the `FormatCache` class had a `CachedObjects` property, which was not implemented:
+```Csharp
+public class FormatCache
+{
+    public FormatCache(Format format)
+    { Format = format; }
+    public Format Format { get; }
+    public Dictionary<string, object> CachedObjects { get; } = new Dictionary<string, object>();
+}
+```
+The class `FormatCache` is now replaced by `Format`. `Format` stores the result from the `Parser` parsing the input string. The `SmartFormatter` has additional overloads for using the cached `Format` as an argument, instead of an additional wrapper around `Format`.
+
+It is **highly recommended** to use these `SmartFormatter` methods whenever there is a **constant input string** with **different data arguments**.
+
 #### Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
 * Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood
 
