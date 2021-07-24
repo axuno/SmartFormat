@@ -6,7 +6,7 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
-#### `Format` replaces `FormatCache`
+#### `Format` replaces `FormatCache` ([#183](https://github.com/axuno/SmartFormat/pull/183))
 
 In v2.x the `FormatCache` class had a `CachedObjects` property, which was not implemented:
 ```Csharp
