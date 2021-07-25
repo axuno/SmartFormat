@@ -27,7 +27,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 |   NullFormatTest | 553.5 ns | 3.02 ns | 2.67 ns | 0.1030 |     - |     - |     864 B |
     */
 
-    [SimpleJob(RuntimeMoniker.NetCoreApp50)]
+    [SimpleJob(RuntimeMoniker.Net50)]
     [MemoryDiagnoser]
     public class NullFormatterChooseFormatterTests
     {

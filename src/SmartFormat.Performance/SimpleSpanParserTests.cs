@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Diagnostics.Windows.Configs;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 
@@ -25,7 +26,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 | ParsePlaceholders | 38.14 us | 0.249 us | 0.220 us | 0.1831 |     - |     - |   1.53 KB |
     */
 
-    [SimpleJob(RuntimeMoniker.NetCoreApp50)]
+    [SimpleJob(RuntimeMoniker.Net50)]
     [MemoryDiagnoser]
     public class SimpleSpanParserTests
     {

@@ -48,7 +48,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
   1 us      : 1 Microsecond (0.000001 sec)
         */
 
-    [SimpleJob(RuntimeMoniker.NetCoreApp50)]
+    [SimpleJob(RuntimeMoniker.Net50)]
     [MemoryDiagnoser]
     // [RPlotExporter]
     public class SourcePerformanceTests
@@ -100,7 +100,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _jsonFormatter = new SmartFormatter();
             _jsonFormatter.AddExtensions(
-                new SystemTextJsonSource(),
+                new NewtonsoftJsonSource(),
                 new DefaultSource()
             );
             _jsonFormatter.AddExtensions(
@@ -149,7 +149,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _reflectionFormatter.Format(_formatCache, _format, _reflectionAddress);
+                _ = _reflectionFormatter.Format(_formatCache, _reflectionAddress);
             }
         }
 
@@ -158,7 +158,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _dictionaryFormatter.Format(_formatCache, _format, _dictionaryAddress);
+                _ = _dictionaryFormatter.Format(_formatCache, _dictionaryAddress);
             }
         }
 
@@ -167,7 +167,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _jsonFormatter.Format(_formatCache, _format, _jsonAddress);
+                _ = _jsonFormatter.Format(_formatCache, _jsonAddress);
             }
         }
 
