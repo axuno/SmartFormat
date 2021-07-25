@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Diagnostics.Windows.Configs;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 
