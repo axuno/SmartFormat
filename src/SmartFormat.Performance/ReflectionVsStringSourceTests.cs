@@ -44,7 +44,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
   1 us      : 1 Microsecond (0.000001 sec)
         */
 
-    [SimpleJob(RuntimeMoniker.NetCoreApp50)]
+    [SimpleJob(RuntimeMoniker.Net50)]
     [MemoryDiagnoser]
     // [RPlotExporter]
     public class ReflectionVsStringSourceTests
