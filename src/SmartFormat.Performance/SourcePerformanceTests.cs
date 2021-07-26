@@ -67,8 +67,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         private readonly Dictionary<string, object> _dictionaryAddress = new Address().ToDictionary();
         private readonly JObject _jsonAddress = new Address().ToJson();
 
-        private Format _formatCache;
-        private Format _formatCacheLiteral;
+        private readonly Format _formatCache;
+        private readonly Format _formatCacheLiteral;
 
         public SourcePerformanceTests()
         {

@@ -27,6 +27,8 @@ namespace SmartFormat.Core.Parsing
         /// Creates a new <see cref="Selector"/> instance.
         /// </summary>
         /// <param name="placeholder">The <see cref="Placeholder"/> the <see cref="Selector"/> belongs to.</param>
+        /// <param name="startIndex">The start index of the selector inside the <see cref="FormatItem.BaseString"/></param>
+        /// <param name="endIndex">The end index of the selector inside the <see cref="FormatItem.BaseString"/></param>
         /// <param name="operatorStartIndex"></param>
         /// <param name="selectorIndex"></param>
         public Selector(Placeholder placeholder, int startIndex, int endIndex, int operatorStartIndex,

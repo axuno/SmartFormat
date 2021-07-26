@@ -169,7 +169,7 @@ namespace SmartFormat.Extensions
                     Format = itemFormat,
                     EndIndex = itemFormat.EndIndex,
                 };
-                newItemFormat.AddItem(newPlaceholder);
+                newItemFormat.Items.Add(newPlaceholder);
                 itemFormat = newItemFormat;
             }
 
@@ -213,23 +213,6 @@ namespace SmartFormat.Extensions
             CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
 
             return true;
-        }
-
-        /// <summary>
-        /// Checks if any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
-        /// </summary>
-        /// <param name="selectorInfo"></param>
-        /// <returns>
-        /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
-        /// </returns>
-        /// <remarks>
-        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
-        /// </remarks>
-        private bool HasNullableOperator(ISelectorInfo selectorInfo)
-        {
-            return selectorInfo.Placeholder != null &&
-                   selectorInfo.Placeholder.Selectors.Any(s =>
-                       s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
         }
 
         /// <summary>

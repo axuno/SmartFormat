@@ -16,7 +16,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class ListFormatterTests
     {
-        public object[] GetArgs()
+        public static object[] GetArgs()
         {
             var args = new object[] {
                 "ABCDE".ToCharArray(),

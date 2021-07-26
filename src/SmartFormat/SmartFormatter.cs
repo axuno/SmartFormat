@@ -577,7 +577,7 @@ namespace SmartFormat
             // 2. The operator character must have a value, usually ','
             // 3. The alignment is an integer value
             if (selectorInfo.Placeholder != null && 
-                selectorInfo.SelectorOperator.FirstOrDefault() == Settings.Parser.AlignmentOperator &&
+                selectorInfo.SelectorOperator.Length > 0 && selectorInfo.SelectorOperator[0] == Settings.Parser.AlignmentOperator &&
                 int.TryParse(selectorInfo.SelectorText, out var selectorValue))
             {
                 selectorInfo.Placeholder.Alignment = selectorValue;

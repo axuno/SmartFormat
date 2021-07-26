@@ -119,7 +119,7 @@ namespace SmartFormat.Tests.Core
             Assert.AreEqual(expectedOutput, actual);
         }
 
-        private SmartFormatter GetCustomFormatter()
+        private static SmartFormatter GetCustomFormatter()
         {
             var testFormatter = new SmartFormatter();
             testFormatter.AddExtensions(new TestExtension1(), new TestExtension2(), new DefaultFormatter());

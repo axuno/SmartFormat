@@ -71,29 +71,10 @@ namespace SmartFormat.Core.Parsing
         public Placeholder? Parent => _parent;
 
         /// <summary>
-        /// Gets the <see cref="IReadOnlyList{T}"/> of <see cref="FormatItem"/>s.
+        /// Gets the <see cref="List{T}"/> of <see cref="FormatItem"/>s.
         /// </summary>
-        public IReadOnlyList<FormatItem> Items => _items;
+        public List<FormatItem> Items { get; } = new();
         
-        /// <summary>
-        /// Adds a <see cref="FormatItem"/> to this <see cref="Format"/>
-        /// </summary>
-        /// <param name="item"></param>
-        internal void AddItem(FormatItem item)
-        {
-            _items.Add(item);
-        }
-
-        /// <summary>
-        /// Replaces the <see cref="FormatItem"/> at the <paramref name="index"/> position of the list with <paramref name="newItem"/>.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="newItem"></param>
-        internal void ReplaceItem(int index, FormatItem newItem)
-        {
-            _items[index] = newItem;
-        }
-
         /// <summary>
         /// Returns <see langword="true"/>, if the <see cref="Format"/> is nested.
         /// </summary>
@@ -155,7 +136,7 @@ namespace SmartFormat.Core.Parsing
                     substring.HasNested = true;
                 }
 
-                substring.AddItem(newItem);
+                substring.Items.Add(newItem);
             }
 
             return substring;
@@ -225,7 +206,6 @@ namespace SmartFormat.Core.Parsing
         private char _splitCacheChar;
         private IList<Format>? _splitCache;
         private readonly Placeholder? _parent;
-        private readonly List<FormatItem> _items = new();
 
         /// <summary>
         /// Splits the <see cref="Format"/> items by the given search character.

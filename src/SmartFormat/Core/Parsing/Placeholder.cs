@@ -23,8 +23,6 @@ namespace SmartFormat.Core.Parsing
     /// </example>
     public class Placeholder : FormatItem
     {
-        private readonly List<Selector> _selectors = new();
-
         /// <summary>
         /// CTOR.
         /// </summary>
@@ -59,17 +57,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Gets a list of all <see cref="Selector"/> within the <see cref="Placeholder"/>.
         /// </summary>
-        public IReadOnlyList<Selector> Selectors => _selectors;
-
-        /// <summary>
-        /// Adds a new <see cref="Selector"/> to the <see cref="Placeholder"/>.
-        /// </summary>
-        /// <param name="operatorStartIndex"></param>
-        /// <param name="selectorIndex"></param>
-        public void AddSelector(int startIndex, int endIndex, int operatorStartIndex, int selectorIndex)
-        {
-            _selectors.Add(new Selector(this, startIndex, endIndex, operatorStartIndex, selectorIndex));
-        }
+        public List<Selector> Selectors { get; } = new();
 
         /// <summary>
         /// Gets or sets the <see cref="Alignment"/> of the result string,

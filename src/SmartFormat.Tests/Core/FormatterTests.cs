@@ -17,7 +17,7 @@ namespace SmartFormat.Tests.Core
     {
         private readonly object[] _errorArgs = { new FormatDelegate(format => throw new Exception("ERROR!")) };
 
-        private SmartFormatter GetSimpleFormatter()
+        private static SmartFormatter GetSimpleFormatter()
         {
             var formatter = new SmartFormatter(); 
             formatter.AddExtensions(new DefaultFormatter());

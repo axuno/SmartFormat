@@ -10,7 +10,7 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     class FormatCacheTests
     {
-        private SmartFormatter GetSimpleFormatter()
+        private static SmartFormatter GetSimpleFormatter()
         {
             var formatter = new SmartFormatter(); 
             formatter.AddExtensions(new DefaultFormatter());
