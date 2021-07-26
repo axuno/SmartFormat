@@ -23,18 +23,18 @@ namespace SmartFormat.Core.Parsing
     /// </example>
     public class Placeholder : FormatItem
     {
+        private readonly List<Selector> _selectors = new();
+
         /// <summary>
         /// CTOR.
         /// </summary>
-        /// <param name="smartSettings">The Smart.Format <see cref="Settings"/></param>
         /// <param name="parent">The parent <see cref="Format"/> of the placeholder</param>
         /// <param name="startIndex">The index inside the input string, where the placeholder starts.</param>
         /// <param name="nestedDepth">The nesting level of this placeholder.</param>
-        public Placeholder(SmartSettings smartSettings, Format parent, int startIndex, int nestedDepth) : base(
-            smartSettings, parent.BaseString, startIndex, parent.EndIndex)
+        public Placeholder(Format parent, int startIndex, int nestedDepth) : base(
+            parent.SmartSettings, parent.BaseString, startIndex, parent.EndIndex)
         {
             Parent = parent;
-            Selectors = new List<Selector>();
             NestedDepth = nestedDepth;
             FormatterName = string.Empty;
             FormatterOptionsRaw = string.Empty;
@@ -59,8 +59,18 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Gets a list of all <see cref="Selector"/> within the <see cref="Placeholder"/>.
         /// </summary>
-        public List<Selector> Selectors { get; }
-        
+        public IReadOnlyList<Selector> Selectors => _selectors;
+
+        /// <summary>
+        /// Adds a new <see cref="Selector"/> to the <see cref="Placeholder"/>.
+        /// </summary>
+        /// <param name="operatorStartIndex"></param>
+        /// <param name="selectorIndex"></param>
+        public void AddSelector(int startIndex, int endIndex, int operatorStartIndex, int selectorIndex)
+        {
+            _selectors.Add(new Selector(this, startIndex, endIndex, operatorStartIndex, selectorIndex));
+        }
+
         /// <summary>
         /// Gets or sets the <see cref="Alignment"/> of the result string,
         /// used like with string.Format("{0,-10}"), where -10 is the alignment.

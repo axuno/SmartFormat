@@ -29,8 +29,7 @@ namespace SmartFormat.Core.Parsing
         public Format(SmartSettings smartSettings, string baseString) : base(smartSettings, baseString, 0,
             baseString.Length)
         {
-            Parent = null;
-            Items = new List<FormatItem>();
+            _parent = null;
         }
 
         /// <summary>
@@ -41,8 +40,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="startIndex">The start index within the format base string.</param>
         public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent.BaseString, startIndex, parent.EndIndex)
         {
-            Parent = parent;
-            Items = new List<FormatItem>();
+            _parent = parent;
         }
 
         /// <summary>
@@ -54,8 +52,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="endIndex">The end index within the format base string.</param>
         public Format(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
         {
-            Parent = null;
-            Items = new List<FormatItem>();
+            _parent = null;
         }
 
         #endregion
@@ -71,12 +68,31 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Gets the parent <see cref="Placeholder"/>.
         /// </summary>
-        public Placeholder? Parent { get; }
+        public Placeholder? Parent => _parent;
 
         /// <summary>
-        /// Gets the <see cref="List{T}"/> of <see cref="FormatItem"/>s.
+        /// Gets the <see cref="IReadOnlyList{T}"/> of <see cref="FormatItem"/>s.
         /// </summary>
-        public List<FormatItem> Items { get; }
+        public IReadOnlyList<FormatItem> Items => _items;
+        
+        /// <summary>
+        /// Adds a <see cref="FormatItem"/> to this <see cref="Format"/>
+        /// </summary>
+        /// <param name="item"></param>
+        internal void AddItem(FormatItem item)
+        {
+            _items.Add(item);
+        }
+
+        /// <summary>
+        /// Replaces the <see cref="FormatItem"/> at the <paramref name="index"/> position of the list with <paramref name="newItem"/>.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="newItem"></param>
+        internal void ReplaceItem(int index, FormatItem newItem)
+        {
+            _items[index] = newItem;
+        }
 
         /// <summary>
         /// Returns <see langword="true"/>, if the <see cref="Format"/> is nested.
@@ -131,7 +147,7 @@ namespace SmartFormat.Core.Parsing
                 {
                     // See if we need to slice the LiteralText:
                     if (start > item.StartIndex || item.EndIndex > end)
-                        newItem = new LiteralText(SmartSettings, substring, Math.Max(start, item.StartIndex),Math.Min(end, item.EndIndex));
+                        newItem = new LiteralText(substring, Math.Max(start, item.StartIndex),Math.Min(end, item.EndIndex));
                 }
                 else
                 {
@@ -139,7 +155,7 @@ namespace SmartFormat.Core.Parsing
                     substring.HasNested = true;
                 }
 
-                substring.Items.Add(newItem);
+                substring.AddItem(newItem);
             }
 
             return substring;
@@ -171,8 +187,7 @@ namespace SmartFormat.Core.Parsing
             foreach (var item in Items)
             {
                 if (item.EndIndex < start) continue;
-                var literalItem = item as LiteralText;
-                if (literalItem == null) continue;
+                if (item is not LiteralText literalItem) continue;
 
                 if (start < literalItem.StartIndex) start = literalItem.StartIndex;
                 var literalIndex =
@@ -209,6 +224,8 @@ namespace SmartFormat.Core.Parsing
 
         private char _splitCacheChar;
         private IList<Format>? _splitCache;
+        private readonly Placeholder? _parent;
+        private readonly List<FormatItem> _items = new();
 
         /// <summary>
         /// Splits the <see cref="Format"/> items by the given search character.
@@ -263,7 +280,7 @@ namespace SmartFormat.Core.Parsing
             {
                 get
                 {
-                    if (index > _splits.Count) throw new ArgumentOutOfRangeException("index");
+                    if (index > _splits.Count) throw new ArgumentOutOfRangeException(nameof(index));
 
                     if (_splits.Count == 0) return _format;
 

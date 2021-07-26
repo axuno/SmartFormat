@@ -100,7 +100,7 @@ namespace SmartFormat.Extensions
         /// <remarks>
         /// Wrap, so that CollectionIndex can be used without code changes.
         /// </remarks>
-        private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
+        private static readonly AsyncLocal<int?> _collectionIndex = new();
 
         /// <remarks>
         /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
@@ -133,8 +133,7 @@ namespace SmartFormat.Extensions
             }
 
             // This extension requires at least IEnumerable
-            var enumerable = current as IEnumerable;
-            if (enumerable == null) return false;
+            if (current is not IEnumerable enumerable) return false;
             // Ignore Strings, because they're IEnumerable.
             // This issue might actually need a solution
             // for other objects that are IEnumerable.
@@ -165,12 +164,12 @@ namespace SmartFormat.Extensions
                 {
                     HasNested = true
                 };
-                var newPlaceholder = new Placeholder(_smartSettings, newItemFormat, itemFormat.StartIndex, 0)
+                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.StartIndex, 0)
                 {
                     Format = itemFormat,
                     EndIndex = itemFormat.EndIndex,
                 };
-                newItemFormat.Items.Add(newPlaceholder);
+                newItemFormat.AddItem(newPlaceholder);
                 itemFormat = newItemFormat;
             }
 

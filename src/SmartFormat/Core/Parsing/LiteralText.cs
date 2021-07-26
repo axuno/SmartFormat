@@ -17,11 +17,10 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Creates an instance of <see cref="LiteralText"/>, representing the literal text that is found a parsed format string.
         /// </summary>
-        /// <param name="smartSettings">The <see cref="SmartSettings"/>.</param>
         /// <param name="parent">The parent <see cref="Format"/> of the <see cref="LiteralText"/>.</param>
         /// <param name="startIndex">The start index of the <see cref="LiteralText"/> in the format string.</param>
         /// <param name="endIndex">The end index of the <see cref="LiteralText"/> in the format string.</param>
-        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex, int endIndex) : this(smartSettings, parent.BaseString,
+        public LiteralText(Format parent, int startIndex, int endIndex) : this(parent.SmartSettings, parent.BaseString,
             startIndex, endIndex)
         {
         }
@@ -29,9 +28,8 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Creates an instance of <see cref="LiteralText"/>, representing the literal text that is found a parsed format string. 
         /// </summary>
-        /// <param name="smartSettings">The <see cref="SmartSettings"/>.</param>
         /// <param name="parent">The parent <see cref="Format"/> of the <see cref="LiteralText"/>.</param>
-        public LiteralText(SmartSettings smartSettings, Format parent) : this(smartSettings, parent.BaseString, parent.StartIndex, parent.EndIndex)
+        public LiteralText(Format parent) : this(parent.SmartSettings, parent.BaseString, parent.StartIndex, parent.EndIndex)
         {
         }
 
@@ -42,7 +40,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="baseString">The reference to the parsed format string.</param>
         /// <param name="startIndex">The start index of the <see cref="LiteralText"/> in the format string.</param>
         /// <param name="endIndex">The end index of the <see cref="LiteralText"/> in the format string.</param>
-        public LiteralText(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
+        private LiteralText(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
         {
         }
 

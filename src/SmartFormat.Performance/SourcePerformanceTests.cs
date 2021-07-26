@@ -62,8 +62,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         private readonly SmartFormatter _reflectionFormatter;
         private readonly SmartFormatter _dictionaryFormatter;
         private readonly SmartFormatter _jsonFormatter;
-        
-        private readonly Address _reflectionAddress = new Address();
+
+        private readonly Address _reflectionAddress = new();
         private readonly Dictionary<string, object> _dictionaryAddress = new Address().ToDictionary();
         private readonly JObject _jsonAddress = new Address().ToJson();
 

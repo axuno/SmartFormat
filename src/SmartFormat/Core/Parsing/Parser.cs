@@ -279,7 +279,7 @@ namespace SmartFormat.Core.Parsing
             else if (index.LastEnd != inputFormat.Length)
             {
                 // 2. The last item must be a literal, so add it
-                resultFormat.Items.Add(new LiteralText(Settings, resultFormat, index.LastEnd, inputFormat.Length));
+                resultFormat.AddItem(new LiteralText(resultFormat, index.LastEnd, inputFormat.Length));
             }
             
             // This may happen with a missing closing brace, e.g. "{0:yyyy/MM/dd HH:mm:ss"
@@ -313,7 +313,7 @@ namespace SmartFormat.Core.Parsing
             // Finish the last text item:
             if (index.Current != index.LastEnd)
             {
-                currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, index.Current));
+                currentFormat.AddItem(new LiteralText(currentFormat, index.LastEnd, index.Current));
             }
 
             index.LastEnd = index.SafeAdd(index.Current, 1);
@@ -333,7 +333,7 @@ namespace SmartFormat.Core.Parsing
             if (currentFormat.Parent != null) return false;
 
             // Don't swallow-up redundant closing braces, but treat them as literals
-            currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.Current, index.Current + 1));
+            currentFormat.AddItem(new LiteralText(currentFormat, index.Current, index.Current + 1));
             
             parsingErrors.AddIssue(currentFormat, _parsingErrorText[ParsingError.TooManyClosingBraces], index.Current,
                 index.Current + 1);
@@ -373,8 +373,8 @@ namespace SmartFormat.Core.Parsing
         private Placeholder CreateNewPlaceholder(Format currentFormat, ref int nestedDepth, ref IndexContainer index)
         {
             nestedDepth++;
-            var placeholder = new Placeholder(Settings, currentFormat, index.Current, nestedDepth);
-            currentFormat.Items.Add(placeholder);
+            var placeholder = new Placeholder(currentFormat, index.Current, nestedDepth);
+            currentFormat.AddItem(placeholder);
             currentFormat.HasNested = true;
             index.Operator = index.SafeAdd(index.Current, 1);
             index.Selector = 0;
@@ -422,7 +422,7 @@ namespace SmartFormat.Core.Parsing
             if (indexNextChar < inputFormat.Length && (inputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar || inputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar))
             {
                 // Finish the last text item:
-                if (index.Current != index.LastEnd) currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, index.Current));
+                if (index.Current != index.LastEnd) currentFormat.AddItem(new LiteralText(currentFormat, index.LastEnd, index.Current));
                 index.LastEnd = index.SafeAdd(index.Current, 1);
 
                 index.Current++;
@@ -432,20 +432,20 @@ namespace SmartFormat.Core.Parsing
                 // **** Escaping of character literals like \t, \n, \v etc. ****
 
                 // Finish the last text item:
-                if (index.Current != index.LastEnd) currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.LastEnd, index.Current));
+                if (index.Current != index.LastEnd) currentFormat.AddItem(new LiteralText(currentFormat, index.LastEnd, index.Current));
                                 
                 // Is this a unicode escape sequence?
                 if (inputFormat[indexNextChar] == 'u')
                 {
                     // The next 4 characters must represent the unicode 
                     index.LastEnd = index.SafeAdd(index.Current, 6);
-                    currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.Current, index.LastEnd));
+                    currentFormat.AddItem(new LiteralText(currentFormat, index.Current, index.LastEnd));
                 }
                 else
                 {
                     // Next add the character literal INCLUDING the escape character, which LiteralText will expect
                     index.LastEnd = index.SafeAdd(index.Current, 2);
-                    currentFormat.Items.Add(new LiteralText(Settings, currentFormat, index.Current, index.LastEnd));
+                    currentFormat.AddItem(new LiteralText(currentFormat, index.Current, index.LastEnd));
                 }
 
                 index.Current = index.SafeAdd(index.Current, 1);
@@ -564,9 +564,7 @@ namespace SmartFormat.Core.Parsing
                 // Add the selector:
                 if (index.Current != index.LastEnd) // if equal, we're already parsing a selector
                 {
-                    currentPlaceholder.Selectors.Add(new Selector(Settings, inputFormat, index.LastEnd, index.Current,
-                        index.Operator,
-                        index.Selector));
+                    currentPlaceholder.AddSelector(index.LastEnd, index.Current, index.Operator, index.Selector);
                     index.Selector = index.SafeAdd(index.Selector, 1);
                     index.Operator = index.Current;
                 }
@@ -623,13 +621,11 @@ namespace SmartFormat.Core.Parsing
             ref Placeholder currentPlaceholder, ParsingErrors parsingErrors)
         {
             if (index.Current != index.LastEnd ||
-                currentPlaceholder.Selectors.Count > 0 && currentPlaceholder.Selectors.Last().Length > 0 &&
+                currentPlaceholder.Selectors.Count > 0 && currentPlaceholder.Selectors[currentPlaceholder.Selectors.Count - 1].Length > 0 &&
                 index.Current - index.Operator == 1 &&
                 (inputFormat[index.Operator] == _parserSettings.ListIndexEndChar ||
                  inputFormat[index.Operator] == _parserSettings.NullableOperator))
-                currentPlaceholder.Selectors.Add(new Selector(Settings, inputFormat, index.LastEnd, index.Current,
-                    index.Operator,
-                    index.Selector));
+                currentPlaceholder.AddSelector(index.LastEnd, index.Current,index.Operator, index.Selector);
             else if (index.Operator != index.Current) // the selector only contains illegal ("trailing") operator characters
                 parsingErrors.AddIssue(currentFormat,
                     $"'0x{Convert.ToByte(inputFormat[index.Operator]):X}': " +
@@ -767,7 +763,7 @@ namespace SmartFormat.Core.Parsing
                     {
                         if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.BaseString), ph.StartIndex, ph.EndIndex);
+                            currentResult.ReplaceItem(i, new LiteralText(ph.Format ?? new Format(Settings, ph.BaseString), ph.StartIndex, ph.EndIndex));
                         }
                     }
                     return currentResult;
@@ -777,13 +773,13 @@ namespace SmartFormat.Core.Parsing
                     {
                         if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.BaseString), ph.StartIndex, ph.StartIndex);
+                            currentResult.ReplaceItem(i,  new LiteralText(ph.Format ?? new Format(Settings, ph.BaseString), ph.StartIndex, ph.StartIndex));
                         }
                     }
                     return currentResult;
                 case ParseErrorAction.OutputErrorInResult:
                     var fmt = new Format(Settings, parsingErrors.Message, 0, parsingErrors.Message.Length);
-                    fmt.Items.Add(new LiteralText(Settings, fmt));
+                    fmt.AddItem(new LiteralText(fmt));
                     return fmt;
                 default:
                     throw new ArgumentException("Illegal type for ParsingErrors", parsingErrors);

@@ -96,7 +96,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
                     level--;
                     if (level == 0)
                     {
-                        placeholders.Add((start, _inputFormatMemory.Slice(start, index + 1 - start)));
+                        placeholders.Add((start, _inputFormatMemory[start..(index + 1)]));
                     }
                 }
             }

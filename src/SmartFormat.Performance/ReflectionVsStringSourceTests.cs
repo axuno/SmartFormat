@@ -53,8 +53,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
         private readonly SmartFormatter _reflectionSourceFormatter;
         private readonly SmartFormatter _stringSourceFormatter;
-        
-        private readonly Address _address = new Address();
+
+        private readonly Address _address = new();
 
         private Format _formatCacheLiteral;
 

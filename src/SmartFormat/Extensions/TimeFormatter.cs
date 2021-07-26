@@ -115,7 +115,7 @@ namespace SmartFormat.Extensions
             if (provider.GetFormat(typeof(TimeTextInfo)) is TimeTextInfo timeTextInfo) return timeTextInfo;
 
             // See if there is a rule for this culture:
-            if (!(provider is CultureInfo cultureInfo))
+            if (provider is not CultureInfo cultureInfo)
                 return CommonLanguagesTimeTextInfo.GetTimeTextInfo(DefaultTwoLetterISOLanguageName);
 
             // If cultureInfo was supplied,

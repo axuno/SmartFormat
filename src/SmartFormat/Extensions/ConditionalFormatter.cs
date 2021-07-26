@@ -18,7 +18,7 @@ namespace SmartFormat.Extensions
     public class ConditionalFormatter : IFormatter
     {
         private static readonly Regex _complexConditionPattern
-            = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
+            = new(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
                 //   Description:      and/or    comparator     value
                 RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
@@ -117,7 +117,7 @@ namespace SmartFormat.Extensions
                 case DateTimeOffset dateTimeOffsetArg when dateTimeOffsetArg.UtcDateTime <= SystemTime.OffsetNow().UtcDateTime:
                     paramIndex = 0;
                     break;
-                case DateTimeOffset dateTimeOffsetArg:
+                case DateTimeOffset:
                     paramIndex = paramCount - 1;
                     break;
                 // TimeSpan: Negative|Zero|Positive  or  Negative/Zero|Positive
@@ -127,7 +127,7 @@ namespace SmartFormat.Extensions
                 case TimeSpan timeSpanArg when timeSpanArg.CompareTo(TimeSpan.Zero) <= 0:
                     paramIndex = 0;
                     break;
-                case TimeSpan timeSpanArg:
+                case TimeSpan:
                     paramIndex = paramCount - 1;
                     break;
                 case string stringArg:
@@ -209,9 +209,9 @@ namespace SmartFormat.Extensions
                 if (i == 0)
                     conditionResult = exp;
                 else if (andOrs[i].Value == "/")
-                    conditionResult = conditionResult | exp;
+                    conditionResult |= exp;
                 else
-                    conditionResult = conditionResult & exp;
+                    conditionResult &= exp;
             }
 
             // Successful
