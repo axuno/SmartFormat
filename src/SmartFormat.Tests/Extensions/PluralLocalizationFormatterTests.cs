@@ -12,11 +12,12 @@ namespace SmartFormat.Tests.Extensions
     {
         private void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             foreach (var test in expectedValuesAndResults)
             {
                 var value = test.Key;
                 var expected = test.Value;
-                var actual = Smart.Format(cultureInfo, format, value);
+                var actual = smart.Format(cultureInfo, format, value);
 
                 Assert.That(actual, Is.EqualTo(expected));
                 Debug.WriteLine(actual);
@@ -66,6 +67,7 @@ namespace SmartFormat.Tests.Extensions
              * but actually declaring them as u* doesn't.
              */
 
+            var smart = Smart.CreateDefaultSmartFormat();
             const string format = "There {0:plural(en):is|are} {0} {0:plural(en):item|items} remaining";
 
             var expectedResults = new[]
@@ -77,19 +79,19 @@ namespace SmartFormat.Tests.Extensions
 
             for (ushort i = 0; i < expectedResults.Length; i++)
             {
-                var actualResult = Smart.Format(format, i);
+                var actualResult = smart.Format(format, i);
                 Assert.AreEqual(expectedResults[i], actualResult);
             }
 
             for (uint i = 0; i < expectedResults.Length; i++)
             {
-                var actualResult = Smart.Format(format, i);
+                var actualResult = smart.Format(format, i);
                 Assert.AreEqual(expectedResults[i], actualResult);
             }
 
             for (ulong i = 0; i < (ulong)expectedResults.Length; i++)
             {
-                var actualResult = Smart.Format(format, i);
+                var actualResult = smart.Format(format, i);
                 Assert.AreEqual(expectedResults[i], actualResult);
             }
         }
@@ -191,7 +193,8 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 5, "5 many miesięcy")]
         public void NamedFormatter_should_use_specific_language(string format, object arg0, string expectedResult)
         {
-            var actualResult = Smart.Format(format, arg0);
+            var smart = Smart.CreateDefaultSmartFormat();
+            var actualResult = smart.Format(format, arg0);
             Assert.AreEqual(expectedResult, actualResult);
         }
 
@@ -201,21 +204,23 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0:plural:zero|one|many}", new[] { "alice", "bob" }, "many")]
         public void Test_should_allow_ienumerable_parameter(string format, object arg0, string expectedResult)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var culture = new CultureInfo("en-US");
-            var actualResult = Smart.Format(culture, format, arg0);
+            var actualResult = smart.Format(culture, format, arg0);
             Assert.AreEqual(expectedResult, actualResult);
         }
 
         [Test]
         public void Test_With_CustomPluralRuleProvider()
         {
-            var actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")), "{0:plural:Frau|Frauen}", new string[2], "more");
+            var smart = Smart.CreateDefaultSmartFormat();
+            var actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")), "{0:plural:Frau|Frauen}", new string[2], "more");
             Assert.AreEqual("Frauen", actualResult);
 
-            actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[2], "more");
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[2], "more");
             Assert.AreEqual("people", actualResult);
 
-            actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
             Assert.AreEqual("person", actualResult);
         }
     }
