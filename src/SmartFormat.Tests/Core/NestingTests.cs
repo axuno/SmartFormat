@@ -27,13 +27,15 @@ namespace SmartFormat.Tests.Core
         [TestCase("{ChildOne.ChildTwo.ChildThree: {Four} {0.ChildOne: {Two} {0.One} } }", " 4  2 1  ")]
         public void Nesting_can_access_root_via_number(string format, string expectedOutput)
         {
-            var actual = Smart.Format(format, data);
+            var smart = Smart.CreateDefaultSmartFormat();
+            var actual = smart.Format(format, data);
             Assert.AreEqual(expectedOutput, actual);
         }
 
         [Test]
         public void Nesting_CurrentScope_propertyName_outrules_OuterScope_propertyName()
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var nestedObject = new
             {
                 IdenticalName = "Name from parent", 
@@ -42,10 +44,10 @@ namespace SmartFormat.Tests.Core
             };
 
             // Access to outer scope, if no current scope variable is found
-            Assert.AreEqual(string.Format($"{nestedObject.ParentValue} - {nestedObject.Child.ChildValue}"), Smart.Format("{Child:{ParentValue} - {Child.ChildValue}|}", nestedObject));
+            Assert.AreEqual(string.Format($"{nestedObject.ParentValue} - {nestedObject.Child.ChildValue}"), smart.Format("{Child:{ParentValue} - {Child.ChildValue}|}", nestedObject));
 
             // Access to current scope, although outer scope variable with same name exists
-            Assert.AreNotEqual(string.Format($"{nestedObject.IdenticalName} - {nestedObject.Child.IdenticalName}"), Smart.Format("{Child:{IdenticalName} - {Child.IdenticalName}|}", nestedObject));
+            Assert.AreNotEqual(string.Format($"{nestedObject.IdenticalName} - {nestedObject.Child.IdenticalName}"), smart.Format("{Child:{IdenticalName} - {Child.IdenticalName}|}", nestedObject));
         }
 
         [Test]

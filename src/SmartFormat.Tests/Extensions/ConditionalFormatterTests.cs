@@ -23,7 +23,8 @@ namespace SmartFormat.Tests.Extensions
             };
 
             var args = new object[] {0, 1, 2, 3, -1, -2};
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
         [Test]
         public void Test_Enum()
@@ -40,7 +41,8 @@ namespace SmartFormat.Tests.Extensions
             };
 
             var args = new object[] {TestFactory.GetPerson(), TestFactory.GetPerson(), new DateTime(1111,1,1,1,1,1), new DateTime(5555,5,5,5,5,5)};
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
@@ -56,7 +58,8 @@ namespace SmartFormat.Tests.Extensions
             };
 
             var args = new object[]{false, true};
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
@@ -73,7 +76,8 @@ namespace SmartFormat.Tests.Extensions
 
             // only the date part will be compared
             var args = new object[] {new DateTime(1111,1,1,1,1,1),SystemTime.Now(),new DateTime(5555,5,5,5,5,5)};
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
         [Test]
         public void Test_DateTimeOffset_Dates()
@@ -90,7 +94,8 @@ namespace SmartFormat.Tests.Extensions
             // only the date part will be compared
             var args = new object[]
                 {SystemTime.OffsetNow().AddDays(-1), SystemTime.OffsetNow(), SystemTime.OffsetNow().AddDays(1)};
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
@@ -106,7 +111,8 @@ namespace SmartFormat.Tests.Extensions
             };
 
             var args = new object[] {new TimeSpan(-1,-1,-1,-1,-1), TimeSpan.Zero,new TimeSpan(5,5,5,5,5)};
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [TestCase("{0:cond:{}|Empty}", "Hello")]
@@ -115,7 +121,8 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Strings(string format, string expected)
         {
             var args = new object[] { "Hello", "", null! };
-            Smart.Default.Test(format, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(format, args, expected);
         }
 
         [TestCase("{0:cond:{}|Null}", "{ NotNull = True }")] // 'expected' comes from the default formatter, writing the anonymous type with 'ToString()'
@@ -123,7 +130,8 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Object(string format, string expected)
         {
             var args = new object[] {new {NotNull = true}, null!};
-            Smart.Default.Test(format, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(format, args, expected);
         }
 
         [Test]
@@ -160,15 +168,16 @@ namespace SmartFormat.Tests.Extensions
                 "Senior Citizen",
                 "Crazy Old",
             };
-
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [TestCase("{0:part(s)|car}", true, "part(s)")]
         [TestCase("{0:part(s)|car}", false, "car")]
         public void Syntax_should_not_be_confused_with_named_formatters(string format, object arg0, string expectedOutput)
         {
-            var actualOutput = Smart.Format(format, arg0);
+            var smart = Smart.CreateDefaultSmartFormat();
+            var actualOutput = smart.Format(format, arg0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
     }

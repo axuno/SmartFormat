@@ -94,16 +94,14 @@ namespace SmartFormat.Tests.Extensions
         public void Format_Complex_Json()
         {
             var jObject = JsonDocument.Parse(JsonComplex.Replace("'", "\"")).RootElement;
-            var savedSetting = Smart.Default.Settings.CaseSensitivity;
-            Smart.Default.Settings.CaseSensitivity = CaseSensitivityType.CaseSensitive;
             Assert.Multiple(() =>
             {
                 var smart = GetFormatterWithJsonSource();
+                smart.Settings.CaseSensitivity = CaseSensitivityType.CaseSensitive;
                 Assert.AreEqual("50.00", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[0].Products[0].Price:0.00}", jObject));
                 Assert.AreEqual("True", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[0].OnStock}", jObject));
                 Assert.AreEqual("False", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[1].OnStock}", jObject));
             });
-            Smart.Default.Settings.CaseSensitivity = savedSetting;
         }
 
         [Test]

@@ -36,7 +36,8 @@ namespace SmartFormat.Tests.Core
 
         public void Invoke_extensions_by_name_or_shortname(string format, object arg0, string expectedResult)
         {
-            var actualResult = Smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
+            var smart = Smart.CreateDefaultSmartFormat();
+            var actualResult = smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
             Assert.AreEqual(expectedResult, actualResult);
         }
 
@@ -47,10 +48,11 @@ namespace SmartFormat.Tests.Core
         [TestCase(false, "no (possibly)")]
         public void Conditional_Formatter_With_Parenthesis(bool value, string expected)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             // explicit conditional formatter
-            Assert.AreEqual(expected, Smart.Format("{value:conditional:yes (probably)|no (possibly)}", new { value }));
+            Assert.AreEqual(expected, smart.Format("{value:conditional:yes (probably)|no (possibly)}", new { value }));
             // implicit
-            Assert.AreEqual(expected, Smart.Format("{value:yes (probably)|no (possibly)}", new { value }));
+            Assert.AreEqual(expected, smart.Format("{value:yes (probably)|no (possibly)}", new { value }));
         }
 
         #region: Custom Extensions :
