@@ -31,23 +31,26 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Simple_List()
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var items = new[] { "one", "two", "three" };
-            var result = Smart.Default.Format("{0:list:{}|, |, and }", new object[] { items }); // important: not only "items" as the parameter
+            var result = smart.Format("{0:list:{}|, |, and }", new object[] { items }); // important: not only "items" as the parameter
             Assert.AreEqual("one, two, and three", result);
         }
 
         [Test]
         public void Empty_List()
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var items = Array.Empty<string>();
-            var result = Smart.Default.Format("{0:list:{}|, |, and }", new object[] { items });
+            var result = smart.Format("{0:list:{}|, |, and }", new object[] { items });
             Assert.AreEqual(string.Empty, result);
         }
 
         [Test]
         public void Null_List()
         {
-            var result = Smart.Default.Format("{TheList?:list:{}|, |, and }", new { TheList = default(object)});
+            var smart = Smart.CreateDefaultSmartFormat();
+            var result = smart.Format("{TheList?:list:{}|, |, and }", new { TheList = default(object)});
             Assert.AreEqual(string.Empty, result);
         }
 
@@ -65,19 +68,20 @@ namespace SmartFormat.Tests.Extensions
             {
                 Persons = data.Where(p => p.Gender == "M")
             };
-
-            Smart.Default.Settings.StringFormatCompatibility = false; // mandatory for this test case because of consecutive curly braces
-            Smart.Default.Settings.Formatter.ErrorAction = SmartFormat.Core.Settings.FormatErrorAction.ThrowError;
-            Smart.Default.Settings.Parser.ErrorAction = SmartFormat.Core.Settings.ParseErrorAction.ThrowError;
+            
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Settings.StringFormatCompatibility = false; // mandatory for this test case because of consecutive curly braces
+            smart.Settings.Formatter.ErrorAction = SmartFormat.Core.Settings.FormatErrorAction.ThrowError;
+            smart.Settings.Parser.ErrorAction = SmartFormat.Core.Settings.ParseErrorAction.ThrowError;
 
             // Note: it's faster to add the named formatter, than finding it implicitly by "trial and error".
-            var result = Smart.Default.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C
+            var result = smart.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C
             Assert.AreEqual("Person A, Person B, and Person C", result);
-            result = Smart.Default.Format("{0:list:{Name}|, |, and }", model.Persons);  // Person A, and Person C
+            result = smart.Format("{0:list:{Name}|, |, and }", model.Persons);  // Person A, and Person C
             Assert.AreEqual("Person A, and Person C", result);
-            result = Smart.Default.Format("{0:list:{Name}|, |, and }", data.Where(p => p.Gender == "F"));  // Person B
+            result = smart.Format("{0:list:{Name}|, |, and }", data.Where(p => p.Gender == "F"));  // Person B
             Assert.AreEqual("Person B", result);
-            result = Smart.Default.Format("{0:{Persons:list:{Name}|, }}", model); // Person A, and Person C
+            result = smart.Format("{0:{Persons:list:{Name}|, }}", model); // Person A, and Person C
             Assert.AreEqual("Person A, Person C", result);
         }
 
@@ -89,8 +93,9 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{4:list:N2|, |, and }","1.00, 2.00, 3.00, 4.00, and 5.00")]
         public void FormatTest(string format, string expected)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var args = GetArgs();
-            Smart.Default.Test(new[] {format}, args, new[] {expected});
+            smart.Test(new[] {format}, args, new[] {expected});
 
         }
 
@@ -100,16 +105,18 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0:list:({})|, |, and }", "(A), (B), (C), (D), and (E)")]
         public void NestedFormatTest(string format, string expected)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var args = GetArgs();
-            Smart.Default.Test(new[] {format}, args, new[] {expected});
+            smart.Test(new[] {format}, args, new[] {expected});
         }
         [TestCase("{2:list:{:{FirstName}}|, }", "Jim, Pam, Dwight")]
         [TestCase("{3:list:{:M/d/yyyy} |}", "1/1/2000 10/10/2010 5/5/5555 ")]
         [TestCase("{2:list:{:{FirstName}'s friends: {Friends:list:{FirstName}|, }}|; }", "Jim's friends: Dwight, Michael; Pam's friends: Dwight, Michael; Dwight's friends: Michael")]
         public void NestedArraysTest(string format, string expected)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var args = GetArgs();
-            Smart.Default.Test(new[] {format}, args, new[] {expected});
+            smart.Test(new[] {format}, args, new[] {expected});
         }
 
         [Test] /* added due to problems with [ThreadStatic] see: https://github.com/axuno/SmartFormat.NET/pull/23 */
@@ -118,6 +125,7 @@ namespace SmartFormat.Tests.Extensions
             // Old test did not show wrong Index value - it ALWAYS passed even when using ThreadLocal<int> or [ThreadStatic] respectively:
             // const string format = "{wheres.Count::>0? where |}{wheres:{}| and }";
             const string format = "Wheres-Index={Index}.";
+            var smart = Smart.CreateDefaultSmartFormat();
 
             var wheres = new List<string>{"test1 = test1", "test2 = test2"};
             
@@ -127,7 +135,7 @@ namespace SmartFormat.Tests.Extensions
                 tasks.Add(Task.Factory.StartNew(val =>
                 {
                     Thread.Sleep(5 * (int)(val ?? 100));
-                    string ret = Smart.Default.Format(format, wheres);
+                    string ret = smart.Format(format, wheres);
                     Thread.Sleep(5 * (int)(val ?? 100)); /* add some delay to force ThreadPool swapping */
                     return ret;
                 }, i));
@@ -165,14 +173,16 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{Index}", "-1")] // Index can be used out-of-context, but should always be -1
         public void TestIndex(string format, string expected)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             var args = GetArgs();
-            Smart.Default.Test(new[] {format}, args, new[] {expected});
+            smart.Test(new[] {format}, args, new[] {expected});
         }
 
         [Test]
         public void Test_Not_An_IList_Argument()
         {
-            Assert.That(() => Smart.Format("{0:list:{}|, |, and }", "not a list"),
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:list:{}|, |, and }", "not a list"),
                 Throws.Exception.TypeOf<FormattingException>().And.Message
                     .Contains("No suitable Formatter"));
         }

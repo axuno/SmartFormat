@@ -46,7 +46,8 @@ namespace SmartFormat.Tests.Extensions
                 "Nested: Michael 7 Scranton Pennsylvania"
             };
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
@@ -146,7 +147,8 @@ namespace SmartFormat.Tests.Extensions
             var args = new object[] {
                 new MiscObject(),
             };
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
