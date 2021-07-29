@@ -14,9 +14,18 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class DefaultFormatter : IFormatter
     {
-        /// <inheritdoc/>>
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
         public string[] Names { get; set; } = {"default", "d", string.Empty};
 
+        ///<inheritdoc/>
+        public string Name { get; set; } = "d";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
+        
         /// <summary>
         /// Checks, if the current value of the <see cref="ISelectorInfo"/> can be processed by the <see cref="DefaultFormatter"/>.
         /// </summary>
@@ -26,6 +35,7 @@ namespace SmartFormat.Extensions
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
+            
             // If the format has nested placeholders, we process those first
             // instead of formatting the item.
             if (format is {HasNested: true})

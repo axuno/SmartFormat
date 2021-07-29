@@ -12,12 +12,23 @@ namespace SmartFormat.Core.Extensions
     public interface IFormatter
     {
         /// <summary>
-        /// An extension can be explicitly called by using any of its names.
-        /// Any extensions with empty names will be called implicitly (when no named formatter is specified).
-        /// For example, "{0:default:N2}" or "{0:d:N2}" will explicitly call the "default" extension.
-        /// "{0:N2}" will implicitly call the "default" extension, and other extensions containing <see cref="string.Empty"/> as a name, too.
+        /// An extension can be explicitly called by using its name.
+        /// For example, "{0:list:N2}" will explicitly call the "list" extension.
         /// </summary>
-        string[] Names { get; set; }
+        string Name { get; set; }
+
+        /// <summary>
+        /// Any extensions marked as <see cref="CanAutoDetect"/> will be called implicitly
+        /// (when no formatter name is specified in the input format string).
+        /// For example, "{0:N2}" will implicitly call extensions marked as <see cref="CanAutoDetect"/>.
+        /// Implicit formatter invocations should not throw exceptions.
+        /// With <see cref="CanAutoDetect"/>=<see langword="false"/>, the formatter can only be
+        /// called by its name in the input format string.
+        /// </summary>
+        /// <remarks>
+        /// If more than one registered <see cref="IFormatter"/> can auto-detect, the first one in the formatter list will win.
+        /// </remarks>
+        bool CanAutoDetect { get; set; }
 
         /// <summary>
         /// Writes the current value to the output, using the specified format.

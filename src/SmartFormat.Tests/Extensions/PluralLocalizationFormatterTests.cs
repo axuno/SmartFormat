@@ -10,7 +10,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class PluralLocalizationFormatterTests
     {
-        private void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
+        private static void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
         {
             var smart = Smart.CreateDefaultSmartFormat();
             foreach (var test in expectedValuesAndResults)

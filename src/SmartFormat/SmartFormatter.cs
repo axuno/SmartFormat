@@ -104,7 +104,7 @@ namespace SmartFormat
         /// </summary>
         /// <param name="formatterExtensions"></param>
         /// <exception cref="T:System.ArgumentException">
-        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Names"/> that already exist.
+        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Name"/> that already exist.
         /// </exception>
         public void AddExtensions(params IFormatter[] formatterExtensions)
         {
@@ -124,7 +124,7 @@ namespace SmartFormat
         ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
         /// </exception>
         /// <exception cref="T:System.ArgumentException">
-        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Names"/> that already exist.
+        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Name"/> that already exist.
         /// </exception>
         public void AddExtensions(int position, params IFormatter[] formatterExtensions)
         {
@@ -132,7 +132,7 @@ namespace SmartFormat
             {
                 if (_formatterExtensions.All(fx => fx.GetType() != format.GetType()))
                 {
-                    if(_formatterExtensions.Any(fx => fx.Names.Where(n => n != string.Empty).Intersect(format.Names.Where(n => n != string.Empty)).Any()))
+                    if(_formatterExtensions.Any(fx => fx.Name.Equals(format.Name)))
                         throw new ArgumentException($"Formatter '{format.GetType().Name}' uses existing name.", nameof(formatterExtensions));
 
                     if(format is IInitializer sourceToInitialize) 
@@ -533,7 +533,7 @@ namespace SmartFormat
             }
 
             var formatterName = formattingInfo.Placeholder.FormatterName;
-            var comparer = Settings.GetCaseSensitivityComparer();
+            var comparison = Settings.GetCaseSensitivityComparison();
 
             // Compatibility mode does not support formatter extensions except this one:
             if (Settings.StringFormatCompatibility)
@@ -546,8 +546,8 @@ namespace SmartFormat
             // Try to evaluate using the not empty formatter name from the format string
             if (!string.IsNullOrEmpty(formatterName))
             {
-                var extension = FormatterExtensions.FirstOrDefault(fe =>
-                    fe.Names.Contains(formatterName, comparer));
+                var extension =
+                    FormatterExtensions.FirstOrDefault(fe => string.Equals(fe.Name, formatterName, comparison));
                 if (extension is null)
                     throw formattingInfo.FormattingException($"No formatter with name '{formatterName}' found",
                         formattingInfo.Format, formattingInfo.Selector?.SelectorIndex ?? -1);
@@ -556,13 +556,9 @@ namespace SmartFormat
             }
             
             // Go through all (implicit) formatters which contain an empty name
-            foreach (var formatterExtension in FormatterExtensions.Where(fe => fe.Names.Contains(string.Empty, comparer)))
-            {
-                // Return true if handled by an extension
-                if (formatterExtension.TryEvaluateFormat(formattingInfo)) return true;
-            }
- 
-            return false;
+            return FormatterExtensions.Where(fe => fe.CanAutoDetect)
+                .Any(formatterExtension => formatterExtension.
+                    TryEvaluateFormat(formattingInfo));
         }
 
         /// <summary>

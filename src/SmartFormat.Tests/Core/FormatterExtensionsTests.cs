@@ -1,36 +1,92 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core
 {
     [TestFixture]
-    public class NamedFormatterTests_Custom
+    public class FormatterExtensionsTests
     {
+        private List<IFormatter> GetAllFormatters()
+        {
+            return new List<IFormatter>(new IFormatter[]
+            {
+                new ChooseFormatter(), new ConditionalFormatter(), new IsMatchFormatter(), new ListFormatter(),
+                new NullFormatter(), new SubStringFormatter(), new TemplateFormatter(), new TimeFormatter("en"),
+                new XElementFormatter()
+            });
+        }
+
+        private IFormattingInfo GetFormattingInfo(string format, IList<object> data)
+        {
+            var formatter = new SmartFormatter(new SmartSettings());
+            var formatParsed = formatter.Parser.ParseFormat(format);
+            var formatDetails = new FormatDetails(formatter, formatParsed, data, null, new StringOutput());
+            return new FormattingInfo(formatDetails, formatDetails.OriginalFormat, data);
+        }
+
+        [Test]
+        public void Formatters_Can_Be_Initialized()
+        {
+            foreach (var formatter in GetAllFormatters())
+            {
+                var guid = Guid.NewGuid().ToString("N");
+                var negatedAutoDetection = formatter.CanAutoDetect;
+                formatter.Name = guid;
+                Assert.That(formatter.Name, Is.EqualTo(guid));
+                
+                if (formatter is not TemplateFormatter)
+                {
+                    formatter.CanAutoDetect = negatedAutoDetection;
+                    Assert.That(formatter.CanAutoDetect, Is.EqualTo(negatedAutoDetection));
+                }
+
+                if (formatter is IInitializer)
+                {
+                    Assert.That(() => ((IInitializer) formatter).Initialize(new SmartFormatter()), Throws.Nothing);
+                }
+            }
+        }
+
+        [Test]
+        public void Formatters_AutoDetection_Should_Not_Throw()
+        {
+            foreach (var formatter in GetAllFormatters().Where(f => f.CanAutoDetect))
+            {
+                Assert.That(() => formatter.TryEvaluateFormat(GetFormattingInfo("", new List<object>() {new object()})),
+                    Throws.Nothing);
+            }
+        }
+
         #region: Default Extensions :
 
         [Test]
-        [TestCase("{0:conditional:zero|one|two}", 0, "zero")]
-        [TestCase("{0:conditional:zero|one|two}", 1, "one")]
-        [TestCase("{0:conditional:zero|one|two}", 2, "two")]
+        [TestCase("{0:cond:zero|one|two}", 0, "zero")]
+        [TestCase("{0:cond:zero|one|two}", 1, "one")]
+        [TestCase("{0:cond:zero|one|two}", 2, "two")]
         [TestCase("{0:cond:zero|one|two}", 0, "zero")]
         [TestCase("{0:cond:zero|one|two}", 1, "one")]
         [TestCase("{0:cond:zero|one|two}", 2, "two")]
         
         [TestCase("{0:plural:one|many}", 1, "one")]
         [TestCase("{0:plural:one|many}", 2, "many")]
-        [TestCase("{0:p:one|many}", 1, "one")]
-        [TestCase("{0:p:one|many}", 2, "many")]
+        [TestCase("{0:plural:one|many}", 1, "one")]
+        [TestCase("{0:plural:one|many}", 2, "many")]
 
         [TestCase("{0:list:+{}|, |, and }", new []{ 1, 2, 3 }, "+1, +2, and +3")]
-        [TestCase("{0:l:+{}|, |, and }", new []{ 1, 2, 3 }, "+1, +2, and +3")]
+        [TestCase("{0:list:+{}|, |, and }", new []{ 1, 2, 3 }, "+1, +2, and +3")]
         
-        [TestCase("{0:default()}", 5, "5")]
-        [TestCase("{0:default:N2}", 5, "5.00")]
+        [TestCase("{0:d()}", 5, "5")]
+        [TestCase("{0:d:N2}", 5, "5.00")]
         [TestCase("{0:d()}", 5, "5")]
         [TestCase("{0:d:N2}", 5, "5.00")]
 
@@ -50,7 +106,7 @@ namespace SmartFormat.Tests.Core
         {
             var smart = Smart.CreateDefaultSmartFormat();
             // explicit conditional formatter
-            Assert.AreEqual(expected, smart.Format("{value:conditional:yes (probably)|no (possibly)}", new { value }));
+            Assert.AreEqual(expected, smart.Format("{value:cond:yes (probably)|no (possibly)}", new { value }));
             // implicit
             Assert.AreEqual(expected, smart.Format("{value:yes (probably)|no (possibly)}", new { value }));
         }
@@ -82,10 +138,10 @@ namespace SmartFormat.Tests.Core
         [TestCase("{0:test2(a,b,c):}", 5, "TestExtension2 Options: a,b,c, Format: ")]
         [TestCase("{0:test2(a,b,c):N2}", 5, "TestExtension2 Options: a,b,c, Format: N2")]
 
-        [TestCase("{0:default:}", 5, "5")]
-        [TestCase("{0:default():}", 5, "5")]
-        [TestCase("{0:default:N2}", 5, "5.00")]
-        [TestCase("{0:default():N2}", 5, "5.00")]
+        [TestCase("{0:d:}", 5, "5")]
+        [TestCase("{0:d():}", 5, "5")]
+        [TestCase("{0:d:N2}", 5, "5.00")]
+        [TestCase("{0:d():N2}", 5, "5.00")]
         public void NamedFormatter_invokes_a_specific_formatter(string format, object arg0, string expectedResult)
         {
             var smart = GetCustomFormatter();
@@ -93,28 +149,15 @@ namespace SmartFormat.Tests.Core
             Assert.AreEqual(expectedResult, actualResult);
         }
 
-        /*
-         * Since version 1.7.0.0 the parser treats names of formatters which are not registered, just as format string for the DefaultFormatter.
-         * This makes SmartFormat compatible to string.Format again, especially in case of time formats like "HH:mm:ss".
         [Test]
-        [TestCase("{0:invalid:}")]
-        [TestCase("{0:invalid():}")]
-        [TestCase("{0:invalid(___):___}")]
-        public void Unhandled_formats_throw(string format)
-        {
-            var smart = GetCustomFormatter();
-            Assert.Throws<FormattingException>(() => smart.Format(format, 99999));
-        }
-        */
-
-        [Test]
-        [TestCase("{0:test2:}", 5, "TestExtension1 Options: , Format: ")]
+        [TestCase("{0:test1:}", 5, "TestExtension1 Options: , Format: ")]
         [TestCase("{0}", 5, "TestExtension2 Options: , Format: ")]
         [TestCase("{0:N2}", 5, "TestExtension2 Options: , Format: N2")]
-        public void Implicit_formatters_require_an_empty_string(string format, object arg0, string expectedOutput)
+        public void Implicit_formatters_require_an_isDefaultFormatter_flag(string format, object arg0, string expectedOutput)
         {
             var formatter = GetCustomFormatter();
-            formatter.GetFormatterExtension<TestExtension1>()!.Names = new[] {"test2"};
+            formatter.GetFormatterExtension<TestExtension1>()!.CanAutoDetect = false;
+            formatter.GetFormatterExtension<TestExtension2>()!.CanAutoDetect = true;
             var actual = formatter.Format(format, arg0);
             Assert.AreEqual(expectedOutput, actual);
         }
@@ -130,8 +173,11 @@ namespace SmartFormat.Tests.Core
 
         private class TestExtension1 : IFormatter
         {
-            private string[] names = { "test1", "t1", "" };
-            public string[] Names { get { return names; } set { names = value; } }
+            ///<inheritdoc/>
+            public string Name { get; set; } = "test1";
+
+            ///<inheritdoc/>
+            public bool CanAutoDetect { get; set; } = true;
 
             public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
             {
@@ -144,7 +190,11 @@ namespace SmartFormat.Tests.Core
         }
         private class TestExtension2 : IFormatter
         {
-            public string[] Names { get; set; } = { "test2", "t2", "" };
+            ///<inheritdoc/>
+            public string Name { get; set; } = "test2";
+
+            ///<inheritdoc/>
+            public bool CanAutoDetect { get; set; } = true;
 
             public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
             {

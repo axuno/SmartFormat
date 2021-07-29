@@ -108,17 +108,24 @@ namespace SmartFormat.Tests.Core
             Assert.That(smart.Format(format, arg), Is.EqualTo(expected));
         }
 
-        [TestCase(1)]
-        [TestCase(2)]
-        public void Nested_PlaceHolders_Conditional(int numOfPeople)
+        [TestCase(1, "There {People.Count:plural:is a person.|are {} people.}", false)]
+        [TestCase(2, "There {People.Count:plural:is a person.|are {} people.}", false)]
+        [TestCase(1, "There {People.Count:is a person.|are {} people.}", true)]
+        [TestCase(2, "There {People.Count:is a person.|are {} people.}", true)]
+        public void Nested_PlaceHolders_Pluralization(int numOfPeople, string format, bool markAsDefault)
         {
-
             var data = numOfPeople == 1
                 ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
                 : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
-            var formatter = Smart.CreateDefaultSmartFormat();
             
-            var result = formatter.Format("There {People.Count:is a person.|are {} people.}", data);
+            var formatter = new SmartFormatter();
+            formatter.AddExtensions(new ReflectionSource());
+            // Note: If pluralization AND conditional formatters are registers, the formatter
+            //       name MUST be included in the format string, because both could return successful evaluation
+            // Here, we register only pluralization:
+            formatter.AddExtensions(new PluralLocalizationFormatter("en"){CanAutoDetect = markAsDefault}, new DefaultFormatter());
+            
+            var result = formatter.Format(format, data);
             
             Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
         }
@@ -209,7 +216,7 @@ namespace SmartFormat.Tests.Core
             var formatter = new SmartFormatter();
             var firstExtension = new DefaultFormatter();
             formatter.AddExtensions(firstExtension);
-            var dupeExtension = new NullFormatter {Names = firstExtension.Names};
+            var dupeExtension = new NullFormatter {Name = firstExtension.Name};
             Assert.That(() => formatter.AddExtensions(dupeExtension), Throws.TypeOf(typeof(ArgumentException)));
         }
 
