@@ -44,7 +44,7 @@ namespace SmartFormat.Extensions
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var parameters = formattingInfo.FormatterOptions?.Split(ParameterDelimiter) ?? Array.Empty<string>();
-            if (parameters.Length == 1 && parameters[0].Length == 0)
+            if (formattingInfo.CurrentValue is not (string or null) || parameters.Length == 1 && parameters[0].Length == 0)
             {
                 // Auto detection calls just return a failure to evaluate
                 if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
@@ -52,7 +52,7 @@ namespace SmartFormat.Extensions
 
                 // throw, if the formatter has been called explicitly
                 throw new FormatException(
-                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 1 formatter option.");
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 1 formatter option and a string? argument.");
             }
 
             var currentValue = formattingInfo.CurrentValue?.ToString();

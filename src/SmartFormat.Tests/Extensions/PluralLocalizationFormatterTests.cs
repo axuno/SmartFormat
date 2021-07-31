@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using NUnit.Framework;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
 using SmartFormat.Utilities;
 using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
@@ -22,6 +23,20 @@ namespace SmartFormat.Tests.Extensions
                 Assert.That(actual, Is.EqualTo(expected));
                 Debug.WriteLine(actual);
             }
+        }
+
+        [Test]
+        public void Explicit_Formatter_With_Not_Enough_Parameters_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:plural:One}", 1), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void Explicit_Formatter_Without_IEnumerable_Arg_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:plural:One|Two}", new object()), Throws.Exception.TypeOf<FormattingException>());
         }
 
         [Test]
