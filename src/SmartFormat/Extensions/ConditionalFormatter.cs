@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
@@ -18,26 +19,45 @@ namespace SmartFormat.Extensions
     public class ConditionalFormatter : IFormatter
     {
         private static readonly Regex _complexConditionPattern
-            = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
+            = new(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
                 //   Description:      and/or    comparator     value
                 RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        ///<inheritdoc />
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
         public string[] Names { get; set; } = {"conditional", "cond", string.Empty};
 
+        ///<inheritdoc/>
+        public string Name { get; set; } = "cond";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
+        
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
-
-            if (format == null) return false;
+            
             // Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
-            if (format.BaseString[format.StartIndex] == ':') format = format.Substring(1);
+            if (format?.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') format = format.Substring(1);
 
             // See if the format string contains un-nested "|":
-            var parameters = format.Split('|');
-            if (parameters.Count == 1) return false; // There are no parameters found.
+            var parameters = format is not null ? format.Split('|') : new List<Format>(0);
+
+            // Check whether arguments can be handled by this formatter
+            if (format is null || parameters.Count == 1)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 format parameters.");
+            }
 
             // See if the value is a number:
             var currentIsNumber =
@@ -118,7 +138,7 @@ namespace SmartFormat.Extensions
                 case DateTimeOffset dateTimeOffsetArg when dateTimeOffsetArg.UtcDateTime <= SystemTime.OffsetNow().UtcDateTime:
                     paramIndex = 0;
                     break;
-                case DateTimeOffset dateTimeOffsetArg:
+                case DateTimeOffset:
                     paramIndex = paramCount - 1;
                     break;
                 // TimeSpan: Negative|Zero|Positive  or  Negative/Zero|Positive
@@ -128,7 +148,7 @@ namespace SmartFormat.Extensions
                 case TimeSpan timeSpanArg when timeSpanArg.CompareTo(TimeSpan.Zero) <= 0:
                     paramIndex = 0;
                     break;
-                case TimeSpan timeSpanArg:
+                case TimeSpan:
                     paramIndex = paramCount - 1;
                     break;
                 case string stringArg:
@@ -210,9 +230,9 @@ namespace SmartFormat.Extensions
                 if (i == 0)
                     conditionResult = exp;
                 else if (andOrs[i].Value == "/")
-                    conditionResult = conditionResult | exp;
+                    conditionResult |= exp;
                 else
-                    conditionResult = conditionResult & exp;
+                    conditionResult &= exp;
             }
 
             // Successful

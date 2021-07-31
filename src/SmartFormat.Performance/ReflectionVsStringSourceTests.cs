@@ -53,11 +53,9 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
         private readonly SmartFormatter _reflectionSourceFormatter;
         private readonly SmartFormatter _stringSourceFormatter;
+
+        private readonly Address _address = new();
         
-        private readonly Address _address = new Address();
-
-        private Format _formatCacheLiteral;
-
         public ReflectionVsStringSourceTests()
         {
             _reflectionSourceFormatter = new SmartFormatter();
@@ -108,7 +106,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _reflectionSourceFormatter.Format(_formatCacheLiteral,"Address: {0} {1}, {2}", _address.City.ZipCode,
+                _ = _reflectionSourceFormatter.Format(_formatCache, _address.City.ZipCode,
                     _address.City.Name, _address.City.AreaCode);
             }
         }
@@ -118,7 +116,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _stringSourceFormatter.Format(_formatCacheLiteral,"Address: {0} {1}, {2}", _address.City.ZipCode,
+                _ = _stringSourceFormatter.Format(_formatCache,_address.City.ZipCode,
                     _address.City.Name, _address.City.AreaCode);
             }
         }

@@ -48,7 +48,7 @@ namespace SmartFormat.Tests.Extensions
     }
   ]
 }";
-        private SmartFormatter GetFormatterWithJsonSource()
+        private static SmartFormatter GetFormatterWithJsonSource()
         {
             var smart = new SmartFormatter();
             // SystemTextJsonSource MUST be registered before ReflectionSource (which is not required here)

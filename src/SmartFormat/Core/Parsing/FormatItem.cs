@@ -75,7 +75,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// The settings for formatter and parser.
         /// </summary>
-        protected SmartSettings SmartSettings;
+        internal SmartSettings SmartSettings;
 
         /// <summary>
         /// CTOR.

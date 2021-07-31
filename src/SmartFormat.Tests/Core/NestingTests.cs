@@ -7,7 +7,7 @@ namespace SmartFormat.Tests.Core
     {
         public NestingTests()
         {
-            data = new {
+            _data = new {
                 One = 1,
                 ChildOne = new {
                     Two = 2,
@@ -20,7 +20,7 @@ namespace SmartFormat.Tests.Core
                 }
             };
         }
-        private object data;
+        private readonly object _data;
 
         [Test]
         [TestCase("{ChildOne.ChildTwo: {Three} {0.One} }", " 3 1 ")]
@@ -28,7 +28,7 @@ namespace SmartFormat.Tests.Core
         public void Nesting_can_access_root_via_number(string format, string expectedOutput)
         {
             var smart = Smart.CreateDefaultSmartFormat();
-            var actual = smart.Format(format, data);
+            var actual = smart.Format(format, _data);
             Assert.AreEqual(expectedOutput, actual);
         }
 
@@ -59,7 +59,7 @@ namespace SmartFormat.Tests.Core
         {
             // Removing the spaces from Nesting_can_access_outer_scopes requires alternative escaping of { and }!
             var sf = Smart.CreateDefaultSmartFormat();
-            var actual = sf.Format(format, data);
+            var actual = sf.Format(format, _data);
             Assert.AreEqual(expectedOutput, actual);
         }
     }

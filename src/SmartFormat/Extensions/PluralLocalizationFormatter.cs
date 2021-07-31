@@ -18,10 +18,9 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class PluralLocalizationFormatter : IFormatter
     {
-
         /// <summary>
         /// Initializes the plugin with rules for many common languages.
-        /// If no CultureInfo is supplied to the formatter, the
+        /// If no <see cref="CultureInfo"/> is supplied to the formatter, the
         /// default language rules will be used by default.
         /// </summary>
         /// <remarks>
@@ -38,8 +37,17 @@ namespace SmartFormat.Extensions
         /// </summary>
         public string DefaultTwoLetterISOLanguageName { get; set; }
 
-        ///<inheritdoc />
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
         public string[] Names { get; set; } = {"plural", "p", string.Empty};
+
+        ///<inheritdoc/>
+        public string Name { get; set; } = "plural";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
 
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
@@ -57,6 +65,8 @@ namespace SmartFormat.Extensions
 
             decimal value;
 
+            // Check whether arguments can be handled by this formatter
+            
             // We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
             // in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
             // 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
@@ -65,8 +75,15 @@ namespace SmartFormat.Extensions
             else if (current is IEnumerable<object> objects)
                 value = objects.Count();
             else
-                return false;
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
 
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' can format numbers and IEnumerables, but the argument was of type '{current?.GetType().ToString() ?? "null"}'");
+            }
 
             // Get the specific plural rule, or the default rule:
             var pluralRule = GetPluralRule(formattingInfo);
@@ -75,7 +92,7 @@ namespace SmartFormat.Extensions
             var pluralIndex = pluralRule(value, pluralCount);
 
             if (pluralIndex < 0 || pluralWords.Count <= pluralIndex)
-                throw new FormattingException(format, "Invalid number of plural parameters",
+                throw new FormattingException(format, $"Invalid number of plural parameters in {nameof(PluralLocalizationFormatter)}",
                     pluralWords.Last().EndIndex);
 
             // Output the selected word (allowing for nested formats):

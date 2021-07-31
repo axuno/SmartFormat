@@ -42,8 +42,17 @@ namespace SmartFormat.Extensions
     {
         private SmartSettings _smartSettings = new();
 
-        ///<inheritdoc />
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
         public string[] Names { get; set; } = {"list", "l", string.Empty};
+
+        ///<inheritdoc/>
+        public string Name { get; set; } = "list";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
 
         /// <summary>
         /// This allows an integer to be used as a selector to index an array (or list).
@@ -100,7 +109,7 @@ namespace SmartFormat.Extensions
         /// <remarks>
         /// Wrap, so that CollectionIndex can be used without code changes.
         /// </remarks>
-        private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
+        private static readonly AsyncLocal<int?> _collectionIndex = new();
 
         /// <remarks>
         /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
@@ -132,20 +141,21 @@ namespace SmartFormat.Extensions
                 return true;
             }
 
-            // This extension requires at least IEnumerable
-            var enumerable = current as IEnumerable;
-            if (enumerable == null) return false;
-            // Ignore Strings, because they're IEnumerable.
-            // This issue might actually need a solution
-            // for other objects that are IEnumerable.
-            if (current is string) return false;
-            // If the object is IFormattable, will be handled with DefaultFormatter
-            if (current is IFormattable) return false;
+            // See if the format string contains un-nested "|":
+            var parameters = format is not null ? format.Split('|', 4) : new List<Format>(0);
 
-            // This extension requires a | to specify the spacer:
-            if (format == null) return false;
-            var parameters = format.Split('|', 4);
-            if (parameters.Count < 2) return false;
+            // Check whether arguments can be handled by this formatter
+            if (format is null || parameters.Count < 2 || current is not IEnumerable enumerable 
+                || current is string or IFormattable)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires an IEnumerable argument and at least 2 format parameters.");
+            }
 
             // Grab all formatting options:
             // They must be in one of these formats:
@@ -165,7 +175,7 @@ namespace SmartFormat.Extensions
                 {
                     HasNested = true
                 };
-                var newPlaceholder = new Placeholder(_smartSettings, newItemFormat, itemFormat.StartIndex, 0)
+                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.StartIndex, 0)
                 {
                     Format = itemFormat,
                     EndIndex = itemFormat.EndIndex,
@@ -214,23 +224,6 @@ namespace SmartFormat.Extensions
             CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
 
             return true;
-        }
-
-        /// <summary>
-        /// Checks if any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
-        /// </summary>
-        /// <param name="selectorInfo"></param>
-        /// <returns>
-        /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
-        /// </returns>
-        /// <remarks>
-        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
-        /// </remarks>
-        private bool HasNullableOperator(ISelectorInfo selectorInfo)
-        {
-            return selectorInfo.Placeholder != null &&
-                   selectorInfo.Placeholder.Selectors.Any(s =>
-                       s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
         }
 
         /// <summary>
