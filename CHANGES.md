@@ -6,6 +6,25 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
+#### `IFormatter`s have single, unique name
+
+* `IFormatter.Names` property is obsolete and replaced with `IFormatter.Name`.
+  * If you've been using more than one of the `IFormatter.Names`, you'll have to reduce it to one.
+  * If you'd like to use another than the standard name of a formatter, you'll have to set a different name. Example:
+  
+```CSharp
+var smart = Smart.CreateDefaultSmartFormat();
+smart.GetFormatterExtension<ChooseFormatter>().Name = "NewName";
+smart.GetFormatterExtension<ChooseFormatter>().CanAutoDetect = false;
+   ```
+* When adding an `IFormatter` extension, it is ensured that the `IFormatter.Name` is not registered already.
+* The `IFormatter.Name`'s string case is evaluated as defined in the `SmartSettings.CaseSensitivity` setting.
+* `IFormatter.CanAutoDetect` marks such formatters, where `TryEvaluateFormat(IFormattingInfo)` will be called when the format string does *not* contain a formatter name explicitly. This is the same behavior as in v2.x, when `IFormatter.Names` contained the magic `string.Empty` as one of the names. Automatic formatter detection bring few things to keep in mind:
+  *  Iterating through the list of formatters brings a performance penalty.
+  *  The *first* formatter in the list of format extensions, that is able to process the input format will be invoked. Example: If extensions contain the `ConditionalFormatter` and the `PluralLocalizationFormatter` (in this sequence), in most cases the `ConditionalFormatter` will be invoked implicitly. To use the `PluralLocalizationFormatter`, the format string must contain its formatter name explicitly.
+* Calling an `IFormatter` extension explicitly, that cannot process the format, will result in a `FormattingException`. In v2.x, the extension was silently skipped.
+
+
 #### `Format` replaces `FormatCache` ([#183](https://github.com/axuno/SmartFormat/pull/183))
 
 In v2.x the `FormatCache` class had a `CachedObjects` property, which was not implemented:
@@ -39,11 +58,11 @@ SmartFormatter:
   * `RemoveFormatterExtension<T>()`
 
 Extensions:
-* For performance it is highly recommended to only add such `ISource` and `IFormatter` extensions that are actually required. `Smart.Format(...)` uses all available extensions as the default. Also, use explicit formatter names instead of letting the `SmartFormatter` implicitly find a matching formatter.
+* For improved performance it is highly recommended to only add such `ISource` and `IFormatter` extensions that are actually required. `Smart.Format(...)` uses all available extensions as the default. Also, use explicit formatter names instead of letting the `SmartFormatter` implicitly find a matching formatter.
 * Neither `ISource` nore `IFormatter` extensions have a CTOR with an argument. This allows for adding extension instances to different `SmartFormatter`s.
-* Any exensions can implement `IInitializer`. If this is implemented, the `SmartFormatter` will call the method `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
+* Any exensions can implement `IInitializer`. Then, the `SmartFormatter` will call the method `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
 * The `Source` abstract class implements `IInitializer`. The `SmartFormatter` and the `SmartSettings` are accessible for classes with `Source` as the base class.
-* `TimeFormatter` and `TemplateFormatter` had both used the same short name `'t'` up to v2.7.x. `'t'` is removed from `TimeFormatter`.
+* Both, `TimeFormatter` and `TemplateFormatter`, had used the same short name `'t'` up to v2.7.x. `'t'` is removed from `TimeFormatter`.
 
 #### Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178))
 
@@ -64,7 +83,7 @@ Additionally, the following selector names are implemented:
 * FromBase64
 * ToBase64
 
-All these selector names may linked. Example with indexed placeholders:
+All these selector names may be linked. Example with indexed placeholders:
 ```CSharp
 Smart.Format("{0.ToLower.TrimStart.TrimEnd.ToBase64}", " ABCDE ");
 // result: "YWJjZGU="
