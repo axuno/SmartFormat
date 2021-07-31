@@ -441,11 +441,6 @@ namespace SmartFormat.Tests.Core
             Assert.That(splits[2].ToString(), Is.EqualTo("f "));
         }
 
-        private Format Parse(string format, string[] formatterExentionNames )
-        {
-            return GetRegularParser().ParseFormat(format);
-        }
-
         [TestCase("{0:name:}", "name", "", "")]
         [TestCase("{0:name()}", "name", "", "")]
         [TestCase("{0:name(1|2|3)}", "name", "1|2|3", "")]
@@ -609,7 +604,7 @@ namespace SmartFormat.Tests.Core
             var placeholder = (Placeholder) format.Items[0];
             
             Assert.That(format.Items.Count, Is.EqualTo(1));
-            Assert.That(placeholder.Selectors.First().RawText, Is.EqualTo(selector));
+            Assert.That(placeholder.Selectors[0].RawText, Is.EqualTo(selector));
             Assert.That(format.HasNested, Is.True);
             Assert.That(placeholder.FormatterName, Is.EqualTo(formatterName));
             Assert.That(placeholder.FormatterOptions, Is.EqualTo(options.Replace("\\", "")));

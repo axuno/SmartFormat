@@ -8,12 +8,12 @@ namespace SmartFormat.Tests.Utilities
     public class FormatDelegateTests
     {
         // This example method behaves similar to MVC's Html.ActionLink method:
-        private string HtmlActionLink(string linkText, string actionName)
+        private static string HtmlActionLink(string linkText, string actionName)
         {
             return string.Format("<a href='www.example.com/{1}'>{0}</a>", linkText, actionName);
         }
 
-        private string GetAnswer(string theText, decimal theValue, CultureInfo culture)
+        private static string GetAnswer(string theText, decimal theValue, CultureInfo culture)
         {
             return $"{theText}{theValue.ToString(culture)}";
         }

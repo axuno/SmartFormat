@@ -17,10 +17,9 @@ namespace SmartFormat.Tests.Extensions
             smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
 
-            var timeFormatter = smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("time")) as TimeFormatter;
-            if (timeFormatter == null)
+            if (smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Name.Equals("time")) is not TimeFormatter)
             {
-                timeFormatter = new TimeFormatter("en");
+                var timeFormatter = new TimeFormatter("en");
                 smart.AddExtensions(timeFormatter);
             }
         }
@@ -40,7 +39,7 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual("en", tf?.DefaultTwoLetterISOLanguageName);
         }
 
-        public object[] GetArgs()
+        public static object[] GetArgs()
         {
             return new object[] {
                 TimeSpan.Zero,

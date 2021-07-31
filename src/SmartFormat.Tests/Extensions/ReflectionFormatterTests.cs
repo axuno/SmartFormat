@@ -16,7 +16,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class ReflectionFormatterTests
     {
-        public object[] GetArgs()
+        private static object[] GetArgs()
         {
             return new object[] {
                 "Zero",
@@ -223,7 +223,7 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
-        public void Nullable_Property_Should_Return_Null()
+        public void Nullable_Property_Should_Return_Empty_String()
         {
             var smart = new SmartFormatter();
             smart.AddExtensions(new ISource[] { new DefaultSource(), new ReflectionSource() });
@@ -231,19 +231,25 @@ namespace SmartFormat.Tests.Extensions
             var data = new {Person = new Person()};
 
             var result = smart.Format("{Person.Address?.City}", data);
-
+            Assert.That(result, Is.Empty);
         }
 
         public class MiscObject
         {
+            private string _onlySetterProperty;
             public MiscObject()
             {
                 Field = "Field";
                 ReadonlyProperty = "ReadonlyProperty";
                 MethodReturnValue = "Method";
+                _onlySetterProperty = string.Empty;
+                _ = _onlySetterProperty;
             }
             public string Field;
-            public string OnlySetterProperty { set { } }
+            public string OnlySetterProperty
+            {
+                set => _onlySetterProperty = value;
+            }
             public string ReadonlyProperty { get; private set; }
             public virtual string Property { get; set; } = "Property";
             public string Method()

@@ -15,8 +15,17 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class NullFormatter : IFormatter
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
         public string[] Names { get; set; } = {"isnull"};
+
+        ///<inheritdoc/>
+        public string Name { get; set; } = "isnull";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = false;
 
         /// <inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)

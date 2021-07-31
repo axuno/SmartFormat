@@ -63,6 +63,7 @@ namespace SmartFormat.Extensions
             // GetMembers (opposite to GetMember!) returns all members, 
             // both those defined by the type represented by the current T:System.Type object 
             // AS WELL AS those inherited from its base types.
+            var mn = sourceType.GetMembers(bindingFlags).Select(m => m.Name);
             var members = sourceType.GetMembers(bindingFlags).Where(m =>
                 string.Equals(m.Name, selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()));
             foreach (var member in members)

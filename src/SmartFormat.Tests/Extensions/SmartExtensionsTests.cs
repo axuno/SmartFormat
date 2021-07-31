@@ -12,7 +12,7 @@ namespace SmartFormat.Tests.Extensions
     {
         #region : StringBuilderTests :
 
-        public object[] GetArgs()
+        public static object[] GetArgs()
         {
             return new object[] {
                 TimeSpan.Zero,

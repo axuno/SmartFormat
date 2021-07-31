@@ -16,7 +16,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class ListFormatterTests
     {
-        public object[] GetArgs()
+        public static object[] GetArgs()
         {
             var args = new object[] {
                 "ABCDE".ToCharArray(),
@@ -184,7 +184,7 @@ namespace SmartFormat.Tests.Extensions
             var smart = Smart.CreateDefaultSmartFormat();
             Assert.That(() => smart.Format("{0:list:{}|, |, and }", "not a list"),
                 Throws.Exception.TypeOf<FormattingException>().And.Message
-                    .Contains("No suitable Formatter"));
+                    .Contains("IEnumerable"));
         }
 
         [TestCase("one", "one")]
