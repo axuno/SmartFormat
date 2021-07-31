@@ -6,7 +6,7 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
-#### `IFormatter`s have single, unique name
+#### `IFormatter`s have one single, unique name ([#185](https://github.com/axuno/SmartFormat/pull/185))
 
 * `IFormatter.Names` property is obsolete and replaced with `IFormatter.Name`.
   * If you've been using more than one of the `IFormatter.Names`, you'll have to reduce it to one.
