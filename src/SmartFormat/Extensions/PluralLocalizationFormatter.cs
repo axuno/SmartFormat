@@ -61,7 +61,17 @@ namespace SmartFormat.Extensions
             // Extract the plural words from the format string:
             var pluralWords = format.Split('|');
             // This extension requires at least two plural words:
-            if (pluralWords.Count == 1) return false;
+            if (pluralWords.Count == 1)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 plural words.");
+
+            }
 
             decimal value;
 

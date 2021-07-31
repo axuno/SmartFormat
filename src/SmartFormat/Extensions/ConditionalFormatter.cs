@@ -59,14 +59,9 @@ namespace SmartFormat.Extensions
                     $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 format parameters.");
             }
 
-            // See if the value is a number:
+            // See if the value is a number or an Enum:
             var currentIsNumber =
-                current is byte or short or ushort or int or uint or long or ulong or float or double or decimal
-                    or Enum;
-
-            // An Enum is a number too:
-            if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
-                currentIsNumber = true;
+                current is byte or short or int or long or float or double or decimal or Enum;
 
             var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
 
@@ -76,11 +71,8 @@ namespace SmartFormat.Extensions
             if (currentIsNumber)
             {
                 paramIndex = -1;
-                while (true)
+                while (paramIndex++ < parameters.Count)
                 {
-                    paramIndex++;
-                    if (paramIndex == parameters.Count) return true;
-
                     if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out var conditionWasTrue,
                         out var outputItem))
                     {

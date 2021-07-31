@@ -26,14 +26,6 @@ namespace SmartFormat.Tests.Core
             });
         }
 
-        private IFormattingInfo GetFormattingInfo(string format, IList<object> data)
-        {
-            var formatter = new SmartFormatter(new SmartSettings());
-            var formatParsed = formatter.Parser.ParseFormat(format);
-            var formatDetails = new FormatDetails(formatter, formatParsed, data, null, new StringOutput());
-            return new FormattingInfo(formatDetails, formatDetails.OriginalFormat, data);
-        }
-
         [Test]
         public void Formatters_Can_Be_Initialized()
         {
@@ -62,7 +54,7 @@ namespace SmartFormat.Tests.Core
         {
             foreach (var formatter in GetAllFormatters().Where(f => f.CanAutoDetect))
             {
-                Assert.That(() => formatter.TryEvaluateFormat(GetFormattingInfo("", new List<object>() {new object()})),
+                Assert.That(() => formatter.TryEvaluateFormat(FormattingInfo.Create("", new List<object>() {new object()})),
                     Throws.Nothing);
             }
         }

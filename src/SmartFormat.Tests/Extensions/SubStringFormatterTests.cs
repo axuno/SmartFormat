@@ -145,5 +145,21 @@ namespace SmartFormat.Tests.Extensions
             var smart = GetFormatter();
             Assert.That(() => smart.Format("{Name:substr()}", _people.First()), Throws.Exception.TypeOf<FormattingException>());
         }
+
+        [Test]
+        public void NamedFormatterWithoutStringArgumentShouldThrow()
+        {
+            var smart = GetFormatter();
+            Assert.That(() => smart.Format("{0:substr(0,2)}", new object()), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void ImplicitFormatterEvaluation_With_Wrong_Args_Should_Fail()
+        {
+            var smart = GetFormatter();
+            Assert.That(
+                smart.GetFormatterExtension<SubStringFormatter>()!.TryEvaluateFormat(
+                    FormattingInfo.Create("{0::(0,2)}", new List<object>(new[] {new object()}))), Is.EqualTo(false));
+        }
     }
 }
