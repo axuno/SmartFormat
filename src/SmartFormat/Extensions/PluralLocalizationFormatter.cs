@@ -27,7 +27,7 @@ namespace SmartFormat.Extensions
         /// Language Plural Rules are described at
         /// https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html
         /// </remarks>
-        public PluralLocalizationFormatter(string defaultTwoLetterIsoLanguageName)
+        public PluralLocalizationFormatter(string defaultTwoLetterIsoLanguageName = "en")
         {
             DefaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
         }
@@ -56,7 +56,7 @@ namespace SmartFormat.Extensions
             var current = formattingInfo.CurrentValue;
 
             // Ignore formats that start with "?" (this can be used to bypass this extension)
-            if (format == null || format.BaseString[format.StartIndex] == ':') return false;
+            if (format == null || format.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') return false;
 
             // Extract the plural words from the format string:
             var pluralWords = format.Split('|');
