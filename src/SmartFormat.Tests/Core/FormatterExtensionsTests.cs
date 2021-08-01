@@ -18,12 +18,20 @@ namespace SmartFormat.Tests.Core
     {
         private static List<IFormatter> GetAllFormatters()
         {
-            return new List<IFormatter>(new IFormatter[]
+            var allFormatterTypes = Smart.Default.GetType().Assembly.GetTypes()
+                .Where(x => typeof(IFormatter).IsAssignableFrom(x) && !x.IsInterface &&
+                            !x.IsAbstract & x.Namespace == $"{nameof(SmartFormat)}.{nameof(SmartFormat.Extensions)}").ToList();
+
+            var allFormatters = new List<IFormatter>();
+            foreach (var ft in allFormatterTypes)
             {
-                new ChooseFormatter(), new ConditionalFormatter(), new IsMatchFormatter(), new ListFormatter(),
-                new NullFormatter(), new SubStringFormatter(), new TemplateFormatter(), new TimeFormatter("en"),
-                new XElementFormatter(), new DefaultFormatter()
-            });
+                if(ft.Name == nameof(PluralLocalizationFormatter) || ft.Name == nameof(TimeFormatter))
+                    allFormatters.Add((IFormatter) Activator.CreateInstance(Type.GetType(ft.AssemblyQualifiedName), "en"));
+                else
+                    allFormatters.Add((IFormatter) Activator.CreateInstance(Type.GetType(ft.AssemblyQualifiedName)));
+            }
+            
+            return allFormatters;
         }
 
         [Test]
