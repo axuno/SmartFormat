@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -27,8 +28,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void CreateTimeFormatterCtor_WithIllegalLanguage()
         {
-            TimeFormatter tf;
-            Assert.Throws<ArgumentException>(() => tf = new TimeFormatter("illegal-language"));
+            Assert.Throws<ArgumentException>(() => new TimeFormatter("illegal-language"));
         }
 
         [Test]
@@ -38,6 +38,28 @@ namespace SmartFormat.Tests.Extensions
             Assert.DoesNotThrow(() => tf = new TimeFormatter("en"));
             Assert.AreEqual("en", tf?.DefaultTwoLetterISOLanguageName);
         }
+
+        [Test]
+        public void Explicit_Formatter_With_Unsupported_ArgType_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:time:}", 1), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void Formatter_With_NestedFormat_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:time:{}}", 1), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void DefaultFormatOptions_Can_Be_Set()
+        {
+            var formatter = new TimeFormatter("en") {DefaultFormatOptions = TimeSpanFormatOptions.RangeDays};
+            Assert.That(formatter.DefaultFormatOptions, Is.EqualTo(TimeSpanFormatOptions.RangeDays));
+        }
+
 
         public static object[] GetArgs()
         {

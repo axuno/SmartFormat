@@ -16,13 +16,13 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class FormatterExtensionsTests
     {
-        private List<IFormatter> GetAllFormatters()
+        private static List<IFormatter> GetAllFormatters()
         {
             return new List<IFormatter>(new IFormatter[]
             {
                 new ChooseFormatter(), new ConditionalFormatter(), new IsMatchFormatter(), new ListFormatter(),
                 new NullFormatter(), new SubStringFormatter(), new TemplateFormatter(), new TimeFormatter("en"),
-                new XElementFormatter()
+                new XElementFormatter(), new DefaultFormatter()
             });
         }
 
@@ -34,6 +34,9 @@ namespace SmartFormat.Tests.Core
                 var guid = Guid.NewGuid().ToString("N");
                 var negatedAutoDetection = formatter.CanAutoDetect;
                 formatter.Name = guid;
+                formatter.GetType().GetProperty("Names")?.SetValue(formatter, new[] {guid}); // "Names" property is obsolete
+                
+                Assert.That(formatter.GetType().GetProperty("Names")?.GetValue(formatter), Is.EqualTo(new[]{guid}));  // "Names" property is obsolete
                 Assert.That(formatter.Name, Is.EqualTo(guid));
                 
                 if (formatter is not TemplateFormatter)
@@ -42,9 +45,9 @@ namespace SmartFormat.Tests.Core
                     Assert.That(formatter.CanAutoDetect, Is.EqualTo(negatedAutoDetection));
                 }
 
-                if (formatter is IInitializer)
+                if (formatter is IInitializer initializer)
                 {
-                    Assert.That(() => ((IInitializer) formatter).Initialize(new SmartFormatter()), Throws.Nothing);
+                    Assert.That(() => initializer.Initialize(new SmartFormatter()), Throws.Nothing);
                 }
             }
         }

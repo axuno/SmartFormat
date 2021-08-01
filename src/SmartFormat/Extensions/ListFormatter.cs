@@ -119,9 +119,16 @@ namespace SmartFormat.Extensions
         /// </remarks>
         private static int CollectionIndex
         {
-            get => _collectionIndex.Value ?? -1;
-            set => _collectionIndex.Value = value;
-        }    
+            get
+            {
+                return _collectionIndex.Value ?? -1;
+            }
+
+            set
+            {
+                _collectionIndex.Value = value;
+            }
+        }
 
         /// <summary>
         /// Writes the given <see cref="IFormattingInfo"/> to the <see cref="Core.Output.IOutput"/>

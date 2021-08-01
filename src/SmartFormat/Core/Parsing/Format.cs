@@ -272,7 +272,10 @@ namespace SmartFormat.Core.Parsing
                     var startIndex = _splits[index - 1] + 1;
                     return _format.Substring(startIndex, _splits[index] - startIndex);
                 }
-                set => throw new NotSupportedException();
+                set
+                {
+                    throw new NotSupportedException();
+                }
             }
 
             public void CopyTo(Format[] array, int arrayIndex)

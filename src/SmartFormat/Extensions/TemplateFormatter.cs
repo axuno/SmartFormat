@@ -19,7 +19,7 @@ namespace SmartFormat.Extensions
     {
         private SmartFormatter? _formatter;
         private IDictionary<string, Format>? _templates;
-        private bool _canHandleAutoDetection = false;
+        private readonly bool _canHandleAutoDetection = false;
 
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
@@ -37,7 +37,11 @@ namespace SmartFormat.Extensions
         /// <exception cref="ArgumentException"></exception>
         public bool CanAutoDetect
         {
-            get => _canHandleAutoDetection;
+            get
+            {
+                return _canHandleAutoDetection;
+            }
+
             set
             {
                 if (value) throw new ArgumentException($"{nameof(TemplateFormatter)} cannot handle auto-detection");
