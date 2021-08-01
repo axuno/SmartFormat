@@ -1,0 +1,122 @@
+﻿// 
+// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+// Licensed under the MIT license.
+// 
+
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+namespace SmartFormat.Utilities
+{
+    internal static class TimeSpanFormatOptionsConverter
+    {
+        private static readonly Regex parser =
+            new Regex(
+                @"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b",
+                RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        public static TimeSpanFormatOptions Merge(this TimeSpanFormatOptions left, TimeSpanFormatOptions right)
+        {
+            var masks = new[]
+            {
+                TimeSpanFormatOptions._Abbreviate,
+                TimeSpanFormatOptions._LessThan,
+                TimeSpanFormatOptions._Range,
+                TimeSpanFormatOptions._Truncate
+            };
+            foreach (var mask in masks)
+                if ((left & mask) == 0)
+                    left |= right & mask;
+            return left;
+        }
+
+        public static TimeSpanFormatOptions Mask(this TimeSpanFormatOptions timeSpanFormatOptions,
+            TimeSpanFormatOptions mask)
+        {
+            return timeSpanFormatOptions & mask;
+        }
+
+        public static IEnumerable<TimeSpanFormatOptions> AllFlags(this TimeSpanFormatOptions timeSpanFormatOptions)
+        {
+            uint value = 0x1;
+            while (value <= (uint) timeSpanFormatOptions)
+            {
+                if ((value & (uint) timeSpanFormatOptions) != 0) yield return (TimeSpanFormatOptions) value;
+                value <<= 1;
+            }
+        }
+
+        public static TimeSpanFormatOptions Parse(string formatOptionsString)
+        {
+            formatOptionsString = formatOptionsString.ToLower();
+
+            var t = TimeSpanFormatOptions.InheritDefaults;
+            foreach (Match m in parser.Matches(formatOptionsString))
+                switch (m.Value)
+                {
+                    case "w":
+                    case "week":
+                    case "weeks":
+                        t |= TimeSpanFormatOptions.RangeWeeks;
+                        break;
+                    case "d":
+                    case "day":
+                    case "days":
+                        t |= TimeSpanFormatOptions.RangeDays;
+                        break;
+                    case "h":
+                    case "hour":
+                    case "hours":
+                        t |= TimeSpanFormatOptions.RangeHours;
+                        break;
+                    case "m":
+                    case "minute":
+                    case "minutes":
+                        t |= TimeSpanFormatOptions.RangeMinutes;
+                        break;
+                    case "s":
+                    case "second":
+                    case "seconds":
+                        t |= TimeSpanFormatOptions.RangeSeconds;
+                        break;
+                    case "ms":
+                    case "millisecond":
+                    case "milliseconds":
+                        t |= TimeSpanFormatOptions.RangeMilliSeconds;
+                        break;
+
+
+                    case "short":
+                        t |= TimeSpanFormatOptions.TruncateShortest;
+                        break;
+                    case "auto":
+                        t |= TimeSpanFormatOptions.TruncateAuto;
+                        break;
+                    case "fill":
+                        t |= TimeSpanFormatOptions.TruncateFill;
+                        break;
+                    case "full":
+                        t |= TimeSpanFormatOptions.TruncateFull;
+                        break;
+
+
+                    case "abbr":
+                        t |= TimeSpanFormatOptions.Abbreviate;
+                        break;
+                    case "noabbr":
+                        t |= TimeSpanFormatOptions.AbbreviateOff;
+                        break;
+
+
+                    case "less":
+                        t |= TimeSpanFormatOptions.LessThan;
+                        break;
+                    case "noless":
+                        t |= TimeSpanFormatOptions.LessThanOff;
+                        break;
+                }
+
+            return t;
+        }
+    }
+}

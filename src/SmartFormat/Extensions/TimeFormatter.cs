@@ -84,7 +84,7 @@ namespace SmartFormat.Extensions
             else
                 options = string.Empty;
 
-            TimeSpan fromTime;
+            TimeSpan? fromTime = null;
             
             switch (current)
             {
@@ -96,34 +96,30 @@ namespace SmartFormat.Extensions
                     {
                         fromTime = SystemTime.Now().ToUniversalTime().Subtract(dateTime.ToUniversalTime());
                     }
-                    else
-                    {
-                        return false;
-                    }
                     break;
                 case DateTimeOffset dateTimeOffset:
                     if (formattingInfo.FormatterOptions != string.Empty)
                     {
                         fromTime = SystemTime.OffsetNow().UtcDateTime.Subtract(dateTimeOffset.UtcDateTime);
                     }
-                    else
-                    {
-                        return false;
-                    }
                     break;
-                default:
-                    // Auto detection calls just return a failure to evaluate
-                    if(formatterName == string.Empty)
-                        return false;
-                
-                    // throw, if the formatter has been called explicitly
-                    throw new FormatException($"Formatter named '{formatterName}' can only process types of {nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}");
+            }
+
+            if (fromTime is null)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (formatterName == string.Empty)
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formatterName}' can only process types of {nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}");
             }
 
             var timeTextInfo = GetTimeTextInfo(formattingInfo.FormatDetails.Provider);
             if (timeTextInfo == null) throw new FormatException($"{nameof(TimeTextInfo)} could not be found for the given {nameof(IFormatProvider)}.");
             var formattingOptions = TimeSpanFormatOptionsConverter.Parse(options);
-            var timeString = fromTime.ToTimeString(formattingOptions, timeTextInfo);
+            var timeString = fromTime.Value.ToTimeString(formattingOptions, timeTextInfo);
             formattingInfo.Write(timeString);
             return true;
         }

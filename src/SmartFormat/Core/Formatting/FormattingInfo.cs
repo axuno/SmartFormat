@@ -220,12 +220,12 @@ namespace SmartFormat.Core.Formatting
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="IFormattingInfo"/>.
+        /// Creates a new instance of <see cref="FormattingInfo"/>.
         /// </summary>
         /// <param name="format">The input format string.</param>
         /// <param name="data">The data argument.</param>
-        /// <returns>A new instance of <see cref="IFormattingInfo"/>.</returns>
-        internal static IFormattingInfo Create(string format, IList<object> data)
+        /// <returns>A new instance of <see cref="FormattingInfo"/>.</returns>
+        internal static FormattingInfo Create(string format, IList<object> data)
         {
             var formatter = new SmartFormatter(new SmartSettings());
             var formatParsed = formatter.Parser.ParseFormat(format);

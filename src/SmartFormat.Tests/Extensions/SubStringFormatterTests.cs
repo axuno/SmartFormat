@@ -12,7 +12,7 @@ namespace SmartFormat.Tests.Extensions
     {
         private readonly List<object> _people;
 
-        private SmartFormatter GetFormatter()
+        private static SmartFormatter GetFormatter()
         {
             var smart = Smart.CreateDefaultSmartFormat();
             smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;

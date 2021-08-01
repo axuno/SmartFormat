@@ -31,8 +31,15 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Use property 'EndIndex' instead")]
         public int endIndex
         {
-            get => EndIndex;
-            set => EndIndex = value;
+            get
+            {
+                return EndIndex;
+            }
+
+            set
+            {
+                EndIndex = value;
+            }
         }
 
         /// <summary>
@@ -52,8 +59,15 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Use property 'StartIndex' instead")]
         public int startIndex
         {
-            get => StartIndex;
-            set => StartIndex = value;
+            get
+            {
+                return StartIndex;
+            }
+
+            set
+            {
+                StartIndex = value;
+            }
         }
 
         /// <summary>
