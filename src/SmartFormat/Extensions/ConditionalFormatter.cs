@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
@@ -12,36 +13,55 @@ using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class to format primitive types with condition patterns.
+    /// </summary>
     public class ConditionalFormatter : IFormatter
     {
         private static readonly Regex _complexConditionPattern
-            = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
+            = new(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
                 //   Description:      and/or    comparator     value
                 RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        public string[] Names { get; set; } = {"conditional", "cond", ""};
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
+        public string[] Names { get; set; } = {"conditional", "cond", string.Empty};
 
+        ///<inheritdoc/>
+        public string Name { get; set; } = "cond";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
+        
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
-
-            if (format == null) return false;
+            
             // Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
-            if (format.BaseString[format.StartIndex] == ':') format = format.Substring(1);
+            if (format?.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') format = format.Substring(1);
 
             // See if the format string contains un-nested "|":
-            var parameters = format.Split('|');
-            if (parameters.Count == 1) return false; // There are no parameters found.
+            var parameters = format is not null ? format.Split('|') : new List<Format>(0);
 
-            // See if the value is a number:
+            // Check whether arguments can be handled by this formatter
+            if (format is null || parameters.Count == 1)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 format parameters.");
+            }
+
+            // See if the value is a number or an Enum:
             var currentIsNumber =
-                current is byte || current is short || current is int || current is long
-                || current is float || current is double || current is decimal;
-            // An Enum is a number too:
-
-            if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
-                currentIsNumber = true;
+                current is byte or short or int or long or float or double or decimal or Enum;
 
             var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
 
@@ -51,11 +71,8 @@ namespace SmartFormat.Extensions
             if (currentIsNumber)
             {
                 paramIndex = -1;
-                while (true)
+                while (paramIndex++ < parameters.Count)
                 {
-                    paramIndex++;
-                    if (paramIndex == parameters.Count) return true;
-
                     if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out var conditionWasTrue,
                         out var outputItem))
                     {
@@ -71,7 +88,7 @@ namespace SmartFormat.Extensions
                     // If the conditional statement was true, then we can break.
                     if (conditionWasTrue)
                     {
-                        formattingInfo.Write(outputItem, current ?? string.Empty);
+                        formattingInfo.FormatAsChild(outputItem, current);
                         return true;
                     }
                 }
@@ -113,7 +130,7 @@ namespace SmartFormat.Extensions
                 case DateTimeOffset dateTimeOffsetArg when dateTimeOffsetArg.UtcDateTime <= SystemTime.OffsetNow().UtcDateTime:
                     paramIndex = 0;
                     break;
-                case DateTimeOffset dateTimeOffsetArg:
+                case DateTimeOffset:
                     paramIndex = paramCount - 1;
                     break;
                 // TimeSpan: Negative|Zero|Positive  or  Negative/Zero|Positive
@@ -123,7 +140,7 @@ namespace SmartFormat.Extensions
                 case TimeSpan timeSpanArg when timeSpanArg.CompareTo(TimeSpan.Zero) <= 0:
                     paramIndex = 0;
                     break;
-                case TimeSpan timeSpanArg:
+                case TimeSpan:
                     paramIndex = paramCount - 1;
                     break;
                 case string stringArg:
@@ -143,13 +160,13 @@ namespace SmartFormat.Extensions
             var selectedParameter = parameters[paramIndex];
 
             // Output the selectedParameter:
-            formattingInfo.Write(selectedParameter, current ?? string.Empty);
+            formattingInfo.FormatAsChild(selectedParameter, current);
             return true;
         }
 
         /// <summary>
         /// Evaluates a conditional format.
-        /// Each condition must start with a comparor: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
+        /// Each condition must start with a comparer: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
         /// Conditions must be separated by either "&amp;" (AND) or "/" (OR).
         /// The conditional statement must end with a "?".
         /// Examples:
@@ -205,9 +222,9 @@ namespace SmartFormat.Extensions
                 if (i == 0)
                     conditionResult = exp;
                 else if (andOrs[i].Value == "/")
-                    conditionResult = conditionResult | exp;
+                    conditionResult |= exp;
                 else
-                    conditionResult = conditionResult & exp;
+                    conditionResult &= exp;
             }
 
             // Successful

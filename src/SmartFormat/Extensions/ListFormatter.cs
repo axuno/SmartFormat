@@ -6,8 +6,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 
@@ -33,17 +35,24 @@ namespace SmartFormat.Extensions
     /// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
     /// In this example, format = "{Width}x{Height}".  Notice the nested braces.
     /// </summary>
-    public class ListFormatter : IFormatter, ISource
+    /// <remarks>
+    /// The <see cref="ListFormatter"/> PluralLocalizationExtension and ConditionalExtension
+    /// </remarks>
+    public class ListFormatter : IFormatter, ISource, IInitializer
     {
-        private readonly SmartSettings _smartSettings;
+        private SmartSettings _smartSettings = new();
 
-        public string[] Names { get; set; } = {"list", "l", ""};
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
+        public string[] Names { get; set; } = {"list", "l", string.Empty};
 
-        public ListFormatter(SmartFormatter formatter)
-        {
-            formatter.Parser.AddOperators("[]");
-            _smartSettings = formatter.Settings;
-        }
+        ///<inheritdoc/>
+        public string Name { get; set; } = "list";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
 
         /// <summary>
         /// This allows an integer to be used as a selector to index an array (or list).
@@ -56,10 +65,10 @@ namespace SmartFormat.Extensions
             var current = selectorInfo.CurrentValue;
             var selector = selectorInfo.SelectorText;
 
-            if (!(current is IList currentList)) return false;
+            if (current is not IList currentList) return false;
 
             // See if we're trying to access a specific index:
-            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator?.Length == 0;
+            var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
             if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
                 itemIndex < currentList.Count)
             {
@@ -72,7 +81,7 @@ namespace SmartFormat.Extensions
             }
 
             // We want to see if there is an "Index" property that was supplied.
-            if (selector != null && selector.Equals("index", StringComparison.OrdinalIgnoreCase))
+            if (selector.Equals("index", StringComparison.OrdinalIgnoreCase))
             {
                 // Looking for "{Index}"
                 if (selectorInfo.SelectorIndex == 0)
@@ -100,7 +109,7 @@ namespace SmartFormat.Extensions
         /// <remarks>
         /// Wrap, so that CollectionIndex can be used without code changes.
         /// </remarks>
-        private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
+        private static readonly AsyncLocal<int?> _collectionIndex = new();
 
         /// <remarks>
         /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
@@ -110,31 +119,50 @@ namespace SmartFormat.Extensions
         /// </remarks>
         private static int CollectionIndex
         {
-            get { return _collectionIndex.Value ?? -1; }
-            set { _collectionIndex.Value = value; }
-        }    
+            get
+            {
+                return _collectionIndex.Value ?? -1;
+            }
 
+            set
+            {
+                _collectionIndex.Value = value;
+            }
+        }
+
+        /// <summary>
+        /// Writes the given <see cref="IFormattingInfo"/> to the <see cref="Core.Output.IOutput"/>
+        /// if it can be processed by the formatter.
+        /// </summary>
+        /// <param name="formattingInfo">The <see cref="IFormattingInfo"/> to process.</param>
+        /// <returns>Returns <see langword="true"/> if processing was possible, else <see langword="false"/>.</returns>
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
 
-            // This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
+            // If the ListFormatter is called explicitly, null with nullable must be handled here
+            if (current is null && HasNullableOperator(formattingInfo))
+            {
+                formattingInfo.Write(string.Empty);
+                return true;
+            }
 
-            // This extension requires at least IEnumerable
-            var enumerable = current as IEnumerable;
-            if (enumerable == null) return false;
-            // Ignore Strings, because they're IEnumerable.
-            // This issue might actually need a solution
-            // for other objects that are IEnumerable.
-            if (current is string) return false;
-            // If the object is IFormattable, ignore it
-            if (current is IFormattable) return false;
+            // See if the format string contains un-nested "|":
+            var parameters = format is not null ? format.Split('|', 4) : new List<Format>(0);
 
-            // This extension requires a | to specify the spacer:
-            if (format == null) return false;
-            var parameters = format.Split('|', 4);
-            if (parameters.Count < 2) return false;
+            // Check whether arguments can be handled by this formatter
+            if (format is null || parameters.Count < 2 || current is not IEnumerable enumerable 
+                || current is string or IFormattable)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires an IEnumerable argument and at least 2 format parameters.");
+            }
 
             // Grab all formatting options:
             // They must be in one of these formats:
@@ -142,10 +170,10 @@ namespace SmartFormat.Extensions
             // itemFormat|spacer|lastSpacer
             // itemFormat|spacer|lastSpacer|twoSpacer
             var itemFormat = parameters[0];
-            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : "";
+            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : string.Empty;
             var lastSpacer = parameters.Count >= 3 ? parameters[2].GetLiteralText() : spacer;
             var twoSpacer = parameters.Count >= 4 ? parameters[3].GetLiteralText() : lastSpacer;
-
+            
             if (!itemFormat.HasNested)
             {
                 // The format is not nested,
@@ -154,30 +182,29 @@ namespace SmartFormat.Extensions
                 {
                     HasNested = true
                 };
-                var newPlaceholder = new Placeholder(_smartSettings, newItemFormat, itemFormat.StartIndex, 0)
+                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.StartIndex, 0)
                 {
                     Format = itemFormat,
-                    EndIndex = itemFormat.EndIndex
+                    EndIndex = itemFormat.EndIndex,
                 };
                 newItemFormat.Items.Add(newPlaceholder);
                 itemFormat = newItemFormat;
             }
 
             // Let's buffer all items from the enumerable (to ensure the Count without double-enumeration):
-            var items = current as ICollection;
-            if (items == null)
+            if (current is not ICollection items)
             {
-                var allItems = new List<object>();
-                foreach (var item in enumerable) allItems.Add(item);
-                items = allItems;
+                items = enumerable.Cast<object?>().ToList();
             }
 
-            var oldCollectionIndex =
-                CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
+            // In case we have nested arrays, we might need to restore the CollectionIndex
+            var savedCollectionIndex = CollectionIndex; 
             CollectionIndex = -1;
             foreach (var item in items)
             {
                 CollectionIndex += 1; // Keep track of the index
+                
+                var spacerFormattingInfo = new FormattingInfo(null, formattingInfo.FormatDetails, format, null);
 
                 // Determine which spacer to write:
                 if (spacer == null || CollectionIndex == 0)
@@ -186,24 +213,47 @@ namespace SmartFormat.Extensions
                 }
                 else if (CollectionIndex < items.Count - 1)
                 {
-                    formattingInfo.Write(spacer);
+                    spacerFormattingInfo.Write(spacer);
                 }
                 else if (CollectionIndex == 1)
                 {
-                    formattingInfo.Write(twoSpacer);
+                    spacerFormattingInfo.Write(twoSpacer);
                 }
                 else
                 {
-                    formattingInfo.Write(lastSpacer);
+                    spacerFormattingInfo.Write(lastSpacer);
                 }
 
                 // Output the nested format for this item:
-                formattingInfo.Write(itemFormat, item);
+                formattingInfo.FormatAsChild(itemFormat, item);
             }
 
-            CollectionIndex = oldCollectionIndex; // Restore the CollectionIndex
+            CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
 
             return true;
+        }
+
+        /// <summary>
+        /// Checks if any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </summary>
+        /// <param name="formattingInfo"></param>
+        /// <returns>
+        /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
+        /// </returns>
+        /// <remarks>
+        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
+        /// </remarks>
+        private bool HasNullableOperator(IFormattingInfo formattingInfo)
+        {
+            return formattingInfo.Placeholder != null &&
+                   formattingInfo.Placeholder.Selectors.Any(s =>
+                       s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
+        }
+
+        ///<inheritdoc />
+        public void Initialize(SmartFormatter smartFormatter)
+        {
+            _smartSettings = smartFormatter.Settings;
         }
     }
 }

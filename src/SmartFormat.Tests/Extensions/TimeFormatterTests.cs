@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -11,27 +12,23 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class TimeFormatterTests
     {
-        private readonly SmartFormatter _smart;
-
         public TimeFormatterTests()
         {
-            _smart = Smart.CreateDefaultSmartFormat();
-            _smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
-            _smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
+            smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
 
-            var timeFormatter = _smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("time")) as TimeFormatter;
-            if (timeFormatter == null)
+            if (smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Name.Equals("time")) is not TimeFormatter)
             {
-                timeFormatter = new TimeFormatter("en");
-                _smart.FormatterExtensions.Add(timeFormatter);
+                var timeFormatter = new TimeFormatter("en");
+                smart.AddExtensions(timeFormatter);
             }
         }
 
         [Test]
         public void CreateTimeFormatterCtor_WithIllegalLanguage()
         {
-            TimeFormatter tf;
-            Assert.Throws<ArgumentException>(() => tf = new TimeFormatter("illegal-language"));
+            Assert.Throws<ArgumentException>(() => new TimeFormatter("illegal-language"));
         }
 
         [Test]
@@ -42,7 +39,29 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual("en", tf?.DefaultTwoLetterISOLanguageName);
         }
 
-        public object[] GetArgs()
+        [Test]
+        public void Explicit_Formatter_With_Unsupported_ArgType_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:time:}", 1), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void Formatter_With_NestedFormat_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:time:{}}", 1), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void DefaultFormatOptions_Can_Be_Set()
+        {
+            var formatter = new TimeFormatter("en") {DefaultFormatOptions = TimeSpanFormatOptions.RangeDays};
+            Assert.That(formatter.DefaultFormatOptions, Is.EqualTo(TimeSpanFormatOptions.RangeDays));
+        }
+
+
+        public static object[] GetArgs()
         {
             return new object[] {
                 TimeSpan.Zero,
@@ -58,12 +77,12 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Defaults()
         {
             var formats = new string[] {
-                "{0}",
-                "{1}",
-                "{2}",
-                "{3}",
-                "{4}",
-                "{5}",
+                "{0:time:}",
+                "{1:time:}",
+                "{2:time:}",
+                "{3:time:}",
+                "{4:time:}",
+                "{5:time:}",
             };
             var expected = new string[] {
                 "less than 1 second",
@@ -74,22 +93,23 @@ namespace SmartFormat.Tests.Extensions
                 "5 days",
             };
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
         public void Test_Options()
         {
             var formats = new string[] {
-                "{0:noless}",
-                "{1:hours}",
-                "{1:hours minutes}",
-                "{2:days milliseconds}",
-                "{2:days milliseconds auto}",
-                "{2:days milliseconds short}",
-                "{2:days milliseconds fill}",
-                "{2:days milliseconds full}",
-                "{3:abbr}",
+                "{0:time:noless}",
+                "{1:time:hours}",
+                "{1:time:hours minutes}",
+                "{2:time:days milliseconds}",
+                "{2:time:days milliseconds auto}",
+                "{2:time:days milliseconds short}",
+                "{2:time:days milliseconds fill}",
+                "{2:time:days milliseconds full}",
+                "{3:time:abbr}",
             };
             var expected = new string[] {
                 "0 seconds",
@@ -103,7 +123,8 @@ namespace SmartFormat.Tests.Extensions
                 "3d 3s",
             };
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [TestCase(0)]
@@ -113,16 +134,17 @@ namespace SmartFormat.Tests.Extensions
         [TestCase(-23)]
         public void TimeSpanFromGivenTimeToCurrentTime(int diffHours)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             // test will work in any TimeZone
             var now = DateTime.Now;
             var dateTime = now.AddHours(diffHours);
             SystemTime.SetDateTime(now);
             var format = "{0:time(abbr hours noless)}";
             // The difference to current time with a DateTime as an argument
-            var actual = _smart.Format(format, dateTime);
+            var actual = smart.Format(format, dateTime);
             Assert.AreEqual($"{diffHours * -1}h", actual);
             // Make sure that logic for TimeSpan and DateTime arguments are the same
-            Assert.AreEqual(actual, _smart.Format(format, now - dateTime));
+            Assert.AreEqual(actual, smart.Format(format, now - dateTime));
             Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
             SystemTime.ResetDateTime();
         }
@@ -134,16 +156,17 @@ namespace SmartFormat.Tests.Extensions
         [TestCase(-23)]
         public void TimeSpanOffsetFromGivenTimeToCurrentTime(int diffHours)
         {
+            var smart = Smart.CreateDefaultSmartFormat();
             // test will work in any TimeZone
             var now = DateTimeOffset.Now;
             var dateTimeOffset = now.AddHours(diffHours);
             SystemTime.SetDateTimeOffset(now);
             var format = "{0:time(abbr hours noless)}";
             // The difference to current time with a DateTimeOffset as an argument
-            var actual = _smart.Format(format, dateTimeOffset);
+            var actual = smart.Format(format, dateTimeOffset);
             Assert.AreEqual($"{diffHours * -1}h", actual);
             // Make sure that logic for TimeSpan and DateTime arguments are the same
-            Assert.AreEqual(actual, _smart.Format(format, now - dateTimeOffset));
+            Assert.AreEqual(actual, smart.Format(format, now - dateTimeOffset));
             Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
             SystemTime.ResetDateTime();
         }

@@ -10,21 +10,49 @@ using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class to output literals depending on the value of the input variable.
+    /// </summary>
     public class ChooseFormatter : IFormatter
     {
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
         public char SplitChar { get; set; } = '|';
+        
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
         public string[] Names { get; set; } = {"choose", "c"};
 
+        ///<inheritdoc/>
+        public string Name { get; set; } = "choose";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = false;
+
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            if (string.IsNullOrEmpty(formattingInfo.FormatterOptions)) return false;
-            var chooseOptions = formattingInfo.FormatterOptions!.Split(SplitChar);
+            var chooseOptions = formattingInfo.FormatterOptions?.Split(SplitChar);
             var formats = formattingInfo.Format?.Split(SplitChar);
-            if (formats is null || formats.Count < 2) return false;
+            
+            // Check whether arguments can be handled by this formatter
+            if (formats is null || formats.Count < 2 || chooseOptions is null)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 format options.");
+            }
 
             var chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
 
-            formattingInfo.Write(chosenFormat, formattingInfo.CurrentValue ?? string.Empty);
+            formattingInfo.FormatAsChild(chosenFormat, formattingInfo.CurrentValue);
 
             return true;
         }

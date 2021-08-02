@@ -2,7 +2,9 @@
 
 [![GitHub release](https://img.shields.io/github/release/axuno/smartformat.net.svg)](https://github.com/axuno/SmartFormat.Net/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/blob/main/License.txt)
-[![Build status](https://ci.appveyor.com/api/projects/status/g27r62fm9c7e0ctv?svg=true)](https://ci.appveyor.com/project/axuno/smartformat)
+[![AppVeyor build status windows](https://img.shields.io/appveyor/job/build/axuno/smartformat/windows/version/v3.0?label=windows%20build)](https://ci.appveyor.com/project/axuno/smartformat/branch/version/v3.0)
+[![AppVeyor build status linux](https://img.shields.io/appveyor/job/build/axuno/smartformat/linux/version/v3.0?label=linux%20build)](https://ci.appveyor.com/project/axuno/smartformat/branch/version/v3.0)
+
 [![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/SmartFormat.svg)](https://ci.appveyor.com/project/axuno/SmartFormat/branch/main/tests)
 [![codecov](https://codecov.io/gh/axuno/SmartFormat/branch/main/graph/badge.svg)](https://codecov.io/gh/axuno/SmartFormat)
 
@@ -13,7 +15,8 @@
 * .Net Standard 2.0 and later (including .Net 5.0)
  
 ### Get started
-[![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the NuGet package
+[![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/)
+[![NuGet](https://img.shields.io/nuget/vpre/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the NuGet package
 
 [![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/wiki)
 Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.Net/wiki)
@@ -30,14 +33,3 @@ See [changelog](CHANGES.md) for changes.
 
 We have started to work on a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**.
 
-* Improve management of extensions for better performance:
-  * make named formatters obligatory instead of iterating through all formatters
-  * the sequence, how extensions are loaded should not have an impact on identifying the right formatter
-* Make caching of ```Parser.ParseFormat``` results the standard behavior
-* Rewrite the parser
-* Performance improvements
-*  less generated garbage 
-* Remove ```public``` properties/methods which should better be ```internal``` or even ```privat```
-* Code clean-up: Make use of current C# features, add missing comments
-* Re-organize unit tests
-* ... ?

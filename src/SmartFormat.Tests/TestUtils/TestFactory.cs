@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.TestUtils
 {
     public abstract class TestFactory
     {

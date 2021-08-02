@@ -25,7 +25,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 | ParsePlaceholders | 38.14 us | 0.249 us | 0.220 us | 0.1831 |     - |     - |   1.53 KB |
     */
 
-    [SimpleJob(RuntimeMoniker.NetCoreApp50)]
+    [SimpleJob(RuntimeMoniker.Net50)]
     [MemoryDiagnoser]
     public class SimpleSpanParserTests
     {
@@ -96,7 +96,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
                     level--;
                     if (level == 0)
                     {
-                        placeholders.Add((start, _inputFormatMemory.Slice(start, index + 1 - start)));
+                        placeholders.Add((start, _inputFormatMemory[start..(index + 1)]));
                     }
                 }
             }

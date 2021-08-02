@@ -3,6 +3,7 @@ using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using SmartFormat.Core.Formatting;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -10,52 +11,59 @@ namespace SmartFormat.Tests.Extensions
     public class SubStringFormatterTests
     {
         private readonly List<object> _people;
-        private readonly SmartFormatter _smart;
+
+        private static SmartFormatter GetFormatter()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
+            smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+
+            if (smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Name.Equals("substr")) == null)
+            {
+                smart.AddExtensions(new SubStringFormatter());
+            }
+
+            return smart;
+        }
 
         public SubStringFormatterTests()
         {
-            _smart = Smart.CreateDefaultSmartFormat();
-            _smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
-            _smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
-
-            if (_smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Names.Contains("substr")) == null)
-            {
-                _smart.FormatterExtensions.Add(new SubStringFormatter());
-            }
-
             _people = new List<object>
                 {new {Name = "Long John", City = "New York"}, new {Name = "Short Mary", City = "Massachusetts"},};
         }
 
-
         [Test]
         public void NoParameters()
         {
-            Assert.AreEqual("No parentheses: Long John", _smart.Format("No parentheses: {Name:substr}", _people.First()));
-            Assert.Throws<SmartFormat.Core.Formatting.FormattingException>(() => _smart.Format("No parameters: {Name:substr()}", _people.First()));
-            Assert.Throws<SmartFormat.Core.Formatting.FormattingException>(() => _smart.Format("Only delimiter: {Name:substr(,)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual("No parentheses: Long John", smart.Format("No parentheses: {Name:substr}", _people.First()));
+            Assert.Throws<SmartFormat.Core.Formatting.FormattingException>(() => smart.Format("No parameters: {Name:substr()}", _people.First()));
+            Assert.Throws<SmartFormat.Core.Formatting.FormattingException>(() => smart.Format("Only delimiter: {Name:substr(,)}", _people.First()));
         }
 
         [Test]
         public void StartPositionLongerThanString()
         {
-            Assert.AreEqual(string.Empty, _smart.Format("{Name:substr(999)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual(string.Empty, smart.Format("{Name:substr(999)}", _people.First()));
         }
 
         [Test]
         public void StartPositionAndLengthLongerThanString()
         {
-            Assert.AreEqual(string.Empty, _smart.Format("{Name:substr(999,1)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual(string.Empty, smart.Format("{Name:substr(999,1)}", _people.First()));
         }
 
         [Test]
         public void LengthLongerThanString_ReturnEmptyString()
         {
-            var formatter = _smart.GetFormatterExtension<SubStringFormatter>()!;
+            var smart = GetFormatter();
+            var formatter = smart.GetFormatterExtension<SubStringFormatter>()!;
             var behavior = formatter.OutOfRangeBehavior;
             
             formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ReturnEmptyString;
-            Assert.AreEqual(string.Empty, _smart.Format("{Name:substr(0,999)}", _people.First()));
+            Assert.AreEqual(string.Empty, smart.Format("{Name:substr(0,999)}", _people.First()));
 
             formatter.OutOfRangeBehavior = behavior;
         }
@@ -63,11 +71,12 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void LengthLongerThanString_ReturnStartIndexToEndOfString()
         {
-            var formatter = _smart.GetFormatterExtension<SubStringFormatter>()!;
+            var smart = GetFormatter();
+            var formatter = smart.GetFormatterExtension<SubStringFormatter>()!;
             var behavior = formatter.OutOfRangeBehavior;
 
             formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ReturnStartIndexToEndOfString;
-            Assert.AreEqual("Long John", _smart.Format("{Name:substr(0,999)}", _people.First()));
+            Assert.AreEqual("Long John", smart.Format("{Name:substr(0,999)}", _people.First()));
 
             formatter.OutOfRangeBehavior = behavior;
         }
@@ -75,11 +84,12 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void LengthLongerThanString_ThrowException()
         {
-            var formatter = _smart.GetFormatterExtension<SubStringFormatter>()!;
+            var smart = GetFormatter();
+            var formatter = smart.GetFormatterExtension<SubStringFormatter>()!;
             var behavior = formatter.OutOfRangeBehavior;
 
             formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ThrowException;
-            Assert.Throws<SmartFormat.Core.Formatting.FormattingException>(() => _smart.Format("{Name:substr(0,999)}", _people.First()));
+            Assert.Throws<SmartFormat.Core.Formatting.FormattingException>(() => smart.Format("{Name:substr(0,999)}", _people.First()));
 
             formatter.OutOfRangeBehavior = behavior;
         }
@@ -87,37 +97,69 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void OnlyPositiveStartPosition()
         {
-            Assert.AreEqual("John", _smart.Format("{Name:substr(5)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual("John", smart.Format("{Name:substr(5)}", _people.First()));
         }
 
         [Test]
         public void StartPositionAndPositiveLength()
         {
-            Assert.AreEqual("New", _smart.Format("{City:substr(0,3)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual("New", smart.Format("{City:substr(0,3)}", _people.First()));
         }
 
         [Test]
         public void OnlyNegativeStartPosition()
         {
-            Assert.AreEqual("John", _smart.Format("{Name:substr(-4)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual("John", smart.Format("{Name:substr(-4)}", _people.First()));
         }
 
         [Test]
         public void NegativeStartPositionAndPositiveLength()
         {
-            Assert.AreEqual("Jo", _smart.Format("{Name:substr(-4, 2)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual("Jo", smart.Format("{Name:substr(-4, 2)}", _people.First()));
         }
 
         [Test]
         public void NegativeStartPositionAndNegativeLength()
         {
-            Assert.AreEqual("Joh", _smart.Format("{Name:substr(-4, -1)}", _people.First()));
+            var smart = GetFormatter();
+            Assert.AreEqual("Joh", smart.Format("{Name:substr(-4, -1)}", _people.First()));
         }
 
         [Test]
         public void DataItemIsNull()
         {
-            Assert.AreEqual(new SubStringFormatter().NullDisplayString, _smart.Format("{Name:substr(0,3)}", new Dictionary<string, string?> { { "Name", null } }));
+            var smart = GetFormatter();
+            var ssf = smart.GetFormatterExtension<SubStringFormatter>();
+            ssf!.NullDisplayString = "???";
+            ssf!.ParameterDelimiter = '*';
+            Assert.AreEqual(ssf.NullDisplayString, smart.Format("{Name:substr(0*3)}", new Dictionary<string, string?> { { "Name", null } }));
+        }
+
+        [Test]
+        public void NamedFormatterWithoutOptionsShouldThrow()
+        {
+            var smart = GetFormatter();
+            Assert.That(() => smart.Format("{Name:substr()}", _people.First()), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void NamedFormatterWithoutStringArgumentShouldThrow()
+        {
+            var smart = GetFormatter();
+            Assert.That(() => smart.Format("{0:substr(0,2)}", new object()), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void ImplicitFormatterEvaluation_With_Wrong_Args_Should_Fail()
+        {
+            var smart = GetFormatter();
+            Assert.That(
+                smart.GetFormatterExtension<SubStringFormatter>()!.TryEvaluateFormat(
+                    FormattingInfo.Create("{0::(0,2)}", new List<object>(new[] {new object()}))), Is.EqualTo(false));
         }
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.TestUtils
 {
     /// <summary>
     /// Generic class that can be used for United States addresses

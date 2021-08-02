@@ -24,7 +24,7 @@ namespace SmartFormat.Core.Parsing
         public ParsingErrors Errors { get; internal set; }
 
         /// <summary>
-        /// If true, the errors will throw an exception.
+        /// If <see langword="true"/>, errors will throw an exception.
         /// </summary>
         public bool ThrowsException { get; internal set; }
     }

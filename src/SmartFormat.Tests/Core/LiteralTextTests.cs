@@ -69,12 +69,13 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void ConvertCharacterLiteralsToUnicodeWithListFormatter()
         {
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Settings.Parser.ConvertCharacterStringLiterals = true;
             // a useful practical test case: separate members of a list by a new line
             var items = new[] { "one", "two", "three" };
             // Note the @ before the format string will switch off conversion of \n by the compiler
-            Smart.Default.Settings.Parser.ConvertCharacterStringLiterals = true;
-            var result = Smart.Default.Format(@"{0:list:{}|\n|\nand }", new object[] { items });
-            Smart.Default.Settings.Parser.ConvertCharacterStringLiterals = false;
+            var result = smart.Format(@"{0:list:{}|\n|\nand }", new object[] { items });
+            
             Assert.AreEqual("one\ntwo\nand three", result);
         }
     }

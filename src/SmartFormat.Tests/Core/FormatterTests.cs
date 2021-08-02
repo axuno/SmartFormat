@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
@@ -14,15 +15,13 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class FormatterTests
     {
-        private object[] errorArgs = new object[]{ new FormatDelegate(format => { throw new Exception("ERROR!"); } ) };
+        private readonly object[] _errorArgs = { new FormatDelegate(format => throw new Exception("ERROR!")) };
 
-        private SmartFormatter GetSimpleFormatter()
+        private static SmartFormatter GetSimpleFormatter()
         {
             var formatter = new SmartFormatter(); 
-            formatter.FormatterExtensions.Add(new DefaultFormatter());
-            formatter.SourceExtensions.Add(new ReflectionSource(formatter));
-            formatter.SourceExtensions.Add(new DefaultSource(formatter));
-            formatter.Parser.AddAlphanumericSelectors();
+            formatter.AddExtensions(new DefaultFormatter());
+            formatter.AddExtensions(new ReflectionSource(), new DefaultSource());
             return formatter;
         }
 
@@ -47,7 +46,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
 
-            Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--"));
+            Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", _errorArgs, "--ERROR!--ERROR!--"));
         }
 
         [Test]
@@ -56,7 +55,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--ERROR!--ERROR!--");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "--ERROR!--ERROR!--");
         }
 
         [Test]
@@ -65,7 +64,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "------");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "------");
         }
 
         [Test]
@@ -74,7 +73,7 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.MaintainTokens;
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--{0}--{0:ZZZZ}--");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "--{0}--{0:ZZZZ}--");
         }
 
         [Test]
@@ -82,25 +81,7 @@ namespace SmartFormat.Tests.Core
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.MaintainTokens;
-            formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
-        }
-
-        [Test]
-        public void Formatter_Align()
-        {
-            string name = "Joe";
-            var obj = new { name = name };
-            var str2 = GetSimpleFormatter().Format("Name: {name,10}| Column 2", obj);
-            Assert.That(str2, Is.EqualTo("Name:        Joe| Column 2"));
-        }
-
-        [Test]
-        public void Formatter_AlignNull()
-        {
-            string? name = null;
-            var obj = new { name = name };
-            var str2 = GetSimpleFormatter().Format("Name: {name,-10}| Column 2", obj);
-            Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
+            formatter.Test("--{Object.Thing}--", _errorArgs, "--{Object.Thing}--");
         }
 
         [Test]
@@ -127,17 +108,24 @@ namespace SmartFormat.Tests.Core
             Assert.That(smart.Format(format, arg), Is.EqualTo(expected));
         }
 
-        [TestCase(1)]
-        [TestCase(2)]
-        public void Nested_PlaceHolders_Conditional(int numOfPeople)
+        [TestCase(1, "There {People.Count:plural:is a person.|are {} people.}", false)]
+        [TestCase(2, "There {People.Count:plural:is a person.|are {} people.}", false)]
+        [TestCase(1, "There {People.Count:is a person.|are {} people.}", true)]
+        [TestCase(2, "There {People.Count:is a person.|are {} people.}", true)]
+        public void Nested_PlaceHolders_Pluralization(int numOfPeople, string format, bool markAsDefault)
         {
-
             var data = numOfPeople == 1
                 ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
                 : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
-            var formatter = Smart.CreateDefaultSmartFormat();
             
-            var result = formatter.Format("There {People.Count:is a person.|are {} people.}", data);
+            var formatter = new SmartFormatter();
+            formatter.AddExtensions(new ReflectionSource());
+            // Note: If pluralization AND conditional formatters are registers, the formatter
+            //       name MUST be included in the format string, because both could return successful evaluation
+            // Here, we register only pluralization:
+            formatter.AddExtensions(new PluralLocalizationFormatter("en"){CanAutoDetect = markAsDefault}, new DefaultFormatter());
+            
+            var result = formatter.Format(format, data);
             
             Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
         }
@@ -160,7 +148,7 @@ namespace SmartFormat.Tests.Core
         {
             var smart = Smart.CreateDefaultSmartFormat();
             smart.Settings.Parser.ConvertCharacterStringLiterals = false;
-            smart.Settings.UseStringFormatCompatibility = true;
+            smart.Settings.StringFormatCompatibility = true;
 
             var expected = "\\Hello";
             var actual = smart.Format("\\{Test}", new { Test = "Hello" });
@@ -190,35 +178,84 @@ namespace SmartFormat.Tests.Core
             var output = new StringOutput();
             var formatter = new SmartFormatter();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-            formatter.Settings.ConvertCharacterStringLiterals = true;
             formatter.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
             formatter.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
-            formatter.Parser.AddAlphanumericSelectors(); // required for this test
             var formatParsed = formatter.Parser.ParseFormat(format);
-            var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
+            var formatDetails = new FormatDetails(formatter, formatParsed, args, null, output);
             
             Assert.AreEqual(args, formatDetails.OriginalArgs);
             Assert.AreEqual(format, formatDetails.OriginalFormat.RawText);
             Assert.AreEqual(formatter.Settings, formatDetails.Settings);
-            Assert.IsTrue(formatDetails.FormatCache == null);
         }
 
         [Test]
         public void Missing_FormatExtensions_Should_Throw()
         {
-            var formatter = GetSimpleFormatter();
+            var formatter = new SmartFormatter();
+            // make sure we test against missing format extensions
+            formatter.AddExtensions(new DefaultSource());
 
-            formatter.FormatterExtensions.Clear();
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
             Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
         }
 
         [Test]
         public void Missing_SourceExtensions_Should_Throw()
         {
-            var formatter = GetSimpleFormatter();
+            var formatter = new SmartFormatter();
+            // make sure we test against missing source extensions
+            formatter.AddExtensions(new DefaultFormatter());
 
-            formatter.SourceExtensions.Clear();
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
             Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
+        }
+
+        [Test]
+        public void Adding_FormatExtension_With_Existing_Name_Should_Throw()
+        {
+            var formatter = new SmartFormatter();
+            var firstExtension = new DefaultFormatter();
+            formatter.AddExtensions(firstExtension);
+            var dupeExtension = new NullFormatter {Name = firstExtension.Name};
+            Assert.That(() => formatter.AddExtensions(dupeExtension), Throws.TypeOf(typeof(ArgumentException)));
+        }
+
+        [Test]
+        public void Remove_None_Existing_Source()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+            Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void Remove_Existing_Source()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+            formatter.AddExtensions(new StringSource());
+            Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(true));
+        }
+
+        [Test]
+        public void Remove_None_Existing_Formatter()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+            Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void Remove_Existing_Formatter()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+            formatter.AddExtensions(new DefaultFormatter());
+            Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(true));
         }
 
         [Test]
@@ -226,6 +263,13 @@ namespace SmartFormat.Tests.Core
         {
             var formatter = GetSimpleFormatter();
             Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));  ;
+        }
+
+        [Test]
+        public void Not_Existing_Formatter_Name_Should_Throw()
+        {
+            var smart = GetSimpleFormatter();
+            Assert.That(() => smart.Format("{0:not_existing_formatter_name:}", new object()), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("not_existing_formatter_name"));
         }
     }
 }

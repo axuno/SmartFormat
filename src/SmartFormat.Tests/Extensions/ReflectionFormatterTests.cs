@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Output;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -11,7 +16,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class ReflectionFormatterTests
     {
-        public object[] GetArgs()
+        private static object[] GetArgs()
         {
             return new object[] {
                 "Zero",
@@ -25,22 +30,24 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Properties()
         {
-            var formats = new string[] {
+            // Length property for a string comes from StringSource
+            var formats = new[] {
                 "{0} {0.Length} {Length}",
                 "{2.Year} {2.Month:00}-{2.Day:00}",
                 "{3.Value} {3.Anon}",
-                "Chained: {4.FirstName} {4.FirstName.Length} {4.Address.City} {4.Address.State}  ",
-                "Nested: {4:{FirstName:{} {Length} }{Address:{City} {State} } }", // Due to double-brace escaping, the spacing in this nested format is irregular
+                "Chained: {4.FirstName} {4.FirstName.Length} {4.Address.City} {4.Address.State}",
+                "Nested: {4:{FirstName:{} {Length} }{Address:{City} {State}}}"
             };
-            var expected = new string[] {
+            var expected = new[] {
                 "Zero 4 4",
                 "2222 02-02",
                 "3 True",
-                "Chained: Michael 7 Scranton Pennsylvania  ",
-                "Nested: Michael 7 Scranton Pennsylvania  ",
+                "Chained: Michael 7 Scranton Pennsylvania",
+                "Nested: Michael 7 Scranton Pennsylvania"
             };
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
@@ -49,46 +56,84 @@ namespace SmartFormat.Tests.Extensions
             var formatter = Smart.CreateDefaultSmartFormat();
             formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
             
-            var formats = new string[]
+            // Length property for a string comes from StringSource
+            var formats = new []
                 {
                     "{0} {0.lenGth} {length}", "{2.YEar} {2.MoNth:00}-{2.daY:00}", "{3.Value} {3.AnoN}",
-                    "Chained: {4.fIrstName} {4.Firstname.Length} {4.Address.City} {4.aDdress.StAte}  ",
-                    "Nested: {4:{FirstName:{} {Length} }{Address:{City} {StaTe} } }",
+                    "Chained: {4.fIrstName} {4.Firstname.Length} {4.Address.City} {4.aDdress.StAte}",
+                    "Nested: {4:{FirstName:{} {Length} }{Address:{City} {StaTe}}}",
                     // Due to double-brace escaping, the spacing in this nested format is irregular
                 };
-            var expected = new string[]
+            var expected = new []
                 {
-                    "Zero 4 4", "2222 02-02", "3 True", "Chained: Michael 7 Scranton Pennsylvania  ",
-                    "Nested: Michael 7 Scranton Pennsylvania  ",
+                    "Zero 4 4", "2222 02-02", "3 True", "Chained: Michael 7 Scranton Pennsylvania",
+                    "Nested: Michael 7 Scranton Pennsylvania",
                 };
             var args = GetArgs();
             formatter.Test(formats, args, expected);
         }
 
+        /// <summary>
+        /// system.string methods are processed by <see cref="StringSource"/> since v3.0
+        /// </summary>
         [Test]
         public void Test_Methods()
         {
-            var formats = new string[] {
-                "{0} {0.ToLower} {ToLower} {ToUpper}",
-            };
-            var expected = new string[] {
-                "Zero zero zero ZERO",
-            };
+            var format = "{0} {0.ToLower} {ToLower} {ToUpper}";
+            //var expected = "Zero zero zero ZERO";
+
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
+
             var args = GetArgs();
-            Smart.Default.Test(formats, args, expected);
+            Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("ToLower"));
         }
 
+        /// <summary>
+        /// system.string methods are processed by <see cref="StringSource"/> since v3.0
+        /// </summary>
         [Test]
         public void Test_Methods_CaseInsensitive()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ReflectionSource());
+            smart.AddExtensions(new DefaultFormatter());
+            smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
 
-            var formats = new string[] { "{0} {0.ToLower} {toloWer} {touPPer}", };
-            var expected = new string[] { "Zero zero zero ZERO", };
+            var format = "{0} {0.ToLower} {toloWer} {touPPer}";
+            //var expected = "Zero zero zero ZERO";
             var args = GetArgs();
-            formatter.Test(formats, args, expected);
+            Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("ToLower"));
         }
+
+        [Test]
+        public void Void_Methods_Should_Just_Be_Ignored()
+        {
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
+            Assert.That(() => smart.Format("{0.Clear}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Clear"));
+        }
+
+        [Test]
+        public void Methods_With_Parameter_Should_Just_Be_Ignored()
+        {
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
+            Assert.That(() => smart.Format("{0.Add}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Add"));
+        }
+
+        [Test]
+        public void Properties_With_No_Getter_Should_Just_Be_Ignored()
+        {
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new DefaultFormatter());
+            Assert.That(() => smart.Format("{Misc.OnlySetterProperty}", new { Misc = new MiscObject() }), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("OnlySetterProperty"));
+        }
+        
 
         [Test]
         public void Test_Fields()
@@ -102,7 +147,8 @@ namespace SmartFormat.Tests.Extensions
             var args = new object[] {
                 new MiscObject(),
             };
-            Smart.Default.Test(formats, args, expected);
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(formats, args, expected);
         }
 
         [Test]
@@ -168,22 +214,42 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
             Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out var found), Is.True);
             Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
-
+            
             // Invoke formatter 2nd time
             obj.Obj.Field = "Another Field Value";
             Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
             Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out found), Is.True);
-            Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));       }
+            Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
+        }
+
+        [Test]
+        public void Nullable_Property_Should_Return_Empty_String()
+        {
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new ISource[] { new DefaultSource(), new ReflectionSource() });
+            smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
+            var data = new {Person = new Person()};
+
+            var result = smart.Format("{Person.Address?.City}", data);
+            Assert.That(result, Is.Empty);
+        }
 
         public class MiscObject
         {
+            private string _onlySetterProperty;
             public MiscObject()
             {
                 Field = "Field";
                 ReadonlyProperty = "ReadonlyProperty";
                 MethodReturnValue = "Method";
+                _onlySetterProperty = string.Empty;
+                _ = _onlySetterProperty;
             }
             public string Field;
+            public string OnlySetterProperty
+            {
+                set => _onlySetterProperty = value;
+            }
             public string ReadonlyProperty { get; private set; }
             public virtual string Property { get; set; } = "Property";
             public string Method()
@@ -210,6 +276,19 @@ namespace SmartFormat.Tests.Extensions
                                               | BindingFlags.Static;
             var field = type.GetField(fieldName, bindingFlags);
             return field?.GetValue(instance);
+        }
+
+        internal class Address
+        {
+            public readonly string Country = string.Empty;
+            public readonly string City = string.Empty;
+        }
+
+        internal class Person
+        {
+            public string FirstName = "first";
+            public string LastName = "last";
+            public Address? Address = null;
         }
     }
 }

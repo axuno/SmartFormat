@@ -25,7 +25,7 @@ namespace SmartFormat.Core.Settings
         /// instead of the <c>Smart.Format</c> default escaping, \{ and \}.
         /// Custom formatters cannot be parsed.
         /// </summary>
-        public bool UseStringFormatCompatibility { get; set; } = false;
+        public bool StringFormatCompatibility { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
@@ -71,34 +71,16 @@ namespace SmartFormat.Core.Settings
 
         internal IEqualityComparer<string> GetCaseSensitivityComparer()
         {
-            {
-                switch (CaseSensitivity)
-                {
-                    case CaseSensitivityType.CaseSensitive:
-                        return StringComparer.Ordinal;
-                    case CaseSensitivityType.CaseInsensitive:
-                        return StringComparer.OrdinalIgnoreCase;
-                    default:
-                        throw new InvalidOperationException(
-                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
-                }
-            }
+            return CaseSensitivity == CaseSensitivityType.CaseSensitive
+                ? StringComparer.Ordinal
+                : StringComparer.OrdinalIgnoreCase;
         }
 
         internal StringComparison GetCaseSensitivityComparison()
         {
-            {
-                switch (CaseSensitivity)
-                {
-                    case CaseSensitivityType.CaseSensitive:
-                        return StringComparison.Ordinal;
-                    case CaseSensitivityType.CaseInsensitive:
-                        return StringComparison.OrdinalIgnoreCase;
-                    default:
-                        throw new InvalidOperationException(
-                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
-                }
-            }
+            return CaseSensitivity == CaseSensitivityType.CaseSensitive
+                ? StringComparison.Ordinal
+                : StringComparison.OrdinalIgnoreCase;
         }
 
         /// <summary>

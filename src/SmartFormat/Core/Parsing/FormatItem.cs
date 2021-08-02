@@ -14,6 +14,9 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public abstract class FormatItem
     {
+        /// <summary>
+        /// Obsolete. Gets the base format string.
+        /// </summary>
         [Obsolete("Use property 'BaseString' instead")]
         public string baseString => BaseString;
 
@@ -22,16 +25,26 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public string BaseString { get; }
         
+        /// <summary>
+        /// Obsolete. The end index is pointing to ONE POSITION AFTER the last character of item.
+        /// </summary>
         [Obsolete("Use property 'EndIndex' instead")]
         public int endIndex
         {
-            get => EndIndex;
-            set => EndIndex = value;
+            get
+            {
+                return EndIndex;
+            }
+
+            set
+            {
+                EndIndex = value;
+            }
         }
 
         /// <summary>
         /// The end index is pointing to ONE POSITION AFTER the last character of item.
-        ///  </summary>
+        /// </summary>
         /// <example>
         /// Format string: {0}{1}ABC
         /// Index:         012345678
@@ -40,16 +53,26 @@ namespace SmartFormat.Core.Parsing
         /// </example>
         public int EndIndex { get; set; }
         
+        /// <summary>
+        /// Obsolete. The start index is pointing to the first character of item.
+        /// </summary>
         [Obsolete("Use property 'StartIndex' instead")]
         public int startIndex
         {
-            get => StartIndex;
-            set => StartIndex = value;
+            get
+            {
+                return StartIndex;
+            }
+
+            set
+            {
+                StartIndex = value;
+            }
         }
 
         /// <summary>
         /// The start index is pointing to the first character of item.
-        ///  </summary>
+        /// </summary>
         /// <example>
         /// Format string: {0}{1}ABC
         /// Index:         012345678
@@ -66,7 +89,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// The settings for formatter and parser.
         /// </summary>
-        protected SmartSettings SmartSettings;
+        internal SmartSettings SmartSettings;
 
         /// <summary>
         /// CTOR.

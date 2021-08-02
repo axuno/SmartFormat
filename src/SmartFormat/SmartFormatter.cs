@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SmartFormat.Core.Extensions;
@@ -11,6 +12,7 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 
 namespace SmartFormat
 {
@@ -20,6 +22,9 @@ namespace SmartFormat
     /// </summary>
     public class SmartFormatter
     {
+        private readonly List<ISource> _sourceExtensions = new();
+        private readonly List<IFormatter> _formatterExtensions = new();
+
         #region : EventHandlers :
 
         /// <summary>
@@ -31,12 +36,14 @@ namespace SmartFormat
 
         #region: Constructor :
 
-        public SmartFormatter()
+        /// <summary>
+        /// Creates a new instance of a <see cref="SmartFormatter"/>.
+        /// </summary>
+        /// <param name="settings">The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.</param>
+        public SmartFormatter(SmartSettings? settings = null)
         {
-            Settings = new SmartSettings();
-            Parser = new SmartFormat.Core.Parsing.Parser(Settings);
-            SourceExtensions = new List<ISource>();
-            FormatterExtensions = new List<IFormatter>();
+            Settings = settings ?? new SmartSettings();
+            Parser = new Parser(Settings);
         }
 
         #endregion
@@ -46,68 +53,139 @@ namespace SmartFormat
         /// <summary>
         /// Gets the list of <see cref="ISource" /> source extensions.
         /// </summary>
-        public List<ISource> SourceExtensions { get; }
+        public IReadOnlyList<ISource> SourceExtensions => _sourceExtensions;
 
         /// <summary>
         /// Gets the list of <see cref="IFormatter" /> formatter extensions.
         /// </summary>
-        public List<IFormatter> FormatterExtensions { get; }
+        public IReadOnlyList<IFormatter> FormatterExtensions => _formatterExtensions;
 
         /// <summary>
-        /// Gets all names of registered formatter extensions which are not empty.
+        /// Adds the extensions at the beginning of the <see cref="SourceExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="ISource"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
         /// </summary>
-        /// <returns></returns>
-        public string[] GetNotEmptyFormatterExtensionNames()
-        {
-            var names = new List<string>();
-            foreach (var extension in FormatterExtensions)
-                names.AddRange(extension.Names.Where(n => n != string.Empty).ToArray());
-            return names.ToArray();
-        }
-
-        /// <summary>
-        /// Adds each extensions to this formatter.
-        /// Each extension must implement ISource.
-        /// </summary>
-        /// <param name="sourceExtensions"></param>
         public void AddExtensions(params ISource[] sourceExtensions)
         {
-            SourceExtensions.InsertRange(0, sourceExtensions);
+            AddExtensions(0, sourceExtensions);
         }
 
         /// <summary>
-        /// Adds each extensions to this formatter.
-        /// Each extension must implement IFormatter.
+        /// Adds the extensions at the <paramref name="position"/> of the <see cref="SourceExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="ISource"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
         /// </summary>
-        /// <param name="formatterExtensions"></param>
-        public void AddExtensions(params IFormatter[] formatterExtensions)
+        /// <param name="position">The position in the <see cref="SourceExtensions"/> list where new extensions will be added.</param>
+        /// <param name="sourceExtensions"></param>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        ///        <paramref name="position" /> is less than 0.
+        ///         -or-
+        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
+        /// </exception>
+        public void AddExtensions(int position, params ISource[] sourceExtensions)
         {
-            FormatterExtensions.InsertRange(0, formatterExtensions);
+            foreach (var source in sourceExtensions)
+            {
+                if (_sourceExtensions.All(sx => sx.GetType() != source.GetType()))
+                {
+                    if(source is IInitializer sourceToInitialize) 
+                        sourceToInitialize.Initialize(this);
+                    
+                    _sourceExtensions.Insert(position, source);
+                    position++;
+                }
+            }
         }
 
+        /// <summary>
+        /// Adds the extensions at the beginning of the <see cref="FormatterExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="IFormatter"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </summary>
+        /// <param name="formatterExtensions"></param>
+        /// <exception cref="T:System.ArgumentException">
+        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Name"/> that already exist.
+        /// </exception>
+        public void AddExtensions(params IFormatter[] formatterExtensions)
+        {
+            AddExtensions(0, formatterExtensions);
+        }
+
+        /// <summary>
+        /// Adds the extensions at the <paramref name="position"/> of the <see cref="FormatterExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
+        /// Each extension must implement <see cref="IFormatter"/>.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </summary>
+        /// <param name="formatterExtensions"></param>
+        /// <param name="position">The position in the <see cref="FormatterExtensions"/> list where new extensions will be added.</param>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        ///        <paramref name="position" /> is less than 0.
+        ///         -or-
+        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Name"/> that already exist.
+        /// </exception>
+        public void AddExtensions(int position, params IFormatter[] formatterExtensions)
+        {
+            foreach (var format in formatterExtensions)
+            {
+                if (_formatterExtensions.All(fx => fx.GetType() != format.GetType()))
+                {
+                    if(_formatterExtensions.Any(fx => fx.Name.Equals(format.Name)))
+                        throw new ArgumentException($"Formatter '{format.GetType().Name}' uses existing name.", nameof(formatterExtensions));
+
+                    if(format is IInitializer sourceToInitialize) 
+                        sourceToInitialize.Initialize(this);
+
+                    _formatterExtensions.Insert(position, format);
+                    position++;
+                }
+            }
+        }
 
         /// <summary>
         /// Searches for a Source Extension of the given type, and returns it.
-        /// This can be used to easily find and configure extensions.
-        /// Returns null if the type cannot be found.
+        /// Returns <see langword="null"/> if the type cannot be found.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <returns>The class implementing <see cref="ISource"/> if found, else <see langword="null"/>.</returns>
         public T? GetSourceExtension<T>() where T : class, ISource
         {
-            return SourceExtensions.OfType<T>().FirstOrDefault();
+            return _sourceExtensions.OfType<T>().FirstOrDefault();
         }
 
         /// <summary>
         /// Searches for a Formatter Extension of the given type, and returns it.
-        /// This can be used to easily find and configure extensions.
-        /// Returns null if the type cannot be found.
+        /// Returns <see langword="null"/> if the type cannot be found.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <returns>The class implementing <see cref="IFormatter"/> if found, else <see langword="null"/>.</returns>
         public T? GetFormatterExtension<T>() where T : class, IFormatter
         {
-            return FormatterExtensions.OfType<T>().FirstOrDefault();
+            return _formatterExtensions.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Removes Source Extension of the given type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns><see langword="true"/>, if the extension was found and could be removed.</returns>
+        public bool RemoveSourceExtension<T>() where T : class, ISource
+        {
+            var source = _sourceExtensions.OfType<T>().FirstOrDefault();
+            return source is not null && _sourceExtensions.Remove(source);
+        }
+
+        /// <summary>
+        /// Removes the Formatter Extension of the given type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns><see langword="true"/>, if the extension was found and could be removed.</returns>
+        public bool RemoveFormatterExtension<T>() where T : class, IFormatter
+        {
+            var format = _formatterExtensions.OfType<T>().FirstOrDefault();
+            return format is not null && _formatterExtensions.Remove(format);
         }
 
         #endregion
@@ -117,10 +195,10 @@ namespace SmartFormat
         /// <summary>
         /// Gets or set the instance of the <see cref="Core.Parsing.Parser" />
         /// </summary>
-        public SmartFormat.Core.Parsing.Parser Parser { get; }
+        public Parser Parser { get; }
 
         /// <summary>
-        /// Get the <see cref="Core.Settings.SmartSettings" /> for Smart.Format
+        /// Get the <see cref="SmartSettings" /> for Smart.Format
         /// </summary>
         public SmartSettings Settings { get; }
 
@@ -174,8 +252,8 @@ namespace SmartFormat
             var output = new StringOutput(format.Length + args.Count * 8);
             var formatParsed = Parser.ParseFormat(format);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, formatParsed, args, null, provider, output);
-            Format(formatDetails, formatParsed, current);
+            var formatDetails = new FormatDetails(this, formatParsed, args, provider, output);
+            Format(formatDetails, current);
 
             return output.ToString();
         }
@@ -201,74 +279,93 @@ namespace SmartFormat
         {
             var formatParsed = Parser.ParseFormat(format);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, formatParsed, args, null, null, output);
-            Format(formatDetails, formatParsed, current);
+            var formatDetails = new FormatDetails(this, formatParsed, args, null, output);
+            Format(formatDetails, current);
         }
 
-        /// <summary>
-        /// Replaces one or more format items in a specified string with the string representation of a specific object,
-        /// using the <see cref="FormatCache"/>.
-        /// </summary>
-        /// <param name="cache">The <see cref="FormatCache" /> to use.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">The objects to format.</param>
-        /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string FormatWithCache(ref FormatCache? cache, string format, params object[] args)
+        private void Format(FormatDetails formatDetails, object current)
         {
-            return FormatWithCache(ref cache, format, (IList<object>) args);
+            var formattingInfo = new FormattingInfo(formatDetails, formatDetails.OriginalFormat, current);
+            Format(formattingInfo);
+        }
+
+        #endregion
+
+        #region: Format Overloads with cached Format :
+
+        /// <summary>
+        /// Replaces one or more format items in as specified string with the string representation of a specific object.
+        /// </summary>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+        /// <param name="args">The object to format.</param>
+        /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
+        public string Format(Format format, params object[] args)
+        {
+            return Format(null, format, (IList<object>) args);
         }
 
         /// <summary>
-        /// Replaces one or more format items in a specified string with the string representation of a specific object,
-        /// using the <see cref="FormatCache"/>.
+        /// Replaces one or more format items in as specified string with the string representation of a specific object.
         /// </summary>
-        /// <param name="cache">The <see cref="FormatCache" /> to use.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">The objects to format.</param>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+        /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string FormatWithCache(ref FormatCache? cache, string format, IList<object> args)
+        public string Format(Format format, IList<object> args)
+        {
+            return Format(null, format, args);
+        }
+
+        /// <summary>
+        /// Replaces one or more format items in a specified string with the string representation of a specific object.
+        /// </summary>
+        /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+        /// <param name="args">The object to format.</param>
+        /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
+        public string Format(IFormatProvider? provider, Format format, params object[] args)
+        {
+            return Format(provider, format, (IList<object>) args);
+        }
+
+        /// <summary>
+        /// Replaces one or more format items in a specified string with the string representation of a specific object.
+        /// </summary>
+        /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+        /// <param name="args">The object to format.</param>
+        /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
+        public string Format(IFormatProvider? provider, Format format, IList<object> args)
         {
             var output = new StringOutput(format.Length + args.Count * 8);
-
-            cache ??= new FormatCache(Parser.ParseFormat(format));
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
-            Format(formatDetails, cache.Format, current);
+            var formatDetails = new FormatDetails(this, format, args, provider, output);
+            Format(formatDetails, current);
 
             return output.ToString();
         }
 
         /// <summary>
-        /// Writes the formatting result into an <see cref="IOutput"/> instance, using the <see cref="FormatCache"/>.
+        /// Writes the formatting result into an <see cref="IOutput"/> instance.
         /// </summary>
-        /// <param name="cache">The <see cref="FormatCache"/> to use.</param>
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="format">The format string.</param>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The objects to format.</param>
-        public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
+        public void FormatInto(IOutput output, Format format, params object[] args)
         {
-            FormatWithCacheInto(ref cache, output, format, (IList<object>) args);
+            FormatInto(output, format, (IList<object>) args);
         }
 
         /// <summary>
-        /// Writes the formatting result into an <see cref="IOutput"/> instance, using the <see cref="FormatCache"/>.
+        /// Writes the formatting result into an <see cref="IOutput"/> instance.
         /// </summary>
-        /// <param name="cache">The <see cref="FormatCache"/> to use.</param>
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="format">The format string.</param>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The objects to format.</param>
-        public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, IList<object> args)
+        public void FormatInto(IOutput output, Format format, IList<object> args)
         {
-            cache ??= new FormatCache(Parser.ParseFormat(format));
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
-            Format(formatDetails, cache.Format, current);
-        }
-
-        private void Format(FormatDetails formatDetails, Format format, object current)
-        {
-            var formattingInfo = new FormattingInfo(formatDetails, format, current);
-            Format(formattingInfo);
+            var formatDetails = new FormatDetails(this, format, args, null, output);
+            Format(formatDetails, current);
         }
 
         #endregion
@@ -303,7 +400,7 @@ namespace SmartFormat
                 catch (Exception ex)
                 {
                     // An error occurred while evaluation selectors
-                    var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors.Last().EndIndex;
+                    var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors[placeholder.Selectors.Count - 1].EndIndex;
                     FormatError(item, ex, errorIndex, childFormattingInfo);
                     continue;
                 }
@@ -315,7 +412,7 @@ namespace SmartFormat
                 catch (Exception ex)
                 {
                     // An error occurred while evaluating formatters
-                    var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors.Last().EndIndex;
+                    var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors[placeholder.Selectors.Count - 1].EndIndex;
                     FormatError(item, ex, errorIndex, childFormattingInfo);
                 }
             }
@@ -349,10 +446,10 @@ namespace SmartFormat
 
         private void CheckForExtensions()
         {
-            if (SourceExtensions.Count == 0)
+            if (_sourceExtensions.Count == 0)
                 throw new InvalidOperationException(
                     "No source extensions are available. Please add at least one source extension, such as the DefaultSource.");
-            if (FormatterExtensions.Count == 0)
+            if (_formatterExtensions.Count == 0)
                 throw new InvalidOperationException(
                     "No formatter extensions are available. Please add at least one formatter extension, such as the DefaultFormatter.");
         }
@@ -360,12 +457,20 @@ namespace SmartFormat
         private void EvaluateSelectors(FormattingInfo formattingInfo)
         {
             if (formattingInfo.Placeholder is null) return;
-
+           
             var firstSelector = true;
             foreach (var selector in formattingInfo.Placeholder.Selectors)
             {
+                // Don't evaluate empty selectors
+                // (used e.g. for Settings.Parser.NullableOperator and Settings.Parser.ListIndexEndChar final operators)
+                if(selector.Length == 0) continue;
+                
                 formattingInfo.Selector = selector;
+
+                // If we have an alignment selector, we set the Alignment for its placeholder and move on
+                if (TrySetPlaceholderAlignment(formattingInfo)) continue;
                 formattingInfo.Result = null;
+                
                 var handled = InvokeSourceExtensions(formattingInfo);
                 if (handled) formattingInfo.CurrentValue = formattingInfo.Result;
 
@@ -421,16 +526,58 @@ namespace SmartFormat
         /// <returns>True if an FormatterExtension was found, else False.</returns>
         private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
         {
-            if (formattingInfo.Placeholder is null) return false;
+            if (formattingInfo.Placeholder is null)
+            {
+                throw new ArgumentException(
+                    $"{nameof(formattingInfo)}.{nameof(formattingInfo.Placeholder)} must not be null.");
+            }
 
             var formatterName = formattingInfo.Placeholder.FormatterName;
+            var comparison = Settings.GetCaseSensitivityComparison();
 
-            // Evaluate the named formatter (or, evaluate all "" formatters)
-            foreach (var formatterExtension in FormatterExtensions)
+            // Compatibility mode does not support formatter extensions except this one:
+            if (Settings.StringFormatCompatibility)
             {
-                if (!formatterExtension.Names.Contains(formatterName)) continue;
-                var handled = formatterExtension.TryEvaluateFormat(formattingInfo);
-                if (handled) return true;
+                return 
+                    FormatterExtensions.First(fe => fe.GetType() == typeof(DefaultFormatter) || fe.GetType().BaseType == typeof(DefaultFormatter))
+                    .TryEvaluateFormat(formattingInfo);
+            }
+
+            // Try to evaluate using the not empty formatter name from the format string
+            if (!string.IsNullOrEmpty(formatterName))
+            {
+                var extension =
+                    FormatterExtensions.FirstOrDefault(fe => string.Equals(fe.Name, formatterName, comparison));
+                if (extension is null)
+                    throw formattingInfo.FormattingException($"No formatter with name '{formatterName}' found",
+                        formattingInfo.Format, formattingInfo.Selector?.SelectorIndex ?? -1);
+
+                return extension.TryEvaluateFormat(formattingInfo);
+            }
+            
+            // Go through all (implicit) formatters which contain an empty name
+            return FormatterExtensions.Where(fe => fe.CanAutoDetect)
+                .Any(formatterExtension => formatterExtension.
+                    TryEvaluateFormat(formattingInfo));
+        }
+
+        /// <summary>
+        /// Process pure alignment selectors.
+        /// E.g. {Number,10} has an alignment selector containing ',10'
+        /// </summary>
+        /// <param name="selectorInfo">The <see cref="ISelectorInfo"/> to process.</param>
+        /// <returns><see langword="true"/>, if the selector contains valid alignment, else <see langword="false"/>.</returns>
+        private bool TrySetPlaceholderAlignment(ISelectorInfo selectorInfo)
+        {
+            // 1. The current selector belongs to a placeholder
+            // 2. The operator character must have a value, usually ','
+            // 3. The alignment is an integer value
+            if (selectorInfo.Placeholder != null && 
+                selectorInfo.SelectorOperator.Length > 0 && selectorInfo.SelectorOperator[0] == Settings.Parser.AlignmentOperator &&
+                int.TryParse(selectorInfo.SelectorText, out var selectorValue))
+            {
+                selectorInfo.Placeholder.Alignment = selectorValue;
+                return true;
             }
 
             return false;

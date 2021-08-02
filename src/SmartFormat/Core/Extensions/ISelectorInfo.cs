@@ -27,11 +27,11 @@ namespace SmartFormat.Core.Extensions
         /// <summary>
         /// The selector to evaluate
         /// </summary>
-        string? SelectorText { get; }
+        string SelectorText { get; }
 
         /// <summary>
         /// The index of the selector in a multi-part selector.
-        /// Example: {Person.Birthday.Year} has 3 seletors,
+        /// Example: {Person.Birthday.Year} has 3 selectors,
         /// and Year has a SelectorIndex of 2.
         /// </summary>
         int SelectorIndex { get; }
@@ -39,12 +39,12 @@ namespace SmartFormat.Core.Extensions
         /// <summary>
         /// The operator that came before the selector; typically "."
         /// </summary>
-        string? SelectorOperator { get; }
+        string SelectorOperator { get; }
 
         /// <summary>
-        /// Sets the result of evaluating the selector.
+        /// Gets or sets the result of evaluating the selector.
         /// </summary>
-        object? Result { set; }
+        object? Result { get; set; }
 
         /// <summary>
         /// Contains all the details about the current placeholder.

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Newtonsoft.Json.Linq;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Parsing;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Performance
@@ -47,7 +48,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
   1 us      : 1 Microsecond (0.000001 sec)
         */
 
-    [SimpleJob(RuntimeMoniker.NetCoreApp50)]
+    [SimpleJob(RuntimeMoniker.Net50)]
     [MemoryDiagnoser]
     // [RPlotExporter]
     public class SourcePerformanceTests
@@ -61,21 +62,19 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         private readonly SmartFormatter _reflectionFormatter;
         private readonly SmartFormatter _dictionaryFormatter;
         private readonly SmartFormatter _jsonFormatter;
-        
-        private readonly Address _reflectionAddress = new Address();
+
+        private readonly Address _reflectionAddress = new();
         private readonly Dictionary<string, object> _dictionaryAddress = new Address().ToDictionary();
         private readonly JObject _jsonAddress = new Address().ToJson();
 
-        private FormatCache _formatCache;
-        private FormatCache _formatCacheLiteral;
+        private readonly Format _formatCache;
+        private readonly Format _formatCacheLiteral;
 
         public SourcePerformanceTests()
         {
             _literalFormatter = new SmartFormatter();
-            _literalFormatter.Parser.AddAlphanumericSelectors();
-            _literalFormatter.Parser.AddAdditionalSelectorChars("._");
             _literalFormatter.AddExtensions(
-                new DefaultSource(_literalFormatter)
+                new DefaultSource()
             );
             _literalFormatter.AddExtensions(
                 new DefaultFormatter()
@@ -83,8 +82,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _reflectionFormatter = new SmartFormatter();
             _reflectionFormatter.AddExtensions(
-                new ReflectionSource(_reflectionFormatter),
-                new DefaultSource(_reflectionFormatter)
+                new ReflectionSource(),
+                new DefaultSource()
             );
             _reflectionFormatter.AddExtensions(
                 new DefaultFormatter()
@@ -92,8 +91,8 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _dictionaryFormatter = new SmartFormatter();
             _dictionaryFormatter.AddExtensions(
-                new DictionarySource(_dictionaryFormatter),
-                new DefaultSource(_dictionaryFormatter)
+                new DictionarySource(),
+                new DefaultSource()
             );
             _dictionaryFormatter.AddExtensions(
                 new DefaultFormatter()
@@ -101,19 +100,17 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
 
             _jsonFormatter = new SmartFormatter();
             _jsonFormatter.AddExtensions(
-                new JsonSource(_jsonFormatter),
-                new DefaultSource(_jsonFormatter)
+                new NewtonsoftJsonSource(),
+                new DefaultSource()
             );
             _jsonFormatter.AddExtensions(
                 new DefaultFormatter()
             );
 
             // Cache the parsing result, so we don't include parsing performance
-            var format = _jsonFormatter.Parser.ParseFormat(_format);
-            _formatCache = new FormatCache(format);
+            _formatCache = _jsonFormatter.Parser.ParseFormat(_format);;
 
-            var formatForLiteral = _jsonFormatter.Parser.ParseFormat(_formatForLiteral);
-            _formatCacheLiteral = new FormatCache(formatForLiteral);
+            _formatCacheLiteral = _jsonFormatter.Parser.ParseFormat(_formatForLiteral);
 
         }
 
@@ -141,7 +138,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _literalFormatter.FormatWithCache(ref _formatCacheLiteral,"Address: {0} {1}, {2}\nName: {3} {4}", _reflectionAddress.City.ZipCode,
+                _ = _literalFormatter.Format(_formatCacheLiteral,"Address: {0} {1}, {2}\nName: {3} {4}", _reflectionAddress.City.ZipCode,
                     _reflectionAddress.City.Name, _reflectionAddress.City.AreaCode,
                     _reflectionAddress.Person.FirstName, _reflectionAddress.Person.LastName);
             }
@@ -152,7 +149,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _reflectionFormatter.FormatWithCache(ref _formatCache, _format, _reflectionAddress);
+                _ = _reflectionFormatter.Format(_formatCache, _reflectionAddress);
             }
         }
 
@@ -161,7 +158,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _dictionaryFormatter.FormatWithCache(ref _formatCache, _format, _dictionaryAddress);
+                _ = _dictionaryFormatter.Format(_formatCache, _dictionaryAddress);
             }
         }
 
@@ -170,7 +167,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _jsonFormatter.FormatWithCache(ref _formatCache, _format, _jsonAddress);
+                _ = _jsonFormatter.Format(_formatCache, _jsonAddress);
             }
         }
 

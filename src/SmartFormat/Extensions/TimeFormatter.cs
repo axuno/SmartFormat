@@ -10,9 +10,20 @@ using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class to format and output <see cref="TimeSpan"/> values.
+    /// </summary>
     public class TimeFormatter : IFormatter
     {
-        public string[] Names { get; set; } = {"timespan", "time", "t", ""};
+        ///<inheritdoc/>
+        [Obsolete("Use property \"Name\" instead", true)]
+        public string[] Names { get; set; } = {"timespan", "time", string.Empty};
+
+        ///<inheritdoc/>
+        public string Name { get; set; } = "time";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
 
         #region Constructors
 
@@ -47,12 +58,24 @@ namespace SmartFormat.Extensions
 
         #region IFormatter
 
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
+            var formatterName = formattingInfo.Placeholder?.FormatterName ?? string.Empty;
             var current = formattingInfo.CurrentValue;
 
-            if (format != null && format.HasNested) return false;
+            // Check whether arguments can be handled by this formatter
+            if (format is {HasNested: true})
+            {
+                // Auto detection calls just return a failure to evaluate
+                if(formatterName == string.Empty)
+                    return false;
+                
+                // throw, if the formatter has been called explicitly
+                throw new FormatException($"Formatter named '{formatterName}' cannot handle nested formats.");
+            }
+            
             string options;
             if (!string.IsNullOrEmpty(formattingInfo.FormatterOptions))
                 options = formattingInfo.FormatterOptions!;
@@ -61,7 +84,7 @@ namespace SmartFormat.Extensions
             else
                 options = string.Empty;
 
-            TimeSpan fromTime;
+            TimeSpan? fromTime = null;
             
             switch (current)
             {
@@ -73,29 +96,30 @@ namespace SmartFormat.Extensions
                     {
                         fromTime = SystemTime.Now().ToUniversalTime().Subtract(dateTime.ToUniversalTime());
                     }
-                    else
-                    {
-                        return false;
-                    }
                     break;
                 case DateTimeOffset dateTimeOffset:
                     if (formattingInfo.FormatterOptions != string.Empty)
                     {
                         fromTime = SystemTime.OffsetNow().UtcDateTime.Subtract(dateTimeOffset.UtcDateTime);
                     }
-                    else
-                    {
-                        return false;
-                    }
                     break;
-                default:
+            }
+
+            if (fromTime is null)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (formatterName == string.Empty)
                     return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formatterName}' can only process types of {nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}");
             }
 
             var timeTextInfo = GetTimeTextInfo(formattingInfo.FormatDetails.Provider);
-            if (timeTextInfo == null) return false;
+            if (timeTextInfo == null) throw new FormatException($"{nameof(TimeTextInfo)} could not be found for the given {nameof(IFormatProvider)}.");
             var formattingOptions = TimeSpanFormatOptionsConverter.Parse(options);
-            var timeString = fromTime.ToTimeString(formattingOptions, timeTextInfo);
+            var timeString = fromTime.Value.ToTimeString(formattingOptions, timeTextInfo);
             formattingInfo.Write(timeString);
             return true;
         }
@@ -110,7 +134,7 @@ namespace SmartFormat.Extensions
             if (provider.GetFormat(typeof(TimeTextInfo)) is TimeTextInfo timeTextInfo) return timeTextInfo;
 
             // See if there is a rule for this culture:
-            if (!(provider is CultureInfo cultureInfo))
+            if (provider is not CultureInfo cultureInfo)
                 return CommonLanguagesTimeTextInfo.GetTimeTextInfo(DefaultTwoLetterISOLanguageName);
 
             // If cultureInfo was supplied,

@@ -14,10 +14,10 @@ namespace SmartFormat.Utilities
     public static class PluralRules
     {
         /// <summary>
-        /// Holds the ISO langue code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
+        /// Holds the ISO language code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
         /// </summary>
         public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate =
-            new Dictionary<string, PluralRuleDelegate>
+            new() 
             {
                 // Singular
                 {"az", Singular}, // Azerbaijani
@@ -201,7 +201,16 @@ namespace SmartFormat.Utilities
             return -1;
         };// Dual: one (n == 1), other
         private static PluralRuleDelegate DualWithZero => (n, c) => n == 0 || n == 1 ? 0 : 1; // DualWithZero: one (n == 0..1), other
-        private static PluralRuleDelegate DualFromZeroToTwo => (n, c) => n == 0 || n == 1 ? 0 : 1; // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+        private static PluralRuleDelegate DualFromZeroToTwo => (n, c) => 
+        {
+            return c switch {
+                2 => n < 2 ? 0 : 1,
+                3 => n == 0 ? 0 : n < 2 ? 1 : 2,
+                4 => n < 0 ? 0 : n == 0 ? 1 : n < 2 ? 2 : 3,
+                _ => -1
+            };
+        };// DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+
         private static PluralRuleDelegate TripleOneTwoOther => (n, c) => n == 1 ? 0 : n == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
         private static PluralRuleDelegate RussianSerboCroatian => (n, c) =>
             n % 10 == 1 && n % 100 != 11 ? 0 : // one
@@ -315,7 +324,7 @@ namespace SmartFormat.Utilities
         }
 
         /// <summary>
-        /// Returns True if the value is inclusively between the min and max and has no fraction.
+        /// Returns <see langword="true"/> if the value is inclusively between the min and max and has no fraction.
         /// </summary>
         private static bool Between(this decimal value, decimal min, decimal max)
         {
