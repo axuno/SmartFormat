@@ -34,14 +34,12 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public SmartSettings Settings { get; internal set; }
 
-        // Cache operator chars
+        // Cache method results from settings
         private readonly List<char> _operatorChars;
-        private readonly IReadOnlyList<char> _customOperatorChars;
-
-        // Cache
+        private readonly List<char> _customOperatorChars;
         private readonly ParserSettings _parserSettings;
         private readonly List<char> _validSelectorChars;
-        private readonly char[] _formatOptionsTerminatorChars;
+        private readonly List<char> _formatOptionsTerminatorChars;
 
         #endregion
 
@@ -65,13 +63,13 @@ namespace SmartFormat.Core.Parsing
             Settings = smartSettings;
             _parserSettings = Settings.Parser;
             _operatorChars = _parserSettings.OperatorChars();
-            _customOperatorChars = _parserSettings.CustomOperatorChars;
+            _customOperatorChars = _parserSettings.CustomOperatorChars();
             _formatOptionsTerminatorChars = _parserSettings.FormatOptionsTerminatorChars();
 
             _validSelectorChars = new List<char>();
-            _validSelectorChars.AddRange(_parserSettings.SelectorChars);
+            _validSelectorChars.AddRange(_parserSettings.SelectorChars());
             _validSelectorChars.AddRange(_parserSettings.OperatorChars());
-            _validSelectorChars.AddRange(_parserSettings.CustomSelectorChars);
+            _validSelectorChars.AddRange(_parserSettings.CustomSelectorChars());
             
             _inputFormat = string.Empty;
             _resultFormat = new Format(Settings, string.Empty);

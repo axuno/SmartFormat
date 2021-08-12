@@ -26,8 +26,8 @@ namespace SmartFormat.Tests.Core
             settings.Parser.AddCustomSelectorChars(new[] {'A', ' '});
             settings.Parser.AddCustomSelectorChars(new[] {' '});
 
-            Assert.That(settings.Parser.CustomSelectorChars.Count(c => c == 'A'), Is.EqualTo(0));
-            Assert.That(settings.Parser.CustomSelectorChars.Count(c => c == ' '), Is.EqualTo(1));
+            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == 'A'), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == ' '), Is.EqualTo(1));
         }
 
         [Test]
@@ -45,13 +45,13 @@ namespace SmartFormat.Tests.Core
             settings.Parser.AddCustomOperatorChars(new[] {settings.Parser.OperatorChars()[0], '°'});
             settings.Parser.AddCustomOperatorChars(new[] {'°'});
 
-            Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == settings.Parser.OperatorChars()[0]), Is.EqualTo(0));
-            Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == '°'), Is.EqualTo(1));
+            Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == settings.Parser.OperatorChars()[0]), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == '°'), Is.EqualTo(1));
         }
 
         [TestCase('°')] // a custom char
         [TestCase('A')] // a standard selector char
-        public void Add_CustomOperator_Used_As_Seperator_Should_Throw(char operatorChar)
+        public void Add_CustomOperator_Used_As_Separator_Should_Throw(char operatorChar)
         {
             var settings = new SmartSettings();
             settings.Parser.AddCustomSelectorChars(new[] {operatorChar}); // reserve as selector char
