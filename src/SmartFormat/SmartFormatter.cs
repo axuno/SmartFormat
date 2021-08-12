@@ -497,7 +497,7 @@ namespace SmartFormat
 
         private bool InvokeSourceExtensions(FormattingInfo formattingInfo)
         {
-            foreach (var sourceExtension in SourceExtensions)
+            foreach (var sourceExtension in _sourceExtensions)
             {
                 var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
                 if (handled) return true;
@@ -539,7 +539,7 @@ namespace SmartFormat
             if (Settings.StringFormatCompatibility)
             {
                 return 
-                    FormatterExtensions.First(fe => fe.GetType() == typeof(DefaultFormatter) || fe.GetType().BaseType == typeof(DefaultFormatter))
+                    _formatterExtensions.First(fe => fe.GetType() == typeof(DefaultFormatter) || fe.GetType().BaseType == typeof(DefaultFormatter))
                     .TryEvaluateFormat(formattingInfo);
             }
 
@@ -547,7 +547,7 @@ namespace SmartFormat
             if (!string.IsNullOrEmpty(formatterName))
             {
                 var extension =
-                    FormatterExtensions.FirstOrDefault(fe => string.Equals(fe.Name, formatterName, comparison));
+                    _formatterExtensions.FirstOrDefault(fe => string.Equals(fe.Name, formatterName, comparison));
                 if (extension is null)
                     throw formattingInfo.FormattingException($"No formatter with name '{formatterName}' found",
                         formattingInfo.Format, formattingInfo.Selector?.SelectorIndex ?? -1);
@@ -556,7 +556,7 @@ namespace SmartFormat
             }
             
             // Go through all (implicit) formatters which contain an empty name
-            return FormatterExtensions.Where(fe => fe.CanAutoDetect)
+            return _formatterExtensions.Where(fe => fe.CanAutoDetect)
                 .Any(formatterExtension => formatterExtension.
                     TryEvaluateFormat(formattingInfo));
         }
