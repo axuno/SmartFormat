@@ -115,11 +115,8 @@ namespace SmartFormat.Core.Parsing
         /// Gets the string representation of this <see cref="FormatItem"/>.
         /// </summary>
         /// <returns>The string representation of this <see cref="FormatItem"/></returns>
-        public override string ToString()
-        {
-            return EndIndex <= StartIndex
-                ? $"Empty ({BaseString.Substring(StartIndex)})"
-                : $"{BaseString.Substring(StartIndex, Length)}";
-        }
+        public override string ToString() => EndIndex <= StartIndex
+            ? BaseString.Substring(StartIndex)
+            : BaseString.Substring(StartIndex, Length);
     }
 }

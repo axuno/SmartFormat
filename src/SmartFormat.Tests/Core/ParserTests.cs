@@ -11,31 +11,36 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class ParserTests
     {
-        private static Parser GetRegularParser()
+        private static Parser GetRegularParser(SmartSettings? settings = null)
         {
-            var parser = new SmartFormatter { Settings = { StringFormatCompatibility = false, Parser = {ErrorAction = ParseErrorAction.ThrowError }}}.Parser;
+            var parser = new Parser(settings ?? new SmartSettings
+                {StringFormatCompatibility = false, Parser = {ErrorAction = ParseErrorAction.ThrowError}});
             return parser;
         }
 
-        [Test]
-        public void Basic_Parser_Test()
+        [TestCase("{City}{PostalCode}{Gender}{FirstName}{LastName}")]
+        [TestCase("Address: {City.ZipCode} {City.Name}, {City.AreaCode}\nName: {Person.FirstName} {Person.LastName}")]
+        [TestCase("{a.b.c.d}")]
+        [TestCase(" aaa {bbb.ccc: ddd {eee} fff } ggg ")]
+        [TestCase("{aaa} {bbb}")]
+        [TestCase("{}")]
+        [TestCase("{a:{b:{c:{d} } } }")]
+        [TestCase("{a}")]
+        [TestCase(" aaa {bbb_bbb.CCC} ddd ")]
+        public void Basic_Parser_Test(string format)
         {
             var parser = GetRegularParser();
 
-            var formats = new[]{
-                " aaa {bbb.ccc: ddd {eee} fff } ggg ",
-                "{aaa} {bbb}",
-                "{}",
-                "{a:{b:{c:{d} } } }",
-                "{a}",
-                " aaa {bbb_bbb.CCC} ddd ",
-            };
-            var results = formats.Select(f => new { format = f, parsed = parser.ParseFormat(f) }).ToArray();
-
             // Verify that the reconstructed formats
             // match the original ones:
+            var fmt = parser.ParseFormat(format);
 
-            results.TryAll(r => Assert.AreEqual(r.format, r.parsed.ToString())).ThrowIfNotEmpty();
+            // The same BaseString reference should be passed around
+            Assert.That(fmt.Items[0].BaseString, Is.SameAs(fmt.BaseString));
+            if(fmt.Items[0] is Placeholder ph && ph.Selectors.Count > 0)
+                Assert.That(ph.Selectors[0].BaseString, Is.SameAs(fmt.BaseString));
+
+            Assert.That(fmt.ToString(), Is.EqualTo(format));
         }
 
         [TestCase("{")]
@@ -353,19 +358,6 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Test_Format_Set_Alignment_Property()
-        {
-            var parser = GetRegularParser();
-            var formatString = "{0}";
-
-            var format = parser.ParseFormat(formatString);
-            var placeholder = (Placeholder) format.Items[0];
-            Assert.AreEqual(formatString, placeholder.ToString());
-            placeholder.Alignment = 10;
-            Assert.AreEqual($"{{0,{placeholder.Alignment}}}", placeholder.ToString());
-        }
-
-        [Test]
         public void Test_Format_With_Alignment()
         {
             var parser = GetRegularParser();
@@ -375,22 +367,8 @@ namespace SmartFormat.Tests.Core
             var placeholder = (Placeholder) format.Items[0];
             Assert.That(placeholder.ToString(), Is.EqualTo(formatString));
             Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
-            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(","));
+            Assert.That(placeholder.Selectors[1].Operator[0], Is.EqualTo(','));
             Assert.That(placeholder.Selectors[1].RawText, Is.EqualTo("-10"));
-        }
-
-        [Test]
-        public void Test_Formatter_Name_And_Options()
-        {
-            var parser = GetRegularParser();
-            var formatString = "{0}";
-
-            var format = parser.ParseFormat(formatString);
-            var placeholder = (Placeholder)format.Items[0];
-            placeholder.FormatterName = "test";
-            Assert.AreEqual($"{{0:{placeholder.FormatterName}}}", placeholder.ToString());
-            placeholder.FormatterOptionsRaw = "options";
-            Assert.AreEqual($"{{0:{placeholder.FormatterName}({placeholder.FormatterOptions})}}", placeholder.ToString());
         }
 
         [Test]
@@ -457,8 +435,8 @@ namespace SmartFormat.Tests.Core
             // Named formatters will only be recognized by the parser, if their name occurs in one of FormatterExtensions.
             // If the name of the formatter does not exists, the string is treaded as format for the DefaultFormatter.
             var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
-            Assert.AreEqual(expectedName, placeholder.FormatterName);
-            Assert.AreEqual(expectedOptions, placeholder.FormatterOptions);
+            Assert.AreEqual(expectedName, placeholder.FormatterName.ToString());
+            Assert.AreEqual(expectedOptions, placeholder.FormatterOptions.ToString());
             Assert.AreEqual(expectedFormat, placeholder.Format!.ToString());
         }
 
@@ -468,7 +446,7 @@ namespace SmartFormat.Tests.Core
             // find formatter formatter name, which does not exist in the (empty) list of formatter extensions
             var parser = GetRegularParser();
             var placeholderWithNonExistingName = (Placeholder)parser.ParseFormat("{0:formattername:}").Items[0];
-            Assert.AreEqual("formattername", placeholderWithNonExistingName.FormatterName);
+            Assert.AreEqual("formattername", placeholderWithNonExistingName.FormatterName.ToString());
         }
 
         // Incomplete:
@@ -505,8 +483,8 @@ namespace SmartFormat.Tests.Core
             var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
             var literalText = placeholder.Format?.GetLiteralText();
 
-            Assert.That(placeholder.FormatterName, Is.Empty);
-            Assert.That(placeholder.FormatterOptions, Is.Empty);
+            Assert.That(placeholder.FormatterName.ToString(), Is.Empty);
+            Assert.That(placeholder.FormatterOptions.ToString(), Is.Empty);
             Assert.That(literalText, Is.EqualTo(expectedLiteralText));
         }
 
@@ -524,8 +502,8 @@ namespace SmartFormat.Tests.Core
             var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
             var literalText = placeholder.Format?.GetLiteralText();
 
-            Assert.That(placeholder.FormatterName, Is.Empty);
-            Assert.That(placeholder.FormatterOptions, Is.Empty);
+            Assert.That(placeholder.FormatterName.Length == 0);
+            Assert.That(placeholder.FormatterOptions.ToString(), Is.Empty);
             Assert.That(literalText, Is.EqualTo(expectedLiteralText));
         }
         
@@ -606,8 +584,8 @@ namespace SmartFormat.Tests.Core
             Assert.That(format.Items.Count, Is.EqualTo(1));
             Assert.That(placeholder.Selectors[0].RawText, Is.EqualTo(selector));
             Assert.That(format.HasNested, Is.True);
-            Assert.That(placeholder.FormatterName, Is.EqualTo(formatterName));
-            Assert.That(placeholder.FormatterOptions, Is.EqualTo(options.Replace("\\", "")));
+            Assert.That(placeholder.FormatterName.ToString(), Is.EqualTo(formatterName));
+            Assert.That(placeholder.FormatterOptions.ToString(), Is.EqualTo(options.Replace("\\", "")));
             Assert.That(placeholder.Format?.Items.Count, Is.EqualTo(3));
             Assert.That(string.Concat(placeholder.Format?.Items[0].ToString(), placeholder.Format?.Items[1].ToString(), placeholder.Format?.Items[2].ToString()), Is.EqualTo(literal.Replace("\\", "")));
         }
@@ -638,8 +616,9 @@ namespace SmartFormat.Tests.Core
         [TestCase("{%C}", '%')]
         public void Selector_With_Custom_Selector_Character(string formatString, char customChar)
         {
-            var parser = GetRegularParser();
-            parser.Settings.Parser.AddCustomSelectorChars(new[]{customChar});
+            var settings = new SmartSettings();
+            settings.Parser.AddCustomSelectorChars(new[]{customChar});
+            var parser = GetRegularParser(settings);
             var result = parser.ParseFormat(formatString);
 
             var placeholder = result.Items[0] as Placeholder;
@@ -661,7 +640,7 @@ namespace SmartFormat.Tests.Core
             Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(3, 1)));
-            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,1)));
+            Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2,1)));
         }
 
         [TestCase("{A?.B}")]
@@ -691,14 +670,14 @@ namespace SmartFormat.Tests.Core
                 // Group Sel_1 is empty
                 Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
                 // Concatenate because of regex simplification for 2 selectors
-                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value + reMatches[0].Groups["Sel_2_Op"].Value));
+                Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value + reMatches[0].Groups["Sel_2_Op"].Value));
             }
             else
             {
                 Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
-                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
                 Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1"].Value));
-                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
                 Assert.That(placeholder.Selectors[2].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
             }
         }
@@ -720,7 +699,7 @@ namespace SmartFormat.Tests.Core
             Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(4,1)));
-            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(formatString.Substring(2,2)));
+            Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2,2)));
         }
     }
 }

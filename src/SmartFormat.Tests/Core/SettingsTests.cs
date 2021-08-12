@@ -42,10 +42,10 @@ namespace SmartFormat.Tests.Core
         public void ExistingOperatorCharacter_Should_Not_Be_Added()
         {
             var settings = new SmartSettings();
-            settings.Parser.AddCustomOperatorChars(new[] {settings.Parser.OperatorChars[0], '°'});
+            settings.Parser.AddCustomOperatorChars(new[] {settings.Parser.OperatorChars()[0], '°'});
             settings.Parser.AddCustomOperatorChars(new[] {'°'});
 
-            Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == settings.Parser.OperatorChars[0]), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == settings.Parser.OperatorChars()[0]), Is.EqualTo(0));
             Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == '°'), Is.EqualTo(1));
         }
 

@@ -5,6 +5,7 @@ using BenchmarkDotNet.Jobs;
 using Newtonsoft.Json.Linq;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Performance
@@ -53,15 +54,17 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
     // [RPlotExporter]
     public class SourcePerformanceTests
     {
+        private const string LoremIpsum = "Us creeping good grass multiply seas under hath sixth fowl heaven days. Third. Deep abundantly all after also meat day. Likeness. Lesser saying meat sea in over likeness land. Meat own, made given stars. Form the. And his. So gathered fish god firmament, great seasons. Give sixth doesn't beast our fourth creature years isn't you you years moving, earth you every a male night replenish fruit. Set. Deep so, let void midst won't first. Second very after all god from night itself shall air had gathered firmament was cattle itself every great first. Let dry it unto. Creepeth don't rule fruit there creature second their whose seas without every man it darkness replenish made gathered you saying over set created. Midst meat light without bearing. Our him given his thing fowl blessed rule that evening let man beginning light forth tree she'd won't light. Moving evening shall have may beginning kind appear, also the kind living whose female hath void fifth saw isn't. Green you'll from. Grass fowl saying yielding heaven. I. Above which. Isn't i. They're moving. Can't cattle i. Gathering shall set darkness multiply second whales meat she'd form, multiply be meat deep bring forth land can't own she'd upon hath appear years let above, for days divided greater first was.\r\n\r\nPlace living all it Air you evening us don't fourth second them own which fish made. Subdue don't you'll the, the bearing said dominion in man have deep abundantly night she'd and place sixth the gathered lesser creeping subdue second fish multiply was created. Cattle wherein meat female fruitful set, earth them subdue seasons second, man forth over, be greater grass. Light unto, over bearing hath thing yielding be, spirit you'll given was set had let their abundantly you're beginning beginning divided replenish moved. Evening own heaven waters, their it of them cattle fruitful is, light after don't air fish multiply which moveth face the dominion fifth open, hath i evening from. Give from every waters two. That forth, bearing dry fly in may fish. Multiply Tree cattle.\r\n\r\nThing. Great saying good face gathered Forth over fowl moved Fourth upon form seasons over lights greater saw can't over saying beginning. Can't in moveth fly created subdue fourth. Them creature one moving living living thing Itself one after one darkness forth divided thing gathered earth there days seas fourth, stars herb. All from third dry have forth. Our third sea all. Male years you. Over fruitful they're. Have she'd their our image dry sixth void meat subdue face moved. Herb moved multiply tree, there likeness first won't there one dry it hath kind won't you seas of make day moving second thing were. Hath, had winged hath creature second had you. Upon. Appear image great place fourth the in, waters abundantly, deep hath void Him heaven divided heaven greater let so. Open replenish Wherein. Be created. The and was of. Signs cattle midst. Is she'd every saying bring there doesn't and. Rule. Stars green divided upon lesser a.";
         private const string _format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
-                              "Name: {Person.FirstName} {Person.LastName}";
+                              "Name: {Person.FirstName} {Person.LastName}" + LoremIpsum;
 
-        private const string _formatForLiteral = "Address: {0} {1}, {2}\nName: {3} {4}";
+        private const string _formatForLiteral = "Address: {0} {1}, {2}\nName: {3} {4}" + LoremIpsum;
 
         private readonly SmartFormatter _literalFormatter;
         private readonly SmartFormatter _reflectionFormatter;
         private readonly SmartFormatter _dictionaryFormatter;
         private readonly SmartFormatter _jsonFormatter;
+        private Parser _pureParsingParser = new Parser(new SmartSettings());
 
         private readonly Address _reflectionAddress = new();
         private readonly Dictionary<string, object> _dictionaryAddress = new Address().ToDictionary();
@@ -122,7 +125,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void DirectMemberAccess()
         {
             for (var i = 0; i < N; i++)
@@ -134,11 +137,20 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         }
 
         [Benchmark(Baseline = true)]
+        public void PureParsing()
+        {
+            for (var i = 0; i < N; i++)
+            {
+                _ = _pureParsingParser.ParseFormat("{City}{City}{City}{FirstName}{LastName}");  // "{City}{City}{City}{FirstName}{LastName}"
+            }
+        }
+
+        [Benchmark]
         public void SfWithLiterals()
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _literalFormatter.Format(_formatCacheLiteral,"Address: {0} {1}, {2}\nName: {3} {4}", _reflectionAddress.City.ZipCode,
+                _ = _literalFormatter.Format(_formatCacheLiteral, _reflectionAddress.City.ZipCode,
                     _reflectionAddress.City.Name, _reflectionAddress.City.AreaCode,
                     _reflectionAddress.Person.FirstName, _reflectionAddress.Person.LastName);
             }
