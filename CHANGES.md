@@ -6,6 +6,16 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
+#### Parser does not allocate any strings
+
+* Reducing GC pressure by avoiding temporary string assignments. Depending on the input string, GC is reduced by 50-80%.
+* ParserSettings: All internal character lists are returned as ```List<char>```.
+* Internal character lists are cached in the parser for better performance
+* Connected modifications
+  * New performance tests for ```Parser```
+  * ```Placeholder``` property ```Placeholder?.Parent``` is renamed to ```Placeholder?ParentPlaceholder``` to avoid confusion with ```Format``` property ```Format?.Parent```.
+  * ```Placeholder``` has additional internal properties ```FormatterNameStartindex```, ```FormatterNameLength```, ```FormatterOptionsStartindex``` and ```FormatterOptionsLength```
+
 #### `IFormatter`s have one single, unique name ([#185](https://github.com/axuno/SmartFormat/pull/185))
 
 * `IFormatter.Names` property is obsolete and replaced with `IFormatter.Name`.
