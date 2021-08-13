@@ -26,9 +26,9 @@ namespace SmartFormat.Tests.Core
             foreach (var ft in allFormatterTypes)
             {
                 if(ft.Name == nameof(PluralLocalizationFormatter) || ft.Name == nameof(TimeFormatter))
-                    allFormatters.Add((IFormatter) Activator.CreateInstance(Type.GetType(ft.AssemblyQualifiedName), "en"));
+                    allFormatters.Add((IFormatter) Activator.CreateInstance(Type.GetType(ft.AssemblyQualifiedName!)!, "en")!);
                 else
-                    allFormatters.Add((IFormatter) Activator.CreateInstance(Type.GetType(ft.AssemblyQualifiedName)));
+                    allFormatters.Add((IFormatter) Activator.CreateInstance(Type.GetType(ft.AssemblyQualifiedName!)!)!);
             }
             
             return allFormatters;

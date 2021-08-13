@@ -15,51 +15,48 @@ namespace SmartFormat.Core.Settings
     /// </summary>
     public class ParserSettings
     {
-        private readonly IList<char> _alphanumericSelectorChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-".ToCharArray();
+        private readonly List<char> _alphanumericSelectorChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-".ToList();
 
-        private readonly IList<char> _customSelectorChars = new List<char>();
-        private readonly IList<char> _customOperatorChars = new List<char>();
+        private readonly List<char> _customSelectorChars = new List<char>();
+        private readonly List<char> _customOperatorChars = new List<char>();
 
         /// <summary>
-        /// Gets or sets the <see cref="ParserSettings.ErrorAction" /> to use for the <see cref="Parser" />.
-        /// The default is <see cref="Settings.ErrorAction.ThrowError"/>.
+        /// Gets or sets the <see cref="ParseErrorAction" /> to use for the <see cref="Parser" />.
+        /// The default is <see cref="ParseErrorAction.ThrowError"/>.
         /// </summary>
         public ParseErrorAction ErrorAction { get; set; } = ParseErrorAction.ThrowError;
 
         /// <summary>
-        /// The list of alphanumeric selector characters.
+        /// The list of standard selector characters.
         /// </summary>
-        public IReadOnlyList<char> AlphanumericSelectorChars => (IReadOnlyList<char>) _alphanumericSelectorChars;
+        internal List<char> SelectorChars() => _alphanumericSelectorChars;
 
         /// <summary>
         /// Gets a read-only list of the custom selector characters, which were set with <see cref="AddCustomSelectorChars"/>.
         /// </summary>
-        public IReadOnlyList<char> CustomSelectorChars => (IReadOnlyList<char>) _customSelectorChars;
+        internal List<char> CustomSelectorChars() => _customSelectorChars;
 
         /// <summary>
-        /// Gets a list of characters which are not allowed in a selector.
+        /// Gets a list of characters which are allowed in a selector.
         /// </summary>
-        public IReadOnlyList<char> DisallowedSelectorChars
+        internal List<char> DisallowedSelectorChars()
         {
-            get
-            {
-                var chars = new List<char> {
-                    CharLiteralEscapeChar, FormatterNameSeparator, AlignmentOperator, SelectorOperator,
-                    PlaceholderBeginChar, PlaceholderEndChar, FormatterOptionsBeginChar, FormatterOptionsEndChar
-                };
-                chars.AddRange(OperatorChars);
-                return chars;
-            }
+            var chars = new List<char> {
+                CharLiteralEscapeChar, FormatterNameSeparator, AlignmentOperator, SelectorOperator,
+                PlaceholderBeginChar, PlaceholderEndChar, FormatterOptionsBeginChar, FormatterOptionsEndChar
+            };
+            chars.AddRange(OperatorChars());
+            return chars;
         }
 
         /// <summary>
         /// Gets a read-only list of the custom operator characters, which were set with <see cref="AddCustomSelectorChars"/>.
         /// Contiguous operator characters are parsed as one operator (e.g. '?.').
         /// </summary>
-        public IReadOnlyList<char> CustomOperatorChars => (IReadOnlyList<char>) _customOperatorChars;
+        internal List<char> CustomOperatorChars() => _customOperatorChars;
 
         /// <summary>
-        /// Add a list of allowable selector characters on top of the <see cref="AlphanumericSelectorChars"/> setting.
+        /// Add a list of allowable selector characters on top of the <see cref="SelectorChars"/> setting.
         /// This can be useful to support additional selector syntax such as math.
         /// Characters in <see cref="DisallowedSelectorChars"/> cannot be added.
         /// Operator chars and selector chars must be different.
@@ -68,7 +65,7 @@ namespace SmartFormat.Core.Settings
         {
             foreach (var c in characters)
             {
-                if (DisallowedSelectorChars.Contains(c) || _customOperatorChars.Contains(c))
+                if (DisallowedSelectorChars().Contains(c) || _customOperatorChars.Contains(c))
                     throw new ArgumentException($"Cannot add '{c}' as a custom selector character. It is disallowed or in use as an operator.");
 
                 if (!_customSelectorChars.Contains(c) && !_alphanumericSelectorChars.Contains(c))
@@ -78,18 +75,17 @@ namespace SmartFormat.Core.Settings
 
         /// <summary>
         /// Add a list of allowable operator characters on top of the standard <see cref="OperatorChars"/> setting.
-        /// Characters in <see cref="DisallowedSelectorChars"/> cannot be added.
         /// Operator chars and selector chars must be different.
         ///  </summary>
         public void AddCustomOperatorChars(IList<char> characters)
         {
             foreach (var c in characters)
             {
-                if (DisallowedSelectorChars.Where(_ => OperatorChars.All(ch => ch != c)).Contains(c) ||
-                    _alphanumericSelectorChars.Contains(c) || _customSelectorChars.Contains(c))
+                if(DisallowedSelectorChars().Where(_ => OperatorChars().All(ch => ch != c)).Contains(c) ||
+                   SelectorChars().Contains(c) || CustomSelectorChars().Contains(c))
                     throw new ArgumentException($"Cannot add '{c}' as a custom operator character. It is disallowed or in use as a selector.");
 
-                if (!OperatorChars.Contains(c) && !_customOperatorChars.Contains(c))
+                if (!OperatorChars().Contains(c) && !CustomOperatorChars().Contains(c))
                     _customOperatorChars.Add(c);
             }
         }
@@ -119,7 +115,8 @@ namespace SmartFormat.Core.Settings
         /// The standard operator characters.
         /// Contiguous operator characters are parsed as one operator (e.g. '?.').
         /// </summary>
-        internal IReadOnlyList<char> OperatorChars => new List<char> {SelectorOperator, NullableOperator, AlignmentOperator, ListIndexBeginChar, ListIndexEndChar};
+        internal List<char> OperatorChars() => new()
+            {SelectorOperator, NullableOperator, AlignmentOperator, ListIndexBeginChar, ListIndexEndChar};
 
         /// <summary>
         /// The character which separates the selector for alignment. <c>E.g.: Smart.Format("Name: {name,10}")</c>
@@ -141,22 +138,22 @@ namespace SmartFormat.Core.Settings
         /// <summary>
         /// Gets the character indicating the start of a <see cref="Placeholder"/>.
         /// </summary>
-        public char PlaceholderBeginChar { get; } = '{';
+        internal char PlaceholderBeginChar { get; } = '{';
 
         /// <summary>
         /// Gets the character indicating the end of a <see cref="Placeholder"/>.
         /// </summary>
-        public char PlaceholderEndChar { get; } = '}';
+        internal char PlaceholderEndChar { get; } = '}';
 
         /// <summary>
         /// Gets the character indicating the begin of formatter options.
         /// </summary>
-        public char FormatterOptionsBeginChar { get; } = '(';
+        internal char FormatterOptionsBeginChar { get; } = '(';
 
         /// <summary>
         /// Gets the character indicating the end of formatter options.
         /// </summary>
-        public char FormatterOptionsEndChar { get; } = ')';
+        internal char FormatterOptionsEndChar { get; } = ')';
 
         /// <summary>
         /// Gets the character indicating the begin of a list index, like in "{Numbers[0]}"
@@ -172,6 +169,9 @@ namespace SmartFormat.Core.Settings
         /// Characters which terminate parsing of format options.
         /// To use them as options, they must be escaped (preceded) by the <see cref="CharLiteralEscapeChar"/>.
         /// </summary>
-        internal char[] FormatOptionsTerminatorChars => new[] {FormatterNameSeparator, FormatterOptionsBeginChar, FormatterOptionsEndChar, PlaceholderBeginChar, PlaceholderEndChar};
+        internal List<char> FormatOptionsTerminatorChars() => new() {
+            FormatterNameSeparator, FormatterOptionsBeginChar, FormatterOptionsEndChar, PlaceholderBeginChar,
+            PlaceholderEndChar
+        };
     }
 }

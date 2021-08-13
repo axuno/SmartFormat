@@ -17,30 +17,11 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Creates an instance of <see cref="LiteralText"/>, representing the literal text that is found a parsed format string.
         /// </summary>
-        /// <param name="parent">The parent <see cref="Format"/> of the <see cref="LiteralText"/>.</param>
-        /// <param name="startIndex">The start index of the <see cref="LiteralText"/> in the format string.</param>
-        /// <param name="endIndex">The end index of the <see cref="LiteralText"/> in the format string.</param>
-        public LiteralText(Format parent, int startIndex, int endIndex) : this(parent.SmartSettings, parent.BaseString,
-            startIndex, endIndex)
-        {
-        }
-
-        /// <summary>
-        /// Creates an instance of <see cref="LiteralText"/>, representing the literal text that is found a parsed format string. 
-        /// </summary>
-        /// <param name="parent">The parent <see cref="Format"/> of the <see cref="LiteralText"/>.</param>
-        public LiteralText(Format parent) : this(parent.SmartSettings, parent.BaseString, parent.StartIndex, parent.EndIndex)
-        {
-        }
-
-        /// <summary>
-        /// Creates an instance of <see cref="LiteralText"/>, representing the literal text that is found a parsed format string.
-        /// </summary>
         /// <param name="smartSettings">The <see cref="SmartSettings"/>.</param>
         /// <param name="baseString">The reference to the parsed format string.</param>
         /// <param name="startIndex">The start index of the <see cref="LiteralText"/> in the format string.</param>
         /// <param name="endIndex">The end index of the <see cref="LiteralText"/> in the format string.</param>
-        private LiteralText(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
+        public LiteralText(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
         {
         }
 
@@ -48,13 +29,10 @@ namespace SmartFormat.Core.Parsing
         /// Get the string representation of the <see cref="LiteralText"/>, with escaped characters converted.
         /// </summary>
         /// <returns>The string representation of the <see cref="LiteralText"/>, with escaped characters converted.</returns>
-        public override string ToString()
-        {
-            return SmartSettings.Parser.ConvertCharacterStringLiterals
+        public override string ToString() => SmartSettings.Parser.ConvertCharacterStringLiterals
                 ? UnEscapeCharacterLiterals().ToString()
                 : BaseString.Substring(StartIndex, Length);
-        }
-
+        
         private ReadOnlySpan<char> UnEscapeCharacterLiterals()
         {
             if (Length == 0) return ReadOnlySpan<char>.Empty;
