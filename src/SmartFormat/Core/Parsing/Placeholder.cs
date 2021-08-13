@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -34,8 +33,10 @@ namespace SmartFormat.Core.Parsing
         {
             Parent = parent;
             NestedDepth = nestedDepth;
-            FormatterName = string.Empty;
-            FormatterOptionsRaw = string.Empty;
+            FormatterNameStartIndex = startIndex;
+            FormatterNameLength = 0;
+            FormatterOptionsStartIndex = startIndex;
+            FormatterOptionsLength = 0;
         }
 
         /// <summary>
@@ -63,12 +64,32 @@ namespace SmartFormat.Core.Parsing
         /// Gets or sets the <see cref="Alignment"/> of the result string,
         /// used like with string.Format("{0,-10}"), where -10 is the alignment.
         /// </summary>
-        public int Alignment { get; set; }
+        public int Alignment { get; internal set; }
+        
+        /// <summary>
+        /// Gets or sets the start index of the <see cref="FormatterName"/> within the <see cref="FormatItem.BaseString"/>
+        /// </summary>
+        internal int FormatterNameStartIndex { get; set; }
+
+        /// <summary>
+        /// Gets or sets the length of the <see cref="FormatterName"/> within the <see cref="FormatItem.BaseString"/>
+        /// </summary>
+        internal int FormatterNameLength { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start index of the <see cref="FormatterOptions"/> within the <see cref="FormatItem.BaseString"/>
+        /// </summary>
+        internal int FormatterOptionsStartIndex { get; set; }
+
+        /// <summary>
+        /// Gets or sets the length of the <see cref="FormatterOptions"/> within the <see cref="FormatItem.BaseString"/>
+        /// </summary>
+        internal int FormatterOptionsLength { get; set; }
         
         /// <summary>
         /// Gets or sets the name of the formatter.
         /// </summary>
-        public string FormatterName { get; set; }
+        public string FormatterName => BaseString.Substring(FormatterNameStartIndex, FormatterNameLength);
 
         /// <summary>
         /// Gets the formatter option string unescaped.
@@ -76,11 +97,11 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public string FormatterOptions => EscapedLiteral
             .UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, FormatterOptionsRaw, 0, FormatterOptionsRaw.Length, true).ToString();
-        
+
         /// <summary>
         /// Gets the raw formatter option string as in the input format string (unescaped).
         /// </summary>
-        public string FormatterOptionsRaw { get; internal set; }
+        public string FormatterOptionsRaw => BaseString.Substring(FormatterOptionsStartIndex, FormatterOptionsLength);
         
         /// <summary>
         /// Gets or sets the <see cref="Format"/> of the <see cref="Placeholder"/>.
@@ -121,6 +142,7 @@ namespace SmartFormat.Core.Parsing
             }
 
             result.Append(SmartSettings.Parser.PlaceholderEndChar);
+
             return result.ToString();
         }
     }

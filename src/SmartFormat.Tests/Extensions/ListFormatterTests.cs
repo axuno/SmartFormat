@@ -122,12 +122,10 @@ namespace SmartFormat.Tests.Extensions
         [Test] /* added due to problems with [ThreadStatic] see: https://github.com/axuno/SmartFormat.NET/pull/23 */
         public void WithThreadPool_ShouldNotMixupCollectionIndex()
         {
-            // Old test did not show wrong Index value - it ALWAYS passed even when using ThreadLocal<int> or [ThreadStatic] respectively:
-            // const string format = "{wheres.Count::>0? where |}{wheres:{}| and }";
-            const string format = "Wheres-Index={Index}.";
-            var smart = Smart.CreateDefaultSmartFormat();
+            const string format = "wheres-Index={Index} - List: {0:{}| and }";
+            const string expected = "wheres-Index=-1 - List: test1 and test2";
 
-            var wheres = new List<string>{"test1 = test1", "test2 = test2"};
+            var wheres = new List<string>{"test1", "test2"};
             
             var tasks = new List<Task<string>>();
             for (int i = 0; i < 10; ++i)
@@ -135,7 +133,7 @@ namespace SmartFormat.Tests.Extensions
                 tasks.Add(Task.Factory.StartNew(val =>
                 {
                     Thread.Sleep(5 * (int)(val ?? 100));
-                    string ret = smart.Format(format, wheres);
+                    string ret = Smart.CreateDefaultSmartFormat().Format(format, wheres);
                     Thread.Sleep(5 * (int)(val ?? 100)); /* add some delay to force ThreadPool swapping */
                     return ret;
                 }, i));
@@ -147,10 +145,10 @@ namespace SmartFormat.Tests.Extensions
                 // Assert.AreEqual(" where test = @test", t.Result);
 
                 // Note: Using "[ThreadStatic] private static int CollectionIndex", the result will be as expected only with the first task
-                if ("Wheres-Index=-1." == t.Result)
+                if (expected == t.Result)
                     Console.WriteLine("Task {0} passed.", t.AsyncState);
                 
-                Assert.AreEqual("Wheres-Index=-1.", t.Result);
+                Assert.AreEqual(expected, t.Result);
             }
         }
 
