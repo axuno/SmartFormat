@@ -127,7 +127,7 @@ namespace SmartFormat.Core.Formatting
         public void Write(string text)
         {
             if (Alignment > 0) PreAlign(text.Length);
-            FormatDetails.Output.Write(text, this);
+            FormatDetails.Output.Write(text);
             if (Alignment < 0) PostAlign(text.Length);
         }
 
@@ -141,7 +141,7 @@ namespace SmartFormat.Core.Formatting
         public void Write(string text, int startIndex, int length)
         {
             if (Alignment > 0) PreAlign(length);
-            FormatDetails.Output.Write(text, startIndex, length, this);
+            FormatDetails.Output.Write(text.Substring(startIndex, length));
             if (Alignment < 0) PostAlign(text.Length);
         }
 
@@ -210,13 +210,13 @@ namespace SmartFormat.Core.Formatting
         private void PreAlign(int textLength)
         {
             var filler = Alignment - textLength;
-            if (filler > 0) FormatDetails.Output.Write(new string(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler), this);
+            if (filler > 0) FormatDetails.Output.Write(new string(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler));
         }
 
         private void PostAlign(int textLength)
         {
             var filler = -Alignment - textLength;
-            if (filler > 0) FormatDetails.Output.Write(new string(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler), this);
+            if (filler > 0) FormatDetails.Output.Write(new string(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler));
         }
 
         /// <summary>

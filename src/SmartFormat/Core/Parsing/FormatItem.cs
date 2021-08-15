@@ -107,7 +107,7 @@ namespace SmartFormat.Core.Parsing
         }
 
         /// <summary>
-        /// Retrieves the raw text that this item represents.
+        /// Retrieves the raw text of this item from <see cref="StartIndex"/> and length <see cref="Length"/>.
         /// </summary>
         public string RawText => BaseString.Substring(StartIndex, Length);
 
