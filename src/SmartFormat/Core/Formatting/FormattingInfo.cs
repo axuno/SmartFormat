@@ -132,20 +132,6 @@ namespace SmartFormat.Core.Formatting
         }
 
         /// <summary>
-        /// Writes a substring of the string parameter to the <see cref="Output.IOutput"/>
-        /// and takes care of alignment.
-        /// </summary>
-        /// <param name="text">The string to write to the <see cref="Output.IOutput"/></param>
-        /// <param name="startIndex">The start index of the substring.</param>
-        /// <param name="length">The length of the substring.</param>
-        public void Write(string text, int startIndex, int length)
-        {
-            if (Alignment > 0) PreAlign(length);
-            FormatDetails.Output.Write(text.Substring(startIndex, length));
-            if (Alignment < 0) PostAlign(text.Length);
-        }
-
-        /// <summary>
         /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance
         /// and invokes formatting with <see cref="SmartFormatter"/> with the child as parameter.
         /// </summary>

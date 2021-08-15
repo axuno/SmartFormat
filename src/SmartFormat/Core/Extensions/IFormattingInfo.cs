@@ -64,11 +64,6 @@ namespace SmartFormat.Core.Extensions
         void Write(string text);
 
         /// <summary>
-        /// Writes a substring to the output.
-        /// </summary>
-        void Write(string text, int startIndex, int length);
-
-        /// <summary>
         /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance
         /// and invokes formatting with <see cref="SmartFormatter"/> with the child as parameter.
         /// </summary>
