@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat", "SmartFormat\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Tests", "SmartFormat.Tests\SmartFormat.Tests.csproj", "{FF479926-FA9A-4517-8B3C-94BC580EABE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Demo.NetFramework", "SmartFormat.Demo.NetFramework\SmartFormat.Demo.NetFramework.csproj", "{54A06E44-EA03-4138-BCD6-C2D47527AA02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Demo.NetFramework", "SmartFormat.Demo.NetFramework\SmartFormat.Demo.NetFramework.csproj", "{54A06E44-EA03-4138-BCD6-C2D47527AA02}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Demo", "SmartFormat.Demo\SmartFormat.Demo.csproj", "{DE4BE604-4A7F-4550-B45B-BCB169FC3895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartFormat.Performance", "SmartFormat.Performance\SmartFormat.Performance.csproj", "{FE939232-9EAB-412A-93BF-BC7FDB1BB580}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Performance", "SmartFormat.Performance\SmartFormat.Performance.csproj", "{FE939232-9EAB-412A-93BF-BC7FDB1BB580}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.ZString", "ZString\src\ZString\SmartFormat.ZString.csproj", "{41BE7684-AF58-4838-9B4E-384D584B104D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,14 @@ Global
 		{FE939232-9EAB-412A-93BF-BC7FDB1BB580}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FE939232-9EAB-412A-93BF-BC7FDB1BB580}.Release|x86.ActiveCfg = Release|Any CPU
 		{FE939232-9EAB-412A-93BF-BC7FDB1BB580}.Release|x86.Build.0 = Release|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Debug|x86.Build.0 = Debug|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Release|x86.ActiveCfg = Release|Any CPU
+		{41BE7684-AF58-4838-9B4E-384D584B104D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

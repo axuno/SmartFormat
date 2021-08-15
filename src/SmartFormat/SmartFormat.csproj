@@ -5,7 +5,7 @@
         <AssemblyTitle>SmartFormat</AssemblyTitle>
         <Version>3.0.0</Version>
         <FileVersion>3.0.0</FileVersion>
-        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG</DefineConstants>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>
@@ -61,6 +61,10 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ZString\src\ZString\SmartFormat.ZString.csproj" />
     </ItemGroup>
 
 </Project>
