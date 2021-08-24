@@ -249,13 +249,20 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider? provider, string format, IList<object> args)
         {
-            var output = new StringOutput(format.Length + args.Count * 8);
             var formatParsed = Parser.ParseFormat(format);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, formatParsed, args, provider, output);
-            Format(formatDetails, current);
-
-            return output.ToString();
+            //var output = new StringOutput(format.Length + args.Count * 8);
+            using var output = new ZStringOutput(); 
+            try
+            {
+                var formatDetails = new FormatDetails(this, formatParsed, args, provider, output);
+                Format(formatDetails, current);
+                return output.ToString();
+            }
+            finally
+            {
+                output.Dispose();
+            }
         }
 
         /// <summary>
@@ -336,12 +343,20 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider? provider, Format format, IList<object> args)
         {
-            var output = new StringOutput(format.Length + args.Count * 8);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, format, args, provider, output);
-            Format(formatDetails, current);
 
-            return output.ToString();
+            //var output = new StringOutput(format.Length + args.Count * 8);
+            using var output = new ZStringOutput(); 
+            try
+            {
+                var formatDetails = new FormatDetails(this, format, args, provider, output);
+                Format(formatDetails, current);
+                return output.ToString();
+            }
+            finally
+            {
+                output.Dispose();
+            }
         }
 
         /// <summary>

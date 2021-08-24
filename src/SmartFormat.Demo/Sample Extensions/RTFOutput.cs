@@ -56,5 +56,10 @@ namespace SmartFormat.Demo.Sample_Extensions
         {
             return output.ToString();
         }
+
+        public void Write(string text)
+        {
+            Write(text.Substring(0, text.Length));
+        }
     }
 }

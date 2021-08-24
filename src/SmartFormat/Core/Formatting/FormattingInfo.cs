@@ -190,7 +190,7 @@ namespace SmartFormat.Core.Formatting
         /// <returns>The child <see cref="IFormattingInfo"/>.</returns>
         public FormattingInfo CreateChild(Placeholder placeholder)
         {
-            return new FormattingInfo(this, FormatDetails, placeholder, CurrentValue);
+            return new(this, FormatDetails, placeholder, CurrentValue);
         }
 
         private void PreAlign(int textLength)

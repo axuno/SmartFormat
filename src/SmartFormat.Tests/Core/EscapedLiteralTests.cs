@@ -33,13 +33,22 @@ namespace SmartFormat.Tests.Core
         [TestCase(@"\zabc\", @"\z", true)] // not included in look-up table
         public void UnEscapeCharLiterals_General_Test(string input, string expected, bool shouldThrow)
         {
+            var resultBuffer = new Span<char>(new char[input.Length]);
             if (shouldThrow)
             {
-                Assert.That( () => EscapedLiteral.UnEscapeCharLiterals('\\', input, 0, input.Length, false), Throws.ArgumentException.And.Message.Contains(expected));
+                try
+                {
+                    EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(), 0, input.Length, false, resultBuffer);
+                    Assert.Fail("Failure expected.");
+                }
+                catch (Exception e)
+                {
+                    Assert.That( () => throw e, Throws.ArgumentException.And.Message.Contains(expected));
+                }
             }
             else
             {
-                var result = EscapedLiteral.UnEscapeCharLiterals('\\', input, 0, input.Length, false);
+                var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(), 0, input.Length, false, resultBuffer);
                 Assert.That(result.ToString(), Is.EqualTo(expected));
             }
         }
@@ -48,13 +57,22 @@ namespace SmartFormat.Tests.Core
         [TestCase(@"\zabc", @"\z", true)] // not included in look-up table
         public void UnEscapeCharLiterals_FormatterOption_Test(string input, string expected, bool shouldThrow)
         {
+            var resultBuffer = new Span<char>(new char[input.Length]);
             if (shouldThrow)
             {
-                Assert.That( () => EscapedLiteral.UnEscapeCharLiterals('\\', input, 0,input.Length,true), Throws.ArgumentException.And.Message.Contains(expected));
+                try
+                {
+                    EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(), 0,input.Length,true, resultBuffer);
+                    Assert.Fail("Failure expected.");
+                }
+                catch (Exception e)
+                {
+                    Assert.That( () => throw e, Throws.ArgumentException.And.Message.Contains(expected));
+                }
             }
             else
             {
-                var result = EscapedLiteral.UnEscapeCharLiterals('\\', input, 0,input.Length,true);
+                var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(), 0,input.Length,true, resultBuffer);
                 Assert.That(result.ToString(), Is.EqualTo(expected));
             }
         }
@@ -82,8 +100,9 @@ namespace SmartFormat.Tests.Core
         [TestCase(@"^.{5,}:,$")] // dot, colon, comma
         public void UnEscape_Escaped_Special_Characters(string pattern)
         {
+            var resultBuffer = new Span<char>(new char[pattern.Length]);
             var optionsEscaped = new string(EscapedLiteral.EscapeCharLiterals('\\', pattern, 0, pattern.Length, true).ToArray());
-            Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', optionsEscaped, 0, optionsEscaped.Length,true).ToString(), Is.EqualTo(pattern));
+            Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', optionsEscaped.AsSpan(), 0, optionsEscaped.Length,true, resultBuffer).ToString(), Is.EqualTo(pattern));
         }
 
         [Test]
@@ -91,7 +110,8 @@ namespace SmartFormat.Tests.Core
         {
             var full = "abc(de";
             var startIndex = 3;
-            Assert.That("(de", Is.EqualTo(EscapedLiteral.UnEscapeCharLiterals('\\', full, startIndex, full.Length - startIndex,true).ToString()));
+            var resultBuffer = new Span<char>(new char[full.Length]);
+            Assert.That("(de", Is.EqualTo(EscapedLiteral.UnEscapeCharLiterals('\\', full.AsSpan(), startIndex, full.Length - startIndex,true, resultBuffer).ToString()));
         }
     }
 }

@@ -95,8 +95,17 @@ namespace SmartFormat.Core.Parsing
         /// Gets the formatter option string unescaped.
         /// To get the raw formatter option string, <see cref="FormatterOptionsRaw"/>.
         /// </summary>
-        public string FormatterOptions => EscapedLiteral
-            .UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, FormatterOptionsRaw, 0, FormatterOptionsRaw.Length, true).ToString();
+        public string FormatterOptions
+        {
+            get
+            {
+                // It's enough to have a buffer with the same size as input length
+                var resultBuffer = new Span<char>(new char[Length]);
+                return EscapedLiteral
+                    .UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, BaseString.AsSpan(FormatterOptionsStartIndex, FormatterOptionsLength), 0,
+                        FormatterOptionsRaw.Length, true, resultBuffer).ToString();
+            }
+        }
 
         /// <summary>
         /// Gets the raw formatter option string as in the input format string (unescaped).

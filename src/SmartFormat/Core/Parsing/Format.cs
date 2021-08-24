@@ -380,7 +380,7 @@ namespace SmartFormat.Core.Parsing
         /// <returns></returns>
         public string GetLiteralText()
         {
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(EndIndex - StartIndex);
             foreach (var item in Items)
             {
                 if (item is LiteralText literalItem) sb.Append(literalItem);

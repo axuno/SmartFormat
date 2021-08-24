@@ -37,7 +37,10 @@ namespace SmartFormat.Core.Parsing
         {
             if (Length == 0) return ReadOnlySpan<char>.Empty;
             
-            return EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, BaseString, StartIndex, Length, false);
+            // It's enough to have a buffer with the same size as input length
+            var resultBuffer = new Span<char>(new char[Length]);
+            return EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, BaseString.AsSpan(),
+                StartIndex, Length, false, resultBuffer);
         }
     }
 }
