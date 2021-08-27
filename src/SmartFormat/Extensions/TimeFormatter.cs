@@ -77,8 +77,8 @@ namespace SmartFormat.Extensions
             }
             
             string options;
-            if (!string.IsNullOrEmpty(formattingInfo.FormatterOptions))
-                options = formattingInfo.FormatterOptions!;
+            if (formattingInfo.FormatterOptions != string.Empty)
+                options = formattingInfo.FormatterOptions;
             else if (format != null)
                 options = format.GetLiteralText();
             else

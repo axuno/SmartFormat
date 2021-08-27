@@ -50,7 +50,7 @@ namespace SmartFormat.Core.Extensions
         /// When a named formatter is used, this will hold the options.
         /// For example, in "{0:choose(1,2,3):one|two|three}", FormatterOptions is "1,2,3".
         /// </summary>
-        string? FormatterOptions { get; }
+        string FormatterOptions { get; }
 
         /// <summary>
         /// Infrequently used details, often used for debugging
@@ -59,14 +59,14 @@ namespace SmartFormat.Core.Extensions
         FormatDetails FormatDetails { get; }
 
         /// <summary>
-        /// Writes a string to the output.
+        /// Writes a <see cref="string"/> to the output.
         /// </summary>
         void Write(string text);
 
         /// <summary>
-        /// Writes a substring to the output.
+        /// Writes a <see cref="ReadOnlySpan{T}"/> text to the output.
         /// </summary>
-        void Write(string text, int startIndex, int length);
+        void Write(ReadOnlySpan<char> text);
 
         /// <summary>
         /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance

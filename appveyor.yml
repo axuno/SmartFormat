@@ -52,7 +52,7 @@ for:
     build_script:
       - cd $APPVEYOR_BUILD_FOLDER/src
       - dotnet --version
-      - dotnet sln remove ./SmartFormat.Demo/SmartFormat.Demo.csproj ./SmartFormat.Demo.NetFramework/SmartFormat.Demo.NetFramework.csproj
+      - dotnet sln remove ./Demo/Demo.csproj ./Demo.NetFramework/Demo.NetFramework.csproj
       - dotnet restore --verbosity quiet
       - dotnet add ./SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
       - dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 

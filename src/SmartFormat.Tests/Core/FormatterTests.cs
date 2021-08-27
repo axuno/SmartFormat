@@ -29,7 +29,15 @@ namespace SmartFormat.Tests.Core
         public void Formatter_With_Params_Objects()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            Assert.That(formatter.Format("{0}{1}ABC", 0, 1), Is.EqualTo("01ABC"));
+            Assert.That(formatter.Format("ABC{0}{1}DEF", 0, 1), Is.EqualTo("ABC01DEF"));
+        }
+
+        [Test]
+        public void Formatter_Pure_Literal_No_Args()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            var parsed = formatter.Parser.ParseFormat("ABC");
+            Assert.That(formatter.Format(parsed), Is.EqualTo("ABC"));
         }
 
         [Test]
@@ -262,7 +270,16 @@ namespace SmartFormat.Tests.Core
         public void Formatter_GetSourceExtension()
         {
             var formatter = GetSimpleFormatter();
+            Assert.That(formatter.GetSourceExtensions().Count, Is.EqualTo(formatter.SourceExtensions.Count));
             Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));  ;
+        }
+
+        [Test]
+        public void Formatter_GetFormatterExtension()
+        {
+            var formatter = GetSimpleFormatter();
+            Assert.That(formatter.GetFormatterExtensions().Count, Is.EqualTo(formatter.FormatterExtensions.Count));
+            Assert.That(formatter.GetFormatterExtension<DefaultFormatter>(), Is.InstanceOf(typeof(DefaultFormatter)));  ;
         }
 
         [Test]

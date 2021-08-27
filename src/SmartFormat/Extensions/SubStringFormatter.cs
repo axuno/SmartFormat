@@ -43,7 +43,7 @@ namespace SmartFormat.Extensions
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var parameters = formattingInfo.FormatterOptions?.Split(ParameterDelimiter) ?? Array.Empty<string>();
+            var parameters = formattingInfo.FormatterOptions.Split(ParameterDelimiter) ?? Array.Empty<string>();
             if (formattingInfo.CurrentValue is not (string or null) || parameters.Length == 1 && parameters[0].Length == 0)
             {
                 // Auto detection calls just return a failure to evaluate

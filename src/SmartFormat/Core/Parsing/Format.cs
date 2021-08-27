@@ -19,6 +19,9 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class Format : FormatItem
     {
+        private string? _toStringCache;
+        private string? _literalTextCache;
+
         #region: Constructors :
 
         /// <summary>
@@ -380,13 +383,16 @@ namespace SmartFormat.Core.Parsing
         /// <returns></returns>
         public string GetLiteralText()
         {
-            var sb = new StringBuilder();
+            if (_literalTextCache != null) return _literalTextCache;
+
+            var sb = new StringBuilder(Length + Items.Count * 8);
             foreach (var item in Items)
             {
                 if (item is LiteralText literalItem) sb.Append(literalItem);
             }
 
-            return sb.ToString();
+            _literalTextCache = sb.ToString();
+            return _literalTextCache;
         }
 
         /// <summary>
@@ -395,9 +401,12 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public override string ToString()
         {
-            var result = new StringBuilder(EndIndex - StartIndex);
-            foreach (var item in Items) result.Append(item);
-            return result.ToString();
+            if (_toStringCache != null) return _toStringCache;
+
+            var sb = new StringBuilder(EndIndex - StartIndex);
+            foreach (var item in Items) sb.Append(item);
+            _toStringCache = sb.ToString();
+            return _toStringCache;
         }
 
         #endregion

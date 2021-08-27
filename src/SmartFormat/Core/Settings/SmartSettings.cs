@@ -16,7 +16,7 @@ namespace SmartFormat.Core.Settings
         /// <summary>
         /// CTOR.
         /// </summary>
-        internal SmartSettings()
+        public SmartSettings()
         {
         }
 

@@ -54,18 +54,21 @@ namespace SmartFormat.Core.Parsing
                 : GeneralLookupTable.TryGetValue(input, out result);
         }
 
-        private static char GetUnicode(string input, int startIndex)
+        private static char GetUnicode(ReadOnlySpan<char> input, int startIndex)
         {
             var unicode = input.Length - startIndex >= 4
-                ? input.Substring(startIndex, 4)
-                : input.Substring(startIndex);
-
+                ? input.Slice(startIndex, 4)
+                : input.Slice(startIndex);
+#if NETSTANDARD
             if (int.TryParse(unicode, NumberStyles.HexNumber, null, out var result))
+#else
+            if (int.TryParse(unicode.ToString(), NumberStyles.HexNumber, null, out var result))
+#endif
             {
                 return (char) result;
             }
 
-            throw new ArgumentException($"Unrecognized escape sequence in literal: \"\\u{unicode}\"");
+            throw new ArgumentException($"Unrecognized escape sequence in literal: \"\\u{unicode.ToString()}\"");
         }
 
         /// <summary>
@@ -73,17 +76,14 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         /// <param name="escapingSequenceStart"></param>
         /// <param name="input"></param>
-        /// <param name="startIndex">The start index position inside the input.</param>
-        /// <param name="length">The number of characters to escape beginning from <c>startIndex</c>.</param>
         /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
-        /// <returns>The input with escaped characters with their real value.</returns>
-        public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
+        /// <param name="resultBuffer">The buffer to fill. It's enough to have a buffer with the same size as the input length.</param>
+        /// <returns>The input having escaped characters replaced with their real value.</returns>
+        public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars, Span<char> resultBuffer)
         {
-            // It's enough to have a buffer with the same size as input length
-            var result = new Span<char>(new char[length]);
-            var max = startIndex + length;
+            var max = input.Length;
             var resultIndex = 0;
-            for (var inputIndex = startIndex; inputIndex < max; inputIndex++)
+            for (var inputIndex = 0; inputIndex < max; inputIndex++)
             {
                 int nextInputIndex;
                 if (inputIndex + 1 < max)
@@ -92,8 +92,8 @@ namespace SmartFormat.Core.Parsing
                 }
                 else
                 {
-                    result[resultIndex++] = input[inputIndex];
-                    return result.Slice(0, resultIndex);
+                    resultBuffer[resultIndex++] = input[inputIndex];
+                    return resultBuffer.Slice(0, resultIndex);
                 }
 
                 if (input[inputIndex] == escapingSequenceStart)
@@ -101,14 +101,14 @@ namespace SmartFormat.Core.Parsing
                     if (input[nextInputIndex] == 'u')
                     {
                         // GetUnicode will throw if code is illegal
-                        result[resultIndex++] = GetUnicode(input, nextInputIndex + 1);
+                        resultBuffer[resultIndex++] = GetUnicode(input, nextInputIndex + 1);
                         inputIndex += 5;  // move to last unicode character
                         continue;
                     }
 
                     if (TryGetChar(input[nextInputIndex], out var realChar, includeFormatterOptionChars))
                     {
-                        result[resultIndex++] = realChar;
+                        resultBuffer[resultIndex++] = realChar;
                     }
                     else
                     {
@@ -118,10 +118,10 @@ namespace SmartFormat.Core.Parsing
                 }
                 else
                 {
-                    result[resultIndex++] = input[inputIndex];
+                    resultBuffer[resultIndex++] = input[inputIndex];
                 }
             }
-            return result.Slice(0, resultIndex);
+            return resultBuffer.Slice(0, resultIndex);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace SmartFormat.Core.Parsing
         /// <param name="length"></param>
         /// <param name="includeFormatterOptionChars"><see langword="true"/>, if characters for formatter options should be included. Default is <see langword="false"/>.</param>
         /// <returns>Returns the escaped characters.</returns>
-        internal static IEnumerable<char> EscapeCharLiteralsAsEnumerable(char escapeSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
+        public static IEnumerable<char> EscapeCharLiterals(char escapeSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
         {
             var max = startIndex + length;
             for (var index = startIndex; index < max; index++)
@@ -155,20 +155,6 @@ namespace SmartFormat.Core.Parsing
 
                 yield return c;
             }
-        }
-
-        /// <summary>
-        /// Escapes a string, that contains character which must be escaped.
-        /// </summary>
-        /// <param name="escapeSequenceStart">The character starting the escape sequence.</param>
-        /// <param name="input">The string to escape.</param>
-        /// <param name="startIndex">This index position where to start with escaping.</param>
-        /// <param name="length">The length of the segment to escape.</param>
-        /// <param name="includeFormatterOptionChars"><see langword="true"/>, if characters for formatter options should be included. Default is <see langword="false"/>.</param>
-        /// <returns>Returns the string with escaped characters.</returns>
-        public static IEnumerable<char> EscapeCharLiterals(char escapeSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
-        {
-            return EscapeCharLiteralsAsEnumerable(escapeSequenceStart, input, startIndex, length, includeFormatterOptionChars);
         }
     }
 }
