@@ -6,13 +6,13 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
-#### Target frameworks
+#### Target frameworks ([#189](https://github.com/axuno/SmartFormat/pull/189))
 
 * Changed `netstandard2.0` to `netstandard2.1`.
 * `net461` support unchanged.
 * Added package `System.Memory`
 
-#### Remove repetitive substring allocations
+#### Remove repetitive substring allocations ([#189](https://github.com/axuno/SmartFormat/pull/189))
 
 Connected modifications:
 
@@ -20,13 +20,13 @@ Connected modifications:
 * Generated substrings are cached in classes `Format`, `FormatItem`, `LiteralText`, `Placeholder` and `Selector`.
 * Evaluating escaped characters for `Placeholder.FormatterOptions` and `LiteralText` work without heap memory allocation.
 
-#### Alignment operator inheritance is optimized
+#### Alignment operator inheritance is optimized ([#189](https://github.com/axuno/SmartFormat/pull/189))
 
 * Alignment implementation introduced with PR [#174](https://github.com/axuno/SmartFormat/pull/174) is modified for better performance
 * Added method `Placeholder.AddSelector`
 * `Placeholder.Selectors` is now internal. Selectors are accessible with `IReadOnlyList<Selector> Placeholder.GetSelectors()`.
 
-#### DictionarySource performance improved
+#### DictionarySource performance improved ([#189](https://github.com/axuno/SmartFormat/pull/189))
 
 * Implemented suggestion in issue [#186](https://github.com/axuno/SmartFormat/issues/186) for better speed and less GC pressure.
 * Side effect: We're using the `CaseSensitivityType` of the dictionary for getting the value for a key. `Settings.GetCaseSensitivityComparison()` will not be applied.
