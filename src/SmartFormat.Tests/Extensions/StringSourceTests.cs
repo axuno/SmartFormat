@@ -15,9 +15,9 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class StringSourceTests
     {
-        private SmartFormatter GetSimpleFormatter()
+        private SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
         {
-            var smart = new SmartFormatter();
+            var smart = new SmartFormatter(settings ?? new SmartSettings());
             smart.AddExtensions(new StringSource(), new DefaultSource());
             smart.AddExtensions(new DefaultFormatter());
             return smart;
@@ -64,8 +64,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0.CAPitalizeWORDS}", "abc abc", "Abc Abc")]
         public void SmartFormat_Parameterless_String_Method_CaseInsensitive(string format, string arg, string expected)
         {
-            var smart = GetSimpleFormatter();
-            smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            var smart = GetSimpleFormatter(new SmartSettings{CaseSensitivity = CaseSensitivityType.CaseInsensitive});
             Assert.That(smart.Format(format, arg), Is.EqualTo(expected));
         }
 

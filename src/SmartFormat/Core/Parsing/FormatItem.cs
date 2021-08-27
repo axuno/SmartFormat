@@ -14,6 +14,8 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public abstract class FormatItem
     {
+        private string? _toStringCache;
+
         /// <summary>
         /// Obsolete. Gets the base format string.
         /// </summary>
@@ -89,7 +91,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// The settings for formatter and parser.
         /// </summary>
-        internal SmartSettings SmartSettings;
+        public SmartSettings SmartSettings { get; }
 
         /// <summary>
         /// CTOR.
@@ -109,14 +111,20 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Retrieves the raw text that this item represents.
         /// </summary>
-        public string RawText => BaseString.Substring(StartIndex, Length);
+        public string RawText => ToString();
 
         /// <summary>
         /// Gets the string representation of this <see cref="FormatItem"/>.
         /// </summary>
         /// <returns>The string representation of this <see cref="FormatItem"/></returns>
-        public override string ToString() => EndIndex <= StartIndex
-            ? BaseString.Substring(StartIndex)
-            : BaseString.Substring(StartIndex, Length);
+        public override string ToString() => _toStringCache ??= AsSpan().ToString();
+
+        /// <summary>
+        /// Gets the <see cref="ReadOnlySpan{T}"/> representation of this <see cref="FormatItem"/>.
+        /// </summary>
+        /// <returns>The <see cref="ReadOnlySpan{T}"/> representation of this <see cref="FormatItem"/></returns>
+        public virtual ReadOnlySpan<char> AsSpan() => EndIndex <= StartIndex
+            ? BaseString.AsSpan(StartIndex)
+            : BaseString.AsSpan(StartIndex, Length);
     }
 }

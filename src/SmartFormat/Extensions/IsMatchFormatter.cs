@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var expression = formattingInfo.FormatterOptions ?? string.Empty;
+            var expression = formattingInfo.FormatterOptions;
             var formats = formattingInfo.Format?.Split('|');
 
             // Check whether arguments can be handled by this formatter

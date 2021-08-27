@@ -13,6 +13,8 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class Selector : FormatItem
     {
+        private string? _operatorCache;
+
         /// <summary>
         /// The start index of the <see cref="Operator"/> inside of a <see cref="Selector"/>.
         /// </summary>
@@ -53,6 +55,6 @@ namespace SmartFormat.Core.Parsing
         /// <example>
         /// The operator that came between selectors is typically ("." or "?.")
         /// </example>
-        public string Operator => BaseString.Substring(OperatorStartIndex, OperatorLength);
+        public string Operator => _operatorCache ??= BaseString.Substring(OperatorStartIndex, OperatorLength);
     }
 }

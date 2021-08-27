@@ -53,12 +53,22 @@ namespace SmartFormat
         /// <summary>
         /// Gets the list of <see cref="ISource" /> source extensions.
         /// </summary>
-        public IReadOnlyList<ISource> SourceExtensions => _sourceExtensions;
+        internal List<ISource> SourceExtensions => _sourceExtensions;
+
+        /// <summary>
+        /// Gets the <see cref="IReadOnlyList{T}"/> of <see cref="ISource" /> source extensions.
+        /// </summary>
+        public IReadOnlyList<ISource> GetSourceExtensions() => _sourceExtensions.AsReadOnly();
 
         /// <summary>
         /// Gets the list of <see cref="IFormatter" /> formatter extensions.
         /// </summary>
-        public IReadOnlyList<IFormatter> FormatterExtensions => _formatterExtensions;
+        internal List<IFormatter> FormatterExtensions => _formatterExtensions;
+
+        /// <summary>
+        /// Gets the <see cref="IReadOnlyList{T}"/> of <see cref="IFormatter" /> formatter extensions.
+        /// </summary>
+        public IReadOnlyList<IFormatter> GetFormatterExtensions() => _formatterExtensions.AsReadOnly();
 
         /// <summary>
         /// Adds the extensions at the beginning of the <see cref="SourceExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
@@ -249,8 +259,9 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider? provider, string format, IList<object> args)
         {
-            var output = new StringOutput(format.Length + args.Count * 8);
             var formatParsed = Parser.ParseFormat(format);
+            // Note: a good estimation of the expected output length is essential for performance and GC pressure
+            var output = new StringOutput(format.Length + formatParsed.Items.Count * 8);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, formatParsed, args, provider, output);
             Format(formatDetails, current);
@@ -336,7 +347,7 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider? provider, Format format, IList<object> args)
         {
-            var output = new StringOutput(format.Length + args.Count * 8);
+            var output = new StringOutput(format.Length + format.Items.Count * 8);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, format, args, provider, output);
             Format(formatDetails, current);
@@ -386,7 +397,7 @@ namespace SmartFormat
             {
                 if (item is LiteralText literalItem)
                 {
-                    formattingInfo.Write(literalItem.ToString());
+                    formattingInfo.Write(literalItem.AsSpan());
                     continue;
                 }
 
@@ -419,7 +430,7 @@ namespace SmartFormat
         }
 
         private void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
-            FormattingInfo formattingInfo)
+            IFormattingInfo formattingInfo)
         {
             OnFormattingFailure?.Invoke(this,
                 new FormattingErrorEventArgs(errorItem.RawText, startIndex,
@@ -466,9 +477,10 @@ namespace SmartFormat
                 if(selector.Length == 0) continue;
                 
                 formattingInfo.Selector = selector;
-
-                // If we have an alignment selector, we set the Alignment for its placeholder and move on
-                if (TrySetPlaceholderAlignment(formattingInfo)) continue;
+                // Do not evaluate alignment-only selectors
+                if (formattingInfo.SelectorOperator.Length > 0 &&
+                    formattingInfo.SelectorOperator[0] == Settings.Parser.AlignmentOperator) continue;
+                
                 formattingInfo.Result = null;
                 
                 var handled = InvokeSourceExtensions(formattingInfo);
@@ -497,6 +509,7 @@ namespace SmartFormat
 
         private bool InvokeSourceExtensions(FormattingInfo formattingInfo)
         {
+            // less GC than using Linq
             foreach (var sourceExtension in _sourceExtensions)
             {
                 var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
@@ -544,40 +557,31 @@ namespace SmartFormat
             }
 
             // Try to evaluate using the not empty formatter name from the format string
-            if (!string.IsNullOrEmpty(formatterName))
+            if (formatterName != string.Empty)
             {
-                var extension =
-                    _formatterExtensions.FirstOrDefault(fe => string.Equals(fe.Name, formatterName, comparison));
-                if (extension is null)
+                IFormatter? formatterExtension = null;
+                // less GC than using Linq
+                foreach (var fe in _formatterExtensions)
+                {
+                    if (!fe.Name.Equals(formatterName, comparison)) continue;
+                    
+                    formatterExtension = fe;
+                    break;
+                }
+                
+                if (formatterExtension is null)
                     throw formattingInfo.FormattingException($"No formatter with name '{formatterName}' found",
                         formattingInfo.Format, formattingInfo.Selector?.SelectorIndex ?? -1);
 
-                return extension.TryEvaluateFormat(formattingInfo);
+                return formatterExtension.TryEvaluateFormat(formattingInfo);
             }
             
             // Go through all (implicit) formatters which contain an empty name
-            return _formatterExtensions.Where(fe => fe.CanAutoDetect)
-                .Any(formatterExtension => formatterExtension.
-                    TryEvaluateFormat(formattingInfo));
-        }
-
-        /// <summary>
-        /// Process pure alignment selectors.
-        /// E.g. {Number,10} has an alignment selector containing ',10'
-        /// </summary>
-        /// <param name="selectorInfo">The <see cref="ISelectorInfo"/> to process.</param>
-        /// <returns><see langword="true"/>, if the selector contains valid alignment, else <see langword="false"/>.</returns>
-        private bool TrySetPlaceholderAlignment(ISelectorInfo selectorInfo)
-        {
-            // 1. The current selector belongs to a placeholder
-            // 2. The operator character must have a value, usually ','
-            // 3. The alignment is an integer value
-            if (selectorInfo.Placeholder != null && 
-                selectorInfo.SelectorOperator.Length > 0 && selectorInfo.SelectorOperator[0] == Settings.Parser.AlignmentOperator &&
-                int.TryParse(selectorInfo.SelectorText, out var selectorValue))
+            // much higher performance and less GC than using Linq
+            foreach (var fe in _formatterExtensions)
             {
-                selectorInfo.Placeholder.Alignment = selectorValue;
-                return true;
+                if (!fe.CanAutoDetect) continue;
+                if (fe.TryEvaluateFormat(formattingInfo)) return true;
             }
 
             return false;
