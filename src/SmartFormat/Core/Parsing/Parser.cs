@@ -57,7 +57,10 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Creates a new instance of a <see cref="Parser"/>.
         /// </summary>
-        /// <param name="smartSettings"></param>
+        /// <param name="smartSettings">
+        /// The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.
+        /// Any changes after passing settings as a parameter may not have effect.
+        /// </param>
         public Parser(SmartSettings? smartSettings = null)
         {
             Settings = smartSettings ?? new SmartSettings();
@@ -116,7 +119,7 @@ namespace SmartFormat.Core.Parsing
         /// specified character. The only allowed escape character is the backslash '\'.
         /// </summary>
         /// <param name="alternativeEscapeChar">Defaults to backslash</param>
-        [Obsolete("Use 'Settings.Parser.StringFormatCompatibility' instead.")]
+        [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
         public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
         {
             if (alternativeEscapeChar != _parserSettings.CharLiteralEscapeChar)
@@ -133,10 +136,10 @@ namespace SmartFormat.Core.Parsing
         /// so it is recommended to use an 'alternative' escape char, which is the
         /// backslash.
         /// </summary>
-        [Obsolete("Use 'Settings.Parser.StringFormatCompatibility' instead.")]
+        [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
         public void UseBraceEscaping()
         {
-            Settings.StringFormatCompatibility = true;
+            throw new NotImplementedException($"Init-only property {nameof(Settings)}.{nameof(Settings.StringFormatCompatibility)} can only be set in an object initializer");
         }
 
         /// <summary>

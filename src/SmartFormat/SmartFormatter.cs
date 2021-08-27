@@ -39,7 +39,10 @@ namespace SmartFormat
         /// <summary>
         /// Creates a new instance of a <see cref="SmartFormatter"/>.
         /// </summary>
-        /// <param name="settings">The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.</param>
+        /// <param name="settings">
+        /// The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.
+        /// Any changes after passing settings as a parameter may not have effect.
+        /// </param>
         public SmartFormatter(SmartSettings? settings = null)
         {
             Settings = settings ?? new SmartSettings();

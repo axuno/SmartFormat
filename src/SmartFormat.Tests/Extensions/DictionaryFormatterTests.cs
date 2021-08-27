@@ -15,13 +15,16 @@ namespace SmartFormat.Tests.Extensions
     {
         public object[] GetArgs()
         {
-            var d = new Dictionary<string, object>() {
-                {"Numbers", new Dictionary<string, object>() {
+            var d = new Dictionary<string, object>
+            {
+                {"Numbers", new Dictionary<string, object>
+                {
                     {"One", 1},
                     {"Two", 2},
                     {"Three", 3},
                 }},
-                {"Letters", new Dictionary<string, object>() {
+                {"Letters", new Dictionary<string, object>
+                {
                     {"A", "a"},
                     {"B", "b"},
                     {"C", "c"},
@@ -43,7 +46,7 @@ namespace SmartFormat.Tests.Extensions
             dynamic d = new ExpandoObject();
             d.Numbers = new Dictionary<string, object> { { "One", 1 }, { "Two", 2 }, { "Three", 3 }, };
             d.Letters = new Dictionary<string, object> { { "A", "a" }, { "B", "b" }, { "C", "c" }, };
-            d.Raw = new Dictionary<string, string>() { { "X", "z" } };
+            d.Raw = new Dictionary<string, string> { { "X", "z" } };
             d.Object = new { Prop1 = "a", Prop2 = "b", Prop3 = "c", };
 
             return new object[] {
@@ -94,8 +97,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Dynamic_CaseInsensitive()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive});
             formatter.AddExtensions(new DictionarySource());
 
             var formats = new string[]
@@ -149,8 +151,8 @@ namespace SmartFormat.Tests.Extensions
                            $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
 
             var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new DefaultSource(), new DictionarySource() });
-            smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
+            smart.AddExtensions(new DefaultSource(), new DictionarySource());
+            smart.AddExtensions(new DefaultFormatter());
             
             var result = smart.Format(format, addrDict);
 

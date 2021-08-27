@@ -14,14 +14,13 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class IsMatchFormatterTests
     {
-        private Dictionary<string, object> _variable = new Dictionary<string,object>() { {"theKey", "Some123Content"}};
+        private Dictionary<string, object> _variable = new() { {"theKey", "Some123Content"}};
         private SmartFormatter _formatter;
 
         public IsMatchFormatterTests()
         {
-            _formatter = Smart.CreateDefaultSmartFormat();
+            _formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
             _formatter.AddExtensions(new IsMatchFormatter {RegexOptions = RegexOptions.CultureInvariant});
-            _formatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
         }
         
         [TestCase("{theKey:ismatch(^.+123.+$):Okay - {}|No match content}", RegexOptions.None, "Okay - Some123Content")]

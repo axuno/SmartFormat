@@ -25,7 +25,6 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-        <AssemblyVersion>3.0.0</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>

@@ -14,9 +14,11 @@ namespace SmartFormat.Tests.Extensions
 
         private static SmartFormatter GetFormatter()
         {
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
-            smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
+            {
+                Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError},
+                Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}
+            });
 
             if (smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Name.Equals("substr")) == null)
             {
