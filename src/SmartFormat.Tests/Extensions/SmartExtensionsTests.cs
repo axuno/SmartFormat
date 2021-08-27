@@ -196,7 +196,7 @@ namespace SmartFormat.Tests.Extensions
         public void StringOutputTest()
         {
             var so = new StringOutput();
-            so.Write("text", 0, 2, null!);
+            so.Write("text".AsSpan(0, 2), null!);
             Assert.AreEqual("te", so.ToString());
         }
 

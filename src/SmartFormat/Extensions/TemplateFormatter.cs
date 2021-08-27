@@ -51,7 +51,7 @@ namespace SmartFormat.Extensions
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var templateName = formattingInfo.FormatterOptions ?? string.Empty;
+            var templateName = formattingInfo.FormatterOptions;
             if (templateName == string.Empty)
             {
                 if (formattingInfo.Format is {HasNested: true}) return false;

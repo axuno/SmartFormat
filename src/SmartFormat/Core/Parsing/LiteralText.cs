@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Buffers;
 using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Core.Parsing
@@ -14,6 +15,8 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class LiteralText : FormatItem
     {
+        private string? _toStringCache;
+
         /// <summary>
         /// Creates an instance of <see cref="LiteralText"/>, representing the literal text that is found a parsed format string.
         /// </summary>
@@ -27,17 +30,39 @@ namespace SmartFormat.Core.Parsing
 
         /// <summary>
         /// Get the string representation of the <see cref="LiteralText"/>, with escaped characters converted.
+        /// Note: The <see cref="Parser"/> puts each escaped character of an input string
+        /// into its own <see cref="LiteralText"/> item.
         /// </summary>
         /// <returns>The string representation of the <see cref="LiteralText"/>, with escaped characters converted.</returns>
-        public override string ToString() => SmartSettings.Parser.ConvertCharacterStringLiterals
-                ? UnEscapeCharacterLiterals().ToString()
-                : BaseString.Substring(StartIndex, Length);
-        
-        private ReadOnlySpan<char> UnEscapeCharacterLiterals()
+        public override string ToString()
+        {
+            if (_toStringCache != null) return _toStringCache;
+            if (Length == 0) _toStringCache = string.Empty;
+
+            // The buffer is only 1 character
+            _toStringCache = AsSpan().ToString();
+
+            return _toStringCache;
+        }
+
+        /// <summary>
+        /// Get the string representation of the <see cref="LiteralText"/>, with escaped characters converted.
+        /// Note: The <see cref="Parser"/> puts each escaped character of an input string
+        /// into its own <see cref="LiteralText"/> item.
+        /// </summary>
+        /// <returns>The string representation of the <see cref="LiteralText"/>, with escaped characters converted.</returns>
+        public override ReadOnlySpan<char> AsSpan()
         {
             if (Length == 0) return ReadOnlySpan<char>.Empty;
-            
-            return EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, BaseString, StartIndex, Length, false);
+
+            // The buffer is only for 1 character - each escaped char goes into its own LiteralText
+            return SmartSettings.Parser.ConvertCharacterStringLiterals &&
+                             BaseString.AsSpan(StartIndex)[0] == SmartSettings.Parser.CharLiteralEscapeChar
+                ? EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar,
+                    BaseString.AsSpan(StartIndex, Length),
+                    false, new char[1])
+                : BaseString.AsSpan(StartIndex, Length);
         }
+
     }
 }

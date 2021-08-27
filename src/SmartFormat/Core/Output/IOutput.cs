@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 //
 
+using System;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output
@@ -20,12 +21,10 @@ namespace SmartFormat.Core.Output
         void Write(string text, IFormattingInfo formattingInfo);
 
         /// <summary>
-        /// Writes a substring to the output.
+        /// Writes a <see cref="ReadOnlySpan{T}"/> text to the output.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="length"></param>
         /// <param name="formattingInfo"></param>
-        void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo);
+        void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo);
     }
 }

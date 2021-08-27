@@ -41,6 +41,9 @@ namespace SmartFormat.Core.Formatting
             CurrentValue = currentValue;
             FormatDetails = formatDetails;
             Format = format;
+            // inherit alignment
+            if (parent != null) Alignment = parent.Alignment;
+            else if (format.ParentPlaceholder != null) Alignment = format.ParentPlaceholder.Alignment;
         }
 
         /// <summary>
@@ -58,6 +61,8 @@ namespace SmartFormat.Core.Formatting
             Placeholder = placeholder;
             Format = placeholder.Format;
             CurrentValue = currentValue;
+            // inherit alignment
+            Alignment = placeholder.Alignment;
         }
 
         /// <summary>
@@ -68,7 +73,7 @@ namespace SmartFormat.Core.Formatting
         /// <summary>
         /// Gets or sets the <see cref="Parsing.Selector"/>.
         /// </summary>
-        public Selector? Selector { get; set; }
+        public Selector? Selector { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="FormatDetails"/>.
@@ -90,29 +95,12 @@ namespace SmartFormat.Core.Formatting
         /// or - if this is <see langword="null"/> - the <see cref="Alignment"/>
         /// of any parent <see cref="IFormattingInfo"/> that is not zero.
         /// </summary>
-        public int Alignment
-        {
-            get
-            {
-                if (Placeholder?.Alignment != null && Placeholder.Alignment != 0) return Placeholder.Alignment;
-
-                var parentFormatInfo = this;
-                var alignment = 0;
-                // Find a parent FormattingInfo which has the Alignment set different from zero
-                while (parentFormatInfo?.Parent?.Alignment != null)
-                {
-                    if(parentFormatInfo.Parent.Alignment != 0) alignment = parentFormatInfo.Parent.Alignment;
-                    parentFormatInfo = parentFormatInfo.Parent;
-                }
-
-                return alignment;
-            }
-        }
+        public int Alignment { get; set; }
 
         /// <summary>
         /// Gets the <see cref="FormatterOptions"/> of a <see cref="Placeholder"/>.
         /// </summary>
-        public string? FormatterOptions => Placeholder?.FormatterOptions;
+        public string FormatterOptions => Placeholder?.FormatterOptions ?? string.Empty;
 
         /// <summary>
         /// Gets the <see cref="Format"/>.
@@ -120,7 +108,7 @@ namespace SmartFormat.Core.Formatting
         public Format? Format { get; }
 
         /// <summary>
-        /// Writes the string parameter to the <see cref="Output.IOutput"/>
+        /// Writes the <see cref="string"/> parameter to the <see cref="Output.IOutput"/>
         /// and takes care of alignment.
         /// </summary>
         /// <param name="text">The string to write to the <see cref="Output.IOutput"/></param>
@@ -132,22 +120,21 @@ namespace SmartFormat.Core.Formatting
         }
 
         /// <summary>
-        /// Writes a substring of the string parameter to the <see cref="Output.IOutput"/>
+        /// Writes the <see cref="ReadOnlySpan{T}"/> text parameter to the <see cref="Output.IOutput"/>
         /// and takes care of alignment.
         /// </summary>
         /// <param name="text">The string to write to the <see cref="Output.IOutput"/></param>
-        /// <param name="startIndex">The start index of the substring.</param>
-        /// <param name="length">The length of the substring.</param>
-        public void Write(string text, int startIndex, int length)
+
+        public void Write(ReadOnlySpan<char> text)
         {
-            if (Alignment > 0) PreAlign(length);
-            FormatDetails.Output.Write(text, startIndex, length, this);
+            if (Alignment > 0) PreAlign(text.Length);
+            FormatDetails.Output.Write(text, this);
             if (Alignment < 0) PostAlign(text.Length);
         }
 
         /// <summary>
         /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance
-        /// and invokes formatting with <see cref="SmartFormatter"/> with the child as parameter.
+        /// and invokes formatting with <see cref="SmartFormatter"/> and with the child as parameter.
         /// </summary>
         /// <param name="format">The <see cref="Format"/> to use.</param>
         /// <param name="value">The value for the item in the format.</param>
@@ -188,7 +175,7 @@ namespace SmartFormat.Core.Formatting
         public string SelectorOperator => Selector?.Operator ?? string.Empty;
 
         /// <summary>
-        /// Gets the result after formatting is completed.
+        /// Gets the result after an <see cref="ISource"/> has assigned a value.
         /// </summary>
         public object? Result { get; set; }
 

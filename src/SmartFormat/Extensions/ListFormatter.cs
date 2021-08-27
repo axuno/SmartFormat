@@ -40,6 +40,7 @@ namespace SmartFormat.Extensions
     /// </remarks>
     public class ListFormatter : IFormatter, ISource, IInitializer
     {
+        // Will overridden during Initialize()
         private SmartSettings _smartSettings = new();
 
         /// <summary>
@@ -186,6 +187,8 @@ namespace SmartFormat.Extensions
                 {
                     Format = itemFormat,
                     EndIndex = itemFormat.EndIndex,
+                    // inherit alignment
+                    Alignment = formattingInfo.Alignment
                 };
                 newItemFormat.Items.Add(newPlaceholder);
                 itemFormat = newItemFormat;
@@ -203,9 +206,11 @@ namespace SmartFormat.Extensions
             foreach (var item in items)
             {
                 CollectionIndex += 1; // Keep track of the index
-                
-                var spacerFormattingInfo = new FormattingInfo(null, formattingInfo.FormatDetails, format, null);
 
+                // Do not inherit alignment for the spacers
+                var spacerFormattingInfo = new FormattingInfo(null, formattingInfo.FormatDetails, format, null)
+                    {Alignment = 0};
+                
                 // Determine which spacer to write:
                 if (spacer == null || CollectionIndex == 0)
                 {

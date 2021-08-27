@@ -30,6 +30,10 @@ namespace SmartFormat.Demo.Sample_Extensions
         {
             Write(text, 0, text.Length, formattingInfo);
         }
+        public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
+        {
+            Write(text.ToString(), 0, text.Length, formattingInfo);
+        }
 
         public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
         {

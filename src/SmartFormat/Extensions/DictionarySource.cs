@@ -5,7 +5,6 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions
@@ -45,18 +44,15 @@ namespace SmartFormat.Extensions
                 }
 
             // this check is for dynamics and generic dictionaries
-            if (current is IDictionary<string, object> dict)
-            {
-                var val = dict.FirstOrDefault(x =>
-                    x.Key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison())).Value;
-                if (val != null)
-                {
-                    selectorInfo.Result = val;
-                    return true;
-                }
-            }
+            if (current is not IDictionary<string, object?> dict) return false;
 
-            return false;
+            // We're using the CaseSensitivityType of the dictionary,
+            // not the one from Settings.GetCaseSensitivityComparison().
+            // This is faster and has less GC than Key.Equals(...)
+            if (!dict.TryGetValue(selector, out var val)) return false;
+
+            selectorInfo.Result = val;
+            return true;
         }
     }
 }
