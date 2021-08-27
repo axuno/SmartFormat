@@ -115,7 +115,7 @@ namespace SmartFormat.Extensions
         {
             // See if the language was explicitly passed:
             var pluralOptions = formattingInfo.FormatterOptions;
-            if (pluralOptions?.Length != 0) return PluralRules.GetPluralRule(pluralOptions);
+            if (pluralOptions.Length != 0) return PluralRules.GetPluralRule(pluralOptions);
 
             // See if a CustomPluralRuleProvider is available from the FormatProvider:
             var provider = formattingInfo.FormatDetails.Provider;

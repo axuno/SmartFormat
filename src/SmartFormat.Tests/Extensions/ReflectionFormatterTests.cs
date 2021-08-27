@@ -53,8 +53,8 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Properties_CaseInsensitive()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings
+                {CaseSensitivity = CaseSensitivityType.CaseInsensitive});
             
             // Length property for a string comes from StringSource
             var formats = new []

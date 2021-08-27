@@ -6,15 +6,40 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
-#### Parser does not allocate any strings
+#### Target frameworks
+
+* Changed `netstandard2.0` to `netstandard2.1`.
+* `net461` support unchanged.
+* Added package `System.Memory`
+
+#### Remove repetitive substring allocations
+
+Connected modifications:
+
+* Added method `Write(ReadOnlySpan<char> text)` to `IFormattingInfo`
+* Generated substrings are cached in classes `Format`, `FormatItem`, `LiteralText`, `Placeholder` and `Selector`.
+* Evaluating escaped characters for `Placeholder.FormatterOptions` and `LiteralText` work without heap memory allocation.
+
+#### Alignment operator inheritance is optimized
+
+* Alignment implementation introduced with PR [#174](https://github.com/axuno/SmartFormat/pull/174) is modified for better performance
+* Added method `Placeholder.AddSelector`
+* `Placeholder.Selectors` is now internal. Selectors are accessible with `IReadOnlyList<Selector> Placeholder.GetSelectors()`.
+
+#### DictionarySource performance improved
+
+* Implemented suggestion in issue [#186](https://github.com/axuno/SmartFormat/issues/186) for better speed and less GC pressure.
+* Side effect: We're using the `CaseSensitivityType` of the dictionary for getting the value for a key. `Settings.GetCaseSensitivityComparison()` will not be applied.
+
+#### Parser does not allocate any strings ([#187](https://github.com/axuno/SmartFormat/pull/187))
 
 * Reducing GC pressure by avoiding temporary string assignments. Depending on the input string, GC is reduced by 50-80%.
-* ParserSettings: All internal character lists are returned as ```List<char>```.
+* ParserSettings: All internal character lists are returned as `List<char>`.
 * Internal character lists are cached in the parser for better performance
 * Connected modifications
-  * New performance tests for ```Parser```
-  * ```Placeholder``` property ```Placeholder?.Parent``` is renamed to ```Placeholder?ParentPlaceholder``` to avoid confusion with ```Format``` property ```Format?.Parent```.
-  * ```Placeholder``` has additional internal properties ```FormatterNameStartindex```, ```FormatterNameLength```, ```FormatterOptionsStartindex``` and ```FormatterOptionsLength```
+  * New performance tests for `Parser`
+  * `Placeholder` property `Placeholder?.Parent` is renamed to `Placeholder?ParentPlaceholder` to avoid confusion with `Format` property `Format?.Parent`.
+  * `Placeholder` has additional internal properties `FormatterNameStartindex`, `FormatterNameLength`, `FormatterOptionsStartindex` and `FormatterOptionsLength`
 
 #### `IFormatter`s have one single, unique name ([#185](https://github.com/axuno/SmartFormat/pull/185))
 
@@ -50,6 +75,12 @@ public class FormatCache
 The class `FormatCache` is now replaced by `Format`. `Format` stores the result from the `Parser` parsing the input string. The `SmartFormatter` has additional overloads for using the cached `Format` as an argument, instead of an additional wrapper around `Format`.
 
 It is **highly recommended** to use these `SmartFormatter` methods whenever there is a **constant input string** with **different data arguments**.
+Other changes:
+
+* `SmartSettings` has a public CTOR.
+* `SmartFormatter` has a CTOR which takes `SmartSettings` as an optional argument.
+* `Smart.CreateDefaultSmartFormat()` takes `SmartSettings` as an optional argument.
+* `Parser` has a CTOR which takes `SmartSettings` as an optional argument.
 
 #### Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
 * Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood

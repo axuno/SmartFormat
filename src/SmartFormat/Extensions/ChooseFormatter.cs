@@ -35,7 +35,7 @@ namespace SmartFormat.Extensions
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var chooseOptions = formattingInfo.FormatterOptions?.Split(SplitChar);
+            var chooseOptions = formattingInfo.FormatterOptions.Split(SplitChar);
             var formats = formattingInfo.Format?.Split(SplitChar);
             
             // Check whether arguments can be handled by this formatter

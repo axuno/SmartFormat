@@ -30,9 +30,9 @@ namespace SmartFormat.Core.Parsing
         #region: Settings :
 
         /// <summary>
-        /// Gets or sets the <seealso cref="SmartSettings" /> for Smart.Format
+        /// Gets or sets the <see cref="SmartSettings" /> for Smart.Format
         /// </summary>
-        public SmartSettings Settings { get; internal set; }
+        public SmartSettings Settings { get; }
 
         // Cache method results from settings
         private readonly List<char> _operatorChars;
@@ -58,9 +58,9 @@ namespace SmartFormat.Core.Parsing
         /// Creates a new instance of a <see cref="Parser"/>.
         /// </summary>
         /// <param name="smartSettings"></param>
-        internal Parser(SmartSettings smartSettings)
+        public Parser(SmartSettings? smartSettings = null)
         {
-            Settings = smartSettings;
+            Settings = smartSettings ?? new SmartSettings();
             _parserSettings = Settings.Parser;
             _operatorChars = _parserSettings.OperatorChars();
             _customOperatorChars = _parserSettings.CustomOperatorChars();
@@ -565,7 +565,7 @@ namespace SmartFormat.Core.Parsing
                 // Add the selector:
                 if (_index.Current != _index.LastEnd) // if equal, we're already parsing a selector
                 {
-                    currentPlaceholder.Selectors.Add(new Selector(Settings, _inputFormat, _index.LastEnd, _index.Current, _index.Operator, _index.Selector));
+                    currentPlaceholder.AddSelector(new Selector(Settings, _inputFormat, _index.LastEnd, _index.Current, _index.Operator, _index.Selector));
                     _index.Selector++;
                     _index.Operator = _index.Current;
                 }
@@ -623,7 +623,7 @@ namespace SmartFormat.Core.Parsing
                 _index.Current - _index.Operator == 1 &&
                 (_inputFormat[_index.Operator] == _parserSettings.ListIndexEndChar ||
                  _inputFormat[_index.Operator] == _parserSettings.NullableOperator))
-                currentPlaceholder.Selectors.Add(new Selector(Settings, _inputFormat, _index.LastEnd, _index.Current,_index.Operator, _index.Selector));
+                currentPlaceholder.AddSelector(new Selector(Settings, _inputFormat, _index.LastEnd, _index.Current,_index.Operator, _index.Selector));
             else if (_index.Operator != _index.Current) // the selector only contains illegal ("trailing") operator characters
                 parsingErrors.AddIssue(_resultFormat,
                     $"'0x{Convert.ToByte(_inputFormat[_index.Operator]):X}': " +

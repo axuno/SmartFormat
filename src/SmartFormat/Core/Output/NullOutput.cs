@@ -4,52 +4,49 @@
 //
 
 using System;
-using System.IO;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output
 {
     /// <summary>
-    /// Wraps a <see cref="TextWriter"/> so that it can be used for output.
+    /// Noop implementation of <see cref="IOutput"/>
     /// </summary>
-    public class TextWriterOutput : IOutput
+    /// <remarks>
+    /// Useful for performance tests excluding the result string generation.
+    /// </remarks>
+    public class NullOutput : IOutput
     {
         /// <summary>
-        /// Creates a new instance of <see cref="TextWriterOutput"/>.
+        /// Creates a new instance of <see cref="NullOutput"/>.
         /// </summary>
-        /// <param name="output">The <see cref="TextWriter"/> to use for output.</param>
-        public TextWriterOutput(TextWriter output)
+        public NullOutput()
         {
-            Output = output;
         }
 
         /// <summary>
-        /// Returns the <see cref="TextWriter"/> used for output.
+        /// Noop for writing a string.
         /// </summary>
-        public TextWriter Output { get; }
-
-        /// <summary>
-        /// Writes text to the <see cref="TextWriter"/> object.
-        /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The text to write.</param>
         /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
         public void Write(string text, IFormattingInfo formattingInfo)
         {
-            Output.Write(text);
         }
 
         /// <summary>
-        /// Writes text to the <see cref="TextWriter"/> object.
+        /// Noop for writing a <see cref="ReadOnlySpan{T}"/>
         /// </summary>
         /// <param name="text">The text to write.</param>
         /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
         public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
         {
-#if NETFRAMEWORK
-            Output.Write(text.ToString());
-#else
-            Output.Write(text);
-#endif
+        }
+
+        /// <summary>
+        /// Always return <see cref="string.Empty"/>.
+        /// </summary>
+        public override string ToString()
+        {
+            return string.Empty;
         }
     }
 }

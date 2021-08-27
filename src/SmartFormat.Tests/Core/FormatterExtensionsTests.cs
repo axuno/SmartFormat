@@ -199,7 +199,6 @@ namespace SmartFormat.Tests.Core
                 formattingInfo.Write("TestExtension2 Options: " + options + ", Format: " + formatString);
                 return true;
             }
-
         }
 
         #endregion

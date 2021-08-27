@@ -45,16 +45,13 @@ namespace SmartFormat.Extensions
         public override void Initialize(SmartFormatter formatter)
         {
             base.Initialize(formatter);
-            var comparer = new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive}
-                .GetCaseSensitivityComparer();
+            var comparer = formatter.Settings.GetCaseSensitivityComparer();
             SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, bool>>(comparer);
             AddMethods();
         }
 
         private void AddMethods()
         {
-            if (SelectorMethods is null) return;
-
             // built-in string methods
             SelectorMethods.Add(nameof(Length), Length);
             SelectorMethods.Add(nameof(ToUpper), ToUpper);

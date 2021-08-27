@@ -624,6 +624,7 @@ namespace SmartFormat.Tests.Core
             var placeholder = result.Items[0] as Placeholder;
             Assert.That(placeholder, Is.Not.Null);
             Assert.That(placeholder!.Selectors.Count, Is.EqualTo(1));
+            Assert.That(placeholder!.Selectors.Count, Is.EqualTo(placeholder!.GetSelectors().Count));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,2)));
         }
 
