@@ -14,7 +14,7 @@ namespace SmartFormat.Tests.Core
         private static Parser GetRegularParser(SmartSettings? settings = null)
         {
             var parser = new Parser(settings ?? new SmartSettings
-                {StringFormatCompatibility = false, Parser = {ErrorAction = ParseErrorAction.ThrowError}});
+                {StringFormatCompatibility = false, Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}});
             return parser;
         }
 
@@ -58,8 +58,8 @@ namespace SmartFormat.Tests.Core
         public void Parser_Throws_Exceptions(string format)
         {
             // Let's set the "ErrorAction" to "Throw":
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings
+                {Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}});
 
             var args = new object[] { TestFactory.GetPerson() };
             Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
@@ -68,8 +68,8 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Parser_Exception_ErrorDescription()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings
+                {Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}});
 
             foreach (var format in new[] { "{.}", "{.}{0.}" })
             {
@@ -97,8 +97,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Parser_Ignores_Exceptions()
         {
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ErrorAction = ParseErrorAction.Ignore;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.Ignore}});
 
             var invalidFormats = new[] {
                 "{",
@@ -126,8 +125,7 @@ namespace SmartFormat.Tests.Core
             //                     | Literal  | Erroneous     | | Okay |  
             var invalidTemplate = "Hello, I'm {Name from {City} {Street}";
 
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ErrorAction = ParseErrorAction.Ignore;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.Ignore}});
             var parsed = parser.ParseFormat(invalidTemplate);
             
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
@@ -146,8 +144,7 @@ namespace SmartFormat.Tests.Core
         [TestCase("Hello, I'm {Name from {City} {Street", false)]
         public void Parser_Error_Action_MaintainTokens(string invalidTemplate, bool lastItemIsPlaceholder)
         {
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
             var parsed = parser.ParseFormat(invalidTemplate);
 
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
@@ -172,8 +169,7 @@ namespace SmartFormat.Tests.Core
             //                     | Literal  | Erroneous     |
             var invalidTemplate = "Hello, I'm {Name from {City}";
             
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ErrorAction = ParseErrorAction.OutputErrorInResult;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.OutputErrorInResult}});
             var parsed = parser.ParseFormat(invalidTemplate);
 
             Assert.That(parsed.Items.Count, Is.EqualTo(1));
@@ -246,8 +242,7 @@ namespace SmartFormat.Tests.Core
   exports.interpolationSearch = interpolationSearch;
 })(typeof window === 'undefined' ? module.exports : window);
 ";
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
             var parsed = parser.ParseFormat(js);
 
             // No characters should get lost compared to the format string,
@@ -295,8 +290,7 @@ namespace SmartFormat.Tests.Core
   border-bottom: 1px solid grey;
 } 
 ";
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ErrorAction = ParseErrorAction.MaintainTokens;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
             var parsed = parser.ParseFormat(css);
 
             // No characters should get lost compared to the format string,
@@ -476,9 +470,8 @@ namespace SmartFormat.Tests.Core
         public void NamedFormatter_should_be_null_when_empty_or_invalid_or_escaped(string format)
         {
             var expectedLiteralText = format.Substring(3, format.Length - 3 - 1);
-            
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ConvertCharacterStringLiterals = false;
+
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = false}});
 
             var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
             var literalText = placeholder.Format?.GetLiteralText();
@@ -496,8 +489,7 @@ namespace SmartFormat.Tests.Core
         [TestCase(@"{0:for(){}mat}", "for()mat")]
         public void NamedFormatter_should_be_null_when_has_nesting(string format, string expectedLiteralText)
         {
-            var parser = GetRegularParser();
-            parser.Settings.Parser.ConvertCharacterStringLiterals = false;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = false}});
 
             var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
             var literalText = placeholder.Format?.GetLiteralText();
@@ -511,9 +503,11 @@ namespace SmartFormat.Tests.Core
         public void Parser_NotifyParsingError()
         {
             ParsingErrors? parsingError = null;
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
-            formatter.Settings.Parser.ErrorAction = ParseErrorAction.Ignore;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings
+            {
+                Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.Ignore},
+                Parser = new ParserSettings {ErrorAction = ParseErrorAction.Ignore}
+            });
             
             formatter.Parser.OnParsingFailure += (o, args) => parsingError = args.Errors;
             var res = formatter.Format("{NoName {Other} {Same", default(object)!);
@@ -536,16 +530,14 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void Literal_Escaping_In_Literal()
         {
-            var parser = GetRegularParser();
-            parser.Settings.StringFormatCompatibility = false;
+            var parser = GetRegularParser(new SmartSettings {StringFormatCompatibility = false});
             Assert.That(parser.ParseFormat("\\{\\}").ToString(), Is.EqualTo("{}"));
         }
 
         [Test]
         public void StringFormat_Escaping_In_Literal()
         {
-            var parser = GetRegularParser();
-            parser.Settings.StringFormatCompatibility = true;
+            var parser = GetRegularParser(new SmartSettings {StringFormatCompatibility = true});
             Assert.That(parser.ParseFormat("{{}}").ToString(), Is.EqualTo("{}"));
         }
 

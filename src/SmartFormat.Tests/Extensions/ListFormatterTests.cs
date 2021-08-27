@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
 
@@ -69,10 +70,12 @@ namespace SmartFormat.Tests.Extensions
                 Persons = data.Where(p => p.Gender == "M")
             };
             
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.StringFormatCompatibility = false; // mandatory for this test case because of consecutive curly braces
-            smart.Settings.Formatter.ErrorAction = SmartFormat.Core.Settings.FormatErrorAction.ThrowError;
-            smart.Settings.Parser.ErrorAction = SmartFormat.Core.Settings.ParseErrorAction.ThrowError;
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
+            {
+                StringFormatCompatibility = false, // mandatory for this test case because of consecutive curly braces
+                Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError},
+                Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}
+            });
 
             // Note: it's faster to add the named formatter, than finding it implicitly by "trial and error".
             var result = smart.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C
