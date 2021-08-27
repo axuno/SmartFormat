@@ -89,6 +89,8 @@ namespace SmartFormat
 
         /// <summary>
         /// Gets or sets the default <see cref="SmartFormatter"/>.
+        /// If not set, the <see cref="CreateDefaultSmartFormat"/> will be used.
+        /// It is recommended to set the <see cref="Default"/> with the extensions that are actually needed.
         /// </summary>
         public static SmartFormatter Default { get; set; } = CreateDefaultSmartFormat();
 

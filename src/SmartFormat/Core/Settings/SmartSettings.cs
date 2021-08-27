@@ -10,6 +10,9 @@ namespace SmartFormat.Core.Settings
 {
     /// <summary>
     /// <see cref="SmartFormat" /> settings to be applied for parsing and formatting.
+    /// <see cref="SmartSettings"/> are used to initialize instances.
+    /// Properties should be considered as 'init-only' like implemented in C# 9.
+    /// Any changes after passing settings as argument to CTORs may not have effect. 
     /// </summary>
     public class SmartSettings
     {
@@ -28,7 +31,7 @@ namespace SmartFormat.Core.Settings
         public bool StringFormatCompatibility { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
+        /// Gets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
         /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
         [Obsolete("Use 'SmartSettings.Formatter.ErrorAction' instead.", false)]
@@ -39,7 +42,7 @@ namespace SmartFormat.Core.Settings
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormat.Core.Parsing.Parser" />.
+        /// Gets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormat.Core.Parsing.Parser" />.
         /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
         [Obsolete("Use 'SmartSettings.Parser.ErrorAction' instead.", false)]
@@ -85,12 +88,14 @@ namespace SmartFormat.Core.Settings
 
         /// <summary>
         /// Gets the settings for the parser.
+        /// Set only during initialization.
         /// </summary>
-        public ParserSettings Parser { get; } = new();
+        public ParserSettings Parser { get; set; } = new();
 
         /// <summary>
         /// Gets the settings for the formatter.
+        /// Set only during initialization.
         /// </summary>
-        public FormatterSettings Formatter { get; } = new();
+        public FormatterSettings Formatter { get; set; } = new();
     }
 }

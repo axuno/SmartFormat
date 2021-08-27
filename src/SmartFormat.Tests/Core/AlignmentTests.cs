@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Utilities;
 
@@ -14,9 +15,9 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class AlignmentTests
     {
-        private SmartFormatter GetSimpleFormatter()
+        private SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
         {
-            var formatter = new SmartFormatter(); 
+            var formatter = new SmartFormatter(settings ?? new SmartSettings()); 
             formatter.AddExtensions(new DefaultFormatter());
             formatter.AddExtensions(new ReflectionSource(), new DefaultSource());
             return formatter;
@@ -45,8 +46,8 @@ namespace SmartFormat.Tests.Core
         {
             const string name = "Joe";
             var obj = new { name };
-            var smart = GetSimpleFormatter();
-            smart.Settings.Formatter.AlignmentFillCharacter = '.'; // dot instead of space
+            // fill with dot instead of space
+            var smart = GetSimpleFormatter(new SmartSettings{Formatter = new FormatterSettings {AlignmentFillCharacter = '.'}});
             var result = smart.Format("Name: {name,-10}|", obj);
             Assert.That(result, Is.EqualTo("Name: Joe.......|"));
         }

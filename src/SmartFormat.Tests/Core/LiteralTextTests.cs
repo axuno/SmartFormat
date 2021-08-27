@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Tests.Core
 {
@@ -20,8 +21,7 @@ namespace SmartFormat.Tests.Core
             const string formatWithFileBehavior = @"No carriage return\r, no line feed\n";
             const string formatWithCodeBehavior = "With carriage return\r, and with line feed\n";
 
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Parser.ConvertCharacterStringLiterals = false;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = false}});
 
             var result = formatter.Format(formatWithFileBehavior);
             Assert.AreEqual(string.Format(formatWithFileBehavior), result);
@@ -35,9 +35,8 @@ namespace SmartFormat.Tests.Core
         {
             const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v \0 \u2022!";
             const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v \0 \u2022!";
-            
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
+
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = true}});
 
             var result = formatter.Format(formatWithFileBehavior);
             Assert.AreEqual(formatWithCodeBehavior, result);
@@ -48,8 +47,7 @@ namespace SmartFormat.Tests.Core
         [TestCase(@"\u2010 {0} \u2015", "\u2010 123 \u2015")]
         public void UnicodeEscapeSequenceIsParsed(string format, string expectedOutput)
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = true}});
             Assert.AreEqual(expectedOutput, formatter.Format(format, 123));
         }
 
@@ -60,8 +58,7 @@ namespace SmartFormat.Tests.Core
         [TestCase(@"Some text \uuuuu {0}", @"\uuuuu")]
         public void UnsupportedCharacterLiteralEscapeSequence(string format, string exMessage)
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.Parser.ConvertCharacterStringLiterals = true;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = true}});
 
             Assert.That( () => formatter.Format(format, 123), Throws.ArgumentException.And.Message.Contains(exMessage));
         }
@@ -69,8 +66,7 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void ConvertCharacterLiteralsToUnicodeWithListFormatter()
         {
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.Parser.ConvertCharacterStringLiterals = true;
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = true}});
             // a useful practical test case: separate members of a list by a new line
             var items = new[] { "one", "two", "three" };
             // Note the @ before the format string will switch off conversion of \n by the compiler

@@ -45,9 +45,11 @@ namespace SmartFormat.Demo
             args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
             propertyGrid1.SelectedObject = args;
 
-
-            Smart.Default.Settings.Formatter.ErrorAction = FormatErrorAction.OutputErrorInResult;
-            Smart.Default.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+            Smart.Default = Smart.CreateDefaultSmartFormat(new SmartSettings
+            {
+                Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.OutputErrorInResult},
+                Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}
+            });
 
             LoadExamples();
         }

@@ -12,6 +12,8 @@ namespace SmartFormat.Core.Settings
 {
     /// <summary>
     /// Class for <see cref="Parser"/> settings.
+    /// Properties should be considered as 'init-only' like implemented in C# 9.
+    /// Any changes after passing settings as argument to CTORs may not have effect. 
     /// </summary>
     public class ParserSettings
     {

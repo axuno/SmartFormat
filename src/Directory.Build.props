@@ -7,7 +7,7 @@
         <Copyright>Copyright 2011-2021 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
         <RepositoryUrl>https://github.com/axuno/SmartFormat.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <AssemblyVersion>2.7.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
+        <AssemblyVersion>3.0.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
         <LangVersion>latest</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisLevel>latest</AnalysisLevel>

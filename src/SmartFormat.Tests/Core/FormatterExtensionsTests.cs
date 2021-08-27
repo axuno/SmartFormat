@@ -65,7 +65,7 @@ namespace SmartFormat.Tests.Core
         {
             foreach (var formatter in GetAllFormatters().Where(f => f.CanAutoDetect))
             {
-                Assert.That(() => formatter.TryEvaluateFormat(FormattingInfo.Create("", new List<object>() {new object()})),
+                Assert.That(() => formatter.TryEvaluateFormat(FormattingInfo.Create("", new List<object> {new()})),
                     Throws.Nothing);
             }
         }
@@ -159,10 +159,9 @@ namespace SmartFormat.Tests.Core
 
         private static SmartFormatter GetCustomFormatter()
         {
-            var testFormatter = new SmartFormatter();
+            var testFormatter = new SmartFormatter(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
             testFormatter.AddExtensions(new TestExtension1(), new TestExtension2(), new DefaultFormatter());
             testFormatter.AddExtensions(new DefaultSource());
-            testFormatter.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
             return testFormatter;
         }
 

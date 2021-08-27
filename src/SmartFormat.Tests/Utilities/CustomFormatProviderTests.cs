@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Utilities
@@ -11,9 +9,9 @@ namespace SmartFormat.Tests.Utilities
     [TestFixture]
     public class CustomFormatProviderTests
     {
-        private SmartFormatter GetSimpleFormatter()
+        private SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
         {
-            var formatter = new SmartFormatter(); 
+            var formatter = new SmartFormatter(settings ?? new SmartSettings()); 
             formatter.AddExtensions(new DefaultFormatter());
             formatter.AddExtensions(new DefaultSource());
             return formatter;
@@ -27,8 +25,7 @@ namespace SmartFormat.Tests.Utilities
         [TestCase("tamrof", "eulav", false)]
         public void Format_With_CustomFormatter(string format, string value, bool stringFormatCompatible)
         {
-            var smart = GetSimpleFormatter();
-            smart.Settings.StringFormatCompatibility = stringFormatCompatible;
+            var smart = GetSimpleFormatter(new SmartSettings {StringFormatCompatibility = stringFormatCompatible});
             var expected = new string(format.Reverse().Select(c => c).ToArray()) + ": " +
                            new string(value.Reverse().Select(c => c).ToArray());
             var resultSmartFormat = smart.Format(new ReverseFormatProvider(), $"{{0:{format}}}", value);

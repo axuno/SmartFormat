@@ -96,10 +96,9 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Methods_CaseInsensitive()
         {
-            var smart = new SmartFormatter();
+            var smart = new SmartFormatter(new SmartSettings{ CaseSensitivity = CaseSensitivityType.CaseInsensitive });
             smart.AddExtensions(new ReflectionSource());
             smart.AddExtensions(new DefaultFormatter());
-            smart.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
 
             var format = "{0} {0.ToLower} {toloWer} {touPPer}";
             //var expected = "Zero zero zero ZERO";
@@ -154,8 +153,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Fields_CaseInsensitive()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings{ CaseSensitivity = CaseSensitivityType.CaseInsensitive });
             
             var formats = new string[] { "{field}" };
             var expected = new string[] { "Field" };
@@ -167,8 +165,7 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Get_Property_From_Base_Class()
         {
             var derived = new DerivedMiscObject();
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings{ CaseSensitivity = CaseSensitivityType.CaseInsensitive });
 
             Assert.AreEqual(string.Format($"{derived.Property}"), formatter.Format("{Property}", derived));
             Assert.AreEqual(string.Format($"{derived.ReadonlyProperty}"), formatter.Format("{ReadonlyProperty}", derived));
@@ -226,8 +223,8 @@ namespace SmartFormat.Tests.Extensions
         public void Nullable_Property_Should_Return_Empty_String()
         {
             var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new DefaultSource(), new ReflectionSource() });
-            smart.AddExtensions(new IFormatter[] {new DefaultFormatter()});
+            smart.AddExtensions(new DefaultSource(), new ReflectionSource());
+            smart.AddExtensions(new DefaultFormatter());
             var data = new {Person = new Person()};
 
             var result = smart.Format("{Person.Address?.City}", data);

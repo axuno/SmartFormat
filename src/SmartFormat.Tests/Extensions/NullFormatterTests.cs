@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Extensions
@@ -12,27 +13,25 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class NullFormatterTests
     {
-        private SmartFormatter GetFormatter()
+        private SmartFormatter GetFormatter(SmartSettings? settings = null)
         {
-            var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new ListFormatter(), new DefaultSource(), new ReflectionSource() });
-            smart.AddExtensions(new IFormatter[] { new NullFormatter(), new ListFormatter(), new DefaultFormatter()});
+            var smart = new SmartFormatter(settings ?? new SmartSettings());
+            smart.AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource());
+            smart.AddExtensions(new NullFormatter(), new ListFormatter(), new DefaultFormatter());
             return smart;
         }
 
         [Test]
         public void Null_Without_Format_Should_Be_Empty_String()
         {
-            var smart = GetFormatter();
-            smart.Settings.StringFormatCompatibility = false;
+            var smart = GetFormatter(new SmartSettings {StringFormatCompatibility = false});
             Assert.That(smart.Format("{JustNull}", new { JustNull = default(object)} ), Is.EqualTo(string.Empty));
         }
 
         [Test]
         public void Null_Without_Format_Should_Be_Empty_String_CompatibilityMode()
         {
-            var smart = GetFormatter();
-            smart.Settings.StringFormatCompatibility = true;
+            var smart = GetFormatter(new SmartSettings {StringFormatCompatibility = true});
             Assert.That(smart.Format("{JustNull}", new { JustNull = default(object)} ), Is.EqualTo(string.Empty));
         }
 
@@ -68,8 +67,8 @@ namespace SmartFormat.Tests.Extensions
         public void Combine_NullFormatter_With_Other_Formatter(object value, string expected)
         {
             var smart = new SmartFormatter();
-            smart.AddExtensions(new ISource[] { new DefaultSource() });
-            smart.AddExtensions(new IFormatter[] { new NullFormatter(), new DefaultFormatter()});
+            smart.AddExtensions(new DefaultSource());
+            smart.AddExtensions(new NullFormatter(), new DefaultFormatter());
             
             // NullFormatter will output only, if value is null
             // DefaultFormatter will render null as string.Empty

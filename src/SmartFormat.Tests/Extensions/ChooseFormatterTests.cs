@@ -85,8 +85,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0:choose(1):1}", 99)]
         public void Choose_throws_when_choice_is_invalid(string format, object arg0)
         {
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
             Assert.Throws<FormattingException>(() => smart.Format(format, arg0));
         }
 
@@ -98,8 +97,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("{0:choose(1|2):1|2|3|4}", 1)]
         public void Choose_throws_when_choices_are_too_few_or_too_many(string format, object arg0)
         {
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
             Assert.Throws<FormattingException>(() => smart.Format(format, arg0));
         }
 
