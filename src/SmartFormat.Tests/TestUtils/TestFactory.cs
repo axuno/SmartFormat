@@ -28,8 +28,8 @@ namespace SmartFormat.Tests.TestUtils
 
         public static List<object> GetItems()
         {
-            return new List<object>
-                       {
+            return new()
+            {
                            new
                                {
                                    Name = "Table",

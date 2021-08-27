@@ -14,9 +14,11 @@ namespace SmartFormat.Tests.Extensions
     {
         public TimeFormatterTests()
         {
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.Formatter.ErrorAction = FormatErrorAction.ThrowError;
-            smart.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
+            {
+                Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError},
+                Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}
+            });
 
             if (smart.FormatterExtensions.FirstOrDefault(fmt => fmt.Name.Equals("time")) is not TimeFormatter)
             {
