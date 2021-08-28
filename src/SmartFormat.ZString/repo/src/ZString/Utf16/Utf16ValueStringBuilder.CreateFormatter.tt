@@ -1,0 +1,78 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#@ include file="../T4Common.t4" once="true" #>
+<#
+    var spanFormattablesA = new Type[]
+    {
+        typeof(SByte),
+        typeof(Int16),
+        typeof(Int32),
+        typeof(Int64),
+    };
+    var spanFormattablesB = new Type[]
+    {
+        typeof(Byte),
+        typeof(UInt16),
+        typeof(UInt32),
+        typeof(UInt64),
+    };
+    var spanFormattablesC = new Type[]
+    {
+        typeof(Single),
+        typeof(Double),
+        typeof(TimeSpan),
+        typeof(DateTime),
+        typeof(DateTimeOffset),
+        typeof(Decimal),
+        typeof(Guid),
+    };
+#>
+using System;
+
+namespace Cysharp.Text
+{
+    public partial struct Utf16ValueStringBuilder
+    {
+        static object CreateFormatter(Type type)
+        {
+<# foreach(var t in spanFormattablesA) { #>
+            if (type == typeof(<#= t.FullName #>))
+            {
+                return new TryFormat<<#= t.FullName #>>((<#= t.FullName #> x, Span<char> dest, out int written, ReadOnlySpan<char> format) => format.Length == 0 ? FastNumberWriter.TryWriteInt64(dest, out written, x) : x.TryFormat(dest, out written, format));
+            }
+<# } #>
+<# foreach(var t in spanFormattablesB) { #>
+            if (type == typeof(<#= t.FullName #>))
+            {
+                return new TryFormat<<#= t.FullName #>>((<#= t.FullName #> x, Span<char> dest, out int written, ReadOnlySpan<char> format) => format.Length == 0 ? FastNumberWriter.TryWriteUInt64(dest, out written, x) : x.TryFormat(dest, out written, format));
+            }
+<# } #>
+<# foreach(var t in spanFormattablesC) { #>
+            if (type == typeof(<#= t.FullName #>))
+            {
+                return new TryFormat<<#= t.FullName #>>((<#= t.FullName #> x, Span<char> dest, out int written, ReadOnlySpan<char> format) => x.TryFormat(dest, out written, format));
+            }
+<# } #>
+<# foreach(var t in spanFormattables.Append(typeof(bool))) { #>
+            if (type == typeof(<#= t.FullName #>?))
+            {
+                return CreateNullableFormatter<<#= t.FullName #>>();
+            }
+<# } #>
+<# foreach(var t in new [] {typeof(IntPtr), typeof(UIntPtr)}) { var u = t == typeof(UIntPtr);  #>
+            if (type == typeof(<#= t.FullName #>))
+            {
+                // ignore format
+                return new TryFormat<<#= t.FullName #>>((<#= t.FullName #> x, Span<char> dest, out int written, ReadOnlySpan<char> _) => <#= t #>.Size == 4
+                    ? x.To<#= u ? "U" : "" #>Int32().TryFormat(dest, out written, default)
+                    : x.To<#= u ? "U" : "" #>Int64().TryFormat(dest, out written, default));
+            }
+<# } #>
+            return null;
+        }
+    }
+}
