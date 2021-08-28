@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using Cysharp.Text;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output
@@ -45,11 +46,17 @@ namespace SmartFormat.Core.Output
         /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
         public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
         {
-#if NETFRAMEWORK
-            Output.Write(text.ToString());
-#else
+#if NETSTANDARD2_1
             Output.Write(text);
+#else
+            Output.Write(text.ToString());
 #endif
+        }
+
+        
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 }

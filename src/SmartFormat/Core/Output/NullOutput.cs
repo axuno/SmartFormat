@@ -4,6 +4,7 @@
 //
 
 using System;
+using Cysharp.Text;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output
@@ -23,21 +24,18 @@ namespace SmartFormat.Core.Output
         {
         }
 
-        /// <summary>
-        /// Noop for writing a string.
-        /// </summary>
-        /// <param name="text">The text to write.</param>
-        /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
+        ///<inheritdoc/>
         public void Write(string text, IFormattingInfo formattingInfo)
         {
         }
 
-        /// <summary>
-        /// Noop for writing a <see cref="ReadOnlySpan{T}"/>
-        /// </summary>
-        /// <param name="text">The text to write.</param>
-        /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
+        ///<inheritdoc/>
         public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
+        {
+        }
+
+        ///<inheritdoc/>
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo)
         {
         }
 

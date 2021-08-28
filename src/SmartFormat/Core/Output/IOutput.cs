@@ -4,6 +4,7 @@
 //
 
 using System;
+using Cysharp.Text;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output
@@ -26,5 +27,12 @@ namespace SmartFormat.Core.Output
         /// <param name="text"></param>
         /// <param name="formattingInfo"></param>
         void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo);
+
+        /// <summary>
+        /// Writes text of a <see cref="Utf16ValueStringBuilder"/> to the output.
+        /// </summary>
+        /// <param name="stringBuilder"></param>
+        /// <param name="formattingInfo"></param>
+        void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using Cysharp.Text;
 using RTF;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
@@ -55,6 +56,15 @@ namespace SmartFormat.Demo.Sample_Extensions
             }
         }
 
+        ///<inheritdoc/>
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo)
+        {
+#if NETSTANDARD2_1
+            output.Append(stringBuilder.AsSpan());
+#else
+            output.Append(stringBuilder.ToString());
+#endif
+        }
 
         public override string ToString()
         {
