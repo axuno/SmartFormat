@@ -263,13 +263,7 @@ namespace SmartFormat
         public string Format(IFormatProvider? provider, string format, IList<object> args)
         {
             var formatParsed = Parser.ParseFormat(format);
-            // Note: a good estimation of the expected output length is essential for performance and GC pressure
-            var output = new StringOutput(format.Length + formatParsed.Items.Count * 8);
-            var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, formatParsed, args, provider, output);
-            Format(formatDetails, current);
-
-            return output.ToString();
+            return Format(provider, formatParsed, args);
         }
 
         /// <summary>
@@ -350,12 +344,19 @@ namespace SmartFormat
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider? provider, Format format, IList<object> args)
         {
-            var output = new StringOutput(format.Length + format.Items.Count * 8);
-            var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, format, args, provider, output);
-            Format(formatDetails, current);
+            using var output = new ZStringOutput(Utilities.ZStringExtensions.CalcCapacity(format));
+            try
+            {
+                var current = args.Count > 0 ? args[0] : args; // The first item is the default.
+                var formatDetails = new FormatDetails(this, format, args, provider, output);
+                Format(formatDetails, current);
 
-            return output.ToString();
+                return output.ToString();
+            }
+            finally
+            {
+                output.Dispose();
+            }
         }
 
         /// <summary>

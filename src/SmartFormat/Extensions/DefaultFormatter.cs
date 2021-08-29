@@ -47,8 +47,6 @@ namespace SmartFormat.Extensions
             // Use the provider to see if a CustomFormatter is available:
             var provider = formattingInfo.FormatDetails.Provider;
 
-            //  (The following code was adapted from the built-in String.Format code)
-
             //  We will try using IFormatProvider, IFormattable, and if all else fails, ToString.
             string? result; 
             if (provider?.GetFormat(typeof(ICustomFormatter)) is ICustomFormatter cFormatter)
@@ -56,11 +54,17 @@ namespace SmartFormat.Extensions
                 var formatText = format?.GetLiteralText();
                 result = cFormatter.Format(formatText, current, provider);
             }
-            // IFormattable:
+            // IFormattable
+            // Note: This is what ValueStringBuilder is implementing in the same way
             else if (current is IFormattable formattable)
             {
                 var formatText = format?.ToString();
                 result = formattable.ToString(formatText, provider);
+            }
+            else if (current is string str)
+            {
+                formattingInfo.Write(str.AsSpan());
+                return true;
             }
             // ToString:
             else
@@ -69,7 +73,7 @@ namespace SmartFormat.Extensions
             }
 
             // Output the result:
-            formattingInfo.Write(result ?? string.Empty);
+            formattingInfo.Write(result != null ? result.AsSpan() : ReadOnlySpan<char>.Empty);
 
             return true;
         }

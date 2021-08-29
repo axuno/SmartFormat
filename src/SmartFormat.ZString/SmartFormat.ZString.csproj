@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <RootNamespace>Cysharp.Text</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1701;1702;1591</NoWarn>
+
+        <!-- NuGet Packaging -->
+        <PackageVersion>$(Version)</PackageVersion>
+        <Company>Cysharp</Company>
+        <Authors>Cysharp</Authors>
+        <Copyright>© Cysharp, Inc.</Copyright>
+        <PackageTags>string;</PackageTags>
+        <Description>Zero allocation StringBuilder for .NET Core and Unity.</Description>
+        <PackageProjectUrl>https://github.com/Cysharp/ZString</PackageProjectUrl>
+        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <PackageIcon>../src/SmartFormat.ZString/repo/src/ZString/Icon.png</PackageIcon>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
+      <DefineConstants>TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="repo\docs\**" />
+      <Compile Remove="repo\sandbox\**" />
+      <Compile Remove="repo\src\ZString.Unity\**" />
+      <Compile Remove="repo\src\ZString\Unity\**" />
+      <Compile Remove="repo\tests\**" />
+      <EmbeddedResource Remove="repo\docs\**" />
+      <EmbeddedResource Remove="repo\sandbox\**" />
+      <EmbeddedResource Remove="repo\src\ZString.Unity\**" />
+      <EmbeddedResource Remove="repo\src\ZString\Unity\**" />
+      <EmbeddedResource Remove="repo\tests\**" />
+      <None Remove="repo\docs\**" />
+      <None Remove="repo\sandbox\**" />
+      <None Remove="repo\src\ZString.Unity\**" />
+      <None Remove="repo\src\ZString\Unity\**" />
+      <None Remove="repo\tests\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Memory" Version="4.5.3" />
+    </ItemGroup>
+
+</Project>
