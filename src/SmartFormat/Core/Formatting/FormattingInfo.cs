@@ -216,6 +216,7 @@ namespace SmartFormat.Core.Formatting
         {
             var formatter = new SmartFormatter(new SmartSettings());
             var formatParsed = formatter.Parser.ParseFormat(format);
+            // use StringOutput because we don't have to care about disposing.
             var formatDetails = new FormatDetails(formatter, formatParsed, data, null, new StringOutput());
             return new FormattingInfo(formatDetails, formatDetails.OriginalFormat, data);
         }

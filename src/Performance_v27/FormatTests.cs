@@ -11,47 +11,40 @@ using SmartFormat.Extensions;
 namespace SmartFormat.Performance
 {
 /*
-BenchmarkDotNet=v0.13.0, OS=Windows 10.0.19043.1165 (21H1/May2021Update)
-AMD Ryzen 9 3900X, 1 CPU, 24 logical and 12 physical cores
-.NET SDK=5.0.302
-  [Host]   : .NET 5.0.8 (5.0.821.31504), X64 RyuJIT
-  .NET 5.0 : .NET 5.0.8 (5.0.821.31504), X64 RyuJIT
-
-Job=.NET 5.0  Runtime=.NET 5.0
-
 StringOutput
-|                   Method |     N |          Mean |       Error |      StdDev | Ratio | RatioSD |      Gen 0 |     Gen 1 | Gen 2 |  Allocated |
-|------------------------- |------ |--------------:|------------:|------------:|------:|--------:|-----------:|----------:|------:|-----------:|
-|              Placeholder |   100 |     28.127 us |   0.5576 us |   0.5216 us |  3.00 |    0.09 |     4.4861 |         - |     - |      37 KB |
-|          Placeholder0005 |   100 |    105.737 us |   2.0459 us |   2.6602 us | 11.30 |    0.34 |     9.6436 |         - |     - |      80 KB |
-|          Literal0010Char |   100 |      9.371 us |   0.1497 us |   0.1400 us |  1.00 |    0.00 |     3.3417 |         - |     - |      27 KB |
-|          Literal3000Char |   100 |     56.754 us |   0.3694 us |   0.3085 us |  6.08 |    0.08 |    74.4629 |    1.6479 |     - |     609 KB |
-|   Literal6000Placeholder |   100 |    133.468 us |   1.5960 us |   1.4929 us | 14.24 |    0.20 |   147.7051 |    6.3477 |     - |   1,209 KB |
-| Literal18kUniPlaceholder |   100 |    110.975 us |   2.1944 us |   2.2535 us | 11.84 |    0.33 |   219.2383 |   13.6719 |     - |   1,797 KB |
-|                          |       |               |             |             |       |         |            |           |       |            |
-|              Placeholder | 10000 |  2,575.411 us |  49.2822 us |  62.3263 us |  2.87 |    0.16 |   449.2188 |         - |     - |   3,672 KB |
-|          Placeholder0005 | 10000 | 10,358.460 us | 196.9912 us | 241.9229 us | 11.54 |    0.47 |   968.7500 |         - |     - |   7,969 KB |
-|          Literal0010Char | 10000 |    900.956 us |  17.6099 us |  27.9311 us |  1.00 |    0.00 |   333.9844 |         - |     - |   2,734 KB |
-|          Literal3000Char | 10000 |  4,255.801 us |  79.6409 us |  74.4961 us |  4.80 |    0.20 |  7445.3125 |  164.0625 |     - |  60,938 KB |
-|   Literal6000Placeholder | 10000 | 13,406.469 us |  96.2487 us |  90.0311 us | 15.13 |    0.61 | 14765.6250 |  640.6250 |     - | 120,859 KB |
-| Literal18kUniPlaceholder | 10000 | 11,653.527 us | 124.2303 us | 110.1269 us | 13.18 |    0.51 | 21921.8750 | 1359.3750 |     - | 179,688 KB |
+|                   Method |     N |         Mean |      Error |       StdDev | Ratio | RatioSD |      Gen 0 |      Gen 1 | Gen 2 |  Allocated |
+|------------------------- |------ |-------------:|-----------:|-------------:|------:|--------:|-----------:|-----------:|------:|-----------:|
+|              Placeholder |   100 |     94.95 us |   1.865 us |     3.637 us |  8.99 |    0.51 |   148.4375 |     3.4180 |     - |   1,215 KB |
+|          Placeholder0005 |   100 |    496.86 us |  15.647 us |    45.145 us | 50.65 |    3.92 |   845.7031 |   101.0742 |     - |   6,930 KB |
+|          Literal0010Char |   100 |     10.37 us |   0.199 us |     0.245 us |  1.00 |    0.00 |     3.9215 |          - |     - |      32 KB |
+|          Literal3000Char |   100 |     64.47 us |   1.204 us |     1.126 us |  6.21 |    0.23 |   146.1182 |     3.1738 |     - |   1,196 KB |
+|   Literal6000Placeholder |   100 |    295.81 us |   2.926 us |     2.737 us | 28.47 |    0.87 |   648.9258 |    53.7109 |     - |   5,320 KB |
+| Literal18kEscPlaceholder |   100 |    391.78 us |   3.079 us |     2.880 us | 37.70 |    1.17 |   913.0859 |   101.0742 |     - |   7,473 KB |
+|                          |       |              |            |              |       |         |            |            |       |            |
+|              Placeholder | 10000 | 10,758.24 us | 159.495 us |   149.192 us | 10.30 |    0.22 | 14843.7500 |   343.7500 |     - | 121,484 KB |
+|          Placeholder0005 | 10000 | 47,659.35 us | 907.987 us | 1,080.894 us | 45.90 |    1.30 | 84600.0000 | 10100.0000 |     - | 692,969 KB |
+|          Literal0010Char | 10000 |  1,042.43 us |  18.413 us |    16.323 us |  1.00 |    0.00 |   390.6250 |          - |     - |   3,203 KB |
+|          Literal3000Char | 10000 |  6,227.31 us | 120.366 us |   138.613 us |  5.95 |    0.16 | 14617.1875 |   320.3125 |     - | 119,609 KB |
+|   Literal6000Placeholder | 10000 | 27,852.48 us | 553.720 us | 1,561.776 us | 26.30 |    0.81 | 64906.2500 |  5406.2500 |     - | 532,031 KB |
+| Literal18kEscPlaceholder | 10000 | 38,686.09 us | 757.920 us |   671.876 us | 37.12 |    0.93 | 91285.7143 | 10071.4286 |     - | 747,344 KB |
 
 NullOutput
-|                   Method |     N |          Mean |      Error |     StdDev | Ratio | RatioSD |    Gen 0 | Gen 1 | Gen 2 | Allocated |
-|------------------------- |------ |--------------:|-----------:|-----------:|------:|--------:|---------:|------:|------:|----------:|
-|              Placeholder |   100 |     25.129 us |  0.2449 us |  0.2290 us |  4.41 |    0.22 |   3.3264 |     - |     - |     27 KB |
-|          Placeholder0005 |   100 |     95.053 us |  1.8962 us |  1.9473 us | 16.53 |    1.00 |   7.4463 |     - |     - |     62 KB |
-|          Literal0010Char |   100 |      5.918 us |  0.1180 us |  0.2329 us |  1.00 |    0.00 |   2.0065 |     - |     - |     16 KB |
-|          Literal3000Char |   100 |      6.079 us |  0.1213 us |  0.1191 us |  1.06 |    0.05 |   2.0065 |     - |     - |     16 KB |
-|   Literal6000Placeholder |   100 |     27.199 us |  0.5289 us |  0.6091 us |  4.68 |    0.23 |   3.3264 |     - |     - |     27 KB |
-| Literal18kUniPlaceholder |   100 |     27.922 us |  0.4137 us |  0.3870 us |  4.90 |    0.23 |   3.3264 |     - |     - |     27 KB |
-|                          |       |               |            |            |       |         |          |       |       |           |
-|              Placeholder | 10000 |  2,306.803 us | 22.6403 us | 21.1777 us |  3.93 |    0.08 | 332.0313 |     - |     - |  2,734 KB |
-|          Placeholder0005 | 10000 | 10,003.514 us | 87.6414 us | 81.9799 us | 17.03 |    0.40 | 750.0000 |     - |     - |  6,172 KB |
-|          Literal0010Char | 10000 |    580.249 us | 10.7885 us | 16.1477 us |  1.00 |    0.00 | 200.1953 |     - |     - |  1,641 KB |
-|          Literal3000Char | 10000 |    549.604 us | 10.8901 us | 23.4421 us |  0.96 |    0.04 | 200.1953 |     - |     - |  1,641 KB |
-|   Literal6000Placeholder | 10000 |  2,752.734 us | 51.4145 us | 52.7989 us |  4.70 |    0.13 | 332.0313 |     - |     - |  2,734 KB |
-| Literal18kUniPlaceholder | 10000 |  2,627.360 us | 49.5915 us | 46.3879 us |  4.47 |    0.13 | 332.0313 |     - |     - |  2,734 KB |
+|                   Method |     N |          Mean |       Error |      StdDev | Ratio | RatioSD |      Gen 0 |   Gen 1 | Gen 2 |  Allocated |
+|------------------------- |------ |--------------:|------------:|------------:|------:|--------:|-----------:|--------:|------:|-----------:|
+|              Placeholder |   100 |     25.964 us |   0.5008 us |   0.5767 us |  4.28 |    0.14 |     3.5095 |       - |     - |      29 KB |
+|          Placeholder0005 |   100 |    108.185 us |   1.1526 us |   0.9625 us | 17.73 |    0.37 |     8.4229 |       - |     - |      70 KB |
+|          Literal0010Char |   100 |      6.064 us |   0.1175 us |   0.1354 us |  1.00 |    0.00 |     2.0065 |       - |     - |      16 KB |
+|          Literal3000Char |   100 |      5.933 us |   0.1175 us |   0.1759 us |  0.99 |    0.03 |     2.0065 |       - |     - |      16 KB |
+|   Literal6000Placeholder |   100 |     88.677 us |   0.7209 us |   0.6390 us | 14.54 |    0.30 |   147.0947 |       - |     - |   1,202 KB |
+| Literal18kEscPlaceholder |   100 |    122.497 us |   0.5515 us |   0.5159 us | 20.07 |    0.43 |   219.6045 |  0.1221 |     - |   1,795 KB |
+|                          |       |               |             |             |       |         |            |         |       |            |
+|              Placeholder | 10000 |  2,550.337 us |  26.7585 us |  23.7207 us |  4.54 |    0.06 |   351.5625 |       - |     - |   2,891 KB |
+|          Placeholder0005 | 10000 | 10,847.854 us | 183.6711 us | 171.8061 us | 19.26 |    0.39 |   843.7500 |       - |     - |   6,953 KB |
+|          Literal0010Char | 10000 |    563.425 us |   8.8864 us |   8.3123 us |  1.00 |    0.00 |   200.1953 |       - |     - |   1,641 KB |
+|          Literal3000Char | 10000 |    585.451 us |   6.9466 us |   6.4979 us |  1.04 |    0.02 |   200.1953 |       - |     - |   1,641 KB |
+|   Literal6000Placeholder | 10000 |  9,179.534 us | 178.6525 us | 272.8212 us | 16.01 |    0.54 | 14703.1250 |       - |     - | 120,234 KB |
+| Literal18kEscPlaceholder | 10000 | 13,271.904 us |  42.8786 us |  40.1087 us | 23.56 |    0.35 | 21953.1250 | 15.6250 |     - | 179,453 KB |
+
 */
 
     [SimpleJob(RuntimeMoniker.Net50)]
@@ -93,11 +86,11 @@ NullOutput
             _parser.AddOperators(".?,[]");
         }
 
-        public IOutput GetOutput(int capacity)
+        public StringOutput GetOutput(Format format)
         {
             // Note: a good estimation of the expected output length is essential for performance and GC pressure
             //return new NullOutput();
-            return new StringOutput(capacity);
+            return new StringOutput(format.baseString.Length + format.Items.Count * 8);
         }
 
         [Params(100, 10000)]
@@ -113,7 +106,9 @@ NullOutput
         {
             for (var i = 0; i < N; i++)
             {
-                _literalFormatter.FormatWithCacheInto(ref _placeholderFormat, GetOutput(_placeholderFormat.Format.baseString.Length), string.Empty, "ph1");
+                var output = GetOutput(_placeholderFormat.Format);
+                _literalFormatter.FormatWithCacheInto(ref _placeholderFormat, output, string.Empty, LoremIpsum );
+                _ = output.ToString();
             }
         }
 
@@ -122,7 +117,9 @@ NullOutput
         {
             for (var i = 0; i < N; i++)
             {
-                _literalFormatter.FormatWithCacheInto(ref _placeholder0005Format, GetOutput(_placeholder0005Format.Format.baseString.Length), string.Empty, "ph1", "ph2", "ph3", "ph4", "ph5");
+                var output = GetOutput(_placeholder0005Format.Format);
+                _literalFormatter.FormatWithCacheInto(ref _placeholder0005Format, output, string.Empty, LoremIpsum, LoremIpsum, LoremIpsum, LoremIpsum, LoremIpsum);
+                _ = output.ToString();
             }
         }
 
@@ -131,7 +128,9 @@ NullOutput
         {
             for (var i = 0; i < N; i++)
             {
-                _literalFormatter.FormatWithCacheInto(ref _literal0010CharFormat, GetOutput(_literal0010CharFormat.Format.baseString.Length), string.Empty);
+                var output = GetOutput(_literal0010CharFormat.Format);
+                _literalFormatter.FormatWithCacheInto(ref _literal0010CharFormat, output, string.Empty);
+                _ = output.ToString();
             }
         }
 
@@ -140,7 +139,9 @@ NullOutput
         {
             for (var i = 0; i < N; i++)
             {
-                _literalFormatter.FormatWithCacheInto(ref _literal3000CharFormat, GetOutput(_literal3000CharFormat.Format.baseString.Length), string.Empty);
+                var output = GetOutput(_literal3000CharFormat.Format);
+                _literalFormatter.FormatWithCacheInto(ref _literal3000CharFormat, output, string.Empty);
+                _ = output.ToString();
             }
         }
 
@@ -149,7 +150,9 @@ NullOutput
         {
             for (var i = 0; i < N; i++)
             {
-                _literalFormatter.FormatWithCacheInto(ref _literal6000PlaceholderFormat, GetOutput(_literal6000PlaceholderFormat.Format.baseString.Length), string.Empty, "ph1");
+                var output = GetOutput(_literal6000PlaceholderFormat.Format);
+                _literalFormatter.FormatWithCacheInto(ref _literal6000PlaceholderFormat, output, string.Empty, LoremIpsum);
+                _ = output.ToString();
             }
         }
 
@@ -158,7 +161,9 @@ NullOutput
         {
             for (var i = 0; i < N; i++)
             {
-                _literalFormatter.FormatWithCacheInto(ref _literal18kEscPlaceholderFormat, GetOutput(_literal18kEscPlaceholderFormat.Format.baseString.Length), string.Empty, "ph1");
+                var output = GetOutput(_literal18kEscPlaceholderFormat.Format);
+                _literalFormatter.FormatWithCacheInto(ref _literal18kEscPlaceholderFormat, output, string.Empty, LoremIpsum);
+                _ = output.ToString();
             }
         }
     }

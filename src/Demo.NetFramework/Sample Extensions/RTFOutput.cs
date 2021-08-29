@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using Cysharp.Text;
 using RTF;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
+#nullable enable
 
 namespace SmartFormat.Demo.Sample_Extensions
 {
@@ -26,23 +28,23 @@ namespace SmartFormat.Demo.Sample_Extensions
             output = new RTFBuilder();
         }
 
-        public void Write(string text, IFormattingInfo formattingInfo)
+        public void Write(string text, IFormattingInfo? formattingInfo)
         {
             Write(text, 0, text.Length, formattingInfo);
         }
-        public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
+        public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo)
         {
             Write(text.ToString(), 0, text.Length, formattingInfo);
         }
 
-        public void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo)
+        public void Write(string text, int startIndex, int length, IFormattingInfo? formattingInfo)
         {
             // Depending on the nested level, we will color this item differently:
-            if (formattingInfo.FormatDetails.FormattingException != null)
+            if (formattingInfo?.FormatDetails.FormattingException != null)
             {
                 output.BackColor(errorColor).Append(text, startIndex, length);
             }
-            else if (formattingInfo.Placeholder == null)
+            else if (formattingInfo?.Placeholder == null)
             {
                 // There is no "nesting" so just output plain text:
                 output.Append(text, startIndex, length);
@@ -55,6 +57,15 @@ namespace SmartFormat.Demo.Sample_Extensions
             }
         }
 
+        ///<inheritdoc/>
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo)
+        {
+#if NETSTANDARD2_1
+            output.Append(stringBuilder.AsSpan());
+#else
+            output.Append(stringBuilder.ToString());
+#endif
+        }
 
         public override string ToString()
         {

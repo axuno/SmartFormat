@@ -26,10 +26,17 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Formatter_With_Params_Objects()
+        public void Formatter_With_Numeric_Params_Objects()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             Assert.That(formatter.Format("ABC{0}{1}DEF", 0, 1), Is.EqualTo("ABC01DEF"));
+        }
+
+        [Test]
+        public void Formatter_With_String_Params_Objects()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("Name: {0}", "Joe"), Is.EqualTo("Name: Joe"));
         }
 
         [Test]

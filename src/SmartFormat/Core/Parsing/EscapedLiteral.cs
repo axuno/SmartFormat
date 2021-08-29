@@ -59,7 +59,7 @@ namespace SmartFormat.Core.Parsing
             var unicode = input.Length - startIndex >= 4
                 ? input.Slice(startIndex, 4)
                 : input.Slice(startIndex);
-#if NETSTANDARD
+#if NETSTANDARD2_1
             if (int.TryParse(unicode, NumberStyles.HexNumber, null, out var result))
 #else
             if (int.TryParse(unicode.ToString(), NumberStyles.HexNumber, null, out var result))
