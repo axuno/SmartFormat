@@ -25,17 +25,17 @@ namespace SmartFormat.Core.Output
         }
 
         ///<inheritdoc/>
-        public void Write(string text, IFormattingInfo formattingInfo)
+        public void Write(string text, IFormattingInfo? formattingInfo = null)
         {
         }
 
         ///<inheritdoc/>
-        public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
+        public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
         {
         }
 
         ///<inheritdoc/>
-        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo)
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
         }
 

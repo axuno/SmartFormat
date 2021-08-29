@@ -48,7 +48,7 @@ namespace SmartFormat.Core.Output
         /// </summary>
         /// <param name="text"></param>
         /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
-        public void Write(string text, IFormattingInfo formattingInfo)
+        public void Write(string text, IFormattingInfo? formattingInfo = null)
         {
             _output.Append(text);
         }
@@ -58,7 +58,7 @@ namespace SmartFormat.Core.Output
         /// </summary>
         /// <param name="text">The text to write.</param>
         /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
-        public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
+        public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
         {
 #if NETSTANDARD2_1
             _output.Append(text);
@@ -68,7 +68,7 @@ namespace SmartFormat.Core.Output
         }
 
         ///<inheritdoc/>
-        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo)
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
 #if NETSTANDARD2_1
             _output.Append(stringBuilder.AsSpan());

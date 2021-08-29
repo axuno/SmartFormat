@@ -29,22 +29,14 @@ namespace SmartFormat.Core.Output
         /// </summary>
         public TextWriter Output { get; }
 
-        /// <summary>
-        /// Writes text to the <see cref="TextWriter"/> object.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
-        public void Write(string text, IFormattingInfo formattingInfo)
+        ///<inheritdoc/>
+        public void Write(string text, IFormattingInfo? formattingInfo = null)
         {
             Output.Write(text);
         }
 
-        /// <summary>
-        /// Writes text to the <see cref="TextWriter"/> object.
-        /// </summary>
-        /// <param name="text">The text to write.</param>
-        /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
-        public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
+        ///<inheritdoc/>
+        public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
         {
 #if NETSTANDARD2_1
             Output.Write(text);
@@ -53,10 +45,14 @@ namespace SmartFormat.Core.Output
 #endif
         }
 
-        
-        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo)
+        ///<inheritdoc/>
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
-            throw new NotImplementedException();
+#if NETSTANDARD2_1
+            Output.Write(stringBuilder.AsSpan());
+#else
+            Output.Write(stringBuilder.ToString());
+#endif
         }
     }
 }

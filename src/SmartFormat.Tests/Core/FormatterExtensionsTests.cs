@@ -65,7 +65,8 @@ namespace SmartFormat.Tests.Core
         {
             foreach (var formatter in GetAllFormatters().Where(f => f.CanAutoDetect))
             {
-                Assert.That(() => formatter.TryEvaluateFormat(FormattingInfo.Create("", new List<object> {new()})),
+                var fi = FormattingInfo.Create("", new List<object> {new()});
+                Assert.That(() => formatter.TryEvaluateFormat(fi),
                     Throws.Nothing);
             }
         }

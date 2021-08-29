@@ -16,27 +16,27 @@ namespace SmartFormat.Core.Output
     /// </summary>
     public class ZStringOutput : IOutput, IDisposable
     {
-        // DefaultBufferSize of Utf16ValueStringBuilder
-        internal const int DefaultBufferSize = 32768; 
-        private Utf16ValueStringBuilder _output;
+        /// <summary>
+        /// Returns the <see cref="Utf16ValueStringBuilder"/> used for output.
+        /// </summary>
+        /// <remarks>Must NOT be a property.</remarks>
+        public Utf16ValueStringBuilder Output;
 
         /// <summary>
         /// Creates a new instance of <see cref="ZStringOutput"/>.
         /// </summary>
         public ZStringOutput()
         {
-            _output = ZString.CreateStringBuilder();
+            Output = ZString.CreateStringBuilder();
         }
 
         /// <summary>
         /// Creates a new instance of <see cref="ZStringOutput"/> with the given initial capacity.
         /// </summary>
+        /// <param name="capacity">The estimated capacity required. This will reduce or avoid incremental buffer increases.</param>
         public ZStringOutput(int capacity)
         {
-            _output = ZString.CreateStringBuilder();
-            
-            if(capacity > DefaultBufferSize)
-                _output.Grow(capacity - DefaultBufferSize);
+            Output = Utilities.ZStringExtensions.CreateStringBuilder(capacity);
         }
 
         /// <summary>
@@ -44,25 +44,25 @@ namespace SmartFormat.Core.Output
         /// </summary>
         public ZStringOutput(Utf16ValueStringBuilder stringBuilder)
         {
-            _output = stringBuilder;
+            Output = stringBuilder;
         }
 
         ///<inheritdoc/>
-        public void Write(string text, IFormattingInfo formattingInfo)
+        public void Write(string text, IFormattingInfo? formattingInfo = null)
         {
-            _output.Append(text);
+            Output.Append(text);
         }
 
         ///<inheritdoc/>
-        public void Write(ReadOnlySpan<char> text, IFormattingInfo formattingInfo)
+        public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
         {
-            _output.Append(text);
+            Output.Append(text);
         }
 
         ///<inheritdoc/>
-        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo formattingInfo)
+        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
-            _output.Append(stringBuilder);
+            Output.Append(stringBuilder);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace SmartFormat.Core.Output
         /// </summary>
         public override string ToString()
         {
-            return _output.ToString();
+            return Output.ToString();
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace SmartFormat.Core.Output
         {
             if (disposing)
             {
-                _output.Dispose();
+                Output.Dispose();
             }
         }
 

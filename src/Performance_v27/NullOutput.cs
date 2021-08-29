@@ -5,6 +5,7 @@
 
 using System.Text;
 using SmartFormat.Core.Extensions;
+#nullable enable
 
 namespace SmartFormat.Core.Output
 {
@@ -27,7 +28,7 @@ namespace SmartFormat.Core.Output
         /// </summary>
         /// <param name="text"></param>
         /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
-        public void Write(string text, IFormattingInfo formattingInfo)
+        public void Write(string text, IFormattingInfo? formattingInfo)
         {
         }
 
