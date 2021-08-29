@@ -6,10 +6,35 @@ v3.0.0-alpha.1
 
 ### Current changes merged into the `version/v3.0` branch:
 
+#### Added ValueStringBuilder support ([#193](https://github.com/axuno/SmartFormat/pull/193))
+
+**Significant improvements of performance:**
+
+BenchmarkDotNet performance tests for formatters and `ISource`s now show (depending on different input format strings) the following improvements compared to v2.7.0:
+* **increase in speed by up to 40%**
+* **decrease of GC pressure** (collects are only GC Generation 0, **allocated memory reduced by up to 60%**)
+
+Formatting measured with a cached parsed `Format`, and including the result `string` returned to the caller. `Parser` was already optimized with PR [#187](https://github.com/axuno/SmartFormat/pull/187). See details in performance tests:
+
+v3.0.0-alpha.1:
+* [Parser performance](https://github.com/axuno/SmartFormat/blob/version/v3.0/src/Performance/ParserTests.cs)
+* [Formatting performance](https://github.com/axuno/SmartFormat/blob/version/v3.0/src/Performance/FormatTests.cs)
+* [Sources performance](https://github.com/axuno/SmartFormat/blob/version/v3.0/src/Performance/SourcePerformanceTests.cs)
+
+v2.7.0:
+* [Parser performance](https://github.com/axuno/SmartFormat/blob/version/v3.0/src/Performance_v27/ParserTests.cs)
+* [Formatting performance](https://github.com/axuno/SmartFormat/blob/version/v3.0/src/Performance_v27/FormatTests.cs)
+* [Sources performance](https://github.com/axuno/SmartFormat/blob/version/v3.0/src/Performance_v27/SourcePerformanceTests.cs)
+
+**Changes in detail:**
+* Added [Cysharp/ZString](https://github.com/Cysharp/ZString) as a git subtree to SmartFormat
+* Added project `SmartFormat.ZString`
+* Replaced all `StringBuilder` implementations with `Utf16ValueStringBuilder`, and all `StringOutput` implementations with `ZStringOutput`
+* Included `SmartFormat.ZString` into the nuget package
+
 #### Target frameworks ([#189](https://github.com/axuno/SmartFormat/pull/189))
 
-* Changed `netstandard2.0` to `netstandard2.1`.
-* `net461` support unchanged.
+* Added `netstandard2.1` besides `netstandard2.0` (`net461`+ will use `netstandard2.0` assemblies). `netstandard2.1` provides more built-in support for `ReadOnlySpan<T>` et al.
 * Added package `System.Memory`
 
 #### Remove repetitive substring allocations ([#189](https://github.com/axuno/SmartFormat/pull/189))

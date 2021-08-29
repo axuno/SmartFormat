@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo.NetFramework", "Demo.N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Performance_v27", "Performance_v27\Performance_v27.csproj", "{4F888B7B-CDC1-495C-B054-93E5895AC05F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.ZString", "SmartFormat.ZString\SmartFormat.ZString.csproj", "{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{4F888B7B-CDC1-495C-B054-93E5895AC05F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4F888B7B-CDC1-495C-B054-93E5895AC05F}.Release|x86.ActiveCfg = Release|Any CPU
 		{4F888B7B-CDC1-495C-B054-93E5895AC05F}.Release|x86.Build.0 = Release|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Debug|x86.Build.0 = Debug|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Release|x86.ActiveCfg = Release|Any CPU
+		{EB7A44EC-24CD-409B-8F0A-2FFCD2D25685}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

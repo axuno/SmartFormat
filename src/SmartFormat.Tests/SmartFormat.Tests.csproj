@@ -4,14 +4,14 @@
 		<Description>Unit tests for SmartFormat</Description>
 		<AssemblyTitle>SmartFormat.Test</AssemblyTitle>
 		<Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-    <TargetFrameworks>net462;net5.0</TargetFrameworks>
+        <TargetFrameworks>net462;net5.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants)</DefineConstants>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<AssemblyName>SmartFormat.Tests</AssemblyName>
 		<AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
+        <DelaySign>false</DelaySign>
 		<SignAssembly>true</SignAssembly>
-    <IsPackable>false</IsPackable>
+        <IsPackable>false</IsPackable>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
@@ -24,6 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
 	  <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
 	</ItemGroup>
 

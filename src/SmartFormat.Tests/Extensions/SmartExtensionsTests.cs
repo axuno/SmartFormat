@@ -189,17 +189,5 @@ namespace SmartFormat.Tests.Extensions
         }
 
         #endregion
-
-        #region : StringOutputTests :
-
-        [Test]
-        public void StringOutputTest()
-        {
-            var so = new StringOutput();
-            so.Write("text".AsSpan(0, 2), null!);
-            Assert.AreEqual("te", so.ToString());
-        }
-
-        #endregion
     }
 }

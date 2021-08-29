@@ -385,14 +385,21 @@ namespace SmartFormat.Core.Parsing
         {
             if (_literalTextCache != null) return _literalTextCache;
 
-            var sb = new StringBuilder(Length + Items.Count * 8);
-            foreach (var item in Items)
+            using var sb = Utilities.ZStringExtensions.CreateStringBuilder(this);
+            try
             {
-                if (item is LiteralText literalItem) sb.Append(literalItem);
-            }
+                foreach (var item in Items)
+                {
+                    if (item is LiteralText literalItem) sb.Append(literalItem.AsSpan());
+                }
 
-            _literalTextCache = sb.ToString();
-            return _literalTextCache;
+                _literalTextCache = sb.ToString();
+                return _literalTextCache;
+            }
+            finally
+            {
+                sb.Dispose();
+            }
         }
 
         /// <summary>
@@ -403,10 +410,17 @@ namespace SmartFormat.Core.Parsing
         {
             if (_toStringCache != null) return _toStringCache;
 
-            var sb = new StringBuilder(EndIndex - StartIndex);
-            foreach (var item in Items) sb.Append(item);
-            _toStringCache = sb.ToString();
-            return _toStringCache;
+            using var sb = Utilities.ZStringExtensions.CreateStringBuilder(this);
+            try
+            {
+                foreach (var item in Items) sb.Append(item.AsSpan());
+                _toStringCache = sb.ToString();
+                return _toStringCache;
+            }
+            finally
+            {
+                sb.Dispose();
+            }
         }
 
         #endregion

@@ -29,13 +29,25 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Format_WithCache_Into()
+        public void Format_WithCache_Into_StringOutput()
         {
             var data = new {Name = "Joe", City = "Melbourne"};
             var formatter = GetSimpleFormatter();
             var formatString = "{Name}, {City}";
             var format = formatter.Parser.ParseFormat(formatString);
             var output = new StringOutput();
+            formatter.FormatInto(output, format, data);
+            Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
+        }
+
+        [Test]
+        public void Format_WithCache_Into_ZStringOutput()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString);
+            using var output = new ZStringOutput();
             formatter.FormatInto(output, format, data);
             Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
         }
