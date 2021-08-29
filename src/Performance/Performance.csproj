@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
     <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
   </ItemGroup>
 

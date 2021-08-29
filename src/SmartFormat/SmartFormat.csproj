@@ -3,8 +3,6 @@
     <PropertyGroup>
         <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
-        <Version>3.0.0</Version>
-        <FileVersion>3.0.0</FileVersion>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG</DefineConstants>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -19,12 +17,19 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
+        <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
         <PackageLicenseFile></PackageLicenseFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <!-- EmbedUntrackedSources for deterministic build -->
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>
@@ -41,6 +46,8 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <WarningLevel>3</WarningLevel>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>
@@ -64,7 +71,18 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
+        <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj">
+            <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+          <IncludeAssets>SmartFormat.ZString.dll</IncludeAssets>
+        </ProjectReference>
     </ItemGroup>
+
+    <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+        </ItemGroup>
+    </Target>
 
 </Project>
