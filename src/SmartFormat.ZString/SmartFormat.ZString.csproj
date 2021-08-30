@@ -27,6 +27,12 @@
       <DefineConstants>TRACE</DefineConstants>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <WarningLevel>3</WarningLevel>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
     <ItemGroup>
       <Compile Remove="repo\docs\**" />
       <Compile Remove="repo\sandbox\**" />
