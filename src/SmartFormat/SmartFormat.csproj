@@ -80,6 +80,7 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
 
     <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
     <!-- BuildOnlySettings will add XML-docs to *.nupkg, and PDBs to *.snupkg (if generated) -->
+    <!-- The order of DependsOnTargets arguments is important  -->
     <Target DependsOnTargets="BuildOnlySettings;ResolveReferences" Name="CopyProjectReferencesToPackage">
         <ItemGroup>
             <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
