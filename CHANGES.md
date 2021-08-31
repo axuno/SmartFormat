@@ -4,7 +4,7 @@ Latest Changes
 What's new in v3.0.0-alpha.1
 ====
 
-#### 1. Significant boost in performance
+### 1. Significant boost in performance
 After implementing a zero allocation `ValueStringBuilder` based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193):
    * Parsing is 10% faster with 50-80% less GC and memory allocation
    * Formatting is up to 40% faster with with 50% less GC and memory allocation
@@ -13,13 +13,13 @@ More optimizations:
    * Added type cache to `ReflectionSource` which increases speed by factor 4. Thanks to [@karljj1](https://github.com/karljj1). ([#155](https://github.com/axuno/SmartFormat/pull/155)).
    * Optimized `DictionarySource` increases speed by 10% with less GC pressure ([#189](https://github.com/axuno/SmartFormat/pull/189))
 
-#### 2. Exact control of whitespace text output
+### 2. Exact control of whitespace text output
 This was an issue in v2 and was going back to combining `string.Format` compatibility with *Smart.Format* features. This is resolved by setting the desired mode with `SmartSettings.StringFormatCompatibility` (defaults to `false`). ([#172](https://github.com/axuno/SmartFormat/pull/172))
 
-#### 3. Literals may contain any Unicode characters ([#166](https://github.com/axuno/SmartFormat/pull/166))
+### 3. Literals may contain any Unicode characters ([#166](https://github.com/axuno/SmartFormat/pull/166))
 Add unicode escape characters like `"\u1234"`. Thanks to [@karljj1](https://github.com/karljj1).
 
-#### 4. Separate modes for "*Smart.Format* features" and "`string.Format` compatibility"
+### 4. Separate modes for "*Smart.Format* features" and "`string.Format` compatibility"
 
 The mode can be set with `SmartSettings.StringFormatCompatibility`. By default, `SmartSettings.StringFormatCompatibility` is `false`. ([#173](https://github.com/axuno/SmartFormat/pull/173), [#175](https://github.com/axuno/SmartFormat/pull/175))
 
@@ -35,11 +35,11 @@ The mode can be set with `SmartSettings.StringFormatCompatibility`. By default, 
    * Curly braces are escaped the `string.Format` way with `{{` and `}}`. This is the reason for all limitations in `string.Format` compatibility mode
    * `DefaultFormatter` is the only formatter which will be invoked. `null` will be output as `string.Empty`.
 
-#### 5. Unlimited characters in formatter options ([#164](https://github.com/axuno/SmartFormat/pull/164), [#165](https://github.com/axuno/SmartFormat/pull/165))
+### 5. Unlimited characters in formatter options ([#164](https://github.com/axuno/SmartFormat/pull/164), [#165](https://github.com/axuno/SmartFormat/pull/165))
 
 This was a big limitation in v2. In v3, the `Parser` can parse any character as part of formatter options. This means e.g. no limitations for `RegEx` expressions used in `IsMatchFormatter`. Note: Special characters like `(){}:\` must be escaped with `\`.
 
-#### 6. Simplified caching of parser result ([#183](https://github.com/axuno/SmartFormat/pull/183))
+### 6. Simplified caching of parser result ([#183](https://github.com/axuno/SmartFormat/pull/183))
 "Parse once, format often" is simplified: The `Parser`'s `Format` result can be directly used as a parameter of the `SmartFormatter`.
 ```Csharp
 var temperatures = new[] {-20, -10, -15};
@@ -62,14 +62,14 @@ in the *foreach* loop.
 
 Class `FormatCache` has been removed in v3.
 
-#### 7. Global support for Alignment ([#174](https://github.com/axuno/SmartFormat/pull/174))
+### 7. Global support for Alignment ([#174](https://github.com/axuno/SmartFormat/pull/174))
 In v2, Alignment of output values was limited to the `DefaultFormatter`. It's about the equivalent to e.g. `string.Format("{0,10}")`. 
 
 * Alignment is now supported by all `IFormatter`s.
 * Introduced `FormatterSettings.AlignmentFillCharacter`, to customize the the fill character. Default is space (0x20), like with `string.Format`.
 * Modified `ListFormatter` so that items can be aligned (but the spacers stay untouched).
 
-#### 8. Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178))
+### 8. Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178))
 The `StringSource` takes over functionality, which have been implemented in `ReflectionSource` in v2. Compared to reflection caching, speed is 15% better and has 10% less memory allocation.
 
 `StringSource` brings the following built-in methods (as selector names):
@@ -93,7 +93,7 @@ Smart.Format("{0.ToLower.TrimStart.TrimEnd.ToBase64}", " ABCDE ");
 // result: "YWJjZGU="
 ```
 
-#### 9. Introduced Nullable Notation ([#176](https://github.com/axuno/SmartFormat/pull/176))
+### 9. Introduced Nullable Notation ([#176](https://github.com/axuno/SmartFormat/pull/176))
 
 C# like `nullable` notation allows to display `Nullable<T>` types.
 
@@ -103,7 +103,7 @@ The nullable operator can also be used for evaluating a list index. E.g.: `Smart
 
 **Note:** Trying to evaluate `null` without the nullable operator will result in a formatting exception. This is the same behavior as in v2.
 
-#### 10. Added `NullFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/176))
+### 10. Added `NullFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/176))
 
 In the context of Nullable Notation, the `NullFormatter` has been added. It outputs a custom string literal, if the variable is `null`, else `string.Empty`.
 
@@ -113,26 +113,26 @@ Smart.Format("{TheValue:isnull:This value is null}", new {TheValue = null});
 // Result: "The value is null"
 ```
 
-#### 11. Improved custom `ISource` and `IFormatter` implementations ([#180](https://github.com/axuno/SmartFormat/pull/180))
+### 11. Improved custom `ISource` and `IFormatter` implementations ([#180](https://github.com/axuno/SmartFormat/pull/180))
 Any custom exensions can implement `IInitializer`. Then, the `SmartFormatter` will call `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
 
-#### 12. `IFormatter`s have one single, unique name  ([#185](https://github.com/axuno/SmartFormat/pull/185))
+### 12. `IFormatter`s have one single, unique name  ([#185](https://github.com/axuno/SmartFormat/pull/185))
 In v2, `IFormatter`s could have an unlimited number of names. 
 To improve performance, in v3, this is limited to one single, unique name.
 
-#### 13. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177))
+### 13. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177))
 
 Separation of `JsonSource` into 2 `ISource` extensions:
 * `NewtonSoftJsonSource`
 * `SystemTextJsonSource`
 
-#### 14. `SmartFormatter` takes `IList<object>` parameters
+### 14. `SmartFormatter` takes `IList<object>` parameters
 Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to [@karljj1](https://github.com/karljj1)) ([#154](https://github.com/axuno/SmartFormat/pull/154))
 
-#### 15. `SmartObjects` have been removed
+### 15. `SmartObjects` have been removed
 * Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`) ([`092b7b1`](https://github.com/axuno/SmartFormat/commit/092b7b1b5873301bdfeb2b62f221f936efc81430))
 
-#### 16. Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
+### 16. Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
 * Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood
 
 v2.7.0
