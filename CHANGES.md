@@ -54,13 +54,12 @@ var result = Smart.Format("Email {0:ismatch("^\(\(\\w+\([-+.]\\w+\)*@\\w+\([-.]\
 ```Csharp
 var temperatures = new[] {-20, -10, -15};
 // parse once
-var parsedFormat = new Parser().ParseFormat("Temperature at North Pole is {Temp}°.");
+var parsedFormat = new Parser().ParseFormat("Temperature is {Temp}°.");
 // one SmartFormatter instance
 var formatter = Smart.CreateDefaultSmartFormat();
 foreach (var current in temperatures)
 {
     var result = formatter.Format(parsedFormat, new {Temp = current});
-    Smart.Format("Temperature is {Temp}°.", new {Temp = current});
 }
 ```
 This pattern is **much** faster than calling
