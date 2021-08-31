@@ -39,6 +39,16 @@ The mode can be set with `SmartSettings.StringFormatCompatibility`. By default, 
 
 This was a big limitation in v2. In v3, the `Parser` can parse any character as part of formatter options. This means e.g. no limitations for `RegEx` expressions used in `IsMatchFormatter`. Note: Special characters like `(){}:\` must be escaped with `\`.
 
+Say we want to include in the output, whether an email is valid (simplified):
+```CSharp
+var emailRegEx = "^((\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)\s*[;]{0,1}\s*)+$";
+// ask a little helper to escape the RegEx
+var escaped = EscapedLiteral.EscapeCharLiterals('\\', emailRegEx, 0, emailRegEx.Length, true);
+// insert the escaped literal from the helper
+var result = Smart.Format("Email {0:ismatch("^\(\(\\w+\([-+.]\\w+\)*@\\w+\([-.]\\w+\)*\\.\\w+\([-.]\\w+\)*\)\\s*[;]\{0,1\}\\s*\)+$"):{} is valid|{} NOT valid}", "joe@specimen.com");
+// returns "Email joe@specimen.com is valid"
+```
+
 ### 6. Simplified caching of parser result ([#183](https://github.com/axuno/SmartFormat/pull/183))
 "Parse once, format often" is simplified: The `Parser`'s `Format` result can be directly used as a parameter of the `SmartFormatter`.
 ```Csharp
