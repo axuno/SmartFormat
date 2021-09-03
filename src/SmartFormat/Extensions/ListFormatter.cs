@@ -40,8 +40,9 @@ namespace SmartFormat.Extensions
     /// </remarks>
     public class ListFormatter : IFormatter, ISource, IInitializer
     {
-        // Will overridden during Initialize()
+        // Will be overridden during Initialize()
         private SmartSettings _smartSettings = new();
+        private bool _isInitialized = false;
 
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
@@ -107,9 +108,6 @@ namespace SmartFormat.Extensions
         // [ThreadStatic] private static int CollectionIndex = -1;
         // same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
         // Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
-        /// <remarks>
-        /// Wrap, so that CollectionIndex can be used without code changes.
-        /// </remarks>
         private static readonly AsyncLocal<int?> _collectionIndex = new();
 
         /// <remarks>
@@ -120,15 +118,8 @@ namespace SmartFormat.Extensions
         /// </remarks>
         private static int CollectionIndex
         {
-            get
-            {
-                return _collectionIndex.Value ?? -1;
-            }
-
-            set
-            {
-                _collectionIndex.Value = value;
-            }
+            get => _collectionIndex.Value ?? -1;
+            set => _collectionIndex.Value = value;
         }
 
         /// <summary>
@@ -246,7 +237,7 @@ namespace SmartFormat.Extensions
         /// <see langword="true"/>, any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has nullable <c>?</c> as their first operator.
         /// </returns>
         /// <remarks>
-        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
+        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '?[')
         /// </remarks>
         private bool HasNullableOperator(IFormattingInfo formattingInfo)
         {
@@ -258,7 +249,9 @@ namespace SmartFormat.Extensions
         ///<inheritdoc />
         public void Initialize(SmartFormatter smartFormatter)
         {
+            if (_isInitialized) return;
             _smartSettings = smartFormatter.Settings;
+            _isInitialized = true;
         }
     }
 }
