@@ -212,7 +212,7 @@ namespace SmartFormat.Core.Formatting
         /// <param name="format">The input format string.</param>
         /// <param name="data">The data argument.</param>
         /// <returns>A new instance of <see cref="FormattingInfo"/>.</returns>
-        internal static FormattingInfo Create(string format, IList<object> data)
+        internal static FormattingInfo Create(string format, IList<object?> data)
         {
             var formatter = new SmartFormatter(new SmartSettings());
             var formatParsed = formatter.Parser.ParseFormat(format);

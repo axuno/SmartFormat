@@ -5,7 +5,6 @@
 
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {

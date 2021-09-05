@@ -161,7 +161,7 @@ namespace SmartFormat.Tests.Extensions
             var smart = GetFormatter();
             Assert.That(
                 smart.GetFormatterExtension<SubStringFormatter>()!.TryEvaluateFormat(
-                    FormattingInfo.Create("{0::(0,2)}", new List<object>(new[] {new object()}))), Is.EqualTo(false));
+                    FormattingInfo.Create("{0::(0,2)}", new List<object?>(new[] {new object()}))), Is.EqualTo(false));
         }
     }
 }

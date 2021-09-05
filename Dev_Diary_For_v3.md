@@ -1,5 +1,13 @@
 ### Dev Diary for `version/v3.0` branch:
 
+#### All `Format()` methods accept nullable args ([#196](https://github.com/axuno/SmartFormat/pull/196))
+- Opposed to `string.Format` null(able) arguments are allowed.
+- Changes effect classes `Smart` and `SmartFormatter`
+
+#### `ListFormatter` is initialized only once ([#195](https://github.com/axuno/SmartFormat/pull/195))
+- ListFormatter implements `IFormatter`, `ISource`, `IInitializer`.
+- Never mind whether added as `IFormatter` or `ISource` extension first, it will be initialized only once, when `IInitializer.Initialize()` gets called
+
 #### Added ValueStringBuilder support ([#193](https://github.com/axuno/SmartFormat/pull/193))
 
 **Significant improvements of performance:**
