@@ -20,14 +20,14 @@ namespace SmartFormat.Tests.Extensions
         public void Call_With_NonNumeric_Argument_Should_Fail()
         {
             var source = new DefaultSource();
-            Assert.That(source.TryEvaluateSelector(FormattingInfo.Create("{a}", new List<object>())), Is.EqualTo(false));
+            Assert.That(source.TryEvaluateSelector(FormattingInfo.Create("{a}", new List<object?>())), Is.EqualTo(false));
         }
 
         [Test]
         public void TryEvaluateSelector_Should_Fail()
         {
             var source = new SourceImplementation();
-            Assert.That(source.TryEvaluateSelector(FormattingInfo.Create("{Dummy}", new List<object>())), Is.EqualTo(false));
+            Assert.That(source.TryEvaluateSelector(FormattingInfo.Create("{Dummy}", new List<object?>())), Is.EqualTo(false));
         }
     }
 }

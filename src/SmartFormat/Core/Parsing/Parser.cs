@@ -139,7 +139,7 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
         public void UseBraceEscaping()
         {
-            throw new NotImplementedException($"Init-only property {nameof(Settings)}.{nameof(Settings.StringFormatCompatibility)} can only be set in an object initializer");
+            throw new NotSupportedException($"Init-only property {nameof(Settings)}.{nameof(Settings.StringFormatCompatibility)} can only be set in an object initializer");
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace SmartFormat.Core.Parsing
         [Obsolete("This feature has been removed", true)]
         public void UseAlternativeBraces(char opening, char closing)
         {
-            throw new NotImplementedException("This feature has been removed");
+            throw new NotSupportedException("This feature has been removed");
         }
 
         #endregion
