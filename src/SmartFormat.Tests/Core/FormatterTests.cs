@@ -48,12 +48,25 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
+        public void Formatter_With_Null_Args()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("a{0}b{1}c", null, null), Is.EqualTo("abc"));
+        }
+        
+        [Test]
         public void Formatter_With_IList_Objects()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            Assert.That(formatter.Format("{0}{1}", new List<object>{0,1}), Is.EqualTo("01"));
+            Assert.That(formatter.Format("{0}{1}", new List<object?>{0,1}), Is.EqualTo("01"));
         }
 
+        [Test]
+        public void Formatter_With_IList_Null()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("a{0}{1}b", new List<object?>{null, null}), Is.EqualTo("ab"));
+        }
 
         [Test]
         public void Formatter_Throws_Exceptions()

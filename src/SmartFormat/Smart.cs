@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
@@ -25,8 +26,9 @@ namespace SmartFormat
         /// </summary>
         /// <param name="format"></param>
         /// <param name="args"></param>
+        /// <remarks>Use <see cref="Default"/> or <see cref="SmartFormatter"/> for more <i>Format(...)</i> overloads.</remarks>
         /// <returns>The format items in the specified format string replaced with the string representation or the corresponding object.</returns>
-        public static string Format(string format, params object[] args)
+        public static string Format(string format, params object?[] args)
         {
             return Default.Format(format, args);
         }
@@ -37,8 +39,9 @@ namespace SmartFormat
         /// <param name="provider"></param>
         /// <param name="format"></param>
         /// <param name="args"></param>
+        /// <remarks>Use <see cref="Default"/> or <see cref="SmartFormatter"/> for more <i>Format(...)</i> overloads.</remarks>
         /// <returns>The format items in the specified format string replaced with the string representation or the corresponding object.</returns>
-        public static string Format(IFormatProvider provider, string format, params object[] args)
+        public static string Format(IFormatProvider provider, string format, params object?[] args)
         {
             return Default.Format(provider, format, args);
         }
@@ -54,10 +57,11 @@ namespace SmartFormat
         /// <param name="arg0"></param>
         /// <param name="arg1"></param>
         /// <param name="arg2"></param>
+        /// <remarks>Use <see cref="Default"/> or <see cref="SmartFormatter"/> for more <i>Format(...)</i> overloads.</remarks>
         /// <returns>The format items in the specified format string replaced with the string representation or the corresponding object.</returns>
-        public static string Format(string format, object arg0, object arg1, object arg2)
+        public static string Format(string format, object? arg0, object? arg1, object? arg2)
         {
-            return Format(format, new[] {arg0, arg1, arg2});
+            return Default.Format(format,  arg0, arg1, arg2);
         }
 
         /// <summary>
@@ -66,10 +70,11 @@ namespace SmartFormat
         /// <param name="format"></param>
         /// <param name="arg0"></param>
         /// <param name="arg1"></param>
+        /// <remarks>Use <see cref="Default"/> or <see cref="SmartFormatter"/> for more <i>Format(...)</i> overloads.</remarks>
         /// <returns>The format items in the specified format string replaced with the string representation or the corresponding object.</returns>
-        public static string Format(string format, object arg0, object arg1)
+        public static string Format(string format, object? arg0, object? arg1)
         {
-            return Format(format, new[] {arg0, arg1});
+            return Default.Format(format, arg0, arg1);
         }
 
         /// <summary>
@@ -77,10 +82,11 @@ namespace SmartFormat
         /// </summary>
         /// <param name="format"></param>
         /// <param name="arg0"></param>
+        /// <remarks>Use <see cref="Default"/> or <see cref="SmartFormatter"/> for more <i>Format(...)</i> overloads.</remarks>
         /// <returns></returns>
-        public static string Format(string format, object arg0)
+        public static string Format(string format, object? arg0)
         {
-            return Default.Format(format, arg0); // call Default.Format in order to avoid infinite recursive method call
+            return Default.Format(format, arg0);
         }
 
         #endregion
@@ -90,7 +96,7 @@ namespace SmartFormat
         /// <summary>
         /// Gets or sets the default <see cref="SmartFormatter"/>.
         /// If not set, the <see cref="CreateDefaultSmartFormat"/> will be used.
-        /// It is recommended to set the <see cref="Default"/> with the extensions that are actually needed.
+        /// It is recommended to set the <see cref="Default"/> <see cref="SmartFormatter"/> with the extensions that are actually needed.
         /// </summary>
         public static SmartFormatter Default { get; set; } = CreateDefaultSmartFormat();
 
