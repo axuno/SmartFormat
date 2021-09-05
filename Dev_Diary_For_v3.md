@@ -1,6 +1,6 @@
 ### Dev Diary for `version/v3.0` branch:
 
-#### All `Format()` methods accept nullable args ([#197](https://github.com/axuno/SmartFormat/pull/197))
+#### All `Format()` methods accept nullable args ([#196](https://github.com/axuno/SmartFormat/pull/196))
 - Opposed to `string.Format` null(able) arguments are allowed.
 - Changes effect classes `Smart` and `SmartFormatter`
 
