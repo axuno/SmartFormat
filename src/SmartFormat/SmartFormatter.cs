@@ -225,9 +225,9 @@ namespace SmartFormat
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(string format, params object[] args)
+        public string Format(string format, params object?[] args)
         {
-            return Format(null, format, (IList<object>) args);
+            return Format(null, format, (IList<object?>) args);
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace SmartFormat
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(string format, IList<object> args)
+        public string Format(string format, IList<object?> args)
         {
             return Format(null, format, args);
         }
@@ -248,9 +248,9 @@ namespace SmartFormat
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IFormatProvider? provider, string format, params object[] args)
+        public string Format(IFormatProvider? provider, string format, params object?[] args)
         {
-            return Format(provider, format, (IList<object>) args);
+            return Format(provider, format, (IList<object?>) args);
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace SmartFormat
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IFormatProvider? provider, string format, IList<object> args)
+        public string Format(IFormatProvider? provider, string format, IList<object?> args)
         {
             var formatParsed = Parser.ParseFormat(format);
             return Format(provider, formatParsed, args);
@@ -272,9 +272,9 @@ namespace SmartFormat
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, string format, params object[] args)
+        public void FormatInto(IOutput output, string format, params object?[] args)
         {
-            FormatInto(output, format, (IList<object>) args);
+            FormatInto(output, format, (IList<object?>) args);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace SmartFormat
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, string format, IList<object> args)
+        public void FormatInto(IOutput output, string format, IList<object?> args)
         {
             var formatParsed = Parser.ParseFormat(format);
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
@@ -291,7 +291,7 @@ namespace SmartFormat
             Format(formatDetails, current);
         }
 
-        private void Format(FormatDetails formatDetails, object current)
+        private void Format(FormatDetails formatDetails, object? current)
         {
             var formattingInfo = new FormattingInfo(formatDetails, formatDetails.OriginalFormat, current);
             Format(formattingInfo);
@@ -307,9 +307,9 @@ namespace SmartFormat
         /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(Format format, params object[] args)
+        public string Format(Format format, params object?[] args)
         {
-            return Format(null, format, (IList<object>) args);
+            return Format(null, format, (IList<object?>) args);
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace SmartFormat
         /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(Format format, IList<object> args)
+        public string Format(Format format, IList<object?> args)
         {
             return Format(null, format, args);
         }
@@ -330,9 +330,9 @@ namespace SmartFormat
         /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IFormatProvider? provider, Format format, params object[] args)
+        public string Format(IFormatProvider? provider, Format format, params object?[] args)
         {
-            return Format(provider, format, (IList<object>) args);
+            return Format(provider, format, (IList<object?>) args);
         }
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace SmartFormat
         /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
-        public string Format(IFormatProvider? provider, Format format, IList<object> args)
+        public string Format(IFormatProvider? provider, Format format, IList<object?> args)
         {
             using var output = new ZStringOutput(Utilities.ZStringExtensions.CalcCapacity(format));
             try
@@ -365,9 +365,9 @@ namespace SmartFormat
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
         /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, Format format, params object[] args)
+        public void FormatInto(IOutput output, Format format, params object?[] args)
         {
-            FormatInto(output, format, (IList<object>) args);
+            FormatInto(output, format, (IList<object?>) args);
         }
 
         /// <summary>
@@ -376,7 +376,7 @@ namespace SmartFormat
         /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
         /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
         /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, Format format, IList<object> args)
+        public void FormatInto(IOutput output, Format format, IList<object?> args)
         {
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, format, args, null, output);

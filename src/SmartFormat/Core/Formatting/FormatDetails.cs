@@ -25,7 +25,7 @@ namespace SmartFormat.Core.Formatting
         /// <param name="originalArgs">The original set of arguments passed to the format method.</param>
         /// <param name="provider">The <see cref="IFormatProvider"/> that can be used to determine how to format items.</param>
         /// <param name="output">The <see cref="IOutput"/> where the result is written.</param>
-        public FormatDetails(SmartFormatter formatter, Format originalFormat, IList<object> originalArgs,
+        public FormatDetails(SmartFormatter formatter, Format originalFormat, IList<object?> originalArgs,
             IFormatProvider? provider, IOutput output)
         {
             Formatter = formatter;
@@ -50,7 +50,7 @@ namespace SmartFormat.Core.Formatting
         /// The original set of arguments passed to the format method.
         /// These provide global-access to the original arguments.
         /// </summary>
-        public IList<object> OriginalArgs { get; }
+        public IList<object?> OriginalArgs { get; }
 
         /// <summary>
         /// The <see cref="IFormatProvider"/> that can be used to determine how to

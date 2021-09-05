@@ -1,7 +1,7 @@
 Latest Changes
 ====
 
-What's new in v3.0.0-alpha.1
+What's new in v3.0.0-alpha.2
 ====
 
 ### 1. Significant boost in performance
@@ -111,6 +111,10 @@ The *Smart.Format* notation is `"{SomeNullable?.Property}"`. If `SomeNullable` i
 The nullable operator can also be used for evaluating a list index. E.g.: `Smart.Format("{TheList?[1]}")` will output `string.Empty`, if the list variable is null.
 
 **Note:** Trying to evaluate `null` without the nullable operator will result in a formatting exception. This is the same behavior as in v2.
+
+All `Format()` methods accept nullable args (**[#196](https://github.com/axuno/SmartFormat/pull/196)**).
+Opposed to `string.Format` null(able) arguments are allowed.
+
 
 ### 10. Added `NullFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/176))
 
