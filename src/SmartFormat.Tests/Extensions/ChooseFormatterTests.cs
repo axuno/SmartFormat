@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using FluentAssertions.Formatting;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
@@ -101,5 +102,27 @@ namespace SmartFormat.Tests.Extensions
             Assert.Throws<FormattingException>(() => smart.Format(format, arg0));
         }
 
+        [TestCase(1234, 9999, "1,234.00")]
+        [TestCase(null, 9999, "9,999.00")]
+        public void May_Contain_Nested_Formats_As_Choice(int? nullableInt, int valueIfNull, string expected)
+        {
+            var data = new { NullableInt = nullableInt, IntValueIfNull = valueIfNull};
+            var smart = Smart.CreateDefaultSmartFormat();
+            var result = smart.Format(CultureInfo.InvariantCulture, "{NullableInt:choose(null):{IntValueIfNull:N2}|{:N2}}", data);
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [TestCase(1234, 9999, "1,234.00")] // first choose formatter
+        [TestCase(null, 1000, "1k")] // first + nested choose formatter, option 1
+        [TestCase(null, 2000, "2k")] // first + nested choose formatter, option 2
+        public void May_Contain_Nested_Choose_Formats(int? nullableInt, int valueIfNull, string expected)
+        {
+            var data = new { NullableInt = nullableInt, IntValueIfNull = valueIfNull};
+            var smart = Smart.CreateDefaultSmartFormat();
+            var result = smart.Format(CultureInfo.InvariantCulture, "{NullableInt:choose(null):{IntValueIfNull:choose(1000|2000):1k|2k}|{:N2}}", data);
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
     }
 }
