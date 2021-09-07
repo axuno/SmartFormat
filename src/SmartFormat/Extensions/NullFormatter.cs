@@ -7,12 +7,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
     /// <summary>
     /// The class formats <see langword="null"/> values.
     /// </summary>
+    /// <example>
+    /// Smart.Format("{0:isnull:It's null}", arg)
+    /// Smart.Format("{0:isnull:It's null|Not null}", arg)
+    /// Smart.Format("{0:isnull:It's null|{}}", arg)
+    /// </example>
     public class NullFormatter : IFormatter
     {
         /// <summary>
@@ -27,21 +33,59 @@ namespace SmartFormat.Extensions
         ///<inheritdoc/>
         public bool CanAutoDetect { get; set; } = false;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
+        public char SplitChar { get; set; } = '|';
+
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var format = formattingInfo.Format;
-            var current = formattingInfo.CurrentValue;
-
-            switch (current)
+            var currentValue = formattingInfo.CurrentValue;
+            var chooseOptions = formattingInfo.FormatterOptions.AsSpan().Trim();
+            var formats = formattingInfo.Format?.Split(SplitChar);
+            
+            // Check whether arguments can be handled by this formatter
+            if (chooseOptions.Length != 0)
             {
-                case null when format is not null:
-                    formattingInfo.Write(format.GetLiteralText());
-                    return true;
-                default:
-                    formattingInfo.Write(string.Empty);
-                    return true;
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' does not allow choose options");
             }
+            
+            if (formats is null || formats.Count is < 1 or > 2)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' must have 1 or 2 format options");
+            }
+
+            // Use the format for null
+            if (currentValue is null)
+            {
+                formattingInfo.FormatAsChild(formats[0], currentValue);
+                return true;
+            }
+
+            // Use the format for a value other than null
+            if (formats.Count > 1)
+            {
+                formattingInfo.FormatAsChild(formats[1], currentValue);
+                return true;
+            }
+
+            // There is no format for a value other than null
+            formattingInfo.Write(ReadOnlySpan<char>.Empty);
+
+            return true;
         }
     }
 }
