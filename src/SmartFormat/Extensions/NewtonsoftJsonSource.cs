@@ -50,7 +50,12 @@ namespace SmartFormat.Extensions
             var jToken = jsonObject.GetValue(selectorInfo.SelectorText,
                 selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison());
 
-            selectorInfo.Result = jToken ?? throw new FormatException($"'{selectorInfo.SelectorText}'");
+            selectorInfo.Result = jToken?.Type switch {
+                null => throw new FormatException($"'{selectorInfo.SelectorText}'"),
+                JTokenType.Null => null,
+                _ => jToken
+            };
+
             return true;
         }
 

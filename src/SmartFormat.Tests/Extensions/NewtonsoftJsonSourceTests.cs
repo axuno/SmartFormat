@@ -55,7 +55,7 @@ namespace SmartFormat.Tests.Extensions
             // NewtonsoftJsonSource MUST be registered before ReflectionSource (which is not required here)
             // We also need the ListFormatter to process arrays
             smart.AddExtensions(new ListFormatter(), new DefaultSource(), new NewtonsoftJsonSource());
-            smart.AddExtensions(new ListFormatter(), new DefaultFormatter());
+            smart.AddExtensions(new ListFormatter(), new NullFormatter(), new DefaultFormatter());
             return smart;
         }
 
@@ -63,8 +63,8 @@ namespace SmartFormat.Tests.Extensions
         public void Format_Null_Json()
         {
             var jObject = JObject.Parse(JsonNull);
-            var result = GetFormatterWithJsonSource().Format("{Name}", jObject);
-            Assert.AreEqual("", result);
+            var result = GetFormatterWithJsonSource().Format("{Name:isnull:Value is Null|{}}", jObject);
+            Assert.AreEqual("Value is Null", result);
         }
 
         [Test]
