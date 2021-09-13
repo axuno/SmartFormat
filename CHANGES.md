@@ -133,11 +133,13 @@ Any custom exensions can implement `IInitializer`. Then, the `SmartFormatter` wi
 In v2, `IFormatter`s could have an unlimited number of names. 
 To improve performance, in v3, this is limited to one single, unique name.
 
-### 13. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177))
+### 13. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177), [#201](https://github.com/axuno/SmartFormat/pull/201))
 
 Separation of `JsonSource` into 2 `ISource` extensions:
 * `NewtonSoftJsonSource`
 * `SystemTextJsonSource`
+
+Fix: `NewtonSoftJsonSource` handles `null` values correctly ([#201](https://github.com/axuno/SmartFormat/pull/201))
 
 ### 14. `SmartFormatter` takes `IList<object>` parameters
 Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to [@karljj1](https://github.com/karljj1)) ([#154](https://github.com/axuno/SmartFormat/pull/154))
