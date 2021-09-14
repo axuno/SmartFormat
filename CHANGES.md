@@ -118,12 +118,12 @@ Opposed to `string.Format` null(able) arguments are allowed.
 
 ### 10. Added `NullFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/176), [#199](https://github.com/axuno/SmartFormat/pull/199))
 
-In the context of Nullable Notation, the `NullFormatter` has been added. It outputs a custom string literal, if the variable is `null`, else `string.Empty`.
+In the context of Nullable Notation, the `NullFormatter` has been added. It outputs a custom string literal, if the variable is `null`, else another literal (default is `string.Empty`) or `Placeholder`.
 
 Example:
 ```CSharp
 Smart.Format("{TheValue:isnull:This value is null}", new {TheValue = null});
-// Result: "The value is null"
+// Result: "This value is null"
 Smart.Format("{TheValue:isnull:The value is null|The value is {}}", new {TheValue = 1234});
 // Result: "The value is 1234"
 ```
