@@ -57,15 +57,7 @@ namespace SmartFormat.Extensions
                 return true;
             }
 
-            // Check whether arguments could be handled by this formatter
-
-            // Auto detection calls just return a failure to evaluate
-            if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
-                return false;
-
-            // throw, if the formatter has been called explicitly
-            throw new FormatException(
-                $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires an {nameof(XElement)} argument.");
+            return false;
         }
     }
 }
