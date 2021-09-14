@@ -121,7 +121,7 @@ namespace SmartFormat
             // sources for specific types must be in the list before ReflectionSource
             formatter.AddExtensions(
                 new StringSource(),
-                (ISource) listSourceAndFormatter, // ListFormatter MUST be the second source extension
+                (ISource) listSourceAndFormatter, // ListFormatter should be one of the first source extensions
                 new DictionarySource(),
                 new ValueTupleSource(),
                 new SystemTextJsonSource(),
@@ -133,9 +133,11 @@ namespace SmartFormat
                 new DefaultSource()
             );
             formatter.AddExtensions(
-                (IFormatter) listSourceAndFormatter,
+                (IFormatter) listSourceAndFormatter, // ListFormatter should be one of the first formatter extensions
                 new PluralLocalizationFormatter("en"),
                 new ConditionalFormatter(),
+                new IsMatchFormatter(),
+                new NullFormatter(),
                 new TimeFormatter("en"),
                 new XElementFormatter(),
                 new ChooseFormatter(),
