@@ -101,6 +101,15 @@ namespace SmartFormat.Core.Settings
         /// </summary>
         public bool ConvertCharacterStringLiterals { get; set; } = true;
 
+
+        /// <summary>
+        /// Gets or sets, whether parsing HTML is enabled.
+        /// If <see langword="true"/>, the <see cref="Parser"/> will treat all content inside 'script' and 'style' HTML tags as literal text.
+        /// This is because scripts and styles may contain curly braces, that interfere with <c>SmartFormat</c>.
+        /// Default is <see langword="false"/>.
+        /// </summary>
+        public bool InputIsHtml { get; set; } = false;
+
         /// <summary>
         /// The character literal escape character for <see cref="PlaceholderBeginChar"/> and <see cref="PlaceholderEndChar"/>,
         /// but also others like for \t (TAB), \n (NEW LINE), \\ (BACKSLASH) and others defined in <see cref="EscapedLiteral"/>.

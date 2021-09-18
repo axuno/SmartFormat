@@ -252,6 +252,13 @@ namespace SmartFormat.Core.Parsing
                 var inputChar = _inputFormat[_index.Current];
                 if (currentPlaceholder == null)
                 {
+                    // We're parsing literal text with an HTML tag
+                    if (_parserSettings.InputIsHtml && inputChar == '<')
+                    {
+                        ParseHtmlTags();
+                        continue;
+                    }
+
                     if (inputChar == _parserSettings.PlaceholderBeginChar)
                     {
                         AddLiteralCharsParsedBefore();
@@ -672,6 +679,107 @@ namespace SmartFormat.Core.Parsing
                 {
                     return;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 'style' and 'script' tags may contain curly or square braces, which SmartFormat uses to identify <see cref="Placeholder"/>s.
+        /// Also, comments may contain any characters, which could mix up the parser.
+        /// That's why the parser will treat all content inside 'style' and 'script' tags as <see cref="LiteralText"/>,
+        /// if <see cref="ParserSettings.InputIsHtml"/> is <see langword="true"/>.
+        /// </summary>
+        private void ParseHtmlTags()
+        {
+            // The tags we will be parsing with this method
+            var scriptTagName = "script".AsSpan();
+            var styleTagName = "style".AsSpan();
+            
+            // The first position is the start of an HTML tag
+            // Move forward to the tag name
+            _index.Current++;
+
+            // Is it a script tag starting with <script
+            var currentTagName = ReadOnlySpan<char>.Empty;
+            if (_inputFormat.AsSpan(_index.Current).StartsWith(scriptTagName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                currentTagName = scriptTagName;
+                _index.Current += currentTagName.Length; // move behind tag name
+            }
+
+            // Is it a style tag starting with <style
+            if (_inputFormat.AsSpan(_index.Current).StartsWith(styleTagName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                currentTagName = styleTagName;
+                _index.Current += currentTagName.Length; // move behind tag name
+            }
+
+            // Not a tag we should parse, stop processing
+            if (currentTagName == ReadOnlySpan<char>.Empty) return;
+
+            // Initialize quoting variables
+            var isQuoting = false;
+            var endQuoteChar = '\"';
+
+            // Parse characters inside script or style tag
+            while (true)
+            {
+                // done
+                if (_index.Current >= _inputFormat.Length) return;
+
+                #region ** Quoted characters (inside of single quotes or double quotes) **
+
+                // text inside quotes (e.g.: const variable = "</script>"; could mix-up the parser                
+                switch (isQuoting)
+                {
+                    case false when _inputFormat[_index.Current] == '\'' || _inputFormat[_index.Current] == '\"':
+                        isQuoting = !isQuoting;
+                        endQuoteChar = _inputFormat[_index.Current]; // start and end quoting char must be equal
+                        _index.Current++;
+                        continue;
+                    case true when _inputFormat[_index.Current] == endQuoteChar:
+                        isQuoting = !isQuoting;
+                        _index.Current++;
+                        continue;
+                    case true:
+                        _index.Current++;
+                        continue;
+                }
+
+                #endregion
+
+                #region ** Parse script and style tags **
+
+                // Is it a self-closing tag like <script/>
+                if (_inputFormat[_index.Current] == '/' && _inputFormat[_index.Current + 1] == '>' && _inputFormat
+                    .AsSpan(_index.Current - 1 - currentTagName.Length)
+                    .StartsWith(currentTagName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _index.Current++;
+                    return;
+                }
+
+                // Is it the start of the end tag like </script>
+                if (_inputFormat[_index.Current] == '<' && _inputFormat[_index.Current + 1] == '/')
+                    // Check whether the end tag is </script> or </style>
+                    if (currentTagName != ReadOnlySpan<char>.Empty && _inputFormat
+                        .AsSpan(_index.Current + 2)
+                        .StartsWith(currentTagName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        _index.Current = _index.SafeAdd(_index.Current, 2 + currentTagName.Length) ; // move behind tag name
+                        if (_index.Current < _inputFormat.Length && _inputFormat[_index.Current] == '>') // closing char
+                            return;
+                    }
+
+                if (_inputFormat.Length > _index.Current)
+                {
+                    _index.Current++;
+                    continue;
+                }
+
+                #endregion
+
+                // We get here, when a script or style tag is not closed
+                return;
             }
         }
 
