@@ -152,7 +152,7 @@ Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to 
 ### 16. Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
 * Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood
 
-### 17. Improved parsing of HTML input
+### 17. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
 
 Introduced experimental `bool ParserSettings.ParseInputAsHtml`.
 The default is `false`.
