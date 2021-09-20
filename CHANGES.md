@@ -1,7 +1,7 @@
 Latest Changes
 ====
 
-What's new in v3.0.0-alpha.2
+What's new in v3.0.0-alpha.3
 ====
 
 ### 1. Significant boost in performance
