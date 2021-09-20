@@ -5,6 +5,7 @@ using SmartFormat.Tests.TestUtils;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SmartFormat.Core.Formatting;
 
 namespace SmartFormat.Tests.Core
 {
@@ -174,141 +175,6 @@ namespace SmartFormat.Tests.Core
 
             Assert.That(parsed.Items.Count, Is.EqualTo(1));
             Assert.That(parsed.Items[0].RawText, Does.StartWith("The format string has 3 issues"));
-        }
-
-        /// <summary>
-        /// SmartFormat is not designed for processing JavaScript because of interfering usage of {}[].
-        /// This example shows that even a comment can lead to parsing will work or not.
-        /// </summary>
-        [TestCase("/* The comment with this '}{' makes it fail */", "############### {TheVariable} ###############", false)]
-        [TestCase("", "############### {TheVariable} ###############", true)]
-        public void Parse_JavaScript_May_Succeed_Or_Fail(string var0, string var1, bool shouldSucceed)
-        {
-            var js = @"
-(function(exports) {
-  'use strict';
-  /**
-   * Searches for specific element in a given array using
-   * the interpolation search algorithm.<br><br>
-   * Time complexity: O(log log N) when elements are uniformly
-   * distributed, and O(N) in the worst case
-   *
-   * @example
-   *
-   * var search = require('path-to-algorithms/src/searching/'+
-   * 'interpolation-search').interpolationSearch;
-   * console.log(search([1, 2, 3, 4, 5], 4)); // 3
-   *
-   * @public
-   * @module searching/interpolation-search
-   * @param {Array} sortedArray Input array.
-   * @param {Number} seekIndex of the element which index should be found.
-   * @returns {Number} Index of the element or -1 if not found.
-   */
-  function interpolationSearch(sortedArray, seekIndex) {
-    let leftIndex = 0;
-    let rightIndex = sortedArray.length - 1;
-
-    while (leftIndex <= rightIndex) {
-      const rangeDiff = sortedArray[rightIndex] - sortedArray[leftIndex];
-      const indexDiff = rightIndex - leftIndex;
-      const valueDiff = seekIndex - sortedArray[leftIndex];
-
-      if (valueDiff < 0) {
-        return -1;
-      }
-
-      if (!rangeDiff) {
-        return sortedArray[leftIndex] === seekIndex ? leftIndex : -1;
-      }
-
-      const middleIndex =
-        leftIndex + Math.floor((valueDiff * indexDiff) / rangeDiff);
-
-      if (sortedArray[middleIndex] === seekIndex) {
-        return middleIndex;
-      }
-
-      if (sortedArray[middleIndex] < seekIndex) {
-        leftIndex = middleIndex + 1;
-      } else {
-        rightIndex = middleIndex - 1;
-      }
-    }
-    " + var0 + @"
-    /* " + var1 + @" */
-    return -1;
-  }
-  exports.interpolationSearch = interpolationSearch;
-})(typeof window === 'undefined' ? module.exports : window);
-";
-            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
-            var parsed = parser.ParseFormat(js);
-
-            // No characters should get lost compared to the format string,
-            // no matter if a Placeholder can be identified or not
-            Assert.That(parsed.Items.Sum(i => i.RawText.Length), Is.EqualTo(js.Length), "No characters lost");
-
-            if (shouldSucceed)
-            {
-                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
-                    "One placeholder");
-                Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
-                    Is.EqualTo("{TheVariable}"));
-            }
-            else
-            {
-                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
-                    "NO placeholder");
-            }
-        }
-        
-        /// <summary>
-        /// SmartFormat is not designed for processing CSS because of interfering usage of {}[].
-        /// This example shows that even a comment can lead to parsing will work or not.
-        /// </summary>
-        [TestCase("", "############### {TheVariable} ###############", false)]
-        [TestCase("/* This '}' in the comment makes it succeed */", "############### {TheVariable} ###############", true)]
-        public void Parse_Css_May_Succeed_Or_Fail(string var0, string var1, bool shouldSucceed)
-        {
-            var css = @"
-.media {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-}
-
-.media .content {
-  font-size: .8rem;
-}
-
-.comment img {
-  border: 1px solid grey;  " + var0 + @"
-  anything: '" + var1 + @"'
-}
-
-.list-item {
-  border-bottom: 1px solid grey;
-} 
-";
-            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
-            var parsed = parser.ParseFormat(css);
-
-            // No characters should get lost compared to the format string,
-            // no matter if a Placeholder can be identified or not
-            Assert.That(parsed.Items.Sum(i => i.RawText.Length), Is.EqualTo(css.Length), "No characters lost");
-
-            if (shouldSucceed)
-            {
-                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
-                    "One placeholders");
-                Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
-                    Is.EqualTo("{TheVariable}"));
-            }
-            else
-            {
-                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
-                    "NO placeholder");
-            }
         }
 
         [Test]
@@ -693,6 +559,225 @@ namespace SmartFormat.Tests.Core
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(4,1)));
             Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2,2)));
+        }
+
+        // Tags which will be skipped by method Parser.ParseHtmlTags()
+        [TestCase("</>")] // nonsense
+        [TestCase("<>")] // nonsense
+        [TestCase("<br/>")] // self-closing tag
+        [TestCase("<p>")] // no closing tag
+        // Tags which will be analyzed by method Parser.ParseHtmlTags()
+        [TestCase("<script />")] // self-closing script
+        [TestCase("<style />")] // self-closing style
+        [TestCase("</script>")] // end script tag without start, won't parse
+        [TestCase("</style>")] // end style tag without start, won't parse
+        [TestCase("<style> something")] // open tag without closing
+        [TestCase("<style></style>")] // start and end tag
+        [TestCase("<script></script>")] // start and end tag
+        [TestCase("<STYLE></style>")] // start and end tag should be case-insensitive
+        [TestCase("<script></SCRIPT>")] // start and end tag should be case-insensitive
+        [TestCase("<script></script")] // end tag not closed correctly
+        [TestCase("<script><illegal/></script>")] // containing a child element of script tag
+        [TestCase("<style><illegal/></style>")] // containing a child element of style tag
+        [TestCase("Something <style></style>! nice")] // tags surrounded by literals
+        [TestCase("Something <script></script>! nice")] // tags surrounded by tags and literals
+        [TestCase("Something <script>{const a='</script>';}</script>! nice")] // assign a variable
+        [TestCase("<script src=\"</script>.js\"></script>")] // script with src-attribute
+        [TestCase("<script>{NoPlaceholder}</script>")] // should not parse as placeholder
+        [TestCase("<style>{NoPlaceholder}</style>")] // should not parse as placeholder
+        [TestCase("Something <style>h1 {color:red;}</style>! nice")]
+        [TestCase("Something <style illegal=\"</style>\"></style>! nice")] // include an HTML attribute
+        public void ParseInputAsHtml(string input)
+        {
+            var parser = GetRegularParser(new SmartSettings
+            {
+                StringFormatCompatibility = false,
+                Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError, ParseInputAsHtml = true }
+            });
+
+            var result = parser.ParseFormat(input);
+
+            Assert.That(result.Items.Count, Is.EqualTo(1));
+            var literalText = result.Items[0] as LiteralText;
+            Assert.That(literalText, Is.Not.Null);
+            Assert.That(literalText!.RawText, Is.EqualTo(input));
+        }
+
+        [TestCase("<script>{Placeholder}</script>", false)] // should parse a placeholder
+        [TestCase("<style>{Placeholder}</style>", false)] // should parse a placeholder
+        [TestCase("Something <style>h1 { color : #000; }</style>! nice", true)] // illegal selector chars
+        [TestCase("Something <script>{const a = '</script>';}</script>! nice", true)] // illegal selector chars
+        public void ParseHtmlInput_Without_ParserSetting_IsHtml(string input, bool shouldThrow)
+        {
+            var parser = GetRegularParser(new SmartSettings
+            {
+                StringFormatCompatibility = false,
+                Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError, ParseInputAsHtml = false }
+            });
+
+            switch (shouldThrow)
+            {
+                case true:
+                    Assert.That(() => _ = parser.ParseFormat(input), Throws.TypeOf<ParsingErrors>());
+                    break;
+                case false:
+                {
+                    var result = parser.ParseFormat(input);
+                    Assert.That(result.Items.Count, Is.EqualTo(3));
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// SmartFormat is able to parse script tags, if <see cref="ParserSettings.ParseInputAsHtml"/> is <see langword="true"/>
+        /// </summary>
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        public void ScriptTags_Can_Be_Parsed_Without_Failure(bool inputIsHtml, bool shouldFail)
+        {
+            var js = @"
+<script type=""text/javascript"">
+(function(exports) {
+  'use strict';
+  /**
+   * Searches for specific element in a given array using
+   * the interpolation search algorithm.<br><br>
+   * Time complexity: O(log log N) when elements are uniformly
+   * distributed, and O(N) in the worst case
+   *
+   * @example
+   *
+   * var search = require('path-to-algorithms/src/searching/'+
+   * 'interpolation-search').interpolationSearch;
+   * console.log(search([1, 2, 3, 4, 5], 4)); // 3
+   *
+   * @public
+   * @module searching/interpolation-search
+   * @param {Array} sortedArray Input array.
+   * @param {Number} seekIndex of the element which index should be found.
+   * @returns {Number} Index of the element or -1 if not found.
+   */
+  function interpolationSearch(sortedArray, seekIndex) {
+    let leftIndex = 0;
+    let rightIndex = sortedArray.length - 1;
+
+    while (leftIndex <= rightIndex) {
+      const rangeDiff = sortedArray[rightIndex] - sortedArray[leftIndex];
+      const indexDiff = rightIndex - leftIndex;
+      const valueDiff = seekIndex - sortedArray[leftIndex];
+
+      if (valueDiff < 0) {
+        return -1;
+      }
+
+      if (!rangeDiff) {
+        return sortedArray[leftIndex] === seekIndex ? leftIndex : -1;
+      }
+
+      const middleIndex =
+        leftIndex + Math.floor((valueDiff * indexDiff) / rangeDiff);
+
+      if (sortedArray[middleIndex] === seekIndex) {
+        return middleIndex;
+      }
+
+      if (sortedArray[middleIndex] < seekIndex) {
+        leftIndex = middleIndex + 1;
+      } else {
+        rightIndex = middleIndex - 1;
+      }
+    }
+    return -1;
+  }
+  exports.interpolationSearch = interpolationSearch;
+})(typeof window === 'undefined' ? module.exports : window);
+/* Comment '}{' which mixes up the parser without ParserSettings.ParseInputAsHtml = true */
+</script>
+<p>############### {TheVariable} ###############</p>
+";
+            var parsingFailures = 0;
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens, ParseInputAsHtml = inputIsHtml}});
+            parser.OnParsingFailure += (o, args) => parsingFailures++;
+            var parsed = parser.ParseFormat(js);
+            
+            // No characters should get lost compared to the format string,
+            // no matter if ParsingErrors occur or not
+            Assert.That(parsed.Items.Sum(i => i.RawText.Length), Is.EqualTo(js.Length), "No characters lost");
+
+            switch (shouldFail)
+            {
+                case true:
+                    Assert.That(parsingFailures, Is.GreaterThan(0));
+                    Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
+                        "NO placeholder");
+                    break;
+                case false:
+                    Assert.That(parsingFailures, Is.EqualTo(0));
+                    Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
+                        "One placeholder");
+                    Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
+                        Is.EqualTo("{TheVariable}"));
+                    break;
+            }
+        }
+        
+        /// <summary>
+        /// SmartFormat is able to parse style tags, if <see cref="ParserSettings.ParseInputAsHtml"/> is <see langword="true"/>
+        /// </summary>
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        public void StyleTags_Can_Be_Parsed_Without_Failure(bool inputIsHtml, bool shouldFail)
+        {
+            var styles = @"
+<style type='text/css'>
+.media {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+
+.media .content {
+  font-size: .8rem;
+}
+
+.comment img {
+  border: 1px solid grey;
+  anything: 'xyz'
+}
+
+.list-item {
+  border-bottom: 1px solid grey;
+}
+/* Comment: { which mixes up the parser without ParserSettings.ParseInputAsHtml = true */
+</style>
+<p>############### {TheVariable} ###############</p>
+";
+            var parsingFailures = 0;
+            var parser = GetRegularParser(new SmartSettings
+            {
+                Parser = new ParserSettings { ErrorAction = ParseErrorAction.MaintainTokens, ParseInputAsHtml = inputIsHtml }
+            });
+            parser.OnParsingFailure += (o, args) => parsingFailures++;
+            var parsed = parser.ParseFormat(styles);
+
+            // No characters should get lost compared to the format string,
+            // no matter if ParsingErrors occur or not
+            Assert.That(parsed.Items.Sum(i => i.RawText.Length), Is.EqualTo(styles.Length), "No characters lost");
+
+            if (shouldFail)
+            {
+                Assert.That(parsingFailures, Is.GreaterThan(0));
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
+                    "NO placeholder");
+            }
+            else
+            {
+                Assert.That(parsingFailures, Is.EqualTo(0));
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
+                    "One placeholders");
+                Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
+                    Is.EqualTo("{TheVariable}"));
+            }
         }
     }
 }
