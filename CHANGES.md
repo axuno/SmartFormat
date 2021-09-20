@@ -152,6 +152,19 @@ Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to 
 ### 16. Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
 * Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood
 
+### 17. Improved parsing of HTML input
+
+Introduced experimental `bool ParserSettings.ParseInputAsHtml`.
+The default is `false`.
+
+If `true`, the`Parser` will parse all content inside &lt;script&gt; and &lt;style&gt; tags as `LiteralText`. All other places may still contain `Placeholder`s.
+
+This is because &lt;script&gt; and &lt;style&gt; tags may contain curly or square braces, that interfere with the SmartFormat {`Placeholder`}.
+
+Best results can only be expected with clean HTML: balanced opening and closing tags, single and double quotes. Also, do not use angle brackets, single and double quotes in script or style comments.
+
+SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleSharp](https://anglesharp.github.io/) or [HtmlAgilityPack](https://html-agility-pack.net/).
+
 v2.7.0
 ===
 * **Fixed** broken backward compatibilty introduced in v2.6.2 (issues referenced in [#148](https://github.com/axuno/SmartFormat/issues/148), [#147](https://github.com/axuno/SmartFormat/issues/147), [#143](https://github.com/axuno/SmartFormat/issues/143)).

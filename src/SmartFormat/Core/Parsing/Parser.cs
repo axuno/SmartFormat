@@ -253,7 +253,7 @@ namespace SmartFormat.Core.Parsing
                 if (currentPlaceholder == null)
                 {
                     // We're parsing literal text with an HTML tag
-                    if (_parserSettings.InputIsHtml && inputChar == '<')
+                    if (_parserSettings.ParseInputAsHtml && inputChar == '<')
                     {
                         ParseHtmlTags();
                         continue;
@@ -686,7 +686,7 @@ namespace SmartFormat.Core.Parsing
         /// 'style' and 'script' tags may contain curly or square braces, which SmartFormat uses to identify <see cref="Placeholder"/>s.
         /// Also, comments may contain any characters, which could mix up the parser.
         /// That's why the parser will treat all content inside 'style' and 'script' tags as <see cref="LiteralText"/>,
-        /// if <see cref="ParserSettings.InputIsHtml"/> is <see langword="true"/>.
+        /// if <see cref="ParserSettings.ParseInputAsHtml"/> is <see langword="true"/>.
         /// </summary>
         private void ParseHtmlTags()
         {

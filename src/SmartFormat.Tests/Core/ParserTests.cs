@@ -592,7 +592,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser(new SmartSettings
             {
                 StringFormatCompatibility = false,
-                Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError, InputIsHtml = true }
+                Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError, ParseInputAsHtml = true }
             });
 
             var result = parser.ParseFormat(input);
@@ -612,7 +612,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser(new SmartSettings
             {
                 StringFormatCompatibility = false,
-                Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError, InputIsHtml = false }
+                Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError, ParseInputAsHtml = false }
             });
 
             switch (shouldThrow)
@@ -630,7 +630,7 @@ namespace SmartFormat.Tests.Core
         }
 
         /// <summary>
-        /// SmartFormat is able to parse script tags, if <see cref="ParserSettings.InputIsHtml"/> is <see langword="true"/>
+        /// SmartFormat is able to parse script tags, if <see cref="ParserSettings.ParseInputAsHtml"/> is <see langword="true"/>
         /// </summary>
         [TestCase(false, true)]
         [TestCase(true, false)]
@@ -692,12 +692,12 @@ namespace SmartFormat.Tests.Core
   }
   exports.interpolationSearch = interpolationSearch;
 })(typeof window === 'undefined' ? module.exports : window);
-/* Comment '}{' which mixes up the parser without ParserSettings.InputIsHtml = true */
+/* Comment '}{' which mixes up the parser without ParserSettings.ParseInputAsHtml = true */
 </script>
 <p>############### {TheVariable} ###############</p>
 ";
             var parsingFailures = 0;
-            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens, InputIsHtml = inputIsHtml}});
+            var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens, ParseInputAsHtml = inputIsHtml}});
             parser.OnParsingFailure += (o, args) => parsingFailures++;
             var parsed = parser.ParseFormat(js);
             
@@ -723,7 +723,7 @@ namespace SmartFormat.Tests.Core
         }
         
         /// <summary>
-        /// SmartFormat is able to parse style tags, if <see cref="ParserSettings.InputIsHtml"/> is <see langword="true"/>
+        /// SmartFormat is able to parse style tags, if <see cref="ParserSettings.ParseInputAsHtml"/> is <see langword="true"/>
         /// </summary>
         [TestCase(false, true)]
         [TestCase(true, false)]
@@ -748,14 +748,14 @@ namespace SmartFormat.Tests.Core
 .list-item {
   border-bottom: 1px solid grey;
 }
-/* Comment: { which mixes up the parser without ParserSettings.InputIsHtml = true */
+/* Comment: { which mixes up the parser without ParserSettings.ParseInputAsHtml = true */
 </style>
 <p>############### {TheVariable} ###############</p>
 ";
             var parsingFailures = 0;
             var parser = GetRegularParser(new SmartSettings
             {
-                Parser = new ParserSettings { ErrorAction = ParseErrorAction.MaintainTokens, InputIsHtml = inputIsHtml }
+                Parser = new ParserSettings { ErrorAction = ParseErrorAction.MaintainTokens, ParseInputAsHtml = inputIsHtml }
             });
             parser.OnParsingFailure += (o, args) => parsingFailures++;
             var parsed = parser.ParseFormat(styles);

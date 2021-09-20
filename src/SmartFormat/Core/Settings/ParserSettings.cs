@@ -103,12 +103,19 @@ namespace SmartFormat.Core.Settings
 
 
         /// <summary>
-        /// Gets or sets, whether parsing HTML is enabled.
-        /// If <see langword="true"/>, the <see cref="Parser"/> will treat all content inside 'script' and 'style' HTML tags as literal text.
-        /// This is because scripts and styles may contain curly braces, that interfere with <c>SmartFormat</c>.
+        /// <para>Experimental.</para>
+        /// Gets or sets, whether the input format should be interpreted as HTML.
+        /// If <see langword="true"/>, the <see cref="Parser"/> will parse all content
+        /// inside &lt;script&gt; and &lt;style&gt; tags as <see cref="LiteralText"/>. All other tags may contain <see cref="Placeholder"/>s.
+        /// This is because &lt;script&gt; and &lt;style&gt; tags may contain curly or square braces, that interfere with <c>SmartFormat</c>.
         /// Default is <see langword="false"/>.
+        /// <para>
+        /// Best results can only be expected with clean HTML: balanced opening and closing tags, single and double quotes.
+        /// Also, do not use angle brackets, single and double quotes in script or style comments.
+        /// <c>SmartFormat</c> is not a fully-fledged HTML parser. If this is required, use <c>AngleSharp</c> or <c>HtmlAgilityPack</c>.
+        /// </para>
         /// </summary>
-        public bool InputIsHtml { get; set; } = false;
+        public bool ParseInputAsHtml { get; set; } = false;
 
         /// <summary>
         /// The character literal escape character for <see cref="PlaceholderBeginChar"/> and <see cref="PlaceholderEndChar"/>,
