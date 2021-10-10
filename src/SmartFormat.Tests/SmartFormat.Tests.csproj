@@ -28,4 +28,28 @@
 	  <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="TestUtils\Localization\LocTest1.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>LocTest1.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="TestUtils\Localization\LocTest2.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>LocTest2.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>LocTest1.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>LocTest2.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
 </Project>
