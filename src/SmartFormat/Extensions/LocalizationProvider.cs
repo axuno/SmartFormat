@@ -97,7 +97,7 @@ namespace SmartFormat.Extensions
                     ? resourceManager.GetString(name, cultureInfo)
                     : resourceManager.GetString(name);
 
-                if (value is null) resourceManager.GetString(name, FallbackCulture);
+                if (value is null && FallbackCulture != null) resourceManager.GetString(name, FallbackCulture);
                 
                 if (value is null) continue;
 
@@ -109,9 +109,8 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Gets or sets the fallback <see cref="CultureInfo"/>, if the localized string cannot be found in the specified culture.
-        /// Default is <see cref="CultureInfo.InvariantCulture"/>;
         /// </summary>
-        public virtual CultureInfo FallbackCulture { get; set; } = CultureInfo.InvariantCulture;
+        public virtual CultureInfo? FallbackCulture { get; set; }
 
         /// <summary>
         /// If <see langword="true"/>, the requested name will be returned, instead of null.
