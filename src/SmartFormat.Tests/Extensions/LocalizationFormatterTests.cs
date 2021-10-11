@@ -15,7 +15,16 @@ namespace SmartFormat.Tests.Extensions
         private static SmartFormatter GetFormatterWithRegisteredResource(CaseSensitivityType caseSensitivity = CaseSensitivityType.CaseSensitive, FormatErrorAction formatErrorAction = FormatErrorAction.ThrowError)
         {
             var formatter = new LocalizationFormatter {CanAutoDetect = false};
-            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings {CaseSensitivity = caseSensitivity, LocalizationProvider = new LocalizationProvider(), Formatter = {ErrorAction = formatErrorAction}});
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
+            {
+                CaseSensitivity = caseSensitivity,
+                Localization =
+                {
+                    LocalizationProvider = new LocalizationProvider
+                        { FallbackCulture = CultureInfo.InvariantCulture, ReturnNameIfNotFound = false }
+                },
+                Formatter = { ErrorAction = formatErrorAction }
+            });
             smart.AddExtensions(formatter);
             ((LocalizationProvider)formatter.LocalizationProvider!).AddResource(new System.Resources.ResourceManager(
                 typeof(LocTest1).FullName!,
@@ -76,6 +85,24 @@ namespace SmartFormat.Tests.Extensions
                 default:
                     throw new ArgumentOutOfRangeException(nameof(errorAction), errorAction, null);
             }
+        }
+
+        [Test]
+        public void No_Localized_String_Found_With_Name_Fallback()
+        {
+            var smart = GetFormatterWithRegisteredResource();
+            ((LocalizationProvider)smart.GetFormatterExtension<LocalizationFormatter>()!.LocalizationProvider!)
+                .ReturnNameIfNotFound = true;
+            var actual = smart.Format("{:L(es):NonExisting}");
+            Assert.That(actual, Is.EqualTo("NonExisting"));
+        }
+
+        [Test]
+        public void No_Localized_String_Only_In_Fallback_Culture()
+        {
+            var smart = GetFormatterWithRegisteredResource();
+            var actual = smart.Format(CultureInfo.GetCultureInfo("pt"), "{:L:OnlyExistForInvariantCulture}");
+            Assert.That(actual, Is.EqualTo("This entry only exists in the invariant culture resource"));
         }
 
         [Test]

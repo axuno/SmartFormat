@@ -97,6 +97,15 @@ namespace SmartFormat.Tests.TestUtils.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This entry only exists in the invariant culture resource.
+        /// </summary>
+        internal static string OnlyExistForInvariantCulture {
+            get {
+                return ResourceManager.GetString("OnlyExistForInvariantCulture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to We translate text.
         /// </summary>
         internal static string WeTranslateText {

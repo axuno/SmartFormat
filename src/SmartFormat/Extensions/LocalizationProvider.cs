@@ -24,7 +24,7 @@ namespace SmartFormat.Extensions
         /// </summary>
         /// <param name="resourceManager"></param>
         /// <param name="caseSensitivity"></param>
-        public void AddResource(ResourceManager resourceManager, CaseSensitivityType caseSensitivity = CaseSensitivityType.CaseSensitive)
+        public virtual void AddResource(ResourceManager resourceManager, CaseSensitivityType caseSensitivity = CaseSensitivityType.CaseSensitive)
         {
             if (Resources.ContainsKey(resourceManager.BaseName)) return;
             resourceManager.IgnoreCase = caseSensitivity == CaseSensitivityType.CaseInsensitive;
@@ -36,7 +36,7 @@ namespace SmartFormat.Extensions
         /// </summary>
         /// <param name="resourceBaseName"></param>
         /// <returns><see langword="true"/>, if the resource could be removed, else <see langword="false"/>.</returns>
-        public bool Remove(string resourceBaseName)
+        public virtual bool Remove(string resourceBaseName)
         {
             if (!Resources.ContainsKey(resourceBaseName)) return false;
             
@@ -48,7 +48,7 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// Remove all resources.
         /// </summary>
-        public void Clear()
+        public virtual void Clear()
         {
             Resources.Clear();
         }
@@ -62,7 +62,7 @@ namespace SmartFormat.Extensions
         /// </remarks>
         /// <param name="input"></param>
         /// <returns>The value from one of the registered resources. If no value was found, the <paramref name="input"/> is returned.</returns>
-        public string? GetString(string input)
+        public virtual string? GetString(string input)
         {
             return GetString(input, default(CultureInfo?));
         }
@@ -74,7 +74,7 @@ namespace SmartFormat.Extensions
         /// <param name="input"></param>
         /// <param name="cultureName"></param>
         /// <returns>The value from one of the registered resources. If no value was found, the <paramref name="input"/> is returned.</returns>
-        public string? GetString(string input, string cultureName)
+        public virtual string? GetString(string input, string cultureName)
         {
             return GetString(input, CultureInfo.GetCultureInfo(cultureName));
         }
@@ -89,7 +89,7 @@ namespace SmartFormat.Extensions
         /// <param name="name"></param>
         /// <param name="cultureInfo"></param>
         /// <returns>The value from one of the registered string resources for the specified culture. If no value was found, the <paramref name="name"/> is returned.</returns>
-        public string? GetString(string name, CultureInfo? cultureInfo)
+        public virtual string? GetString(string name, CultureInfo? cultureInfo)
         {
             foreach (var resourceManager in Resources.Values)
             {
@@ -97,12 +97,25 @@ namespace SmartFormat.Extensions
                     ? resourceManager.GetString(name, cultureInfo)
                     : resourceManager.GetString(name);
 
+                if (value is null) resourceManager.GetString(name, FallbackCulture);
+                
                 if (value is null) continue;
 
                 return value;
             }
 
-            return null;
+            return ReturnNameIfNotFound ? name : null;
         }
+
+        /// <summary>
+        /// Gets or sets the fallback <see cref="CultureInfo"/>, if the localized string cannot be found in the specified culture.
+        /// Default is <see cref="CultureInfo.InvariantCulture"/>;
+        /// </summary>
+        public virtual CultureInfo FallbackCulture { get; set; } = CultureInfo.InvariantCulture;
+
+        /// <summary>
+        /// If <see langword="true"/>, the requested name will be returned, instead of null.
+        /// </summary>
+        public virtual bool ReturnNameIfNotFound { get; set; } = false;
     }
 }

@@ -120,6 +120,9 @@
   <data name="has {:#,#} inhabitants" xml:space="preserve">
     <value>has {:#,#} inhabitants</value>
   </data>
+  <data name="OnlyExistForInvariantCulture" xml:space="preserve">
+    <value>This entry only exists in the invariant culture resource</value>
+  </data>
   <data name="WeTranslateText" xml:space="preserve">
     <value>We translate text</value>
   </data>

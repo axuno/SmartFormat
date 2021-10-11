@@ -93,7 +93,7 @@ namespace SmartFormat.Extensions
         public void Initialize(SmartFormatter smartFormatter)
         {
             _formatter = smartFormatter;
-            LocalizationProvider = _formatter.Settings.LocalizationProvider;
+            LocalizationProvider = _formatter.Settings.Localization.LocalizationProvider;
             var stringComparer = _formatter.Settings.GetCaseSensitivityComparer();
             LocalizedFormatCache = new Dictionary<string, Format>(stringComparer);
         }

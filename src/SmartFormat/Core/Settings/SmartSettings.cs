@@ -5,8 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using SmartFormat.Core.Extensions;
-using SmartFormat.Extensions;
 
 namespace SmartFormat.Core.Settings
 {
@@ -99,11 +97,10 @@ namespace SmartFormat.Core.Settings
         /// Set only during initialization.
         /// </summary>
         public FormatterSettings Formatter { get; set; } = new();
-        
+
         /// <summary>
-        /// Gets or sets the <see cref="ILocalizationProvider"/> used for localizing strings.
-        /// Defaults to <see langword="null"/>.
+        /// Gets the settings for <see cref="Localization"/>.
         /// </summary>
-        public ILocalizationProvider? LocalizationProvider { get; set; }
+        public Localization Localization { get; set; } = new();
     }
 }
