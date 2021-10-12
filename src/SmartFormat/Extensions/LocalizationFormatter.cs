@@ -19,8 +19,11 @@ namespace SmartFormat.Extensions
         private SmartFormatter? _formatter;
         private readonly bool _canHandleAutoDetection = false;
         
+        /// <summary>
+        /// Storage for localized versions of <see cref="Format"/>s
+        /// to avoid repetitive parsing.
+        /// </summary>
         internal IDictionary<string, Format>? LocalizedFormatCache;
-
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
         /// </summary>
@@ -53,12 +56,15 @@ namespace SmartFormat.Extensions
         {
             if (formattingInfo.Format is null || formattingInfo.Format?.Length == 0)
             {
-                throw new LocalizationFormattingException(formattingInfo.Format, "Format string is required for localization", 0);
+                throw new LocalizationFormattingException(formattingInfo.Format,
+                    new ArgumentException("Format for localization must not be null or empty.",
+                        $"{nameof(IFormattingInfo)}.{nameof(IFormattingInfo.Format)}"), 0);
             }
 
             if (LocalizationProvider is null)
             {
-                throw new LocalizationFormattingException(formattingInfo.Format, $"{nameof(LocalizationProvider)} is not initalized with an instance of {nameof(ILocalizationProvider)}", 0);
+                throw new LocalizationFormattingException(formattingInfo.Format,
+                    new NullReferenceException($"The {nameof(ILocalizationProvider)} must not be null."), 0);
             }
 
             var cultureInfo = GetCultureInfo(formattingInfo);
@@ -85,9 +91,9 @@ namespace SmartFormat.Extensions
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ILocalizationProvider"/>.
+        /// The <see cref="ILocalizationProvider"/> that resolves strings to localized versions.
         /// </summary>
-        internal ILocalizationProvider? LocalizationProvider { get; set; }
+        internal ILocalizationProvider? LocalizationProvider;
 
         ///<inheritdoc/>
         public void Initialize(SmartFormatter smartFormatter)
@@ -98,7 +104,7 @@ namespace SmartFormat.Extensions
             LocalizedFormatCache = new Dictionary<string, Format>(stringComparer);
         }
 
-        private CultureInfo GetCultureInfo(IFormattingInfo formattingInfo)
+        private static CultureInfo GetCultureInfo(IFormattingInfo formattingInfo)
         {
             var culture = formattingInfo.FormatterOptions.Trim();
             CultureInfo cultureInfo;
@@ -107,7 +113,7 @@ namespace SmartFormat.Extensions
                 if (formattingInfo.FormatDetails.Provider is CultureInfo ci)
                     cultureInfo = ci;
                 else
-                    cultureInfo = CultureInfo.CurrentUICulture; // also used this way by ResourceManager!
+                    cultureInfo = CultureInfo.CurrentUICulture; // also used this way by ResourceManager
             }
             else
             {

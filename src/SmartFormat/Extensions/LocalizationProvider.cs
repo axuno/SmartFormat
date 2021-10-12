@@ -115,6 +115,9 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// If <see langword="true"/>, the requested name will be returned, instead of null.
         /// </summary>
+        /// <remarks>
+        /// Same behavior as e.g. <c>Microsoft.Extensions.Localization.ResourceManagerStringLocalizer</c>, if <see langword="true"/>.
+        /// </remarks>
         public virtual bool ReturnNameIfNotFound { get; set; } = false;
     }
 }

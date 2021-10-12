@@ -37,7 +37,7 @@ namespace SmartFormat.Tests.Extensions
         public void Missing_Format_Should_Throw()
         {
             var smart = GetFormatterWithRegisteredResource(CaseSensitivityType.CaseSensitive);
-            Assert.That(() => smart.Format("{:L:}"), Throws.InstanceOf<LocalizationFormattingException>());
+            Assert.That(() => smart.Format("{:L:}"), Throws.InstanceOf<LocalizationFormattingException>().With.InnerException.InstanceOf<ArgumentException>());
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace SmartFormat.Tests.Extensions
             var smart = GetFormatterWithRegisteredResource();
             var formatter = smart.GetFormatterExtension<LocalizationFormatter>();
             formatter!.LocalizationProvider = null;
-            Assert.That(() => smart.Format("{:L(en):dummy}"), Throws.InstanceOf<LocalizationFormattingException>());
+            Assert.That(() => smart.Format("{:L(en):dummy}"), Throws.InstanceOf<LocalizationFormattingException>().With.InnerException.InstanceOf<NullReferenceException>());
         }
 
         [TestCase(FormatErrorAction.Ignore)]

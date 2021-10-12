@@ -19,7 +19,7 @@ namespace SmartFormat.Core.Formatting
         /// <param name="errorItem">The <see cref="FormatItem"/> which caused the <see cref="Exception"/>.</param>
         /// <param name="formatException">The <see cref="Exception"/> that was caused by the <see cref="FormatItem"/>.</param>
         /// <param name="index">The index inside the format string, where the error occurred.</param>
-        public FormattingException(FormatItem? errorItem, Exception formatException, int index)
+        public FormattingException(FormatItem? errorItem, Exception formatException, int index) : base(formatException.Message, formatException)
         {
             Format = errorItem?.BaseString;
             ErrorItem = errorItem;
