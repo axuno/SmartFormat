@@ -119,5 +119,6 @@
   </resheader>
   <data name="Jack" xml:space="preserve">
     <value>Jack</value>
+    <comment>Project setting has &lt;NeutralLanguage&gt;en&lt;/NeutralLanguage&gt;</comment>
   </data>
 </root>

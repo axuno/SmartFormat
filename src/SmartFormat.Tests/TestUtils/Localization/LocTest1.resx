@@ -122,6 +122,7 @@
   </data>
   <data name="OnlyExistForInvariantCulture" xml:space="preserve">
     <value>This entry only exists in the invariant culture resource</value>
+    <comment>Project setting has &lt;NeutralLanguage&gt;en&lt;/NeutralLanguage&gt;</comment>
   </data>
   <data name="WeTranslateText" xml:space="preserve">
     <value>We translate text</value>

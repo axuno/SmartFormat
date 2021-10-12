@@ -13,6 +13,7 @@
 		<SignAssembly>true</SignAssembly>
         <IsPackable>false</IsPackable>
 		<Nullable>enable</Nullable>
+        <NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
 
 	<ItemGroup>

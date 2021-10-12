@@ -21,7 +21,7 @@ namespace SmartFormat.Tests.Extensions
                 Localization =
                 {
                     LocalizationProvider = new LocalizationProvider
-                        { FallbackCulture = CultureInfo.InvariantCulture, ReturnNameIfNotFound = false }
+                        { FallbackCulture = null, ReturnNameIfNotFound = false }
                 },
                 Formatter = { ErrorAction = formatErrorAction }
             });
