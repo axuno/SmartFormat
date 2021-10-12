@@ -85,6 +85,7 @@ namespace SmartFormat.Tests.Extensions
             var result = provider.GetString(nameof(LocTest1.WeTranslateText), CultureInfo.GetCultureInfo("es"));
             LocTest1.Culture = CultureInfo.GetCultureInfo("es");
             Assert.That(result, Is.EqualTo(LocTest1.WeTranslateText));
+            Assert.That(result, Is.EqualTo("Traducimos el texto"));
         }
 
         [Test]
@@ -98,13 +99,14 @@ namespace SmartFormat.Tests.Extensions
             var result = provider.GetString(nameof(LocTest1.WeTranslateText), "es");
             LocTest1.Culture = CultureInfo.GetCultureInfo("es");
             Assert.That(result, Is.EqualTo(LocTest1.WeTranslateText));
+            Assert.That(result, Is.EqualTo("Traducimos el texto"));
         }
 
-        [TestCase("Jack", "en")]
-        [TestCase("Jack", "fr")]
-        [TestCase("Jack", "es")]
-        [TestCase("Jack", "de")]
-        public void GetString_2_Resources(string input, string cultureName)
+        [TestCase("Jack", "en", "Jack")]
+        [TestCase("Jack", "fr", "Jean")]
+        [TestCase("Jack", "es", "Juan")]
+        [TestCase("Jack", "de", "Hans")]
+        public void GetString_2_Resources(string input, string cultureName, string expected)
         {
             // Gets the name similar to "Jack" in other languages
             var provider = GetInitializedProvider();
@@ -121,6 +123,7 @@ namespace SmartFormat.Tests.Extensions
             LocTest2.Culture = CultureInfo.GetCultureInfo(cultureName);
             Assert.That(provider.Resources.Count, Is.EqualTo(2));
             Assert.That(result, Is.EqualTo(LocTest2.Jack));
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [Test]
