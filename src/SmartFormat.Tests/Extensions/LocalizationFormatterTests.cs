@@ -126,7 +126,7 @@ namespace SmartFormat.Tests.Extensions
             CultureInfo.CurrentUICulture = culture == string.Empty ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(culture);
 
             var actual = smart.Format(format);
-            Assert.That(expected, Is.EqualTo(actual));
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [TestCase("{:L():WeTranslateText}", "Traducimos el texto", "es")]
@@ -139,7 +139,7 @@ namespace SmartFormat.Tests.Extensions
             var culture = cultureString == string.Empty ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(cultureString);
 
             var actual = smart.Format(culture, format);
-            Assert.That(expected, Is.EqualTo(actual));
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [TestCase("{:L(es):WeTranslateText}", "Traducimos el texto")]
@@ -151,7 +151,7 @@ namespace SmartFormat.Tests.Extensions
             var smart = GetFormatterWithRegisteredResource(CaseSensitivityType.CaseSensitive);
 
             var actual = smart.Format(format);
-            Assert.That(expected, Is.EqualTo(actual));
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         // Possible, but not recommended
