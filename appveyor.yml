@@ -22,6 +22,7 @@ for:
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
       - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
+      - cmd: copy .\SmartFormat.Tests\bin\* ..\..\artifacts\
       - ps: |
           $version = "2.7.0"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
@@ -56,7 +57,6 @@ for:
       - dotnet restore --verbosity quiet
       - dotnet add ./SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
       - dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
-      - copy ./SmartFormat.Tests/bin/* ../../artifacts/
     test_script:
       - dotnet test --no-build --framework net5.0 SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../SmartFormat/SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter|Cysharp" /p:AltCoverLineCover="true"
       - bash <(curl -s https://codecov.io/bash) -f ./SmartFormat.Tests/coverage.net5.0.xml -n net5.0linux
