@@ -22,7 +22,7 @@ for:
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
       - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
-      - cmd: xcopy .\SmartFormat.Tests\bin\* ..\..\artifacts\ /S
+      - cmd: copy .\SmartFormat.Tests\bin\Release\net5.0\SmartFormat.Tests.dll ..\..\artifacts\
       - ps: |
           $version = "2.7.0"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
@@ -40,6 +40,7 @@ for:
     artifacts:
       - path: 'artifacts\*.nupkg'
       - path: 'artifacts\*.snupkg'
+      - path: 'artifacts\*.dll'
     deploy:
       - provider: NuGet
         api_key:
