@@ -68,6 +68,9 @@ namespace SmartFormat.Tests.Extensions
             var result = provider.GetString(nameof(LocTest1.WeTranslateText), CultureInfo.GetCultureInfo("es"));
             LocTest1.Culture = CultureInfo.GetCultureInfo("es");
             Assert.That(result, Is.EqualTo(LocTest1.WeTranslateText));
+            Assert.That(
+                provider.Resources.First().Value
+                    .GetString(nameof(LocTest1.WeTranslateText), CultureInfo.GetCultureInfo("es")), Is.EqualTo("Traducimos el texto"));
             Assert.That(result, Is.EqualTo("Traducimos el texto"));
         }
 
