@@ -75,7 +75,7 @@ namespace SmartFormat.Tests.Extensions
         {
             var smart = GetSimpleFormatter();
             var format = $"{{0.{selector}}}";
-            Assert.That(() => smart.Format(format, "dummy"), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains($"selector \"{selector}\""));
+            Assert.That(() => smart.Format(format, "dummy"), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains($"selector named \"{selector}\""));
         }
 
         [Test]

@@ -13,6 +13,7 @@
 		<SignAssembly>true</SignAssembly>
         <IsPackable>false</IsPackable>
 		<Nullable>enable</Nullable>
+        <NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -26,6 +27,30 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
 	  <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Localization\LocTest1.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>LocTest1.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Localization\LocTest2.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>LocTest2.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Localization\LocTest1.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>LocTest1.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Localization\LocTest2.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>LocTest2.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 </Project>
