@@ -22,7 +22,7 @@ for:
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
       - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
-      - cmd: copy .\SmartFormat.Tests\bin\* ..\..\artifacts\
+      - cmd: xcopy .\SmartFormat.Tests\bin\* ..\..\artifacts\ /S
       - ps: |
           $version = "2.7.0"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
