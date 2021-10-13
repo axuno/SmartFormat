@@ -97,7 +97,6 @@ namespace SmartFormat.Tests.Extensions
             provider.AddResource(LocTest2.ResourceManager);
             
             var result = provider.GetString(input, cultureName);
-            Console.WriteLine(cultureName + ": " + result);
             LocTest2.Culture = CultureInfo.GetCultureInfo(cultureName);
             Assert.That(provider.Resources.Count, Is.EqualTo(2));
             Assert.That(result, Is.EqualTo(LocTest2.Jack));
