@@ -12,21 +12,16 @@ namespace SmartFormat.Tests.Extensions
     {
         private static LocalizationProvider GetInitializedProvider()
         {
-            return new LocalizationProvider();
+            return new LocalizationProvider(true, LocTest1.ResourceManager);
         }
 
         [Test]
         public void Resources_Should_Be_Added_Exactly_Once()
         {
             var provider = GetInitializedProvider();
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
+            provider.AddResource(LocTest1.ResourceManager);
             // only one of the same resource should be added
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
-
+            provider.AddResource(LocTest1.ResourceManager);
             Assert.That(provider.Resources.Count, Is.EqualTo(1));
         }
 
@@ -34,9 +29,6 @@ namespace SmartFormat.Tests.Extensions
         public void Remove_Resource()
         {
             var provider = GetInitializedProvider();
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
 
             var success1 = provider.Remove("does-not-exist");
             var success2 = provider.Remove(provider.Resources.First().Value.BaseName);
@@ -50,9 +42,6 @@ namespace SmartFormat.Tests.Extensions
         public void Clear_All_Resources()
         {
             var provider = GetInitializedProvider();
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
             
             provider.Clear();
 
@@ -63,9 +52,6 @@ namespace SmartFormat.Tests.Extensions
         public void GetString_Without_Culture()
         {
             var provider = GetInitializedProvider();
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
             
             CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
             // uses the caller's UI culture
@@ -78,9 +64,6 @@ namespace SmartFormat.Tests.Extensions
         public void GetString_With_Culture()
         {
             var provider = GetInitializedProvider();
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
             
             var result = provider.GetString(nameof(LocTest1.WeTranslateText), CultureInfo.GetCultureInfo("es"));
             LocTest1.Culture = CultureInfo.GetCultureInfo("es");
@@ -92,9 +75,6 @@ namespace SmartFormat.Tests.Extensions
         public void GetString_With_CultureName()
         {
             var provider = GetInitializedProvider();
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
             
             var result = provider.GetString(nameof(LocTest1.WeTranslateText), "es");
             LocTest1.Culture = CultureInfo.GetCultureInfo("es");
@@ -110,13 +90,8 @@ namespace SmartFormat.Tests.Extensions
         {
             // Gets the name similar to "Jack" in other languages
             var provider = GetInitializedProvider();
-            // Both resources should be used to find the localized string
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest2).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
+            // Both (initial and LocTest2) resources should be used to find the localized string
+            provider.AddResource(LocTest2.ResourceManager);
             
             var result = provider.GetString(input, cultureName);
             Console.WriteLine(cultureName + ": " + result);
@@ -130,9 +105,6 @@ namespace SmartFormat.Tests.Extensions
         public void GetString_NonExisting_Value()
         {
             var provider = GetInitializedProvider();
-            provider.AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
             
             var result = provider.GetString("does-not-exist", CultureInfo.InvariantCulture);
             Assert.That(result, Is.Null);

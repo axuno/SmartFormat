@@ -20,15 +20,12 @@ namespace SmartFormat.Tests.Extensions
                 CaseSensitivity = caseSensitivity,
                 Localization =
                 {
-                    LocalizationProvider = new LocalizationProvider
+                    LocalizationProvider = new LocalizationProvider(true, LocTest1.ResourceManager)
                         { FallbackCulture = null, ReturnNameIfNotFound = false }
                 },
                 Formatter = { ErrorAction = formatErrorAction }
             });
             smart.AddExtensions(formatter);
-            ((LocalizationProvider)formatter.LocalizationProvider!).AddResource(new System.Resources.ResourceManager(
-                typeof(LocTest1).FullName!,
-                typeof(LocalizationFormatterTests).Assembly));
 
             return smart;
         }

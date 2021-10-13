@@ -20,14 +20,32 @@ namespace SmartFormat.Extensions
         internal readonly Dictionary<string, ResourceManager> Resources = new();
 
         /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="isCaseSensitive"><see langword="true"/>, if finding resource names should be case-sensitive (default).</param>
+        /// <param name="resources">Parameters of type <see cref="ResourceManager"/>.</param>
+        public LocalizationProvider(bool isCaseSensitive = true, params ResourceManager[] resources)
+        {
+            foreach (var resourceManager in resources)
+            {
+                DoAddResource(resourceManager, isCaseSensitive);
+            }
+        }
+
+        /// <summary>
         /// Adds a new resource, if it does exist.
         /// </summary>
         /// <param name="resourceManager"></param>
-        /// <param name="caseSensitivity"></param>
-        public virtual void AddResource(ResourceManager resourceManager, CaseSensitivityType caseSensitivity = CaseSensitivityType.CaseSensitive)
+        /// <param name="isCaseSensitive"></param>
+        public virtual void AddResource(ResourceManager resourceManager, bool isCaseSensitive = true)
+        {
+            DoAddResource(resourceManager, isCaseSensitive);
+        }
+
+        private void DoAddResource(ResourceManager resourceManager, bool isCaseSensitive = true)
         {
             if (Resources.ContainsKey(resourceManager.BaseName)) return;
-            resourceManager.IgnoreCase = caseSensitivity == CaseSensitivityType.CaseInsensitive;
+            resourceManager.IgnoreCase = !isCaseSensitive;
             Resources.Add(resourceManager.BaseName, resourceManager);
         }
 
