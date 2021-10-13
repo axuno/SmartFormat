@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
@@ -73,28 +72,28 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Gets the value from one of the registered resources.
-        /// If no value was found, the <paramref name="input"/> is returned.
+        /// If no value was found, the <paramref name="name"/> is returned.
         /// </summary>
         /// <remarks>
         /// <see cref="CultureInfo.CurrentUICulture"/> is used, if no <see cref="CultureInfo"/> is provided as a parameter.
         /// </remarks>
-        /// <param name="input"></param>
-        /// <returns>The value from one of the registered resources. If no value was found, the <paramref name="input"/> is returned.</returns>
-        public virtual string? GetString(string input)
+        /// <param name="name"></param>
+        /// <returns>The value from one of the registered resources. If no value was found, the <paramref name="name"/> is returned.</returns>
+        public virtual string? GetString(string name)
         {
-            return GetString(input, default(CultureInfo?));
+            return GetString(name, default(CultureInfo?));
         }
 
         /// <summary>
         /// Gets the value from one of the registered resources.
-        /// If no value was found, the <paramref name="input"/> is returned.
+        /// If no value was found, the <paramref name="name"/> is returned.
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="name"></param>
         /// <param name="cultureName"></param>
-        /// <returns>The value from one of the registered resources. If no value was found, the <paramref name="input"/> is returned.</returns>
-        public virtual string? GetString(string input, string cultureName)
+        /// <returns>The value from one of the registered resources. If no value was found, the <paramref name="name"/> is returned.</returns>
+        public virtual string? GetString(string name, string cultureName)
         {
-            return GetString(input, CultureInfo.GetCultureInfo(cultureName));
+            return GetString(name, CultureInfo.GetCultureInfo(cultureName));
         }
 
         /// <summary>

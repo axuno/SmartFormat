@@ -43,13 +43,33 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.de.resx">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.es.resx">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.fr.resx">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
 	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LocTest1.Designer.cs</LastGenOutput>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.de.resx">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.es.resx">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.fr.resx">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LocTest2.Designer.cs</LastGenOutput>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	</ItemGroup>
 

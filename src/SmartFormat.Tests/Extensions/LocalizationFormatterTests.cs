@@ -173,7 +173,6 @@ namespace SmartFormat.Tests.Extensions
             expected = string.Format(CultureInfo.GetCultureInfo(culture), expected, new {City = new { Name = "X-City", Inhabitants = 8900000}}, "X-City", 8900000);
 
             var actual = smart.Format(format, "X-City", 8900000, new {City = new { Name = "X-City", Inhabitants = 8900000}});
-            Console.WriteLine(culture + ": " + actual);
             Assert.That(actual, Is.EqualTo(expected));
         }
 
@@ -189,7 +188,6 @@ namespace SmartFormat.Tests.Extensions
             // zero and two hundred: plural, one: singular
             var smart = GetFormatterWithRegisteredResource();
             var actual = smart.Format(CultureInfo.GetCultureInfo(cultureName), format, count);
-            Console.WriteLine(cultureName + ": " + actual);
             Assert.That(actual, Is.EqualTo(expected));
         }
         
@@ -203,7 +201,6 @@ namespace SmartFormat.Tests.Extensions
         {
             var smart = GetFormatterWithRegisteredResource();
             var actual = smart.Format(CultureInfo.GetCultureInfo(cultureName), format, count);
-            Console.WriteLine(cultureName + ": " + actual);
             Assert.That(actual, Is.EqualTo(expected));
         }
     }
