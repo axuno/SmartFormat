@@ -5,7 +5,7 @@ using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
-using SmartFormat.Tests.TestUtils.Localization;
+using SmartFormat.Tests.Localization;
 
 namespace SmartFormat.Tests.Extensions
 {

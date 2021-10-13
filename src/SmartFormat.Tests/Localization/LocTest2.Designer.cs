@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SmartFormat.Tests.TestUtils.Localization {
+namespace SmartFormat.Tests.Localization {
     using System;
     
     
@@ -22,24 +22,24 @@ namespace SmartFormat.Tests.TestUtils.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class LocTest1 {
+    public class LocTest2 {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal LocTest1() {
+        internal LocTest2() {
         }
         
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SmartFormat.Tests.TestUtils.Localization.LocTest1", typeof(LocTest1).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SmartFormat.Tests.Localization.LocTest2", typeof(LocTest2).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace SmartFormat.Tests.TestUtils.Localization {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,56 +61,11 @@ namespace SmartFormat.Tests.TestUtils.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {} item.
+        ///   Looks up a localized string similar to Jack.
         /// </summary>
-        internal static string ___item {
+        public static string Jack {
             get {
-                return ResourceManager.GetString("{} item", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {} items.
-        /// </summary>
-        internal static string ___items {
-            get {
-                return ResourceManager.GetString("{} items", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} has {1:#,#} inhabitants.
-        /// </summary>
-        internal static string _0__has__1______inhabitants {
-            get {
-                return ResourceManager.GetString("{0} has {1:#,#} inhabitants", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to has {:#,#} inhabitants.
-        /// </summary>
-        internal static string has________inhabitants {
-            get {
-                return ResourceManager.GetString("has {:#,#} inhabitants", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This entry only exists in the invariant culture resource.
-        /// </summary>
-        internal static string OnlyExistForInvariantCulture {
-            get {
-                return ResourceManager.GetString("OnlyExistForInvariantCulture", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to We translate text.
-        /// </summary>
-        internal static string WeTranslateText {
-            get {
-                return ResourceManager.GetString("WeTranslateText", resourceCulture);
+                return ResourceManager.GetString("Jack", resourceCulture);
             }
         }
     }

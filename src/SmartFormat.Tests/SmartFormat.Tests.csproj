@@ -30,12 +30,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="TestUtils\Localization\LocTest1.Designer.cs">
+	  <Compile Update="Localization\LocTest1.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>LocTest1.resx</DependentUpon>
 	  </Compile>
-	  <Compile Update="TestUtils\Localization\LocTest2.Designer.cs">
+	  <Compile Update="Localization\LocTest2.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>LocTest2.resx</DependentUpon>
@@ -43,33 +43,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.de.resx">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.es.resx">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.fr.resx">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest1.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
+	  <EmbeddedResource Update="Localization\LocTest1.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LocTest1.Designer.cs</LastGenOutput>
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.de.resx">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.es.resx">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.fr.resx">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="TestUtils\Localization\LocTest2.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
+	  <EmbeddedResource Update="Localization\LocTest2.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LocTest2.Designer.cs</LastGenOutput>
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	</ItemGroup>
 

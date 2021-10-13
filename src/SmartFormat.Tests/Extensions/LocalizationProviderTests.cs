@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Extensions;
-using SmartFormat.Tests.TestUtils.Localization;
+using SmartFormat.Tests.Localization;
 
 namespace SmartFormat.Tests.Extensions
 {
