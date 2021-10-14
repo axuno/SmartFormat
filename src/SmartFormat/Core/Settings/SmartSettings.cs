@@ -97,5 +97,10 @@ namespace SmartFormat.Core.Settings
         /// Set only during initialization.
         /// </summary>
         public FormatterSettings Formatter { get; set; } = new();
+
+        /// <summary>
+        /// Gets the settings for <see cref="Localization"/>.
+        /// </summary>
+        public Localization Localization { get; set; } = new();
     }
 }

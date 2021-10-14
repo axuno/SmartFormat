@@ -128,14 +128,51 @@ Smart.Format("{TheValue:isnull:The value is null|The value is {}}", new {TheValu
 // Result: "The value is 1234"
 ```
 
-### 11. Improved custom `ISource` and `IFormatter` implementations ([#180](https://github.com/axuno/SmartFormat/pull/180))
+### 11. Added `LocalizationFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/207)
+
+#### Features
+  * Added `LocalizationFormatter` to localize literals and placeholders
+  * Added `ILocalizationProvider` and a standard implemention as `LocalizationProvider`, which handles `resx` resource files. A fallback culture can be set. It will be used, in case no item for a certain culture could be found in any of the resources. `LocalizationProvider` can search an unlimited number of defined resoures.
+  * `SmartSettings` were exended with category `Localization`. That way, custom `IFormatter`s can also make use of localization, if needed.
+  * Added `LocalizationFormattingException`, which is derived from `FormattingException` to easily identify this kind of issues
+
+#### Examples
+Culture-specific results shown here are included in embedded resource files, which are omitted for brevity.
+
+a) Localize pure literals into Spanish:
+```CSharp
+// culture supplied as a format option
+_ = Smart.Format(culture, "{:L(en):WeTranslateText}");
+// culture supplied as an argument to the formatter
+var culture = CultureInfo.GetCultureInfo("es");
+_ = Smart.Format(culture, "{:L:WeTranslateText}");
+// result for both: "Traducimos el texto"
+```
+b) Localized strings may contain placeholders
+```CSharp
+_ = Smart.Format("{0} {1:L(es):has {:#,#} inhabitants}", "X-City", 8900000);
+// result: "X-City tiene 8.900.000 habitantes"
+_ = Smart.Format("{0} {1:L(es):has {:#,#} inhabitants}", "X-City", 8900000);
+// result: "X-City has 8,900,000 inhabitants"
+```
+c) Localization can be used together with other formatters
+```CSharp
+_ = Smart.Format("{0:plural:{:L(en):{} item}|{:L(en):{} items}}", 0;
+// result for English: 0 items
+_ = Smart.Format("{0:plural:{:L(fr):{} item}|{:L(fr):{} items}}", 0;
+// result for French: 0 élément
+_ = Smart.Format("{0:plural:{:L(fr):{} item}|{:L(fr):{} items}}", 200;
+// result for French: 200 éléments
+```
+
+### 12. Improved custom `ISource` and `IFormatter` implementations ([#180](https://github.com/axuno/SmartFormat/pull/180))
 Any custom exensions can implement `IInitializer`. Then, the `SmartFormatter` will call `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
 
-### 12. `IFormatter`s have one single, unique name  ([#185](https://github.com/axuno/SmartFormat/pull/185))
+### 13. `IFormatter`s have one single, unique name  ([#185](https://github.com/axuno/SmartFormat/pull/185))
 In v2, `IFormatter`s could have an unlimited number of names. 
 To improve performance, in v3, this is limited to one single, unique name.
 
-### 13. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177), [#201](https://github.com/axuno/SmartFormat/pull/201))
+### 14. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177), [#201](https://github.com/axuno/SmartFormat/pull/201))
 
 Separation of `JsonSource` into 2 `ISource` extensions:
 * `NewtonSoftJsonSource`
@@ -143,16 +180,16 @@ Separation of `JsonSource` into 2 `ISource` extensions:
 
 Fix: `NewtonSoftJsonSource` handles `null` values correctly ([#201](https://github.com/axuno/SmartFormat/pull/201))
 
-### 14. `SmartFormatter` takes `IList<object>` parameters
+### 15. `SmartFormatter` takes `IList<object>` parameters
 Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to [@karljj1](https://github.com/karljj1)) ([#154](https://github.com/axuno/SmartFormat/pull/154))
 
-### 15. `SmartObjects` have been removed
+### 16. `SmartObjects` have been removed
 * Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`) ([`092b7b1`](https://github.com/axuno/SmartFormat/commit/092b7b1b5873301bdfeb2b62f221f936efc81430))
 
-### 16. Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
+### 17. Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
 * Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood
 
-### 17. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
+### 18. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
 
 Introduced experimental `bool ParserSettings.ParseInputAsHtml`.
 The default is `false`.

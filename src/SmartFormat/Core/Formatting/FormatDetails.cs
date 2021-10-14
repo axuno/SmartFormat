@@ -57,7 +57,7 @@ namespace SmartFormat.Core.Formatting
         /// format items such as numbers, dates, and anything else that
         /// might be culture-specific.
         /// </summary>
-        public IFormatProvider? Provider { get; }
+        public IFormatProvider? Provider { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="IOutput"/> where the result is written.
