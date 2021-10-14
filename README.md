@@ -31,5 +31,5 @@ See [changelog](CHANGES.md) for changes.
 
 <hr>
 
-We have started to work on a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**.
+We have started to work on a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**. 
 
