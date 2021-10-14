@@ -128,13 +128,13 @@ Smart.Format("{TheValue:isnull:The value is null|The value is {}}", new {TheValu
 // Result: "The value is 1234"
 ```
 
-### 11. Added features to localize literals and placeholders
+### 11. Added `LocalizationFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/207)
 
 #### Features
-  * Added `LocalizationFormatter`
-  * Added `ILocalizationProvider` and a standard implemention as `LocalizationProvider`, which handles `resx` resource files
-  * `SmartSettings` were exended with category `Localization`.
-  * Custom `IFormatter` can now make use of localization, if needed.
+  * Added `LocalizationFormatter` to localize literals and placeholders
+  * Added `ILocalizationProvider` and a standard implemention as `LocalizationProvider`, which handles `resx` resource files. A fallback culture can be set. It will be used, in case no item for a certain culture could be found in any of the resources. `LocalizationProvider` can search an unlimited number of defined resoures.
+  * `SmartSettings` were exended with category `Localization`. That way, custom `IFormatter`s can also make use of localization, if needed.
+  * Added `LocalizationFormattingException`, which is derived from `FormattingException` to easily identify this kind of issues
 
 #### Examples
 Culture-specific results shown here are included in embedded resource files, which are omitted for brevity.
