@@ -23,9 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="SmartFormatDemo.cs">
-            <SubType>Form</SubType>
-        </Compile>
+        <Compile Update="SmartFormatDemo.cs" />
         <Compile Update="SmartFormatDemo.Designer.cs">
             <DependentUpon>SmartFormatDemo.cs</DependentUpon>
         </Compile>
