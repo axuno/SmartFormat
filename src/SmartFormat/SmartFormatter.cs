@@ -506,7 +506,7 @@ namespace SmartFormat
                 }
 
                 if (!handled)
-                    throw formattingInfo.FormattingException($"Could not evaluate the selector \"{selector.RawText}\"",
+                    throw formattingInfo.FormattingException($"No source extension could handle the selector named \"{selector.RawText}\"",
                         selector);
             }
         }
