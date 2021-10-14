@@ -33,7 +33,7 @@ for:
           dotnet pack SmartFormat --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
     test_script:
       - cmd: nuget install Appveyor.TestLogger
-      - cmd: dotnet test --no-build --framework net5.0 --test-adapter-path:. --logger:Appveyor SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      - cmd: dotnet test --no-build --framework netstandard2.1 --test-adapter-path:. --logger:Appveyor SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net5.0.xml" -n net5.0win
     artifacts:
