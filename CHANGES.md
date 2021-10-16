@@ -203,14 +203,14 @@ Best results can only be expected with clean HTML: balanced opening and closing 
 SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleSharp](https://anglesharp.github.io/) or [HtmlAgilityPack](https://html-agility-pack.net/).
 
 
-### 19. Refactored `PluralLocalizationFormatter`
+### 19. Refactored `PluralLocalizationFormatter` ([#209](https://github.com/axuno/SmartFormat/pull/209))
 
 * Constructor with string argument for default language is obsolete.
 * Property `DefaultTwoLetterISOLanguageName` is obsolete.
 * Culture is now determined in this sequence (same as with `LocalizationFormatter`):<br/>
   a) Get the culture from the `FormattingInfo.FormatterOptions`.<br/>
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
-  c) The CultureInfo.CurrentUICulture<br/>
+  c) The `CultureInfo.CurrentUICulture`<br/>
 
 
 v2.7.0
