@@ -9,7 +9,7 @@ using System.Globalization;
 using System.Resources;
 using SmartFormat.Core.Extensions;
 
-namespace SmartFormat.Extensions
+namespace SmartFormat.Utilities
 {
     /// <summary>
     /// The default <see cref="ILocalizationProvider"/> for string localization.
