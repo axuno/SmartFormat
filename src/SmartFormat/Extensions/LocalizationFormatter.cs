@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {

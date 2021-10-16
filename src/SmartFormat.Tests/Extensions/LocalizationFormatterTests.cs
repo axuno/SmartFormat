@@ -6,6 +6,7 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.Localization;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions
 {
