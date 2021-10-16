@@ -19,14 +19,28 @@ namespace SmartFormat.Extensions
     public class PluralLocalizationFormatter : IFormatter
     {
         /// <summary>
-        /// Initializes the plugin with rules for many common languages.
-        /// If no <see cref="CultureInfo"/> is supplied to the formatter, the
-        /// default language rules will be used by default.
+        /// CTOR for the plugin with rules for many common languages.
         /// </summary>
         /// <remarks>
         /// Language Plural Rules are described at
         /// https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html
         /// </remarks>
+        public PluralLocalizationFormatter()
+        {
+        }
+
+        /// <summary>
+        /// Initializes the plugin with rules for many common languages.
+        /// </summary>
+        /// <remarks>
+        /// Culture is now determined in this sequence:<br/>
+        /// 1. Get the culture from the <see cref="FormattingInfo.FormatterOptions"/>.<br/>
+        /// 2. Get the culture from the <see cref="IFormatProvider"/> argument (which may be a <see cref="CultureInfo"/>) to <see cref="SmartFormatter.Format(IFormatProvider, string, object?[])"/><br/>
+        /// 3. The <see cref="CultureInfo.CurrentUICulture"/>.<br/>
+        /// Language Plural Rules are described at
+        /// https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html
+        /// </remarks>
+        [Obsolete("This constructor is not required. Changed process to determine the default culture.", true)]
         public PluralLocalizationFormatter(string defaultTwoLetterIsoLanguageName = "en")
         {
             DefaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
@@ -35,7 +49,16 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// Gets or sets the two letter ISO language name.
         /// </summary>
-        public string DefaultTwoLetterISOLanguageName { get; set; }
+        /// <remarks>
+        /// Culture is now determined in this sequence:<br/>
+        /// 1. Get the culture from the <see cref="FormattingInfo.FormatterOptions"/>.<br/>
+        /// 2. Get the culture from the <see cref="IFormatProvider"/> argument (which may be a <see cref="CultureInfo"/>) to <see cref="SmartFormatter.Format(IFormatProvider, string, object?[])"/><br/>
+        /// 3. The <see cref="CultureInfo.CurrentUICulture"/>.<br/>
+        /// Language Plural Rules are described at
+        /// https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html
+        /// </remarks>
+        [Obsolete("This property is not supported any more. Changed process to get or set the default culture.", true)]
+        public string DefaultTwoLetterISOLanguageName { get; set; } = "en";
 
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
@@ -54,10 +77,10 @@ namespace SmartFormat.Extensions
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
-
+            
             // Ignore formats that start with "?" (this can be used to bypass this extension)
             if (format == null || format.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') return false;
-
+            
             // Extract the plural words from the format string:
             var pluralWords = format.Split('|');
             // This extension requires at least two plural words:
@@ -113,9 +136,10 @@ namespace SmartFormat.Extensions
 
         private PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
         {
-            // See if the language was explicitly passed:
-            var pluralOptions = formattingInfo.FormatterOptions;
-            if (pluralOptions.Length != 0) return PluralRules.GetPluralRule(pluralOptions);
+            // Determine the culture
+            var culture = GetCultureInfo(formattingInfo);
+            var pluralOptions = formattingInfo.FormatterOptions.Trim();
+            if (pluralOptions.Length != 0) return PluralRules.GetPluralRule(culture.TwoLetterISOLanguageName);
 
             // See if a CustomPluralRuleProvider is available from the FormatProvider:
             var provider = formattingInfo.FormatDetails.Provider;
@@ -123,15 +147,34 @@ namespace SmartFormat.Extensions
                 (CustomPluralRuleProvider?) provider?.GetFormat(typeof(CustomPluralRuleProvider));
             if (pluralRuleProvider != null) return pluralRuleProvider.GetPluralRule();
 
-            // Use the CultureInfo, if provided:
-            if (provider is CultureInfo cultureInfo)
+            // No CustomPluralRuleProvider, so use the CultureInfo
+            return PluralRules.GetPluralRule(culture.TwoLetterISOLanguageName);
+        }
+
+        private static CultureInfo GetCultureInfo(IFormattingInfo formattingInfo)
+        {
+            var culture = formattingInfo.FormatterOptions.Trim();
+            CultureInfo cultureInfo;
+            if (culture == string.Empty)
             {
-                var culturePluralRule = PluralRules.GetPluralRule(cultureInfo.TwoLetterISOLanguageName);
-                return culturePluralRule;
+                if (formattingInfo.FormatDetails.Provider is CultureInfo ci)
+                    cultureInfo = ci;
+                else
+                    cultureInfo = CultureInfo.CurrentUICulture; // also used this way by ResourceManager
             }
-            
-            // Use the default, if provided:
-            return PluralRules.GetPluralRule(DefaultTwoLetterISOLanguageName);;
+            else
+            {
+                try
+                {
+                    cultureInfo = CultureInfo.GetCultureInfo(culture);
+                }
+                catch (Exception e)
+                {
+                    throw new FormattingException(formattingInfo.Format, e, 0);
+                }
+            }
+
+            return cultureInfo;
         }
     }
 

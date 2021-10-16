@@ -134,7 +134,7 @@ namespace SmartFormat
             );
             formatter.AddExtensions(
                 (IFormatter) listSourceAndFormatter, // ListFormatter should be one of the first formatter extensions
-                new PluralLocalizationFormatter("en"),
+                new PluralLocalizationFormatter(),
                 new ConditionalFormatter(),
                 new IsMatchFormatter(),
                 new NullFormatter(),

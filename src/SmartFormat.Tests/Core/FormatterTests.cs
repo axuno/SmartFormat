@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
@@ -146,9 +147,8 @@ namespace SmartFormat.Tests.Core
             // Note: If pluralization AND conditional formatters are registers, the formatter
             //       name MUST be included in the format string, because both could return successful evaluation
             // Here, we register only pluralization:
-            formatter.AddExtensions(new PluralLocalizationFormatter("en"){CanAutoDetect = markAsDefault}, new DefaultFormatter());
-            
-            var result = formatter.Format(format, data);
+            formatter.AddExtensions(new PluralLocalizationFormatter{CanAutoDetect = markAsDefault}, new DefaultFormatter());
+            var result = formatter.Format(CultureInfo.GetCultureInfo("en"), format, data);
             
             Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
         }
