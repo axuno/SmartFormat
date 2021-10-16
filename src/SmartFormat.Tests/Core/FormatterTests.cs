@@ -147,12 +147,8 @@ namespace SmartFormat.Tests.Core
             // Note: If pluralization AND conditional formatters are registers, the formatter
             //       name MUST be included in the format string, because both could return successful evaluation
             // Here, we register only pluralization:
-            var savedCulture = CultureInfo.CurrentUICulture;
-            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en");
             formatter.AddExtensions(new PluralLocalizationFormatter{CanAutoDetect = markAsDefault}, new DefaultFormatter());
-            CultureInfo.CurrentUICulture = savedCulture;
-
-            var result = formatter.Format(format, data);
+            var result = formatter.Format(CultureInfo.GetCultureInfo("en"), format, data);
             
             Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
         }
