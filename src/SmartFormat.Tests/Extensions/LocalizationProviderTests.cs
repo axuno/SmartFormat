@@ -2,8 +2,8 @@
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
-using SmartFormat.Extensions;
 using SmartFormat.Tests.Localization;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions
 {

@@ -5,7 +5,7 @@
 
 using System.Globalization;
 
-namespace SmartFormat.Core.Extensions
+namespace SmartFormat.Utilities
 {
     /// <summary>
     /// Provides the localized equivalent of an input string.
