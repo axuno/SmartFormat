@@ -66,6 +66,25 @@ namespace SmartFormat.Tests.Core
             Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
         }
 
+        [TestCase("{V(LU)}")] // braces are illegal
+        [TestCase("{V LU }")] // blanks are illegal
+        [TestCase("{VĀLUĒ}")] // 0x100 and 0x112 are illegal chars
+        public void Parser_Throws_On_Illegal_Selector_Chars(string format)
+        {
+            var parser = GetRegularParser();
+            try
+            {
+                parser.ParseFormat(format);
+                Assert.That(true, "Should throw");
+            }
+            catch (Exception e)
+            {
+                // Throws, because selector contains 2 illegal characters
+                Assert.That(e, Is.InstanceOf<ParsingErrors>());
+                Assert.That(((ParsingErrors)e).Issues.Count, Is.EqualTo(2));
+            }
+        }
+
         [Test]
         public void Parser_Exception_ErrorDescription()
         {
