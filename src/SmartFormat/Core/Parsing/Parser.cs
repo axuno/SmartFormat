@@ -613,7 +613,7 @@ namespace SmartFormat.Core.Parsing
                 // Ensure the selector characters are valid:
                 if (!_validSelectorChars.Contains(inputChar))
                     parsingErrors.AddIssue(_resultFormat,
-                        $"'0x{Convert.ToByte(inputChar):X}': " +
+                        $"'0x{Convert.ToUInt32(inputChar):X}': " +
                         _parsingErrorText[ParsingError.InvalidCharactersInSelector],
                         _index.Current, _index.SafeAdd(_index.Current, 1));
             }
@@ -636,7 +636,7 @@ namespace SmartFormat.Core.Parsing
                 currentPlaceholder.AddSelector(new Selector(Settings, _inputFormat, _index.LastEnd, _index.Current,_index.Operator, _index.Selector));
             else if (_index.Operator != _index.Current) // the selector only contains illegal ("trailing") operator characters
                 parsingErrors.AddIssue(_resultFormat,
-                    $"'0x{Convert.ToByte(_inputFormat[_index.Operator]):X}': " +
+                    $"'0x{Convert.ToInt32(_inputFormat[_index.Operator]):X}': " +
                     _parsingErrorText[ParsingError.TrailingOperatorsInSelector],
                     _index.Operator, _index.Current);
             _index.LastEnd = _index.SafeAdd(_index.Current, 1);
