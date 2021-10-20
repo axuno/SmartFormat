@@ -186,10 +186,8 @@ Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to 
 ### 16. `SmartObjects` have been removed
 * Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`) ([`092b7b1`](https://github.com/axuno/SmartFormat/commit/092b7b1b5873301bdfeb2b62f221f936efc81430))
 
-### 17. Bugfix for plural rule ([#182](https://github.com/axuno/SmartFormat/pull/182))
-* Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood
 
-### 18. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
+### 17. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
 
 Introduced experimental `bool ParserSettings.ParseInputAsHtml`.
 The default is `false`.
@@ -203,7 +201,7 @@ Best results can only be expected with clean HTML: balanced opening and closing 
 SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleSharp](https://anglesharp.github.io/) or [HtmlAgilityPack](https://html-agility-pack.net/).
 
 
-### 19. Refactored `PluralLocalizationFormatter` ([#209](https://github.com/axuno/SmartFormat/pull/209))
+### 18. Refactored `PluralLocalizationFormatter` ([#209](https://github.com/axuno/SmartFormat/pull/209))
 
 * Constructor with string argument for default language is obsolete.
 * Property `DefaultTwoLetterISOLanguageName` is obsolete.
@@ -211,6 +209,10 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   a) Get the culture from the `FormattingInfo.FormatterOptions`.<br/>
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
+
+### 19. Bugfixes
+* Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood ([#182](https://github.com/axuno/SmartFormat/pull/182))
+* Fixes #211 Illegal placeholder characters that are not 8-bit, will not throw unexpected `ThrowByteOverflowException` ([#212](https://github.com/axuno/SmartFormat/pull/212))
 
 
 v2.7.0
