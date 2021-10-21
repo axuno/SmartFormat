@@ -41,10 +41,10 @@ for:
       - path: 'artifacts\*.snupkg'
     deploy:
       - provider: NuGet
-    api_key:
-      secure: OxZeF53X5DcHmg+t3zMNZP9NhlpSJHEQN6O4zuz6/FT3SCaBh8kp+tbftzt+nlhi
-      on:
-        branch: main
+        api_key:
+          secure: siTK+zMCX6XYTT2G7uhX9XjB6LNhDtZheum/MKIfrnsBITjZ+yEGAPNKVL/LCEPB
+        on:
+          branch: main
   -
     matrix:
       only:
