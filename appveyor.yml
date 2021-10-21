@@ -30,7 +30,10 @@ for:
               $version = $version + "-PR" + $env:APPVEYOR_PULL_REQUEST_NUMBER
           }
 
-          dotnet pack SmartFormat --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
+          # Only pack for the main project, exclude forks
+          if ($env:APPVEYOR_PROJECT_SLUG -eq 'smartformat')  {
+              dotnet pack SmartFormat --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
+          }
     test_script:
       - cmd: nuget install Appveyor.TestLogger
       - cmd: dotnet test --no-build --framework net5.0 --test-adapter-path:. --logger:Appveyor SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverInplace=true /p:AltCoverForce=true /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
