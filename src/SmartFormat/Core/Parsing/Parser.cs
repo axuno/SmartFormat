@@ -401,7 +401,7 @@ namespace SmartFormat.Core.Parsing
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
                                 selectorIndex));
                         else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToUInt32(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
                                 operatorIndex, i);
                         lastI = i + 1;
 
@@ -420,7 +420,7 @@ namespace SmartFormat.Core.Parsing
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
                                 selectorIndex));
                         else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToUInt32(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
                                 operatorIndex, i);
                         lastI = i + 1;
 
@@ -439,7 +439,7 @@ namespace SmartFormat.Core.Parsing
                             || _alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')
                             || _allowedSelectorChars.IndexOf(c) != -1;
                         if (!isValidSelectorChar)
-                            parsingErrors.AddIssue(current, $"'0x{Convert.ToByte(c):X}': " +  parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                            parsingErrors.AddIssue(current, $"'0x{Convert.ToUInt32(c):X}': " +  parsingErrorText[ParsingError.InvalidCharactersInSelector],
                                 i, i + 1);
                     }
                 }
