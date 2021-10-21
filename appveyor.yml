@@ -30,7 +30,7 @@ for:
               $version = $version + "-PR" + $env:APPVEYOR_PULL_REQUEST_NUMBER
           }
 
-          # Don't pack forked projects
+          # Only pack for the main project, exclude forks
           if ($env:APPVEYOR_PROJECT_SLUG -eq 'smartformat')  {
               dotnet pack SmartFormat --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
           }
