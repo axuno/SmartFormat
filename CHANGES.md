@@ -215,6 +215,11 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
 * Fixes #211 Illegal placeholder characters that are not 8-bit, will not throw unexpected `ThrowByteOverflowException` ([#212](https://github.com/axuno/SmartFormat/pull/212))
 
 
+v2.7.1
+===
+* **Fixed**: [#179](https://github.com/axuno/SmartFormat/issues/179) DualFromZeroToTwo plural rule. Thanks to [@OhSoGood](https://github.com/OhSoGood)
+* **Fixed**: [#211](https://github.com/axuno/SmartFormat/issues/211) Illegal placeholder characters that are not 8-bit, will no more throw unexpected `ThrowByteOverflowException`. Thanks to [@bogatykh](https://github.com/bogatykh)
+
 v2.7.0
 ===
 * **Fixed** broken backward compatibilty introduced in v2.6.2 (issues referenced in [#148](https://github.com/axuno/SmartFormat/issues/148), [#147](https://github.com/axuno/SmartFormat/issues/147), [#143](https://github.com/axuno/SmartFormat/issues/143)).
