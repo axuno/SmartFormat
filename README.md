@@ -25,11 +25,8 @@ See [changelog](CHANGES.md) for changes.
 
 # Version 3.0
 
-<hr>
-
 **See the [list of changes](https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md) already merged into branch `version/v3`**
 
 <hr>
 
 We have started to work on a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**. 
-
