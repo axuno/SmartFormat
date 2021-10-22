@@ -10,8 +10,17 @@ After implementing a zero allocation `ValueStringBuilder` based on [ZString](htt
    * Formatting is up to 40% faster with with 50% less GC and memory allocation
 
 More optimizations:
-   * Added type cache to `ReflectionSource` which increases speed by factor 4. Thanks to [@karljj1](https://github.com/karljj1). ([#155](https://github.com/axuno/SmartFormat/pull/155)).
-   * Optimized `DictionarySource` increases speed by 10% with less GC pressure ([#189](https://github.com/axuno/SmartFormat/pull/189))
+
+   a) `ReflectionSource`
+   
+   * Added a type cache which increases speed by factor 4. Thanks to [@karljj1](https://github.com/karljj1). ([#155](https://github.com/axuno/SmartFormat/pull/155)). 
+   * Type caching can be disabled ([#217](https://github.com/axuno/SmartFormat/pull/217))
+   * Dictionary for type cache changed to `ConcurrentDictionary` ([#217](https://github.com/axuno/SmartFormat/pull/217))
+   * `TypeCache` is accessible from a derived class ([#217](https://github.com/axuno/SmartFormat/pull/217))
+   
+   b) `DictionarySource`
+   
+   * Speed increased by 10% with less GC pressure ([#189](https://github.com/axuno/SmartFormat/pull/189))
 
 ### 2. Exact control of whitespace text output
 This was an issue in v2 and was going back to combining `string.Format` compatibility with *Smart.Format* features. This is resolved by setting the desired mode with `SmartSettings.StringFormatCompatibility` (defaults to `false`). ([#172](https://github.com/axuno/SmartFormat/pull/172))
@@ -209,10 +218,6 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   a) Get the culture from the `FormattingInfo.FormatterOptions`.<br/>
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
-
-### 19. Bugfixes
-* Fixes #179 (DualFromZeroToTwo plural rule). Thanks to @OhSoGood ([#182](https://github.com/axuno/SmartFormat/pull/182))
-* Fixes #211 Illegal placeholder characters that are not 8-bit, will not throw unexpected `ThrowByteOverflowException` ([#212](https://github.com/axuno/SmartFormat/pull/212))
 
 
 v2.7.1
