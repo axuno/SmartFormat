@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -14,7 +9,7 @@ using SmartFormat.Tests.TestUtils;
 namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
-    public class ReflectionFormatterTests
+    public class ReflectionSourceTests
     {
         private static object[] GetArgs()
         {
@@ -77,7 +72,7 @@ namespace SmartFormat.Tests.Extensions
         /// system.string methods are processed by <see cref="StringSource"/> since v3.0
         /// </summary>
         [Test]
-        public void Test_Methods()
+        public void Test_Parameterless_Methods()
         {
             var format = "{0} {0.ToLower} {ToLower} {ToUpper}";
             //var expected = "Zero zero zero ZERO";
@@ -177,10 +172,9 @@ namespace SmartFormat.Tests.Extensions
             // Note: Cached Property values work the same as cached methods
 
             var formatter = Smart.CreateDefaultSmartFormat();
-            var reflectionSource = formatter.SourceExtensions.First(ext => ext.GetType() == typeof(ReflectionSource));
+            var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
             var typeCache =
-                GetInstanceField(typeof(ReflectionSource), reflectionSource, "_typeCache") as System.Collections.Generic
-                    .Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
+                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
 
             var obj = new {Obj = new MiscObject { MethodReturnValue = "The Method Value"}};
             
@@ -200,10 +194,9 @@ namespace SmartFormat.Tests.Extensions
         public void Test_With_TypeCaching_And_Property_Value()
         {
             var formatter = Smart.CreateDefaultSmartFormat();
-            var reflectionSource = formatter.SourceExtensions.First(ext => ext.GetType() == typeof(ReflectionSource));
+            var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
             var typeCache =
-                GetInstanceField(typeof(ReflectionSource), reflectionSource, "_typeCache") as System.Collections.Generic
-                    .Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
+                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
 
             var obj = new {Obj = new MiscObject { Field = "The Field Value"}};
             
@@ -217,6 +210,23 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
             Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out found), Is.True);
             Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
+        }
+
+        [Test]
+        public void Test_With_TypeCaching_Disabled()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
+            reflectionSource.IsTypeCacheEnabled = false;
+            var typeCache =
+                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
+
+            var obj = new {Obj = new MiscObject { Field = "The Field Value", MethodReturnValue = "The Method Value"}};
+            
+            // Invoke formatter, expecting results, but empty cache
+            Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
+            Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
+            Assert.That(typeCache!.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -286,6 +296,11 @@ namespace SmartFormat.Tests.Extensions
             public string FirstName = "first";
             public string LastName = "last";
             public Address? Address = null;
+        }
+
+        internal class TestReflectionSource : ReflectionSource
+        {
+            public static string TypeCacheFieldName => nameof(TypeCache);
         }
     }
 }

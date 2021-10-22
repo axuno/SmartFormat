@@ -11,7 +11,7 @@ using SmartFormat.Tests.TestUtils;
 namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
-    public class DictionaryFormatterTests
+    public class DictionarySourceTests
     {
         public object[] GetArgs()
         {
