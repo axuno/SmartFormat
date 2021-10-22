@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SmartFormat.Core.Extensions;
@@ -22,7 +21,7 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class StringSource : Source
     {
-        private CultureInfo _cultureInfo = CultureInfo.CurrentCulture;
+        private CultureInfo _cultureInfo = CultureInfo.CurrentUICulture;
 
         /// <summary>
         /// CTOR.
@@ -46,6 +45,7 @@ namespace SmartFormat.Extensions
         {
             base.Initialize(formatter);
             var comparer = formatter.Settings.GetCaseSensitivityComparer();
+            // Comparer is called when _adding_ items to the Dictionary (not, when getting items)
             SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, bool>>(comparer);
             AddMethods();
         }
@@ -85,11 +85,11 @@ namespace SmartFormat.Extensions
             // Search is case-insensitive
             if (!SelectorMethods.TryGetValue(selector, out var method)) return false;
 
-            // Check if selector must match case-sensitive
-            var caseComparison = selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison();
-            if (selectorInfo.FormatDetails.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive && !SelectorMethods.Keys.Any(k => k.Equals(selector, caseComparison)))
+            // Check if the Selector must match case-sensitive
+            if (selectorInfo.FormatDetails.Settings.CaseSensitivity == CaseSensitivityType.CaseSensitive &&
+                method.Method.Name != selector)
                 return false;
-            
+
             return method.Invoke(selectorInfo, currentValue);
         }
 
@@ -213,7 +213,7 @@ namespace SmartFormat.Extensions
             if (formatDetails.Provider is CultureInfo info)
                 return info;
 
-            return CultureInfo.CurrentCulture;
+            return CultureInfo.CurrentUICulture;
         }
     }
 }
