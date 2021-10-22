@@ -78,8 +78,8 @@ In v2, Alignment of output values was limited to the `DefaultFormatter`. It's ab
 * Introduced `FormatterSettings.AlignmentFillCharacter`, to customize the the fill character. Default is space (0x20), like with `string.Format`.
 * Modified `ListFormatter` so that items can be aligned (but the spacers stay untouched).
 
-### 8. Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178))
-The `StringSource` takes over functionality, which have been implemented in `ReflectionSource` in v2. Compared to reflection caching, speed is 15% better and has 10% less memory allocation.
+### 8. Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178), [#216](https://github.com/axuno/SmartFormat/pull/216))
+The `StringSource` takes over functionality, which have been implemented in `ReflectionSource` in v2. Compared to reflection caching, speed is 20% better at 25% less memory allocation.
 
 `StringSource` brings the following built-in methods (as selector names):
 * Length
