@@ -12,12 +12,12 @@ using SmartFormat.Utilities;
 namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
-    public class ValueTupleTests
+    public class ValueTupleSourceTests
     {
         [Test]
         public void Format_With_ValueTuples()
         {
-            var addr = new DictionaryFormatterTests.Address();
+            var addr = new DictionarySourceTests.Address();
             var dict1 = new Dictionary<string, string> { {"dict1key", "dict1 Value"} };
             var dict2 = new Dictionary<string, string> { { "dict2key", "dict2 Value" } };
 
@@ -38,7 +38,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("Name: {Person.FirstName} {City.AreaCode}", false)]
         public void Format_With_Null_Values_In_ValueTuples(string format, bool shouldSucceed)
         {
-            var addr = new DictionaryFormatterTests.Address {City = null};
+            var addr = new DictionarySourceTests.Address {City = null};
 
             var dict1 = new Dictionary<string, string> { {"dict1key", "dict1 Value"} };
             var dict2 = new Dictionary<string, string> { { "dict2key", "dict2 Value" } };
@@ -62,7 +62,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Format_With_ValueTuples_2nd_Argument()
         {
-            var addr = new DictionaryFormatterTests.Address();
+            var addr = new DictionarySourceTests.Address();
             var dict1 = new Dictionary<string, string> { {"dict1key", "dict1 Value"} };
             var dict2 = new Dictionary<string, string> { { "dict2key", "dict2 Value" } };
 
