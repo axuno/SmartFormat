@@ -12,8 +12,11 @@ namespace SmartFormat.Core.Output
 {
     /// <summary>
     /// Wraps a <see cref="StringBuilder"/> so it can be used for output.
-    /// This is used for the default output.
     /// </summary>
+    /// <remarks>
+    /// <see cref="StringBuilder"/>, <see cref="UnicodeEncoding"/>
+    /// and <see langword="string"/> objects use <b>UTF-16</b> encoding to store characters.
+    /// </remarks>
     public class StringOutput : IOutput
     {
         private readonly StringBuilder _output;
