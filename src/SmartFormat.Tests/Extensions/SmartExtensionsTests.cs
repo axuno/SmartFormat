@@ -27,121 +27,23 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_AppendLine()
         {
-            var formats = new[]
-            {
-                "{0:time:}",
-                "{1:time:}",
-                "{2:time:}",
-                "{3:time:}",
-                "{4:time:}",
-                "{5:time:}"
-            };
-            var expected = new[]
-            {
-                "less than 1 second" + Environment.NewLine,
-                "1 day 1 hour 1 minute 1 second" + Environment.NewLine,
-                "2 hours 2 seconds" + Environment.NewLine,
-                "3 days 3 seconds" + Environment.NewLine,
-                "less than 1 second" + Environment.NewLine,
-                "5 days" + Environment.NewLine
-            };
-            var args = GetArgs();
+            var sb = new StringBuilder();
+            sb.AppendLineSmart("{0} {1} {2} {3}", "these", "are", "the", "args");
 
-            TestAppendLine(formats, args, expected);
+            var actual = sb.ToString();
+
+            Assert.That(actual, Is.EqualTo("these are the args" + Environment.NewLine));
         }
 
         [Test]
         public void Test_Append()
         {
-            var formats = new [] {
-                "{0:time:noless}",
-                "{1:time:hours}",
-                "{1:time:hours minutes}",
-                "{2:time:days milliseconds}",
-                "{2:time:days milliseconds auto}",
-                "{2:time:days milliseconds short}",
-                "{2:time:days milliseconds fill}",
-                "{2:time:days milliseconds full}",
-                "{3:time:abbr}",
-            };
-            var expected = new [] {
-                "0 seconds",
-                "25 hours",
-                "25 hours 1 minute",
-                "2 hours 2 seconds",
-                "2 hours 2 seconds",
-                "2 hours",
-                "2 hours 0 minutes 2 seconds 0 milliseconds",
-                "0 days 2 hours 0 minutes 2 seconds 0 milliseconds",
-                "3d 3s",
-            };
-            var args = GetArgs();
+            var sb = new StringBuilder();
+            sb.AppendSmart("{0} {1} {2} {3}", "these", "are", "the", "args");
 
-            TestAppend(formats, args, expected);
-        }
+            var actual = sb.ToString();
 
-        public static void TestAppend(string[] bunchOfFormat, object[] args, string[] bunchOfExpected)
-        {
-            var allErrors = new ExceptionCollection();
-
-            var numberOfTests = Math.Max(bunchOfFormat.Length, bunchOfExpected.Length);
-            for (int i = 0; i < numberOfTests; i++)
-            {
-                var format = bunchOfFormat[i % bunchOfFormat.Length];
-                var expected = bunchOfExpected[i % bunchOfExpected.Length];
-
-                string actual = string.Empty;
-
-                try
-                {
-                    var builder = new StringBuilder();
-                    builder.AppendSmart(format, args);
-
-                    actual = builder.ToString();
-
-                    Assert.AreEqual(expected, actual);
-                    Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error: \"{0}\" => \"{1}\"", format, actual);
-                    allErrors.Add(ex);
-                }
-            }
-
-            allErrors.ThrowIfNotEmpty();
-        }
-
-        public static void TestAppendLine(string[] bunchOfFormat, object[] args, string[] bunchOfExpected)
-        {
-            var allErrors = new ExceptionCollection();
-
-            var numberOfTests = Math.Max(bunchOfFormat.Length, bunchOfExpected.Length);
-            for (int i = 0; i < numberOfTests; i++)
-            {
-                var format = bunchOfFormat[i % bunchOfFormat.Length];
-                var expected = bunchOfExpected[i % bunchOfExpected.Length];
-
-                string? actual = null;
-
-                try
-                {
-                    var builder = new StringBuilder();
-                    builder.AppendLineSmart(format, args);
-
-                    actual = builder.ToString();
-
-                    Assert.AreEqual(expected, actual);
-                    Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error: \"{0}\" => \"{1}\"", format, actual);
-                    allErrors.Add(ex);
-                }
-            }
-
-            allErrors.ThrowIfNotEmpty();
+            Assert.That(actual, Is.EqualTo("these are the args"));
         }
 
         #endregion

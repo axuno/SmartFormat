@@ -138,7 +138,7 @@ namespace SmartFormat
                 new ConditionalFormatter(),
                 new IsMatchFormatter(),
                 new NullFormatter(),
-                new TimeFormatter("en"),
+                new TimeFormatter(),
                 new XElementFormatter(),
                 new ChooseFormatter(),
                 new SubStringFormatter(),

@@ -113,7 +113,7 @@ namespace SmartFormat.Tests.Extensions
             smart.Test(new[] {format}, args, new[] {expected});
         }
         [TestCase("{2:list:{:{FirstName}}|, }", "Jim, Pam, Dwight")]
-        [TestCase("{3:list:{:M/d/yyyy} |}", "1/1/2000 10/10/2010 5/5/5555 ")]
+        [TestCase("{3:list:{:d:M/d/yyyy} |}", "1/1/2000 10/10/2010 5/5/5555 ")] // use the default formatter ("d") for nested dates
         [TestCase("{2:list:{:{FirstName}'s friends: {Friends:list:{FirstName}|, }}|; }", "Jim's friends: Dwight, Michael; Pam's friends: Dwight, Michael; Dwight's friends: Michael")]
         public void NestedArraysTest(string format, string expected)
         {

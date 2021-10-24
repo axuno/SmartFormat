@@ -46,12 +46,12 @@ namespace SmartFormat.Utilities
             }
         }
 
-        public static TimeSpanFormatOptions Parse(string formatOptionsString)
+        public static TimeSpanFormatOptions Parse(string formatString)
         {
-            formatOptionsString = formatOptionsString.ToLower();
+            formatString = formatString.ToLower();
 
             var t = TimeSpanFormatOptions.InheritDefaults;
-            foreach (Match m in parser.Matches(formatOptionsString))
+            foreach (Match m in parser.Matches(formatString))
                 switch (m.Value)
                 {
                     case "w":
