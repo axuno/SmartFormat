@@ -74,17 +74,11 @@ namespace SmartFormat.Tests.Utilities
                 ms: new[] { "{0}ms" },
                 lessThan: "less than {0}");
 
-            try
-            {
-                var c = CultureInfo.GetCultureInfo(language);
-                Console.WriteLine($"Culture for language '{language}' has Name {c.Name} and DisplayName {c.DisplayName}, is neural: {c.IsNeutralCulture}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-
-            Assert.That(() => CommonLanguagesTimeTextInfo.AddLanguage(language, custom), Throws.TypeOf<System.Globalization.CultureNotFoundException>());
+            // Note: Linux returns a CultureInfo for language '123xyz', with Name '123xyz' and marked as IsNeutralCulture = true
+            if (System.Runtime.InteropServices.RuntimeInformation
+                .IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                Assert.That(() => CommonLanguagesTimeTextInfo.AddLanguage(language, custom),
+                    Throws.TypeOf<System.Globalization.CultureNotFoundException>());
         }
     }
 }

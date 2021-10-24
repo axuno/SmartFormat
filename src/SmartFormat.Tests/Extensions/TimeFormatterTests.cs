@@ -47,8 +47,16 @@ namespace SmartFormat.Tests.Extensions
             var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
             timeFormatter.UseEnglishAsFallbackLanguage = false;
 
-            Assert.That(() => smart.Format("{0:time(123xyz):noless}", new TimeSpan(1,2,3)), Throws.InstanceOf<FormattingException>().And.InnerException.InstanceOf<CultureNotFoundException>());
-            Assert.That(() => smart.Format(CultureInfo.InvariantCulture, "{0:time:noless}", new TimeSpan(1,2,3)), Throws.InstanceOf<FormattingException>().And.Message.Contains("TimeTextInfo could not be found"), "Language as argument");
+            // Note: Linux returns a CultureInfo for language '123xyz', with Name '123xyz' and marked as IsNeutralCulture = true
+            if (System.Runtime.InteropServices.RuntimeInformation
+                .IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                Assert.That(() => smart.Format("{0:time(123xyz):noless}", new TimeSpan(1, 2, 3)),
+                    Throws.InstanceOf<FormattingException>().And.InnerException.InstanceOf<CultureNotFoundException>());
+            }
+            Assert.That(() => smart.Format(CultureInfo.InvariantCulture, "{0:time:noless}", new TimeSpan(1, 2, 3)),
+                Throws.InstanceOf<FormattingException>().And.Message.Contains("TimeTextInfo could not be found"),
+                "Language as argument");
         }
 
         [TestCase(true)]
