@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -20,12 +21,13 @@ namespace SmartFormat.Tests.Utilities
         [TestCase("de", "German")]
         public void Get_TimeTextInfo_For_BuiltIn_Languages(string language, string property)
         {
-            var tti = (TimeTextInfo) typeof(CommonLanguagesTimeTextInfo)
-                .GetProperty(property, BindingFlags.Public | BindingFlags.Static)!
-                .GetValue(null, null);
+            var tti =  typeof(CommonLanguagesTimeTextInfo)
+                .GetProperty(property, BindingFlags.Public | BindingFlags.Static)
+                ?.GetValue(null, null) as TimeTextInfo;
 
+            Assert.That(tti, Is.Not.Null);
             Assert.That(() => CommonLanguagesTimeTextInfo.GetTimeTextInfo(language)!.GetLessThanText("1"),
-                Is.EqualTo(tti.GetLessThanText("1")));
+                Is.EqualTo(tti?.GetLessThanText("1")));
         }
 
         [Test]
@@ -71,7 +73,7 @@ namespace SmartFormat.Tests.Utilities
                 s: new[] { "{0}s" },
                 ms: new[] { "{0}ms" },
                 lessThan: "less than {0}");
-            
+
             Assert.That(() => CommonLanguagesTimeTextInfo.AddLanguage(language, custom), Throws.TypeOf<System.Globalization.CultureNotFoundException>());
         }
     }

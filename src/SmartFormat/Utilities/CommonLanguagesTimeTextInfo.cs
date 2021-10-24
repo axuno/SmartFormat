@@ -145,8 +145,9 @@ namespace SmartFormat.Utilities
         public static void AddLanguage(string twoLetterISOLanguageName, TimeTextInfo timeTextInfo)
         {
             var c = twoLetterISOLanguageName.ToLower();
-            // Test for validity
-            _ = CultureInfo.GetCultureInfo(c);
+            // Test for validity. Null-check necessary for Linux.
+            if (CultureInfo.GetCultureInfo(c) is null)
+                throw new CultureNotFoundException(nameof(twoLetterISOLanguageName), $"No {nameof(CultureInfo)} found for language '{twoLetterISOLanguageName}'");
 
             _customLanguage.Add(twoLetterISOLanguageName, timeTextInfo);
         }
