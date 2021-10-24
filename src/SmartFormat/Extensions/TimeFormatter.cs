@@ -201,7 +201,7 @@ namespace SmartFormat.Extensions
             else
             {
                 cultureInfo = CultureInfo.GetCultureInfo(culture);
-                // Test for validity. Null-check necessary for Linux.
+                // Test for validity
                 if (CultureInfo.GetCultureInfo(culture) is null)
                     throw new CultureNotFoundException(nameof(formattingInfo) + nameof(formattingInfo.FormatterOptions), $"No {nameof(CultureInfo)} found for language '{culture}'");
             }

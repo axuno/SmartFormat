@@ -74,6 +74,9 @@ namespace SmartFormat.Tests.Utilities
                 ms: new[] { "{0}ms" },
                 lessThan: "less than {0}");
 
+            var c = CultureInfo.GetCultureInfo(language);
+            Console.WriteLine($"Culture for language '{language}' has Name {c.Name} and DisplayName {c.DisplayName}, is neural: {c.IsNeutralCulture}");
+
             Assert.That(() => CommonLanguagesTimeTextInfo.AddLanguage(language, custom), Throws.TypeOf<System.Globalization.CultureNotFoundException>());
         }
     }
