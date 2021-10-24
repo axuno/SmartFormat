@@ -108,7 +108,7 @@ namespace SmartFormat.Utilities
         /// </summary>
         /// <param name="minimumValue"></param>
         /// <returns>The "less than" text for the given threshold.</returns>
-        public string GetLessThanText(string minimumValue)
+        public virtual string GetLessThanText(string minimumValue)
         {
             return string.Format(_lessThan, minimumValue);
         }

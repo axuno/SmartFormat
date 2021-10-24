@@ -219,6 +219,57 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
 
+### 19. Refactored `TimeFormatter`
+
+* Constructor with string argument for default language is obsolete.
+* Property `DefaultTwoLetterISOLanguageName` is obsolete.
+* Culture is now determined in this sequence (same as with `LocalizationFormatter` and `PluralLocalizationFormatter`):<br/>
+  a) Get the culture from the `FormattingInfo.FormatterOptions`.<br/>
+  b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
+  c) The `CultureInfo.CurrentUICulture`<br/>
+* **New:** With the extended `CommonLanguagesTimeTextInfo`, `TimeFormatter` includes French, Spanish, Portuguese, Italian and German as new languages besides English out-of-the-box.
+* **New:** With `TimeFormatter.UseEnglishAsFallbackLanguage = true`, English will be used, if no supported language was found.
+* **New:** Custom languages can now easily be added to `CommonLanguagesTimeTextInfo`. Custom languages override built-in definitions.
+    ```CSharp
+    var language = "nl"; // dummy - it's English, not Dutch ;-)
+    TimeTextInfo custom = new(
+        pluralRule: PluralRules.GetPluralRule(language),
+        week: new[] { "{0} week", "{0} weeks" },
+        day: new[] { "{0} day", "{0} days" },
+        hour: new[] { "{0} hour", "{0} hours" },
+        minute: new[] { "{0} minute", "{0} minutes" },
+        second: new[] { "{0} second", "{0} seconds" },
+        millisecond: new[] { "{0} millisecond", "{0} milliseconds" },
+        w: new[] { "{0}w" },
+        d: new[] { "{0}d" },
+        h: new[] { "{0}h" },
+        m: new[] { "{0}m" },
+        s: new[] { "{0}s" },
+        ms: new[] { "{0}ms" },
+        lessThan: "less than {0}");
+    CommonLanguagesTimeTextInfo.AddLanguage(language, custom)
+    ```
+* **Changed:** 
+  a) This notation - using formats as formatter options - was allowed in *Smart.Format v2.x*, but is now depreciated. It is still detected and working, as long as the format part is left empty
+    ```CSharp
+    var formatDepreciated = "{0:time(abbr hours noless)}";
+    ```
+  b) This format string is recommended for *Smart.Format v3* and later. It allows for including the language as an option to the `TimeFormatter`:
+    ```CSharp
+    // Without language option:
+    var formatRecommended = "{0:time:abbr hours noless:}";
+    // With language option:
+    var formatRecommended = "{0:time(en):abbr hours noless:}";
+    ```
+* PRs for extending built-in languages are welcome.
+* Example:
+    ```Csharp
+    var timeSpan = new TimeSpan(1,1,1,1,1)
+    Smart.Format("{0:time(en):hours minutes}", timeSpan);
+    // result: "25 hours 1 minute"
+    Smart.Format("{0:time(fr):hours minutes}", timeSpan);
+    // result: "25 heures 1 minute"
+   ```
 
 v2.7.1
 ===
