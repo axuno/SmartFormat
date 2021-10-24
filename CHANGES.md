@@ -219,7 +219,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
 
-### 19. Refactored `TimeFormatter`
+### 19. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220))
 
 * Constructor with string argument for default language is obsolete.
 * Property `DefaultTwoLetterISOLanguageName` is obsolete.
