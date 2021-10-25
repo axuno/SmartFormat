@@ -10,7 +10,7 @@
         <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
         <PackageId>SmartFormat.NET</PackageId>
-        <PackageReleaseNotes>See the change log with for details of this release:
+        <PackageReleaseNotes>See the change log for details of this release:
 https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
