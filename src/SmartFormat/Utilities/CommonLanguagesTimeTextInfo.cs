@@ -141,14 +141,9 @@ namespace SmartFormat.Utilities
         /// </summary>
         /// <param name="twoLetterISOLanguageName">The string to get the associated <see cref="System.Globalization.CultureInfo"/></param>
         /// <param name="timeTextInfo">The localized <see cref="TimeTextInfo"/></param>
-        /// <exception cref="CultureNotFoundException">If no <see cref="CultureInfo"/> for the <paramref name="twoLetterISOLanguageName"/> was found.</exception>
         public static void AddLanguage(string twoLetterISOLanguageName, TimeTextInfo timeTextInfo)
         {
             var c = twoLetterISOLanguageName.ToLower();
-            // Test for validity
-            if (CultureInfo.GetCultureInfo(c) is null)
-                throw new CultureNotFoundException(nameof(twoLetterISOLanguageName), $"No {nameof(CultureInfo)} found for language '{twoLetterISOLanguageName}'");
-
             _customLanguage.Add(twoLetterISOLanguageName, timeTextInfo);
         }
 

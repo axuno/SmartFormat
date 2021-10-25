@@ -45,18 +45,29 @@ namespace SmartFormat.Tests.Extensions
         {
             var smart = GetStandardFormatter();
             var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
-            timeFormatter.UseEnglishAsFallbackLanguage = false;
+            timeFormatter.FallbackLanguage = string.Empty;
 
-            // Note: Linux returns a CultureInfo for language '123xyz', with Name '123xyz' and marked as IsNeutralCulture = true
-            if (System.Runtime.InteropServices.RuntimeInformation
-                .IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-            {
-                Assert.That(() => smart.Format("{0:time(123xyz):noless}", new TimeSpan(1, 2, 3)),
-                    Throws.InstanceOf<FormattingException>().And.InnerException.InstanceOf<CultureNotFoundException>());
-            }
             Assert.That(() => smart.Format(CultureInfo.InvariantCulture, "{0:time:noless}", new TimeSpan(1, 2, 3)),
                 Throws.InstanceOf<FormattingException>().And.Message.Contains("TimeTextInfo could not be found"),
                 "Language as argument");
+        }
+
+        [Test]
+        public void Setting_Unknown_FallbackLanguage_Should_Throw()
+        {
+            var smart = GetStandardFormatter();
+            var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
+            Exception? ex = null;
+            try
+            {
+                timeFormatter.FallbackLanguage = "something-not-existing";
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+
+            Assert.That(ex, Is.InstanceOf<Exception>().And.Message.Contains(nameof(TimeTextInfo)));
         }
 
         [TestCase(true)]
@@ -65,7 +76,7 @@ namespace SmartFormat.Tests.Extensions
         {
             var smart = GetStandardFormatter();
             var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
-            timeFormatter.UseEnglishAsFallbackLanguage = useFallbackLanguage;
+            timeFormatter.FallbackLanguage = useFallbackLanguage ? "en" : string.Empty;
 
             if(useFallbackLanguage)
                 Assert.That(() => smart.Format("{0:time(nl):noless}", new TimeSpan(1,2,3)), Throws.Nothing);

@@ -16,6 +16,8 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class TimeFormatter : IFormatter
     {
+        private string _fallbackLanguage = "en";
+
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
         /// </summary>
@@ -75,9 +77,27 @@ namespace SmartFormat.Extensions
         public TimeSpanFormatOptions DefaultFormatOptions { get; set; }
 
         /// <summary>
-        /// Gets or sets, whether English shall be used if no supported language was found.
+        /// Gets or sets, the fallback language that is used if no supported language was found.
+        /// Default is "en". If no fallback language shall be used, set it to <see cref="string.Empty"/>.
         /// </summary>
-        public bool UseEnglishAsFallbackLanguage { get; set; } = true;
+        /// <exception cref="Exception">If no <see cref="TimeTextInfo"/> could be found for the language.</exception>
+        public string FallbackLanguage
+        {
+            get
+            {
+                return _fallbackLanguage;
+            }
+
+            set
+            {
+                if(value == string.Empty)
+                    _fallbackLanguage = value;
+                else if (CommonLanguagesTimeTextInfo.GetTimeTextInfo(value) != null)
+                    _fallbackLanguage = value;
+                else
+                    throw new Exception($"No {nameof(TimeTextInfo)} found for language '{value}'.");
+            }
+        }
 
         /// <summary>
         /// The ISO language name, which will be used for getting the <see cref="TimeTextInfo"/>.
@@ -176,11 +196,11 @@ namespace SmartFormat.Extensions
 
             if (timeTextInfoFromCulture != null) return timeTextInfoFromCulture;
 
-            if(timeTextInfoFromCulture is null && !UseEnglishAsFallbackLanguage)
+            if(timeTextInfoFromCulture is null && FallbackLanguage == string.Empty)
                 throw new FormattingException(formattingInfo.Placeholder, $"{nameof(TimeTextInfo)} could not be found for the given culture argument '{formattingInfo.FormatterOptions}'.", 0);
 
-            if(UseEnglishAsFallbackLanguage)
-                return CommonLanguagesTimeTextInfo.GetTimeTextInfo("en")!;
+            if(FallbackLanguage != string.Empty)
+                return CommonLanguagesTimeTextInfo.GetTimeTextInfo(FallbackLanguage)!;
 
             throw new Exception($"{nameof(TimeTextInfo)} could not be found for the given {nameof(IFormatProvider)}.");
         }
