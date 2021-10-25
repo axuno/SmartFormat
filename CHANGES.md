@@ -7,7 +7,7 @@ What's new in v3.0.0-alpha.3
 ### 1. Significant boost in performance
 After implementing a zero allocation `ValueStringBuilder` based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193):
    * Parsing is 10% faster with 50-80% less GC and memory allocation
-   * Formatting is up to 40% faster with with 50% less GC and memory allocation
+   * Formatting is up to 40% faster with 50% less GC and memory allocation
 
 More optimizations:
 
@@ -219,7 +219,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
 
-### 19. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220))
+### 19. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221))
 
 * Constructor with string argument for default language is obsolete.
 * Property `DefaultTwoLetterISOLanguageName` is obsolete.
@@ -228,7 +228,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
 * **New:** With the extended `CommonLanguagesTimeTextInfo`, `TimeFormatter` includes French, Spanish, Portuguese, Italian and German as new languages besides English out-of-the-box.
-* **New:** With `TimeFormatter.UseEnglishAsFallbackLanguage = true`, English will be used, if no supported language was found.
+* **New:** With e.g. `TimeFormatter.FallbackLanguage = "en";`, this fallback language will be used, if no supported language could be found.
 * **New:** Custom languages can now easily be added to `CommonLanguagesTimeTextInfo`. Custom languages override built-in definitions.
     ```CSharp
     var language = "nl"; // dummy - it's English, not Dutch ;-)

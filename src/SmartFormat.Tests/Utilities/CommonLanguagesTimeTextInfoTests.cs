@@ -58,27 +58,27 @@ namespace SmartFormat.Tests.Utilities
         public void Add_Invalid_Custom_Language_TimeTextInfo_Should_Throw()
         {
             var language = "123xyz";
-            TimeTextInfo custom = new(
-                pluralRule: PluralRules.GetPluralRule("en"), // "123xyz" would throw here already
-                week: new[] { "{0} week", "{0} weeks" },
-                day: new[] { "{0} day", "{0} days" },
-                hour: new[] { "{0} hour", "{0} hours" },
-                minute: new[] { "{0} minute", "{0} minutes" },
-                second: new[] { "{0} second", "{0} seconds" },
-                millisecond: new[] { "{0} millisecond", "{0} milliseconds" },
-                w: new[] { "{0}w" },
-                d: new[] { "{0}d" },
-                h: new[] { "{0}h" },
-                m: new[] { "{0}m" },
-                s: new[] { "{0}s" },
-                ms: new[] { "{0}ms" },
-                lessThan: "less than {0}");
+            Assert.That(() =>
+                {
+                    TimeTextInfo custom = new(
+                        pluralRule: PluralRules.GetPluralRule(language),
+                        week: new[] { "{0} week", "{0} weeks" },
+                        day: new[] { "{0} day", "{0} days" },
+                        hour: new[] { "{0} hour", "{0} hours" },
+                        minute: new[] { "{0} minute", "{0} minutes" },
+                        second: new[] { "{0} second", "{0} seconds" },
+                        millisecond: new[] { "{0} millisecond", "{0} milliseconds" },
+                        w: new[] { "{0}w" },
+                        d: new[] { "{0}d" },
+                        h: new[] { "{0}h" },
+                        m: new[] { "{0}m" },
+                        s: new[] { "{0}s" },
+                        ms: new[] { "{0}ms" },
+                        lessThan: "less than {0}");
 
-            // Note: Linux returns a CultureInfo for language '123xyz', with Name '123xyz' and marked as IsNeutralCulture = true
-            if (System.Runtime.InteropServices.RuntimeInformation
-                .IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-                Assert.That(() => CommonLanguagesTimeTextInfo.AddLanguage(language, custom),
-                    Throws.TypeOf<System.Globalization.CultureNotFoundException>());
+                    CommonLanguagesTimeTextInfo.AddLanguage(language, custom);
+                },
+                Throws.ArgumentException.And.Message.Contains("IsoLangToDelegate not found"));
         }
     }
 }
