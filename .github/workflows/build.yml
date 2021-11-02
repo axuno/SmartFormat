@@ -44,6 +44,6 @@ jobs:
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"axuno_SmartFormat" /o:"axuno" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           dotnet restore
-          dotnet test --no-build --verbosity normal
           dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release --no-restore
+          dotnet test --no-build --verbosity normal
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
