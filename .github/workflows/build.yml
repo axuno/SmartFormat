@@ -42,7 +42,8 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"axuno_SmartFormat" /o:"axuno" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          dotnet sln ./src/SmartFormat.sln remove ./Demo/Demo.csproj ./Demo.NetFramework/Demo.NetFramework.csproj
           dotnet restore ./src/SmartFormat.sln
-          dotnet build ./src/SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release --no-restore
+          dotnet build ./src/SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release --no-restore /nowarn:CS1591,CS0618
           dotnet test ./src/SmartFormat.sln --no-build --verbosity normal /p:configuration=release
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
