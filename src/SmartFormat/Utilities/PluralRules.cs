@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace SmartFormat.Utilities
 {
@@ -16,8 +17,8 @@ namespace SmartFormat.Utilities
         /// <summary>
         /// Holds the ISO language code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
         /// </summary>
-        public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate =
-            new() 
+        public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate { get; } =
+            new()
             {
                 // Singular
                 {"az", Singular}, // Azerbaijani

@@ -23,13 +23,13 @@ namespace SmartFormat.Utilities
         /// <para>Uses the specified timeSpanFormatOptions.</para>
         /// <para>For example: "31.23:59:00.555" = "31 days 23 hours 59 minutes 0 seconds 555 milliseconds"</para>
         /// </summary>
-        /// <param name="FromTime"></param>
+        /// <param name="fromTime"></param>
         /// <param name="options">
         /// <para>A combination of flags that determine the formatting options.</para>
         /// <para>These will be combined with the default timeSpanFormatOptions.</para>
         /// </param>
         /// <param name="timeTextInfo">An object that supplies the text to use for output</param>
-        public static string ToTimeString(this TimeSpan FromTime, TimeSpanFormatOptions options,
+        public static string ToTimeString(this TimeSpan fromTime, TimeSpanFormatOptions options,
             TimeTextInfo timeTextInfo)
         {
             // If there are any missing options, merge with the defaults:
@@ -47,22 +47,22 @@ namespace SmartFormat.Utilities
             switch (rangeMin)
             {
                 case TimeSpanFormatOptions.RangeWeeks:
-                    FromTime = TimeSpan.FromDays(round(FromTime.TotalDays / 7) * 7);
+                    fromTime = TimeSpan.FromDays(round(fromTime.TotalDays / 7) * 7);
                     break;
                 case TimeSpanFormatOptions.RangeDays:
-                    FromTime = TimeSpan.FromDays(round(FromTime.TotalDays));
+                    fromTime = TimeSpan.FromDays(round(fromTime.TotalDays));
                     break;
                 case TimeSpanFormatOptions.RangeHours:
-                    FromTime = TimeSpan.FromHours(round(FromTime.TotalHours));
+                    fromTime = TimeSpan.FromHours(round(fromTime.TotalHours));
                     break;
                 case TimeSpanFormatOptions.RangeMinutes:
-                    FromTime = TimeSpan.FromMinutes(round(FromTime.TotalMinutes));
+                    fromTime = TimeSpan.FromMinutes(round(fromTime.TotalMinutes));
                     break;
                 case TimeSpanFormatOptions.RangeSeconds:
-                    FromTime = TimeSpan.FromSeconds(round(FromTime.TotalSeconds));
+                    fromTime = TimeSpan.FromSeconds(round(fromTime.TotalSeconds));
                     break;
                 case TimeSpanFormatOptions.RangeMilliSeconds:
-                    FromTime = TimeSpan.FromMilliseconds(round(FromTime.TotalMilliseconds));
+                    fromTime = TimeSpan.FromMilliseconds(round(fromTime.TotalMilliseconds));
                     break;
             }
 
@@ -76,28 +76,28 @@ namespace SmartFormat.Utilities
                 switch (i)
                 {
                     case TimeSpanFormatOptions.RangeWeeks:
-                        value = (int) Math.Floor(FromTime.TotalDays / 7);
-                        FromTime -= TimeSpan.FromDays(value * 7);
+                        value = (int) Math.Floor(fromTime.TotalDays / 7);
+                        fromTime -= TimeSpan.FromDays(value * 7);
                         break;
                     case TimeSpanFormatOptions.RangeDays:
-                        value = (int) Math.Floor(FromTime.TotalDays);
-                        FromTime -= TimeSpan.FromDays(value);
+                        value = (int) Math.Floor(fromTime.TotalDays);
+                        fromTime -= TimeSpan.FromDays(value);
                         break;
                     case TimeSpanFormatOptions.RangeHours:
-                        value = (int) Math.Floor(FromTime.TotalHours);
-                        FromTime -= TimeSpan.FromHours(value);
+                        value = (int) Math.Floor(fromTime.TotalHours);
+                        fromTime -= TimeSpan.FromHours(value);
                         break;
                     case TimeSpanFormatOptions.RangeMinutes:
-                        value = (int) Math.Floor(FromTime.TotalMinutes);
-                        FromTime -= TimeSpan.FromMinutes(value);
+                        value = (int) Math.Floor(fromTime.TotalMinutes);
+                        fromTime -= TimeSpan.FromMinutes(value);
                         break;
                     case TimeSpanFormatOptions.RangeSeconds:
-                        value = (int) Math.Floor(FromTime.TotalSeconds);
-                        FromTime -= TimeSpan.FromSeconds(value);
+                        value = (int) Math.Floor(fromTime.TotalSeconds);
+                        fromTime -= TimeSpan.FromSeconds(value);
                         break;
                     case TimeSpanFormatOptions.RangeMilliSeconds:
-                        value = (int) Math.Floor(FromTime.TotalMilliseconds);
-                        FromTime -= TimeSpan.FromMilliseconds(value);
+                        value = (int) Math.Floor(fromTime.TotalMilliseconds);
+                        fromTime -= TimeSpan.FromMilliseconds(value);
                         break;
                     default:
                         // This code is unreachable, but it prevents compile-errors.

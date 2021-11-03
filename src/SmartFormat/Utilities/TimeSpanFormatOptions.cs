@@ -25,7 +25,7 @@ namespace SmartFormat.Utilities
         /// Specifies that all <c>timeSpanFormatOptions</c> should be inherited from
         /// <c>TimeSpanUtility.DefaultTimeFormatOptions</c>.
         /// </summary>
-        InheritDefaults = 0x0,
+        None = 0x0,
 
         /// <summary>
         /// Abbreviates units.
