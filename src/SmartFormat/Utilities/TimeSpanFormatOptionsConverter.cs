@@ -50,7 +50,7 @@ namespace SmartFormat.Utilities
         {
             formatString = formatString.ToLower();
 
-            var t = TimeSpanFormatOptions.InheritDefaults;
+            var t = TimeSpanFormatOptions.None;
             foreach (Match m in parser.Matches(formatString))
                 switch (m.Value)
                 {
