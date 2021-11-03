@@ -95,7 +95,7 @@ namespace SmartFormat.Extensions
                 else if (CommonLanguagesTimeTextInfo.GetTimeTextInfo(value) != null)
                     _fallbackLanguage = value;
                 else
-                    throw new Exception($"No {nameof(TimeTextInfo)} found for language '{value}'.");
+                    throw new ArgumentException($"No {nameof(TimeTextInfo)} found for language '{value}'.");
             }
         }
 
@@ -202,7 +202,7 @@ namespace SmartFormat.Extensions
             if(FallbackLanguage != string.Empty)
                 return CommonLanguagesTimeTextInfo.GetTimeTextInfo(FallbackLanguage)!;
 
-            throw new Exception($"{nameof(TimeTextInfo)} could not be found for the given {nameof(IFormatProvider)}.");
+            throw new ArgumentException($"{nameof(TimeTextInfo)} could not be found for the given {nameof(IFormatProvider)}.", nameof(formattingInfo));
         }
 
         #endregion
@@ -221,9 +221,6 @@ namespace SmartFormat.Extensions
             else
             {
                 cultureInfo = CultureInfo.GetCultureInfo(culture);
-                // Test for validity
-                if (CultureInfo.GetCultureInfo(culture) is null)
-                    throw new CultureNotFoundException(nameof(formattingInfo) + nameof(formattingInfo.FormatterOptions), $"No {nameof(CultureInfo)} found for language '{culture}'");
             }
 
             return cultureInfo;

@@ -86,12 +86,13 @@ namespace SmartFormat.Core.Parsing
         {
             // 1. The operator character must have a value, usually ','
             // 2. The alignment is an integer value
-            if (selector.OperatorLength > 0 && selector.Operator[0] == SmartSettings.Parser.AlignmentOperator)
+            if (selector.OperatorLength > 0 
+                && selector.Operator[0] == SmartSettings.Parser.AlignmentOperator 
+                && int.TryParse(selector.RawText, out var alignment))
             {
-                if (int.TryParse(selector.RawText, out var alignment))
-                    Alignment = alignment;
+                Alignment = alignment;
             }
-            
+
             _selectors.Add(selector);
         }
 
@@ -177,49 +178,42 @@ namespace SmartFormat.Core.Parsing
             if (_toStringCache != null) return _toStringCache;
 
             using var sb = Utilities.ZStringExtensions.CreateStringBuilder(Length);
-            try
+            sb.Append(SmartSettings.Parser.PlaceholderBeginChar);
+            foreach (var s in Selectors)
             {
-                sb.Append(SmartSettings.Parser.PlaceholderBeginChar);
-                foreach (var s in Selectors)
-                {
-                    // alignment operators will be appended later
-                    if (s.Operator.Length > 0 && s.Operator[0] == SmartSettings.Parser.AlignmentOperator) continue;
+                // alignment operators will be appended later
+                if (s.Operator.Length > 0 && s.Operator[0] == SmartSettings.Parser.AlignmentOperator) continue;
                 
-                    sb.Append(s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex));
-                }
-                if (Alignment != 0)
-                {
-                    sb.Append(SmartSettings.Parser.AlignmentOperator);
-                    sb.Append(Alignment);
-                }
-
-                if (FormatterName != string.Empty)
-                {
-                    sb.Append(SmartSettings.Parser.FormatterNameSeparator);
-                    sb.Append(FormatterName);
-                    if (FormatterOptions != string.Empty)
-                    {
-                        sb.Append(SmartSettings.Parser.FormatterOptionsBeginChar);
-                        sb.Append(FormatterOptions);
-                        sb.Append(SmartSettings.Parser.FormatterOptionsEndChar);
-                    }
-                }
-
-                if (Format != null)
-                {
-                    sb.Append(SmartSettings.Parser.FormatterNameSeparator);
-                    sb.Append(Format);
-                }
-
-                sb.Append(SmartSettings.Parser.PlaceholderEndChar);
-
-                _toStringCache = sb.ToString();
-                return _toStringCache;
+                sb.Append(s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex));
             }
-            finally
+            if (Alignment != 0)
             {
-                sb.Dispose();
+                sb.Append(SmartSettings.Parser.AlignmentOperator);
+                sb.Append(Alignment);
             }
+
+            if (FormatterName != string.Empty)
+            {
+                sb.Append(SmartSettings.Parser.FormatterNameSeparator);
+                sb.Append(FormatterName);
+                if (FormatterOptions != string.Empty)
+                {
+                    sb.Append(SmartSettings.Parser.FormatterOptionsBeginChar);
+                    sb.Append(FormatterOptions);
+                    sb.Append(SmartSettings.Parser.FormatterOptionsEndChar);
+                }
+            }
+
+            if (Format != null)
+            {
+                sb.Append(SmartSettings.Parser.FormatterNameSeparator);
+                sb.Append(Format);
+            }
+
+            sb.Append(SmartSettings.Parser.PlaceholderEndChar);
+
+            _toStringCache = sb.ToString();
+            return _toStringCache;
         }
     }
 }

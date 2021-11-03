@@ -9,7 +9,7 @@ namespace SmartFormat.Tests.Utilities
     [TestFixture]
     public class CustomFormatProviderTests
     {
-        private SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
+        private static SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
         {
             var formatter = new SmartFormatter(settings ?? new SmartSettings()); 
             formatter.AddExtensions(new DefaultFormatter());

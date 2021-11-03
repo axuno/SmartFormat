@@ -13,26 +13,26 @@ namespace SmartFormat.Utilities
     public interface ILocalizationProvider
     {
         /// <summary>
-        /// Gets the localized equivalent of the <paramref name="input"/> string.
+        /// Gets the localized equivalent of the <paramref name="name"/> string.
         /// </summary>
-        /// <param name="input">The string to be localized.</param>
-        /// <returns>The localized equivalent of the <paramref name="input"/> string, or <see langref="null"/> if not found.</returns>
-        public string? GetString(string input);
+        /// <param name="name">The string to be localized.</param>
+        /// <returns>The localized equivalent of the <paramref name="name"/> string, or <see langref="null"/> if not found.</returns>
+        public string? GetString(string name);
 
         /// <summary>
-        /// Gets the localized equivalent of the <paramref name="input"/> string.
+        /// Gets the localized equivalent of the <paramref name="name"/> string.
         /// </summary>
-        /// <param name="input">The string to be localized.</param>
+        /// <param name="name">The string to be localized.</param>
         /// <param name="cultureName">The culture name to use for localization.</param>
-        /// <returns>The localized equivalent of the <paramref name="input"/> string, or <see langref="null"/> if not found.</returns>
-        public string? GetString(string input, string cultureName);
+        /// <returns>The localized equivalent of the <paramref name="name"/> string, or <see langref="null"/> if not found.</returns>
+        public string? GetString(string name, string cultureName);
 
         /// <summary>
-        /// Gets the localized equivalent of the <paramref name="input"/> string.
+        /// Gets the localized equivalent of the <paramref name="name"/> string.
         /// </summary>
-        /// <param name="input">The string to be localized.</param>
-        /// <param name="culture">The <see cref="CultureInfo"/> to use for localization.</param>
-        /// <returns>The localized equivalent of the <paramref name="input"/> string, or <see langref="null"/> if not found.</returns>
-        public string? GetString(string input, CultureInfo culture);
+        /// <param name="name">The string to be localized.</param>
+        /// <param name="cultureInfo">The <see cref="CultureInfo"/> to use for localization.</param>
+        /// <returns>The localized equivalent of the <paramref name="name"/> string, or <see langref="null"/> if not found.</returns>
+        public string? GetString(string name, CultureInfo cultureInfo);
     }
 }
