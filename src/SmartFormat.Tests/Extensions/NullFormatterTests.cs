@@ -15,7 +15,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class NullFormatterTests
     {
-        private SmartFormatter GetFormatter(SmartSettings? settings = null)
+        private static SmartFormatter GetFormatter(SmartSettings? settings = null)
         {
             var smart = new SmartFormatter(settings ?? new SmartSettings());
             smart.AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource());

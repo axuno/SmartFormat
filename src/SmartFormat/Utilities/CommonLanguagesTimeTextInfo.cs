@@ -144,7 +144,7 @@ namespace SmartFormat.Utilities
         public static void AddLanguage(string twoLetterISOLanguageName, TimeTextInfo timeTextInfo)
         {
             var c = twoLetterISOLanguageName.ToLower();
-            _customLanguage.Add(twoLetterISOLanguageName, timeTextInfo);
+            _customLanguage.Add(c, timeTextInfo);
         }
 
         /// <summary>

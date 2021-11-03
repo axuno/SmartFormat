@@ -41,10 +41,10 @@ namespace SmartFormat.Extensions
         }
 
         /// <inheritdoc />
-        public override void Initialize(SmartFormatter formatter)
+        public override void Initialize(SmartFormatter smartFormatter)
         {
-            base.Initialize(formatter);
-            var comparer = formatter.Settings.GetCaseSensitivityComparer();
+            base.Initialize(smartFormatter);
+            var comparer = smartFormatter.Settings.GetCaseSensitivityComparer();
             // Comparer is called when _adding_ items to the Dictionary (not, when getting items)
             SelectorMethods =  new Dictionary<string, Func<ISelectorInfo, string, bool>>(comparer);
             AddMethods();

@@ -33,9 +33,9 @@ namespace SmartFormat.Extensions
                 return true;
             }
 
-            if (current is null or not JsonElement) return false;
+            if (current is not JsonElement element) return false;
 
-            var je = ((JsonElement)current).Clone();
+            var je = element.Clone();
 
             JsonElement targetElement;
             if (selectorInfo.FormatDetails.Settings.CaseSensitivity == SmartFormat.Core.Settings.CaseSensitivityType.CaseInsensitive)
@@ -58,7 +58,7 @@ namespace SmartFormat.Extensions
                 JsonValueKind.String => targetElement.GetString(),
                 JsonValueKind.Object => targetElement,
                 JsonValueKind.Array => targetElement.EnumerateArray().ToArray(),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(selectorInfo), $"Unexpected kind of '{nameof(JsonValueKind)}'")
             };
 
             return true;

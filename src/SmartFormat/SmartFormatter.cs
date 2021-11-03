@@ -25,15 +25,6 @@ namespace SmartFormat
         private readonly List<ISource> _sourceExtensions = new();
         private readonly List<IFormatter> _formatterExtensions = new();
 
-        #region : EventHandlers :
-
-        /// <summary>
-        /// Event raising, if an error occurs during formatting.
-        /// </summary>
-        public event EventHandler<FormattingErrorEventArgs>? OnFormattingFailure;
-
-        #endregion
-
         #region: Constructor :
 
         /// <summary>
@@ -48,6 +39,15 @@ namespace SmartFormat
             Settings = settings ?? new SmartSettings();
             Parser = new Parser(Settings);
         }
+
+        #endregion
+
+        #region : EventHandlers :
+
+        /// <summary>
+        /// Event raising, if an error occurs during formatting.
+        /// </summary>
+        public event EventHandler<FormattingErrorEventArgs>? OnFormattingFailure;
 
         #endregion
 
@@ -99,14 +99,13 @@ namespace SmartFormat
         {
             foreach (var source in sourceExtensions)
             {
-                if (_sourceExtensions.All(sx => sx.GetType() != source.GetType()))
-                {
-                    if(source is IInitializer sourceToInitialize) 
-                        sourceToInitialize.Initialize(this);
+                if (_sourceExtensions.Any(sx => sx.GetType() == source.GetType())) continue;
+
+                if(source is IInitializer sourceToInitialize) 
+                    sourceToInitialize.Initialize(this);
                     
-                    _sourceExtensions.Insert(position, source);
-                    position++;
-                }
+                _sourceExtensions.Insert(position, source);
+                position++;
             }
         }
 
@@ -143,7 +142,7 @@ namespace SmartFormat
         {
             foreach (var format in formatterExtensions)
             {
-                if (_formatterExtensions.All(fx => fx.GetType() != format.GetType()))
+                if (_formatterExtensions.Any(fx => fx.GetType() == format.GetType())) continue;
                 {
                     if(_formatterExtensions.Any(fx => fx.Name.Equals(format.Name)))
                         throw new ArgumentException($"Formatter '{format.GetType().Name}' uses existing name.", nameof(formatterExtensions));
@@ -266,40 +265,7 @@ namespace SmartFormat
             return Format(provider, formatParsed, args);
         }
 
-        /// <summary>
-        /// Writes the formatting result into an <see cref="IOutput"/> instance.
-        /// </summary>
-        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="format">The format string.</param>
-        /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, string format, params object?[] args)
-        {
-            FormatInto(output, format, (IList<object?>) args);
-        }
-
-        /// <summary>
-        /// Writes the formatting result into an <see cref="IOutput"/> instance.
-        /// </summary>
-        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="format">The format string.</param>
-        /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, string format, IList<object?> args)
-        {
-            var formatParsed = Parser.ParseFormat(format);
-            var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, formatParsed, args, null, output);
-            Format(formatDetails, current);
-        }
-
-        private void Format(FormatDetails formatDetails, object? current)
-        {
-            var formattingInfo = new FormattingInfo(formatDetails, formatDetails.OriginalFormat, current);
-            Format(formattingInfo);
-        }
-
-        #endregion
-
-        #region: Format Overloads with cached Format :
+        #region ** Format overloads with cached Format **
 
         /// <summary>
         /// Replaces one or more format items in as specified string with the string representation of a specific object.
@@ -345,48 +311,14 @@ namespace SmartFormat
         public string Format(IFormatProvider? provider, Format format, IList<object?> args)
         {
             using var output = new ZStringOutput(Utilities.ZStringExtensions.CalcCapacity(format));
-            try
-            {
-                var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-                var formatDetails = new FormatDetails(this, format, args, provider, output);
-                Format(formatDetails, current);
-
-                return output.ToString();
-            }
-            finally
-            {
-                output.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Writes the formatting result into an <see cref="IOutput"/> instance.
-        /// </summary>
-        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
-        /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, Format format, params object?[] args)
-        {
-            FormatInto(output, format, (IList<object?>) args);
-        }
-
-        /// <summary>
-        /// Writes the formatting result into an <see cref="IOutput"/> instance.
-        /// </summary>
-        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
-        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
-        /// <param name="args">The objects to format.</param>
-        public void FormatInto(IOutput output, Format format, IList<object?> args)
-        {
             var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-            var formatDetails = new FormatDetails(this, format, args, null, output);
+            var formatDetails = new FormatDetails(this, format, args, provider, output);
             Format(formatDetails, current);
+            return output.ToString();
         }
 
         #endregion
-
-        #region: Format :
-
+        
         /// <summary>
         /// Format the <see cref="FormattingInfo" /> argument.
         /// </summary>
@@ -432,6 +364,73 @@ namespace SmartFormat
                 }
             }
         }
+        
+        private void Format(FormatDetails formatDetails, object? current)
+        {
+            var formattingInfo = new FormattingInfo(formatDetails, formatDetails.OriginalFormat, current);
+            Format(formattingInfo);
+        }
+
+        #endregion
+
+        #region: FormatInto Overloads :
+
+        /// <summary>
+        /// Writes the formatting result into an <see cref="IOutput"/> instance.
+        /// </summary>
+        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">The objects to format.</param>
+        public void FormatInto(IOutput output, string format, params object?[] args)
+        {
+            FormatInto(output, format, (IList<object?>) args);
+        }
+
+        /// <summary>
+        /// Writes the formatting result into an <see cref="IOutput"/> instance.
+        /// </summary>
+        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">The objects to format.</param>
+        public void FormatInto(IOutput output, string format, IList<object?> args)
+        {
+            var formatParsed = Parser.ParseFormat(format);
+            var current = args.Count > 0 ? args[0] : args; // The first item is the default.
+            var formatDetails = new FormatDetails(this, formatParsed, args, null, output);
+            Format(formatDetails, current);
+        }        
+
+        #region: FormatInto Overloads with cached Format :
+
+        /// <summary>
+        /// Writes the formatting result into an <see cref="IOutput"/> instance.
+        /// </summary>
+        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+        /// <param name="args">The objects to format.</param>
+        public void FormatInto(IOutput output, Format format, params object?[] args)
+        {
+            FormatInto(output, format, (IList<object?>) args);
+        }
+
+        /// <summary>
+        /// Writes the formatting result into an <see cref="IOutput"/> instance.
+        /// </summary>
+        /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
+        /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+        /// <param name="args">The objects to format.</param>
+        public void FormatInto(IOutput output, Format format, IList<object?> args)
+        {
+            var current = args.Count > 0 ? args[0] : args; // The first item is the default.
+            var formatDetails = new FormatDetails(this, format, args, null, output);
+            Format(formatDetails, current);
+        }
+
+        #endregion
+
+        #endregion
+        
+        #region: Private methods :
 
         private void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
             IFormattingInfo formattingInfo)

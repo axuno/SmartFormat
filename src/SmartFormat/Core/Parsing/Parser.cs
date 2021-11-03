@@ -284,9 +284,9 @@ namespace SmartFormat.Core.Parsing
                     {
                         ParseAlternativeEscaping();
                     }
-                    else if (_index.NamedFormatterStart != PositionUndefined)
+                    else if (_index.NamedFormatterStart != PositionUndefined && !ParseNamedFormatter())
                     {
-                        if(!ParseNamedFormatter()) continue;
+                        // continue the loop
                     }
                 }
                 else
@@ -408,17 +408,15 @@ namespace SmartFormat.Core.Parsing
         /// Finishes the current placeholder <see cref="Format"/>.
         /// </summary>
         /// <param name="nestedDepth">The counter for nesting levels.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void FinishPlaceholderFormat(ref int nestedDepth)
         {
-            if (_resultFormat.ParentPlaceholder == null)
-            {
-                throw new NullReferenceException($"Unexpected null reference: {nameof(_resultFormat.ParentPlaceholder)}");
-            }
+            System.Diagnostics.Debug.Assert(_resultFormat.ParentPlaceholder is not null);
 
             nestedDepth--;
             _resultFormat.EndIndex = _index.Current;
-            _resultFormat.ParentPlaceholder.EndIndex = _index.SafeAdd(_index.Current, 1);
+            _resultFormat.ParentPlaceholder!.EndIndex = _index.SafeAdd(_index.Current, 1);
             _resultFormat = _resultFormat.ParentPlaceholder.Parent;
             _index.NamedFormatterStart = _index.NamedFormatterOptionsStart = _index.NamedFormatterOptionsEnd = PositionUndefined;
         }
@@ -429,8 +427,7 @@ namespace SmartFormat.Core.Parsing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ParseAlternativeEscaping()
         {
-            // 2021-05-03/axuno: Why? Does not make in difference in unit tests
-            // index.NamedFormatterStart = PositionUndefined;
+            // 2021-05-03/axuno: Removed "index.NamedFormatterStart = PositionUndefined"
 
             // See what is the next character
             var indexNextChar = _index.SafeAdd(_index.Current, 1);
@@ -566,7 +563,7 @@ namespace SmartFormat.Core.Parsing
         {
             if (currentPlaceholder == null)
             {
-                throw new NullReferenceException($"Unexpected null reference: {nameof(currentPlaceholder)}");
+                throw new ArgumentNullException(nameof(currentPlaceholder), $"Unexpected null reference");
             }
 
             var inputChar = _inputFormat[_index.Current];
@@ -758,17 +755,18 @@ namespace SmartFormat.Core.Parsing
                     return;
                 }
 
-                // Is it the start of the end tag like </script>
-                if (_inputFormat[_index.Current] == '<' && _inputFormat[_index.Current + 1] == '/')
-                    // Check whether the end tag is </script> or </style>
-                    if (currentTagName != ReadOnlySpan<char>.Empty && _inputFormat
+                // Is it the begin of </script> or </style>?
+                if (_inputFormat[_index.Current] == '<' 
+                    && _inputFormat[_index.Current + 1] == '/' 
+                    && currentTagName != ReadOnlySpan<char>.Empty 
+                    && _inputFormat
                         .AsSpan(_index.Current + 2)
                         .StartsWith(currentTagName, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        _index.Current = _index.SafeAdd(_index.Current, 2 + currentTagName.Length) ; // move behind tag name
-                        if (_index.Current < _inputFormat.Length && _inputFormat[_index.Current] == '>') // closing char
-                            return;
-                    }
+                {
+                    _index.Current = _index.SafeAdd(_index.Current, 2 + currentTagName.Length); // move behind tag name
+                    if (_index.Current < _inputFormat.Length && _inputFormat[_index.Current] == '>') // closing char
+                        return;
+                }
 
                 if (_inputFormat.Length > _index.Current)
                 {

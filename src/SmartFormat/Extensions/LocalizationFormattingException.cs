@@ -14,6 +14,7 @@ namespace SmartFormat.Extensions
     /// <summary>
     /// An exception caused when localization had issues.
     /// </summary>
+    [Serializable]
     public class LocalizationFormattingException : FormattingException
     {
         /// <summary>
@@ -35,5 +36,11 @@ namespace SmartFormat.Extensions
         public LocalizationFormattingException(FormatItem? errorItem, string issue, int index) : base(errorItem, issue, index)
         {
         }
+
+        ///<inheritdoc/>
+        protected LocalizationFormattingException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) : base(info, context) 
+        { }
     }
 }
