@@ -46,5 +46,4 @@ jobs:
           dotnet add ./src/SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
           dotnet restore ./src/SmartFormat.sln
           dotnet build ./src/SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release --no-restore /nowarn:CS1591,CS0618
-          # dotnet test ./src/SmartFormat.sln --no-build --verbosity normal /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../SmartFormat/SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|Cysharp|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
