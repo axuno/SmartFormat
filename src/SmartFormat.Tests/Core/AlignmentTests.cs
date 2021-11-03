@@ -15,7 +15,7 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class AlignmentTests
     {
-        private SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
+        private static SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
         {
             var formatter = new SmartFormatter(settings ?? new SmartSettings()); 
             formatter.AddExtensions(new DefaultFormatter());

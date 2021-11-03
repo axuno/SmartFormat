@@ -58,10 +58,9 @@ namespace SmartFormat.Extensions
             if (formattingInfo.Format is null || formattingInfo.Format?.Length == 0)
             {
                 throw new LocalizationFormattingException(formattingInfo.Format,
-                    new ArgumentException("Format for localization must not be null or empty.",
-                        $"{nameof(IFormattingInfo)}.{nameof(IFormattingInfo.Format)}"), 0);
+                    new ArgumentException($"'{nameof(formattingInfo.Format)}' for localization must not be null or empty.", nameof(formattingInfo)), 0);
             }
-
+            
             if (LocalizationProvider is null)
             {
                 throw new LocalizationFormattingException(formattingInfo.Format,

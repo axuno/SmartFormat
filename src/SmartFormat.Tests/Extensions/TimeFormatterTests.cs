@@ -11,7 +11,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class TimeFormatterTests
     {
-        private SmartFormatter GetStandardFormatter()
+        private static SmartFormatter GetStandardFormatter()
         {
             var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
             {

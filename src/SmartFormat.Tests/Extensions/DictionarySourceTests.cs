@@ -13,7 +13,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class DictionarySourceTests
     {
-        public object[] GetArgs()
+        private static object[] GetArgs()
         {
             var d = new Dictionary<string, object>
             {
@@ -41,7 +41,7 @@ namespace SmartFormat.Tests.Extensions
             };
         }
 
-        public dynamic GetDynamicArgs()
+        private static dynamic GetDynamicArgs()
         {
             dynamic d = new ExpandoObject();
             d.Numbers = new Dictionary<string, object> { { "One", 1 }, { "Two", 2 }, { "Three", 3 }, };

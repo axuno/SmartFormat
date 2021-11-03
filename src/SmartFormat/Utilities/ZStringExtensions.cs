@@ -30,7 +30,6 @@ namespace SmartFormat.Utilities
         /// <param name="format">The estimated buffer capacity will be calculated from the <see cref="Format"/> instance.</param>
         internal static Utf16ValueStringBuilder CreateStringBuilder(Format format)
         {
-            var sb = new Utf16ValueStringBuilder(false);
             return CreateStringBuilder(CalcCapacity(format));
         }
         
