@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -13,6 +14,7 @@ namespace SmartFormat.Core.Parsing
     /// Represents parsing errors in a format string.
     /// This exception only gets thrown when Parser.ErrorAction is set to ThrowError.
     /// </summary>
+    [Serializable]
     public class ParsingErrors : Exception
     {
         private readonly Format _result;
@@ -50,19 +52,19 @@ namespace SmartFormat.Core.Parsing
         {
             get
             {
-                var arrows = string.Empty;
+                var arrows = new StringBuilder();
                 var lastArrow = 0;
                 foreach (var issue in Issues)
                 {
-                    arrows += new string('-', issue.Index - lastArrow);
+                    arrows.Append(new string('-', issue.Index - lastArrow));
                     if (issue.Length > 0)
                     {
-                        arrows += new string('^', Math.Max(issue.Length, 1));
+                        arrows.Append(new string('^', Math.Max(issue.Length, 1)));
                         lastArrow = issue.Index + issue.Length;
                     }
                     else
                     {
-                        arrows += '^';
+                        arrows.Append('^');
                         lastArrow = issue.Index + 1;
                     }
                 }
