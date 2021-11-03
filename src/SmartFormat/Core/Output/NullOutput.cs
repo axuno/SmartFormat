@@ -22,21 +22,25 @@ namespace SmartFormat.Core.Output
         /// </summary>
         public NullOutput()
         {
+            // Nothing to do here
         }
 
         ///<inheritdoc/>
         public void Write(string text, IFormattingInfo? formattingInfo = null)
         {
+            // Nothing to do here
         }
 
         ///<inheritdoc/>
         public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
         {
+            // Nothing to do here
         }
 
         ///<inheritdoc/>
         public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
+            // Nothing to do here
         }
 
         /// <summary>

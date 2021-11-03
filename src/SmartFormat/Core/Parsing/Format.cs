@@ -189,7 +189,7 @@ namespace SmartFormat.Core.Parsing
         private IList<int> FindAll(char search, int maxCount)
         {
             var results = new List<int>();
-            var index = 0; // startIndex;
+            var index = 0;
             while (maxCount != 0)
             {
                 index = IndexOf(search, index);
@@ -386,20 +386,11 @@ namespace SmartFormat.Core.Parsing
             if (_literalTextCache != null) return _literalTextCache;
 
             using var sb = Utilities.ZStringExtensions.CreateStringBuilder(this);
-            try
-            {
-                foreach (var item in Items)
-                {
-                    if (item is LiteralText literalItem) sb.Append(literalItem.AsSpan());
-                }
+            foreach (var item in Items)
+                if (item is LiteralText literalItem) sb.Append(literalItem.AsSpan());
 
-                _literalTextCache = sb.ToString();
-                return _literalTextCache;
-            }
-            finally
-            {
-                sb.Dispose();
-            }
+            _literalTextCache = sb.ToString();
+            return _literalTextCache;
         }
 
         /// <summary>
@@ -411,16 +402,9 @@ namespace SmartFormat.Core.Parsing
             if (_toStringCache != null) return _toStringCache;
 
             using var sb = Utilities.ZStringExtensions.CreateStringBuilder(this);
-            try
-            {
-                foreach (var item in Items) sb.Append(item.AsSpan());
-                _toStringCache = sb.ToString();
-                return _toStringCache;
-            }
-            finally
-            {
-                sb.Dispose();
-            }
+            foreach (var item in Items) sb.Append(item.AsSpan());
+            _toStringCache = sb.ToString();
+            return _toStringCache;
         }
 
         #endregion

@@ -49,7 +49,7 @@ namespace SmartFormat.Tests.Extensions
   ]
 }";
 
-        private SmartFormatter GetFormatterWithJsonSource(SmartSettings? settings = null)
+        private static SmartFormatter GetFormatterWithJsonSource(SmartSettings? settings = null)
         {
             var smart = new SmartFormatter(settings ?? new SmartSettings());
             // NewtonsoftJsonSource MUST be registered before ReflectionSource (which is not required here)

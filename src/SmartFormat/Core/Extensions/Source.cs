@@ -34,10 +34,10 @@ namespace SmartFormat.Core.Extensions
         }
 
         /// <inheritdoc />
-        public virtual void Initialize(SmartFormatter formatter)
+        public virtual void Initialize(SmartFormatter smartFormatter)
         {
-            _formatter = formatter;
-            _smartSettings = formatter.Settings;
+            _formatter = smartFormatter;
+            _smartSettings = smartFormatter.Settings;
         }
 
         /// <summary>

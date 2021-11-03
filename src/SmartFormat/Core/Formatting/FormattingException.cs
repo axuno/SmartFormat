@@ -41,6 +41,14 @@ namespace SmartFormat.Core.Formatting
             Index = index;
         }
 
+        ///<inheritdoc/>
+        protected FormattingException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) : base(info, context)
+        {
+            Issue = string.Empty;
+        }
+
         /// <summary>
         /// Get the base format string of the <see cref="FormatItem"/> causing the <see cref="Exception"/>.
         /// </summary>

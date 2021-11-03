@@ -46,7 +46,9 @@ namespace SmartFormat.Utilities
         /// <returns></returns>
         string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
         {
-            return _getFormat1 != null ? _getFormat1(format) : _getFormat2 != null ? _getFormat2(format, formatProvider) : string.Empty;
+            if (_getFormat1 != null) return _getFormat1(format);
+            if (_getFormat2 != null) return _getFormat2(format, formatProvider);
+            return string.Empty;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class StringSourceTests
     {
-        private SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
+        private static SmartFormatter GetSimpleFormatter(SmartSettings? settings = null)
         {
             var smart = new SmartFormatter(settings ?? new SmartSettings());
             smart.AddExtensions(new StringSource(), new DefaultSource());

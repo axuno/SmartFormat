@@ -41,7 +41,7 @@ namespace SmartFormat.Extensions
         /// https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html
         /// </remarks>
         [Obsolete("This constructor is not required. Changed process to determine the default culture.", true)]
-        public PluralLocalizationFormatter(string defaultTwoLetterIsoLanguageName = "en")
+        public PluralLocalizationFormatter(string defaultTwoLetterIsoLanguageName)
         {
             DefaultTwoLetterISOLanguageName = defaultTwoLetterIsoLanguageName;
         }
@@ -134,7 +134,7 @@ namespace SmartFormat.Extensions
             return true;
         }
 
-        private PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
+        private static PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
         {
             // Determine the culture
             var culture = GetCultureInfo(formattingInfo);
