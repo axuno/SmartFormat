@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
         <RootNamespace>Cysharp.Text</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -34,16 +34,20 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <!-- repo\src\ZString\ZStringWriter.cs replaced for net461 compatibility -->
+      <Compile Remove="repo\src\ZString\ZStringWriter.cs" />
       <Compile Remove="repo\docs\**" />
       <Compile Remove="repo\sandbox\**" />
       <Compile Remove="repo\src\ZString.Unity\**" />
       <Compile Remove="repo\src\ZString\Unity\**" />
       <Compile Remove="repo\tests\**" />
+      <EmbeddedResource Remove="repo\src\ZString\ZStringWriter.cs" />
       <EmbeddedResource Remove="repo\docs\**" />
       <EmbeddedResource Remove="repo\sandbox\**" />
       <EmbeddedResource Remove="repo\src\ZString.Unity\**" />
       <EmbeddedResource Remove="repo\src\ZString\Unity\**" />
       <EmbeddedResource Remove="repo\tests\**" />
+      <None Remove="repo\src\ZString\ZStringWriter.cs" />
       <None Remove="repo\docs\**" />
       <None Remove="repo\sandbox\**" />
       <None Remove="repo\src\ZString.Unity\**" />
@@ -52,7 +56,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Memory" Version="4.5.3" />
+        <PackageReference Include="System.Memory" Version="4.5.4" />
     </ItemGroup>
 
 </Project>
