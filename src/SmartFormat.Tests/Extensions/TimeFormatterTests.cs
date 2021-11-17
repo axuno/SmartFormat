@@ -47,7 +47,8 @@ namespace SmartFormat.Tests.Extensions
             var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
             timeFormatter.FallbackLanguage = string.Empty;
 
-            Assert.That(() => smart.Format(CultureInfo.InvariantCulture, "{0:time:noless}", new TimeSpan(1, 2, 3)),
+            Assert.That(
+                delegate { return smart.Format(CultureInfo.InvariantCulture, "{0:time:noless}", new TimeSpan(1, 2, 3)); },
                 Throws.InstanceOf<FormattingException>().And.Message.Contains("TimeTextInfo could not be found"),
                 "Language as argument");
         }
