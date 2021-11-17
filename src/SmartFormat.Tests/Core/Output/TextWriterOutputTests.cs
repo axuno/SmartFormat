@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Cysharp.Text;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
 
@@ -36,7 +32,7 @@ namespace SmartFormat.Tests.Core.Output
         [Test]
         public void Output_Of_ValueStringBuilder()
         {
-            using var sb = ZString.CreateStringBuilder();
+            using var sb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
             sb.Append("text");
             var sw = new StringWriter(new StringBuilder());
             var two = new TextWriterOutput(sw);
