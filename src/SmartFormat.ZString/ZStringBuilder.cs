@@ -8,14 +8,13 @@ namespace SmartFormat.ZString
     /// A 1:1 wrapper around <see cref="Utf16ValueStringBuilder"/>,
     /// so that we don't have to reference Cysharp.Text classes directly.
     /// </summary>
-    /// <remarks>
-    /// **********************************
-    /// The only required additional method is:
-    /// public void Append(ZStringBuilder value) => _vsb.Append(value._vsb);
-    /// **********************************
-    /// </remarks>
     public struct ZStringBuilder : IDisposable
     {
+        /**********************************
+        The only required additional method is:
+        public void Append(ZStringBuilder value) => _vsb.Append(value._vsb);
+        **********************************/
+
         private Utf16ValueStringBuilder _vsb;
 
         /// <summary>
