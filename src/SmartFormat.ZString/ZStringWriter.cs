@@ -5,6 +5,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+/*
+ *  The ZStringWriter class from the repo is excluded from the project
+ *  and replaced with this modified version, so we can compile for TFM net461 
+ */
+
 namespace Cysharp.Text
 {
     /// <summary>
@@ -50,7 +55,7 @@ namespace Cysharp.Text
             base.Dispose(disposing);
         }
 
-        public override Encoding Encoding => encoding = encoding ?? new UnicodeEncoding(false, false);
+        public override Encoding Encoding => encoding ??= new UnicodeEncoding(false, false);
 
         public override void Write(char value)
         {

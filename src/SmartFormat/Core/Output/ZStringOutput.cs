@@ -5,34 +5,34 @@
 
 using System;
 using System.Text;
-using Cysharp.Text;
+using SmartFormat.ZString;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Core.Output
 {
     /// <summary>
-    /// Wraps a <see cref="Utf16ValueStringBuilder"/> so it can be used for output.
+    /// Wraps a <see cref="ZStringBuilder"/> so it can be used for output.
     /// This is used for the default output.
     /// </summary>
     /// <remarks>
-    /// <see cref="StringBuilder"/>, <see cref="Utf16ValueStringBuilder"/>,
+    /// <see cref="StringBuilder"/>, <see cref="ZStringBuilder"/>,
     /// <see cref="UnicodeEncoding"/> and <see langword="string"/> objects use <b>UTF-16</b> encoding to store characters.
     /// </remarks>
     public class ZStringOutput : IOutput, IDisposable
     {
-        private Utf16ValueStringBuilder _output;
+        private ZStringBuilder _output;
 
         /// <summary>
-        /// Returns the <see cref="Utf16ValueStringBuilder"/> used for output.
+        /// Returns the <see cref="ZStringBuilder"/> used for output.
         /// </summary>
-        public Utf16ValueStringBuilder Output => _output; // Use with a backing field!
+        public ZStringBuilder Output => _output; // Use with a backing field!
 
         /// <summary>
         /// Creates a new instance of <see cref="ZStringOutput"/>.
         /// </summary>
         public ZStringOutput()
         {
-            _output = ZString.CreateStringBuilder();
+            _output = Utilities.ZStringExtensions.CreateStringBuilder();
         }
 
         /// <summary>
@@ -45,9 +45,9 @@ namespace SmartFormat.Core.Output
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="ZStringOutput"/> using the given <see cref="Utf16ValueStringBuilder"/>.
+        /// Creates a new instance of <see cref="ZStringOutput"/> using the given <see cref="ZStringBuilder"/>.
         /// </summary>
-        public ZStringOutput(Utf16ValueStringBuilder stringBuilder)
+        public ZStringOutput(ZStringBuilder stringBuilder)
         {
             _output = stringBuilder;
         }
@@ -65,13 +65,13 @@ namespace SmartFormat.Core.Output
         }
 
         ///<inheritdoc/>
-        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
+        public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
             _output.Append(stringBuilder);
         }
 
         /// <summary>
-        /// Returns the string result of the <see cref="Utf16ValueStringBuilder"/>.
+        /// Returns the string result of the <see cref="ZStringBuilder"/>.
         /// </summary>
         public override string ToString()
         {

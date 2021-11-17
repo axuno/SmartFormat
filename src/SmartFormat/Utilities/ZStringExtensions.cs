@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cysharp.Text;
-using SmartFormat.Core.Parsing;
+﻿using SmartFormat.Core.Parsing;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Utilities
 {
@@ -25,21 +22,29 @@ namespace SmartFormat.Utilities
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Utf16ValueStringBuilder"/> with the given initial capacity.
+        /// Creates a new instance of <see cref="ZStringBuilder"/> with the given initial capacity.
+        /// </summary>
+        internal static ZStringBuilder CreateStringBuilder()
+        {
+            return new ZStringBuilder(false);
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ZStringBuilder"/> with the given initial capacity.
         /// </summary>
         /// <param name="format">The estimated buffer capacity will be calculated from the <see cref="Format"/> instance.</param>
-        internal static Utf16ValueStringBuilder CreateStringBuilder(Format format)
+        internal static ZStringBuilder CreateStringBuilder(Format format)
         {
             return CreateStringBuilder(CalcCapacity(format));
         }
         
         /// <summary>
-        /// Creates a new instance of <see cref="Utf16ValueStringBuilder"/> with the given initial capacity.
+        /// Creates a new instance of <see cref="ZStringBuilder"/> with the given initial capacity.
         /// </summary>
         /// <param name="capacity">The estimated capacity required. This will reduce or avoid incremental buffer increases.</param>
-        internal static Utf16ValueStringBuilder CreateStringBuilder(int capacity)
+        internal static ZStringBuilder CreateStringBuilder(int capacity)
         {
-            var sb = new Utf16ValueStringBuilder(false);
+            var sb = new ZStringBuilder(false);
             if(capacity > DefaultBufferSize)
                 sb.Grow(capacity - DefaultBufferSize);
 
