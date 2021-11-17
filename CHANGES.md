@@ -5,9 +5,12 @@ What's new in v3.0.0-alpha.4
 ====
 
 ### 1. Significant boost in performance
-After implementing a zero allocation `ValueStringBuilder` based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193):
+After implementing a zero allocation `ValueStringBuilder` based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193) and [#228](https://github.com/axuno/SmartFormat/pull/228):
    * Parsing is 10% faster with 50-80% less GC and memory allocation
    * Formatting is up to 40% faster with 50% less GC and memory allocation
+   * Since [#228](https://github.com/axuno/SmartFormat/pull/228) there no more `Cysharp.Text` classes used in the `SmartFormat` namespace
+     * Created `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
+     * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
 
 More optimizations:
 
