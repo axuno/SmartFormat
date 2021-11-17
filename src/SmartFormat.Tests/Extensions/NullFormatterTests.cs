@@ -97,7 +97,7 @@ namespace SmartFormat.Tests.Extensions
         public void NullFormatter_Format_Count_Must_Be_1_or_2()
         {
             var smart = GetFormatter();
-            Assert.That(() => smart.Format("{0:isnull:1|2|3}", 123), Throws.InstanceOf<FormattingException>(), "No format included");
+            Assert.That(delegate { return smart.Format("{0:isnull:1|2|3}", 123); }, Throws.InstanceOf<FormattingException>(), "No format included");
         }
     }
 }

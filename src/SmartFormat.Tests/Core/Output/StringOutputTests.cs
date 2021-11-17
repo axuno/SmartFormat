@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cysharp.Text;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
 
@@ -32,7 +27,7 @@ namespace SmartFormat.Tests.Core.Output
         public void Output_Of_ValueStringBuilder()
         {
             var so = new StringOutput();
-            using var sb = ZString.CreateStringBuilder();
+            using var sb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
             sb.Append("text");
             so.Write(sb, null!);
             Assert.AreEqual("text", so.ToString());

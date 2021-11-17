@@ -4,8 +4,8 @@
 //
 
 using System;
-using Cysharp.Text;
 using SmartFormat.Core.Extensions;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Output
 {
@@ -38,7 +38,7 @@ namespace SmartFormat.Core.Output
         }
 
         ///<inheritdoc/>
-        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
+        public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
             // Nothing to do here
         }

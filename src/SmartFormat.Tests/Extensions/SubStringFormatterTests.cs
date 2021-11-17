@@ -4,6 +4,7 @@ using SmartFormat.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -161,7 +162,7 @@ namespace SmartFormat.Tests.Extensions
             var smart = GetFormatter();
             Assert.That(
                 smart.GetFormatterExtension<SubStringFormatter>()!.TryEvaluateFormat(
-                    FormattingInfo.Create("{0::(0,2)}", new List<object?>(new[] {new object()}))), Is.EqualTo(false));
+                    FormattingInfoExtensions.Create("{0::(0,2)}", new List<object?>(new[] {new object()}))), Is.EqualTo(false));
         }
     }
 }
