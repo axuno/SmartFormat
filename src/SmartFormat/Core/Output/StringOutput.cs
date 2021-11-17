@@ -5,8 +5,8 @@
 
 using System;
 using System.Text;
-using Cysharp.Text;
 using SmartFormat.Core.Extensions;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Output
 {
@@ -71,7 +71,7 @@ namespace SmartFormat.Core.Output
         }
 
         ///<inheritdoc/>
-        public void Write(Utf16ValueStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
+        public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
 #if NETSTANDARD2_1
             _output.Append(stringBuilder.AsSpan());

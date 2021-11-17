@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cysharp.Text;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
 
@@ -22,7 +21,7 @@ namespace SmartFormat.Tests.Core.Output
         [Test]
         public void Create_With_Other_ValueStringBuilder()
         {
-            using var vsb = ZString.CreateStringBuilder();
+            using var vsb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
             vsb.Append("text");
             using var zStringOutput = new ZStringOutput(vsb);
             Assert.That(zStringOutput, Is.Not.Null);
@@ -49,7 +48,7 @@ namespace SmartFormat.Tests.Core.Output
         public void Output_Of_ValueStringBuilder()
         {
             var so = new ZStringOutput();
-            using var sb = ZString.CreateStringBuilder();
+            using var sb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
             sb.Append("text");
             so.Write(sb, null);
             Assert.AreEqual("text", so.ToString());
