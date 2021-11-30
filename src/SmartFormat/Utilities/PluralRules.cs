@@ -18,200 +18,224 @@ namespace SmartFormat.Utilities
         /// Holds the ISO language code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
         /// </summary>
         public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate { get; } =
-            new()
-            {
+            new() {
                 // Singular
-                {"az", Singular}, // Azerbaijani
-                {"bm", Singular}, // Bambara
-                {"bo", Singular}, // Tibetan
-                {"dz", Singular}, // Dzongkha
-                {"fa", Singular}, // Persian
-                {"hu", Singular}, // Hungarian
-                {"id", Singular}, // Indonesian
-                {"ig", Singular}, // Igbo
-                {"ii", Singular}, // Sichuan Yi
-                {"ja", Singular}, // Japanese
-                {"jv", Singular}, // Javanese
-                {"ka", Singular}, // Georgian
-                {"kde", Singular}, // Makonde
-                {"kea", Singular}, // Kabuverdianu
-                {"km", Singular}, // Khmer
-                {"kn", Singular}, // Kannada
-                {"ko", Singular}, // Korean
-                {"ms", Singular}, // Malay
-                {"my", Singular}, // Burmese
-                {"root", Singular}, // Root (?)
-                {"sah", Singular}, // Sakha
-                {"ses", Singular}, // Koyraboro Senni
-                {"sg", Singular}, // Sango
-                {"th", Singular}, // Thai
-                {"to", Singular}, // Tonga
-                {"vi", Singular}, // Vietnamese
-                {"wo", Singular}, // Wolof
-                {"yo", Singular}, // Yoruba
-                {"zh", Singular}, // Chinese
+                { "az", Singular }, // Azerbaijani
+                { "bm", Singular }, // Bambara
+                { "bo", Singular }, // Tibetan
+                { "dz", Singular }, // Dzongkha
+                { "fa", Singular }, // Persian
+                { "hu", Singular }, // Hungarian
+                { "id", Singular }, // Indonesian
+                { "ig", Singular }, // Igbo
+                { "ii", Singular }, // Sichuan Yi
+                { "ja", Singular }, // Japanese
+                { "jv", Singular }, // Javanese
+                { "ka", Singular }, // Georgian
+                { "kde", Singular }, // Makonde
+                { "kea", Singular }, // Kabuverdianu
+                { "km", Singular }, // Khmer
+                { "kn", Singular }, // Kannada
+                { "ko", Singular }, // Korean
+                { "ms", Singular }, // Malay
+                { "my", Singular }, // Burmese
+                { "root", Singular }, // Root (?)
+                { "sah", Singular }, // Sakha
+                { "ses", Singular }, // Koyraboro Senni
+                { "sg", Singular }, // Sango
+                { "th", Singular }, // Thai
+                { "to", Singular }, // Tonga
+                { "vi", Singular }, // Vietnamese
+                { "wo", Singular }, // Wolof
+                { "yo", Singular }, // Yoruba
+                { "zh", Singular }, // Chinese
                 // Dual: one (n == 1), other
-                {"af", DualOneOther}, // Afrikaans
-                {"bem", DualOneOther}, // Bembda
-                {"bg", DualOneOther}, // Bulgarian
-                {"bn", DualOneOther}, // Bengali
-                {"brx", DualOneOther}, // Bodo
-                {"ca", DualOneOther}, // Catalan
-                {"cgg", DualOneOther}, // Chiga
-                {"chr", DualOneOther}, // Cherokee
-                {"da", DualOneOther}, // Danish
-                {"de", DualOneOther}, // German
-                {"dv", DualOneOther}, // Divehi
-                {"ee", DualOneOther}, // Ewe
-                {"el", DualOneOther}, // Greek
-                {"en", DualOneOther}, // English
-                {"eo", DualOneOther}, // Esperanto
-                {"es", DualOneOther}, // Spanish
-                {"et", DualOneOther}, // Estonian
-                {"eu", DualOneOther}, // Basque
-                {"fi", DualOneOther}, // Finnish
-                {"fo", DualOneOther}, // Faroese
-                {"fur", DualOneOther}, // Friulian
-                {"fy", DualOneOther}, // Western Frisian
-                {"gl", DualOneOther}, // Galician
-                {"gsw", DualOneOther}, // Swiss German
-                {"gu", DualOneOther}, // Gujarati
-                {"ha", DualOneOther}, // Hausa
-                {"haw", DualOneOther}, // Hawaiian
-                {"he", DualOneOther}, // Hebrew
-                {"is", DualOneOther}, // Icelandic
-                {"it", DualOneOther}, // Italian
-                {"kk", DualOneOther}, // Kazakh
-                {"kl", DualOneOther}, // Kalaallisut
-                {"ku", DualOneOther}, // Kurdish
-                {"lb", DualOneOther}, // Luxembourgish
-                {"lg", DualOneOther}, // Ganda
-                {"lo", DualOneOther}, // Lao
-                {"mas", DualOneOther}, // Masai
-                {"ml", DualOneOther}, // Malayalam
-                {"mn", DualOneOther}, // Mongolian
-                {"mr", DualOneOther}, // Marathi
-                {"nah", DualOneOther}, // Nahuatl
-                {"nb", DualOneOther}, // Norwegian Bokmål
-                {"ne", DualOneOther}, // Nepali
-                {"nl", DualOneOther}, // Dutch
-                {"nn", DualOneOther}, // Norwegian Nynorsk
-                {"no", DualOneOther}, // Norwegian
-                {"nyn", DualOneOther}, // Nyankole
-                {"om", DualOneOther}, // Oromo
-                {"or", DualOneOther}, // Oriya
-                {"pa", DualOneOther}, // Punjabi
-                {"pap", DualOneOther}, // Papiamento
-                {"ps", DualOneOther}, // Pashto
-                {"pt", DualOneOther}, // Portuguese
-                {"rm", DualOneOther}, // Romansh
-                {"saq", DualOneOther}, // Samburu
-                {"so", DualOneOther}, // Somali
-                {"sq", DualOneOther}, // Albanian
-                {"ssy", DualOneOther}, // Saho
-                {"sw", DualOneOther}, // Swahili
-                {"sv", DualOneOther}, // Swedish
-                {"syr", DualOneOther}, // Syriac
-                {"ta", DualOneOther}, // Tamil
-                {"te", DualOneOther}, // Telugu
-                {"tk", DualOneOther}, // Turkmen
-                {"tr", DualOneOther}, // Turkish
-                {"ur", DualOneOther}, // Urdu
-                {"wae", DualOneOther}, // Walser
-                {"xog", DualOneOther}, // Soga
-                {"zu", DualOneOther}, // Zulu
+                { "af", DualOneOther }, // Afrikaans
+                { "bem", DualOneOther }, // Bembda
+                { "bg", DualOneOther }, // Bulgarian
+                { "bn", DualOneOther }, // Bengali
+                { "brx", DualOneOther }, // Bodo
+                { "ca", DualOneOther }, // Catalan
+                { "cgg", DualOneOther }, // Chiga
+                { "chr", DualOneOther }, // Cherokee
+                { "da", DualOneOther }, // Danish
+                { "de", DualOneOther }, // German
+                { "dv", DualOneOther }, // Divehi
+                { "ee", DualOneOther }, // Ewe
+                { "el", DualOneOther }, // Greek
+                { "en", DualOneOther }, // English
+                { "eo", DualOneOther }, // Esperanto
+                { "es", DualOneOther }, // Spanish
+                { "et", DualOneOther }, // Estonian
+                { "eu", DualOneOther }, // Basque
+                { "fi", DualOneOther }, // Finnish
+                { "fo", DualOneOther }, // Faroese
+                { "fur", DualOneOther }, // Friulian
+                { "fy", DualOneOther }, // Western Frisian
+                { "gl", DualOneOther }, // Galician
+                { "gsw", DualOneOther }, // Swiss German
+                { "gu", DualOneOther }, // Gujarati
+                { "ha", DualOneOther }, // Hausa
+                { "haw", DualOneOther }, // Hawaiian
+                { "he", DualOneOther }, // Hebrew
+                { "is", DualOneOther }, // Icelandic
+                { "it", DualOneOther }, // Italian
+                { "kk", DualOneOther }, // Kazakh
+                { "kl", DualOneOther }, // Kalaallisut
+                { "ku", DualOneOther }, // Kurdish
+                { "lb", DualOneOther }, // Luxembourgish
+                { "lg", DualOneOther }, // Ganda
+                { "lo", DualOneOther }, // Lao
+                { "mas", DualOneOther }, // Masai
+                { "ml", DualOneOther }, // Malayalam
+                { "mn", DualOneOther }, // Mongolian
+                { "mr", DualOneOther }, // Marathi
+                { "nah", DualOneOther }, // Nahuatl
+                { "nb", DualOneOther }, // Norwegian Bokmål
+                { "ne", DualOneOther }, // Nepali
+                { "nl", DualOneOther }, // Dutch
+                { "nn", DualOneOther }, // Norwegian Nynorsk
+                { "no", DualOneOther }, // Norwegian
+                { "nyn", DualOneOther }, // Nyankole
+                { "om", DualOneOther }, // Oromo
+                { "or", DualOneOther }, // Oriya
+                { "pa", DualOneOther }, // Punjabi
+                { "pap", DualOneOther }, // Papiamento
+                { "ps", DualOneOther }, // Pashto
+                { "pt", DualOneOther }, // Portuguese
+                { "rm", DualOneOther }, // Romansh
+                { "saq", DualOneOther }, // Samburu
+                { "so", DualOneOther }, // Somali
+                { "sq", DualOneOther }, // Albanian
+                { "ssy", DualOneOther }, // Saho
+                { "sw", DualOneOther }, // Swahili
+                { "sv", DualOneOther }, // Swedish
+                { "syr", DualOneOther }, // Syriac
+                { "ta", DualOneOther }, // Tamil
+                { "te", DualOneOther }, // Telugu
+                { "tk", DualOneOther }, // Turkmen
+                { "tr", DualOneOther }, // Turkish
+                { "ur", DualOneOther }, // Urdu
+                { "wae", DualOneOther }, // Walser
+                { "xog", DualOneOther }, // Soga
+                { "zu", DualOneOther }, // Zulu
                 // DualWithZero: one (n == 0..1), other
-                {"ak", DualWithZero}, // Akan
-                {"am", DualWithZero}, // Amharic
-                {"bh", DualWithZero}, // Bihari
-                {"fil", DualWithZero}, // Filipino
-                {"guw", DualWithZero}, // Gun
-                {"hi", DualWithZero}, // Hindi
-                {"ln", DualWithZero}, // Lingala
-                {"mg", DualWithZero}, // Malagasy
-                {"nso", DualWithZero}, // Northern Sotho
-                {"ti", DualWithZero}, // Tigrinya
-                {"tl", DualWithZero}, // Tagalog
-                {"wa", DualWithZero}, // Walloon
+                { "ak", DualWithZero }, // Akan
+                { "am", DualWithZero }, // Amharic
+                { "bh", DualWithZero }, // Bihari
+                { "fil", DualWithZero }, // Filipino
+                { "guw", DualWithZero }, // Gun
+                { "hi", DualWithZero }, // Hindi
+                { "ln", DualWithZero }, // Lingala
+                { "mg", DualWithZero }, // Malagasy
+                { "nso", DualWithZero }, // Northern Sotho
+                { "ti", DualWithZero }, // Tigrinya
+                { "tl", DualWithZero }, // Tagalog
+                { "wa", DualWithZero }, // Walloon
                 // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
-                {"ff", DualFromZeroToTwo}, // Fulah
-                {"fr", DualFromZeroToTwo}, // French
-                {"kab", DualFromZeroToTwo}, // Kabyle
+                { "ff", DualFromZeroToTwo }, // Fulah
+                { "fr", DualFromZeroToTwo }, // French
+                { "kab", DualFromZeroToTwo }, // Kabyle
                 // Triple: one (n == 1), two (n == 2), other
-                {"ga", TripleOneTwoOther}, // Irish
-                {"iu", TripleOneTwoOther}, // Inuktitut
-                {"ksh", TripleOneTwoOther}, // Colognian
-                {"kw", TripleOneTwoOther}, // Cornish
-                {"se", TripleOneTwoOther}, // Northern Sami
-                {"sma", TripleOneTwoOther}, // Southern Sami
-                {"smi", TripleOneTwoOther}, // Sami language
-                {"smj", TripleOneTwoOther}, // Lule Sami
-                {"smn", TripleOneTwoOther}, // Inari Sami
-                {"sms", TripleOneTwoOther}, // Skolt Sami
+                { "ga", TripleOneTwoOther }, // Irish
+                { "iu", TripleOneTwoOther }, // Inuktitut
+                { "ksh", TripleOneTwoOther }, // Colognian
+                { "kw", TripleOneTwoOther }, // Cornish
+                { "se", TripleOneTwoOther }, // Northern Sami
+                { "sma", TripleOneTwoOther }, // Southern Sami
+                { "smi", TripleOneTwoOther }, // Sami language
+                { "smj", TripleOneTwoOther }, // Lule Sami
+                { "smn", TripleOneTwoOther }, // Inari Sami
+                { "sms", TripleOneTwoOther }, // Skolt Sami
                 // Russian & Serbo-Croatian
-                {"be", RussianSerboCroatian}, // Belarusian
-                {"bs", RussianSerboCroatian}, // Bosnian
-                {"hr", RussianSerboCroatian}, // Croatian
-                {"ru", RussianSerboCroatian}, // Russian
-                {"sh", RussianSerboCroatian}, // Serbo-Croatian
-                {"sr", RussianSerboCroatian}, // Serbian
-                {"uk", RussianSerboCroatian}, // Ukrainian
+                { "be", RussianSerboCroatian }, // Belarusian
+                { "bs", RussianSerboCroatian }, // Bosnian
+                { "hr", RussianSerboCroatian }, // Croatian
+                { "ru", RussianSerboCroatian }, // Russian
+                { "sh", RussianSerboCroatian }, // Serbo-Croatian
+                { "sr", RussianSerboCroatian }, // Serbian
+                { "uk", RussianSerboCroatian }, // Ukrainian
                 // Unique
                 // Arabic
-                {"ar", Arabic},
+                { "ar", Arabic },
                 // Breton
-                {"br", Breton},
+                { "br", Breton },
                 // Czech
-                {"cs", Czech},
+                { "cs", Czech },
                 // Welsh
-                {"cy", Welsh},
+                { "cy", Welsh },
                 // Manx
-                {"gv", Manx},
+                { "gv", Manx },
                 // Langi
-                {"lag", Langi},
+                { "lag", Langi },
                 // Lithuanian
-                {"lt", Lithuanian},
+                { "lt", Lithuanian },
                 // Latvian
-                {"lv", Latvian},
+                { "lv", Latvian },
                 // Macedonian
-                {"mb", Macedonian},
+                { "mb", Macedonian },
                 // Moldavian
-                {"mo", Moldavian},
+                { "mo", Moldavian },
                 // Maltese
-                {"mt", Maltese},
+                { "mt", Maltese },
                 // Polish
-                {"pl", Polish},
+                { "pl", Polish },
                 // Romanian
-                {"ro", Romanian},
+                { "ro", Romanian },
                 // Tachelhit
-                {"shi", Tachelhit},
+                { "shi", Tachelhit },
                 // Slovak
-                {"sk", Slovak},
+                { "sk", Slovak },
                 // Slovenian
-                {"sl", Slovenian},
+                { "sl", Slovenian },
                 // Central Morocco Tamazight
-                {"tzm", CentralMoroccoTamazight}
+                { "tzm", CentralMoroccoTamazight }
             };
 
         private static PluralRuleDelegate Singular => (n, c) => 0;
+
         private static PluralRuleDelegate DualOneOther => (n, c) =>
         {
             if (c == 2) return n == 1 ? 0 : 1;
             if (c == 3) return n == 0 ? 0 : n == 1 ? 1 : 2;
             if (c == 4) return n < 0 ? 0 : n == 0 ? 1 : n == 1 ? 2 : 3;
             return -1;
-        };// Dual: one (n == 1), other
-        private static PluralRuleDelegate DualWithZero => (n, c) => n == 0 || n == 1 ? 0 : 1; // DualWithZero: one (n == 0..1), other
-        private static PluralRuleDelegate DualFromZeroToTwo => (n, c) => 
-        {
-            return c switch {
-                2 => n < 2 ? 0 : 1,
-                3 => n == 0 ? 0 : n < 2 ? 1 : 2,
-                4 => n < 0 ? 0 : n == 0 ? 1 : n < 2 ? 2 : 3,
-                _ => -1
-            };
-        };// DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+        }; // Dual: one (n == 1), other
 
+        private static PluralRuleDelegate DualWithZero =>
+            (n, c) => n == 0 || n == 1 ? 0 : 1; // DualWithZero: one (n == 0..1), other
+
+        private static PluralRuleDelegate DualFromZeroToTwo => (n, c) =>
+        {
+            if (c == 2) return n < 2 ? 0 : 1;
+
+            if (c == 3)
+                switch (n)
+                {
+                    case 0:
+                        return 0;
+                    case > 0 and < 2:
+                        return 1;
+                    case > 2:
+                        return 2;
+                }
+
+            if (c == 4)
+                switch (n)
+                {
+                    case < 0:
+                        return 0;
+                    case 0:
+                        return 1;
+                    case > 0 and < 2:
+                        return 2;
+                    case > 2:
+                        return 3;
+                }
+
+            return -1;
+        }; // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+        
         private static PluralRuleDelegate TripleOneTwoOther => (n, c) => n == 1 ? 0 : n == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
         private static PluralRuleDelegate RussianSerboCroatian => (n, c) =>
             n % 10 == 1 && n % 100 != 11 ? 0 : // one

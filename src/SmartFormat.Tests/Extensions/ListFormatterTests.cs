@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,6 +9,7 @@ using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using SmartFormat.Pooling;
 using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
@@ -88,7 +88,7 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual("Person A, Person C", result);
         }
 
-        [TestCase("{4}", "System.Int32[]")]
+        [TestCase("{4:list}", "System.Int32[]")]
         [TestCase("{4:list:|}","12345")]
         [TestCase("{4:list:00|}","0102030405")]
         [TestCase("{4:list:|,}","1,2,3,4,5")]
@@ -125,18 +125,37 @@ namespace SmartFormat.Tests.Extensions
         [Test] /* added due to problems with [ThreadStatic] see: https://github.com/axuno/SmartFormat.NET/pull/23 */
         public void WithThreadPool_ShouldNotMixupCollectionIndex()
         {
+            void ResetAllPools(bool goThreadSafe)
+            {
+                // get specialized pools (includes smart pools)
+                foreach (dynamic p in PoolRegistry.Items.Values)
+                {
+                    p.Reset(goThreadSafe);
+                }
+            }
+
+            // Switch to thread safety
+            const bool currentThreadSafeMode = true;
+            var savedIsThreadSafeMode = SmartSettings.IsThreadSafeMode;
+            SmartSettings.IsThreadSafeMode = ListFormatter.IsThreadSafeMode = currentThreadSafeMode;
+            ResetAllPools(currentThreadSafeMode);
+            
             const string format = "wheres-Index={Index} - List: {0:{}| and }";
             const string expected = "wheres-Index=-1 - List: test1 and test2";
 
             var wheres = new List<string>{"test1", "test2"};
-            
             var tasks = new List<Task<string>>();
-            for (int i = 0; i < 10; ++i)
+
+            for (var i = 0; i < 10; ++i)
             {
                 tasks.Add(Task.Factory.StartNew(val =>
                 {
                     Thread.Sleep(5 * (int)(val ?? 100));
-                    string ret = Smart.CreateDefaultSmartFormat().Format(format, wheres);
+                    var smart = new SmartFormatter();
+                    smart.AddExtensions(new StringSource(), new ListFormatter(), new DefaultSource());
+                    smart.AddExtensions(new ListFormatter(), new DefaultFormatter());
+                    string ret = smart.Format(format, wheres);
+                    
                     Thread.Sleep(5 * (int)(val ?? 100)); /* add some delay to force ThreadPool swapping */
                     return ret;
                 }, i));
@@ -144,15 +163,16 @@ namespace SmartFormat.Tests.Extensions
 
             foreach (var t in tasks)
             {
-                // Old test did not show wrong Index value:
-                // Assert.AreEqual(" where test = @test", t.Result);
-
                 // Note: Using "[ThreadStatic] private static int CollectionIndex", the result will be as expected only with the first task
                 if (expected == t.Result)
-                    Console.WriteLine("Task {0} passed.", t.AsyncState);
+                    Console.WriteLine(@"Task {0} passed.", t.AsyncState);
                 
-                Assert.AreEqual(expected, t.Result);
+                Assert.That(t.Result, Is.EqualTo(expected));
             }
+
+            // Restore thread safety
+            SmartSettings.IsThreadSafeMode = ListFormatter.IsThreadSafeMode = savedIsThreadSafeMode;
+            ResetAllPools(savedIsThreadSafeMode);
         }
 
         [Test]

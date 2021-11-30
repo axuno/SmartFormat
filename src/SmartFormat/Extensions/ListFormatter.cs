@@ -9,9 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.SmartPools;
+using SmartFormat.Pooling.SpecializedPools;
 
 namespace SmartFormat.Extensions
 {
@@ -103,23 +104,35 @@ namespace SmartFormat.Extensions
             return false;
         }
 
-        // This does not work, because CollectionIndex will be initialized only once 
-        // NOT once per thread.
-        // [ThreadStatic] private static int CollectionIndex = -1;
-        // same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
-        // Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
-        private static readonly AsyncLocal<int?> _collectionIndex = new();
+        // Note: CollectionIndex must be initialized ONLY ONCE, NOT once per thread (aka ThreadStatic).
+        // Note: Multi threading support generates some garbage
+        private static readonly AsyncLocal<int?> _collectionIndexThreadSafe = new();
+        private static int _collectionIndexSingleThread = -1;
 
+        /// <summary>
+        /// Gets, whether the <see cref="ListFormatter"/> is in thread safe mode.
+        /// </summary>
+        internal static bool IsThreadSafeMode { get; set; } = SmartSettings.IsThreadSafeMode;
+
+        /// <summary>
+        /// Gets or sets the collection index.
+        /// </summary>
         /// <remarks>
-        /// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
-        /// not supported by .Net Core. Instead .Net Core provides AsyncLocal&lt;T&gt;
-        /// Good examples are: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
-        /// and https://github.com/StephenCleary/AsyncLocal/blob/master/src/UnitTests/UnitTests.cs
+        /// In thread safe mode, <see cref="CollectionIndex"/> wraps an <see cref="AsyncLocal{T}"/>,
+        /// while in single thread mode, a static <see langword="int"/> ist wrapped.
         /// </remarks>
         private static int CollectionIndex
         {
-            get => _collectionIndex.Value ?? -1;
-            set => _collectionIndex.Value = value;
+            get => IsThreadSafeMode
+                ? _collectionIndexThreadSafe.Value ?? -1
+                : _collectionIndexSingleThread;
+
+            set
+            {
+                if (IsThreadSafeMode)
+                    _collectionIndexThreadSafe.Value = value;
+                else _collectionIndexSingleThread = value;
+            }
         }
 
         /// <summary>
@@ -141,15 +154,19 @@ namespace SmartFormat.Extensions
             }
 
             // See if the format string contains un-nested "|":
-            var parameters = format is not null ? format.Split('|', 4) : new List<Format>(0);
-
+            using var splitListPooledObject = SplitListPool.Instance.Get(out var splitList);
+            var parameters = (SplitList) (format is not null ? format.Split('|', 4) : splitList);
+            
             // Check whether arguments can be handled by this formatter
-            if (format is null || parameters.Count < 2 || current is not IEnumerable enumerable 
-                || current is string or IFormattable)
+            if (format is null || parameters.Count < 2 || current is not IEnumerable currentAsEnumerable 
+                || currentAsEnumerable is string or IFormattable)
             {
                 // Auto detection calls just return a failure to evaluate
                 if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                {
+                    parameters.Clear();
                     return false;
+                }
 
                 // throw, if the formatter has been called explicitly
                 throw new FormatException(
@@ -170,37 +187,42 @@ namespace SmartFormat.Extensions
             {
                 // The format is not nested,
                 // so we will treat it as an itemFormat:
-                var newItemFormat = new Format(_smartSettings, itemFormat.BaseString, itemFormat.StartIndex, itemFormat.EndIndex)
-                {
-                    HasNested = true
-                };
-                var newPlaceholder = new Placeholder(newItemFormat, itemFormat.StartIndex, 0)
-                {
-                    Format = itemFormat,
-                    EndIndex = itemFormat.EndIndex,
-                    // inherit alignment
-                    Alignment = formattingInfo.Alignment
-                };
+                var newItemFormat = FormatPool.Instance.Get().Initialize(_smartSettings, itemFormat.BaseString,
+                    itemFormat.StartIndex, itemFormat.EndIndex, true);
+
+                var newPlaceholder = PlaceholderPool.Instance.Get().Initialize(newItemFormat, itemFormat.StartIndex, 0);
+                newPlaceholder.Format = itemFormat;
+                newPlaceholder.EndIndex = itemFormat.EndIndex;
+                // inherit alignment
+                newPlaceholder.Alignment = formattingInfo.Alignment;
+                
                 newItemFormat.Items.Add(newPlaceholder);
                 itemFormat = newItemFormat;
             }
 
             // Let's buffer all items from the enumerable (to ensure the Count without double-enumeration):
-            if (current is not ICollection items)
+            List<object>? itemsAsList = null;
+            if (currentAsEnumerable is not ICollection items)
             {
-                items = enumerable.Cast<object?>().ToList();
+                itemsAsList = ListPool<object>.Instance.Get();
+                foreach (var item in currentAsEnumerable)
+                    itemsAsList.Add(item);
+
+                items = itemsAsList;
             }
 
             // In case we have nested arrays, we might need to restore the CollectionIndex
             var savedCollectionIndex = CollectionIndex; 
             CollectionIndex = -1;
+
+            // Do not inherit alignment for the spacers - use new FormattingInfo
+            var spacerFormattingInfo = FormattingInfoPool.Instance.Get()
+                .Initialize(null, formattingInfo.FormatDetails, format, null);
+            spacerFormattingInfo.Alignment = 0;
+
             foreach (var item in items)
             {
                 CollectionIndex += 1; // Keep track of the index
-
-                // Do not inherit alignment for the spacers
-                var spacerFormattingInfo = new FormattingInfo(null, formattingInfo.FormatDetails, format, null)
-                    {Alignment = 0};
                 
                 // Determine which spacer to write:
                 if (spacer == null || CollectionIndex == 0)
@@ -225,6 +247,13 @@ namespace SmartFormat.Extensions
             }
 
             CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
+
+            FormattingInfoPool.Instance.Return(spacerFormattingInfo);
+
+            if (itemsAsList != null)
+                ListPool<object>.Instance.Return(itemsAsList);
+
+            parameters.Clear();
 
             return true;
         }

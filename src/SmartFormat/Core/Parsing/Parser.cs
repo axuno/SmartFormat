@@ -8,8 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.SmartPools;
 
-namespace SmartFormat.Core.Parsing
+ namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Parses a format string.
@@ -75,7 +76,7 @@ namespace SmartFormat.Core.Parsing
             _validSelectorChars.AddRange(_parserSettings.CustomSelectorChars());
             
             _inputFormat = string.Empty;
-            _resultFormat = new Format(Settings, string.Empty);
+            _resultFormat = InitializationObject.Format; // will never be used
         }
 
         #endregion
@@ -199,7 +200,7 @@ namespace SmartFormat.Core.Parsing
             public int Operator;
 
             /// <summary>
-            /// The current index of the selector <b>across all</b> <see cref="Placeholder"/>.
+            /// The current index of the selector <b>across all</b> <see cref="Placeholder"/>s.
             /// </summary>
             public int Selector;
 
@@ -237,10 +238,10 @@ namespace SmartFormat.Core.Parsing
             };
             
             // Initialize - will be re-assigned with new placeholders
-            _resultFormat = new Format(Settings, _inputFormat);
+            _resultFormat = FormatPool.Instance.Get().Initialize(Settings, _inputFormat);
 
             // Store parsing errors until parsing is finished:
-            var parsingErrors = new ParsingErrors(_resultFormat);
+            var parsingErrors = ParsingErrorsPool.Instance.Get().Initialize(_resultFormat);
 
             Placeholder? currentPlaceholder = null;
 
@@ -309,7 +310,7 @@ namespace SmartFormat.Core.Parsing
             else if (_index.LastEnd != _inputFormat.Length)
             {
                 // 2. The last item must be a literal, so add it
-                _resultFormat.Items.Add(new LiteralText(Settings, _inputFormat, _index.LastEnd, _inputFormat.Length));
+                _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _inputFormat.Length));
             }
             
             // This may happen with a missing closing brace, e.g. "{0:yyyy/MM/dd HH:mm:ss"
@@ -328,6 +329,7 @@ namespace SmartFormat.Core.Parsing
                 return HandleParsingErrors(parsingErrors, _resultFormat);
             }
 
+            ParsingErrorsPool.Instance.Return(parsingErrors);
             return _resultFormat;
         }
 
@@ -341,7 +343,7 @@ namespace SmartFormat.Core.Parsing
             // Finish the last text item:
             if (_index.Current != _index.LastEnd)
             {
-                _resultFormat.Items.Add(new LiteralText(Settings, _inputFormat, _index.LastEnd, _index.Current));
+                _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _index.Current));
             }
 
             _index.LastEnd = _index.SafeAdd(_index.Current, 1);
@@ -359,7 +361,7 @@ namespace SmartFormat.Core.Parsing
             if (_resultFormat.ParentPlaceholder != null) return false;
 
             // Don't swallow-up redundant closing braces, but treat them as literals
-            _resultFormat.Items.Add(new LiteralText(Settings, _inputFormat, _index.Current, _index.Current + 1));
+            _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.Current, _index.Current + 1));
             
             parsingErrors.AddIssue(_resultFormat, _parsingErrorText[ParsingError.TooManyClosingBraces], _index.Current,
                 _index.Current + 1);
@@ -396,7 +398,7 @@ namespace SmartFormat.Core.Parsing
         private void CreateNewPlaceholder(ref int nestedDepth, out Placeholder newPlaceholder)
         {
             nestedDepth++;
-            newPlaceholder = new Placeholder(_resultFormat, _index.Current, nestedDepth);
+            newPlaceholder = PlaceholderPool.Instance.Get().Initialize(_resultFormat, _index.Current, nestedDepth);
             _resultFormat.Items.Add(newPlaceholder);
             _resultFormat.HasNested = true;
             _index.Operator = _index.SafeAdd(_index.Current, 1);
@@ -436,7 +438,7 @@ namespace SmartFormat.Core.Parsing
             if (indexNextChar < _inputFormat.Length && (_inputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar || _inputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar))
             {
                 // Finish the last text item:
-                if (_index.Current != _index.LastEnd) _resultFormat.Items.Add(new LiteralText(Settings, _inputFormat, _index.LastEnd, _index.Current));
+                if (_index.Current != _index.LastEnd) _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _index.Current));
                 _index.LastEnd = _index.SafeAdd(_index.Current, 1);
 
                 _index.Current++;
@@ -446,20 +448,20 @@ namespace SmartFormat.Core.Parsing
                 // **** Escaping of character literals like \t, \n, \v etc. ****
 
                 // Finish the last text item:
-                if (_index.Current != _index.LastEnd) _resultFormat.Items.Add(new LiteralText(Settings, _inputFormat, _index.LastEnd, _index.Current));
+                if (_index.Current != _index.LastEnd) _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _index.Current));
                                 
                 // Is this a unicode escape sequence?
                 if (_inputFormat[indexNextChar] == 'u')
                 {
                     // The next 4 characters must represent the unicode 
                     _index.LastEnd = _index.SafeAdd(_index.Current, 6);
-                    _resultFormat.Items.Add(new LiteralText(Settings, _inputFormat, _index.Current, _index.LastEnd));
+                    _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.Current, _index.LastEnd));
                 }
                 else
                 {
                     // Next add the character literal INCLUDING the escape character, which LiteralText will expect
                     _index.LastEnd = _index.SafeAdd(_index.Current, 2);
-                    _resultFormat.Items.Add(new LiteralText(Settings, _inputFormat, _index.Current, _index.LastEnd));
+                    _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.Current, _index.LastEnd));
                 }
 
                 _index.Current = _index.SafeAdd(_index.Current, 1);
@@ -572,7 +574,7 @@ namespace SmartFormat.Core.Parsing
                 // Add the selector:
                 if (_index.Current != _index.LastEnd) // if equal, we're already parsing a selector
                 {
-                    currentPlaceholder.AddSelector(new Selector(Settings, _inputFormat, _index.LastEnd, _index.Current, _index.Operator, _index.Selector));
+                    currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, _inputFormat, _index.LastEnd, _index.Current, _index.Operator, _index.Selector));
                     _index.Selector++;
                     _index.Operator = _index.Current;
                 }
@@ -585,8 +587,9 @@ namespace SmartFormat.Core.Parsing
                 AddLastSelector(ref currentPlaceholder, parsingErrors);
                 
                 // Start the format:
-                var newFormat = new Format(Settings, currentPlaceholder, _index.Current + 1);
+                var newFormat = FormatPool.Instance.Get().Initialize(Settings, currentPlaceholder, _index.Current + 1);
                 currentPlaceholder.Format = newFormat;
+                //FormatPool.Instance.Return(_resultFormat); // return to pool before reassigning
                 _resultFormat = newFormat;
                 currentPlaceholder = null;
                 // named formatters will not be parsed with string.Format compatibility switched ON.
@@ -630,7 +633,7 @@ namespace SmartFormat.Core.Parsing
                 _index.Current - _index.Operator == 1 &&
                 (_inputFormat[_index.Operator] == _parserSettings.ListIndexEndChar ||
                  _inputFormat[_index.Operator] == _parserSettings.NullableOperator))
-                currentPlaceholder.AddSelector(new Selector(Settings, _inputFormat, _index.LastEnd, _index.Current,_index.Operator, _index.Selector));
+                currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, _inputFormat, _index.LastEnd, _index.Current,_index.Operator, _index.Selector));
             else if (_index.Operator != _index.Current) // the selector only contains illegal ("trailing") operator characters
                 parsingErrors.AddIssue(_resultFormat,
                     $"'0x{Convert.ToInt32(_inputFormat[_index.Operator]):X}': " +
@@ -854,7 +857,8 @@ namespace SmartFormat.Core.Parsing
                     {
                         if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, (ph.Format ?? new Format(Settings, ph.BaseString)).BaseString, ph.StartIndex, ph.EndIndex);
+                            var parent = ph.Format ?? FormatPool.Instance.Get().Initialize(Settings, ph.BaseString);
+                            currentResult.Items[i] = LiteralTextPool.Instance.Get().Initialize(Settings, parent, parent.BaseString, ph.StartIndex, ph.EndIndex);
                         }
                     }
                     return currentResult;
@@ -864,13 +868,14 @@ namespace SmartFormat.Core.Parsing
                     {
                         if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, (ph.Format ?? new Format(Settings, ph.BaseString)).BaseString, ph.StartIndex, ph.StartIndex);
+                            var parent = ph.Format ?? FormatPool.Instance.Get().Initialize(Settings, ph.BaseString);
+                            currentResult.Items[i] = LiteralTextPool.Instance.Get().Initialize(Settings, parent, parent.BaseString, ph.StartIndex, ph.StartIndex);
                         }
                     }
                     return currentResult;
                 case ParseErrorAction.OutputErrorInResult:
-                    var fmt = new Format(Settings, parsingErrors.Message, 0, parsingErrors.Message.Length);
-                    fmt.Items.Add(new LiteralText(Settings, parsingErrors.Message, 0, parsingErrors.Message.Length));
+                    var fmt = FormatPool.Instance.Get().Initialize(Settings, parsingErrors.Message, 0, parsingErrors.Message.Length);
+                    fmt.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, fmt, parsingErrors.Message, 0, parsingErrors.Message.Length));
                     return fmt;
                 default:
                     throw new ArgumentException("Illegal type for ParsingErrors", parsingErrors);

@@ -4,7 +4,6 @@
 //
 
 using System;
-using System.Collections.Generic;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;

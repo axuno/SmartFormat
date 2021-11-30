@@ -4,7 +4,7 @@
         <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
-        <DefineConstants>TRACE;DEBUG</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>
         <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
@@ -42,12 +42,14 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <Optimize>false</Optimize>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <WarningLevel>3</WarningLevel>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <DefineConstants>RELEASE</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

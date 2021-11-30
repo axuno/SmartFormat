@@ -6,6 +6,8 @@
 using System;
 using System.Buffers;
 using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -17,16 +19,33 @@ namespace SmartFormat.Core.Parsing
     {
         private string? _toStringCache;
 
+        #region: Create, initialize, return to pool :
+
         /// <summary>
-        /// Creates an instance of <see cref="LiteralText"/>, representing the literal text that is found a parsed format string.
+        /// CTOR for object pooling.
+        /// Immediately after creating the instance, an overload of 'Initialize' must be called.
+        /// </summary>
+        public LiteralText()
+        {
+            // Inserted for clarity and documentation
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="LiteralText"/> instance, representing the literal text that is found in a parsed format string.
         /// </summary>
         /// <param name="smartSettings">The <see cref="SmartSettings"/>.</param>
+        /// <param name="parent">The parent <see cref="FormatItem"/></param>
         /// <param name="baseString">The reference to the parsed format string.</param>
         /// <param name="startIndex">The start index of the <see cref="LiteralText"/> in the format string.</param>
         /// <param name="endIndex">The end index of the <see cref="LiteralText"/> in the format string.</param>
-        public LiteralText(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
+        /// <returns>The <see cref="LiteralText"/> instance, representing the literal text that is found in a parsed format string.</returns>
+        public new LiteralText Initialize(SmartSettings smartSettings, FormatItem parent, string baseString, int startIndex, int endIndex)
         {
+            base.Initialize(smartSettings, parent, baseString, startIndex, endIndex);
+            return this;
         }
+
+        #endregion
 
         /// <summary>
         /// Get the string representation of the <see cref="LiteralText"/>, with escaped characters converted.
@@ -64,5 +83,14 @@ namespace SmartFormat.Core.Parsing
                 : BaseString.AsSpan(StartIndex, Length);
         }
 
+        /// <summary>
+        /// Clears the <see cref="LiteralText"/> item.
+        /// <para>This method gets called by <see cref="LiteralTextPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
+        /// </summary>
+        public override void Clear()
+        {
+            base.Clear();
+            _toStringCache = null;
+        }
     }
 }

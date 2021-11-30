@@ -5,7 +5,6 @@ using SmartFormat.Tests.TestUtils;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SmartFormat.Core.Formatting;
 
 namespace SmartFormat.Tests.Core
 {
@@ -34,7 +33,7 @@ namespace SmartFormat.Tests.Core
 
             // Verify that the reconstructed formats
             // match the original ones:
-            var fmt = parser.ParseFormat(format);
+            using var fmt = parser.ParseFormat(format);
 
             // The same BaseString reference should be passed around
             Assert.That(fmt.Items[0].BaseString, Is.SameAs(fmt.BaseString));
@@ -146,7 +145,7 @@ namespace SmartFormat.Tests.Core
             var invalidTemplate = "Hello, I'm {Name from {City} {Street}";
 
             var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.Ignore}});
-            var parsed = parser.ParseFormat(invalidTemplate);
+            using var parsed = parser.ParseFormat(invalidTemplate);
             
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
             Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "), "Literal text");
@@ -165,7 +164,7 @@ namespace SmartFormat.Tests.Core
         public void Parser_Error_Action_MaintainTokens(string invalidTemplate, bool lastItemIsPlaceholder)
         {
             var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
-            var parsed = parser.ParseFormat(invalidTemplate);
+            using var parsed = parser.ParseFormat(invalidTemplate);
 
             Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
             Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "));
@@ -190,7 +189,7 @@ namespace SmartFormat.Tests.Core
             var invalidTemplate = "Hello, I'm {Name from {City}";
             
             var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.OutputErrorInResult}});
-            var parsed = parser.ParseFormat(invalidTemplate);
+            using var parsed = parser.ParseFormat(invalidTemplate);
 
             Assert.That(parsed.Items.Count, Is.EqualTo(1));
             Assert.That(parsed.Items[0].RawText, Does.StartWith("The format string has 3 issues"));
@@ -242,7 +241,7 @@ namespace SmartFormat.Tests.Core
             var parser = GetRegularParser();
             var formatString = "{0,-10}";
 
-            var format = parser.ParseFormat(formatString);
+            using var format = parser.ParseFormat(formatString);
             var placeholder = (Placeholder) format.Items[0];
             Assert.That(placeholder.ToString(), Is.EqualTo(formatString));
             Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));

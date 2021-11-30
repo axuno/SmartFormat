@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
@@ -157,12 +155,16 @@ namespace SmartFormat.Tests.Core
         public void Formatter_NotifyFormattingError()
         {
             var obj = new { Name = "some name" };
-            var badPlaceholder = new List<string>();
+            var badPlaceholder = new List<FormattingErrorEventArgs>();
 
             var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.Ignore}});
-            formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args.Placeholder);
+            formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args);
             var res = formatter.Format("{NoName} {Name} {OtherMissing}", obj);
-            Assert.That(badPlaceholder.Count == 2 && badPlaceholder[0] == "{NoName}" && badPlaceholder[1] == "{OtherMissing}");
+            Assert.That(badPlaceholder.Count, Is.EqualTo(2));
+            Assert.That(badPlaceholder[0].Placeholder == "{NoName}");
+            Assert.That(badPlaceholder[1].Placeholder == "{OtherMissing}");
+            Assert.That(badPlaceholder[0].ErrorIndex, Is.EqualTo(7));
+            Assert.That(badPlaceholder[0].IgnoreError, Is.EqualTo(true));
         }
 
         [TestCase("\\{Test}", "\\Hello", false)]
@@ -198,7 +200,7 @@ namespace SmartFormat.Tests.Core
                 Parser = new ParserSettings {ErrorAction = ParseErrorAction.OutputErrorInResult}
             });
             var formatParsed = formatter.Parser.ParseFormat(format);
-            var formatDetails = new FormatDetails(formatter, formatParsed, args, null, output);
+            var formatDetails = new FormatDetails().Initialize(formatter, formatParsed, args, null, output);
             
             Assert.AreEqual(args, formatDetails.OriginalArgs);
             Assert.AreEqual(format, formatDetails.OriginalFormat.RawText);

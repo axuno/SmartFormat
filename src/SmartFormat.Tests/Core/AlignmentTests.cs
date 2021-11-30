@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
-using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Core
 {

@@ -5,7 +5,7 @@
 		<AssemblyTitle>SmartFormat.Test</AssemblyTitle>
 		<Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
         <TargetFrameworks>net462;net5.0</TargetFrameworks>
-		<DefineConstants>$(DefineConstants)</DefineConstants>
+        <DefineConstants>$(DefineConstants)</DefineConstants>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<AssemblyName>SmartFormat.Tests</AssemblyName>
 		<AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
@@ -23,6 +23,17 @@
 		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
         <PackageReference Include="FluentAssertions" Version="6.1.0" />
 	</ItemGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <WarningLevel>4</WarningLevel>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <WarningLevel>3</WarningLevel>
+        <DefineConstants>RELEASE</DefineConstants>
+    </PropertyGroup>
+
 
 	<ItemGroup>
 	  <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />

@@ -10,9 +10,10 @@ namespace SmartFormat.Performance
         {
             //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
             //BenchmarkRunner.Run<SourcePerformanceTests>();
-            BenchmarkRunner.Run<FormatTests>();
+            //BenchmarkRunner.Run<FormatTests>();
+            BenchmarkRunner.Run<ObjectPoolPerformanceTests>();
             //BenchmarkRunner.Run<ParserTests>();
-            
+
             //BenchmarkRunner.Run<SimpleSpanParserTests>();
             //BenchmarkRunner.Run<NullFormatterChooseFormatterTests>();
             //BenchmarkRunner.Run<ReflectionVsStringSourceTests>();

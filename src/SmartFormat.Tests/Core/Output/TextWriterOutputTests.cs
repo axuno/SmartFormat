@@ -32,7 +32,7 @@ namespace SmartFormat.Tests.Core.Output
         [Test]
         public void Output_Of_ValueStringBuilder()
         {
-            using var sb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
+            using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
             sb.Append("text");
             var sw = new StringWriter(new StringBuilder());
             var two = new TextWriterOutput(sw);

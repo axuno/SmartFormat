@@ -5,9 +5,12 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
+using SmartFormat.Pooling;
 
 namespace SmartFormat.Extensions
 {
@@ -21,14 +24,17 @@ namespace SmartFormat.Extensions
         private static readonly object[] Empty = Array.Empty<object>();
 
         /// <summary>
-        /// Gets the type cache <see cref="ConcurrentDictionary{TKey,TValue}"/>.
+        /// Gets the type cache <see cref="IDictionary{TKey,TValue}"/>.
         /// It could e.g. be pre-filled or cleared in a derived class.
         /// </summary>
         /// <remarks>
-        /// Note: For reading, <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/> and <see cref="ConcurrentDictionary{TKey, TValue}"/> perform equally.
-        /// For writing, <see cref="ConcurrentDictionary{TKey, TValue}"/> is slower (tested under net5.0).
+        /// Note: For reading, <see cref="Dictionary{TKey, TValue}"/> and <see cref="ConcurrentDictionary{TKey, TValue}"/> perform equally.
+        /// For writing, <see cref="ConcurrentDictionary{TKey, TValue}"/> is slower with more garbage (tested under net5.0).
         /// </remarks>
-        protected readonly ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> TypeCache = new();
+        protected readonly IDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> TypeCache =
+            SmartSettings.IsThreadSafeMode
+                ? new ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>()
+                : new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>();
 
         /// <summary>
         /// Gets or sets, whether the type cache dictionary should be used.
