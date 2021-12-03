@@ -54,7 +54,7 @@ namespace SmartFormat.Tests.Utilities
         {
             public string Format(string? format, object? arg, IFormatProvider? formatProvider)
             {
-                return new string(format?.Reverse().Select(c => c).ToArray()) + ": " +
+                return new string(format!.Reverse().Select(c => c).ToArray()) + ": " +
                        new string((arg as string ?? "?").Reverse().Select(c => c).ToArray());
             }
         }

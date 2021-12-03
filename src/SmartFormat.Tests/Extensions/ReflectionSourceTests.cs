@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
@@ -173,9 +174,20 @@ namespace SmartFormat.Tests.Extensions
 
             var formatter = Smart.CreateDefaultSmartFormat();
             var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
-            var typeCache =
-                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
 
+            IDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
+                method)>? typeCache;
+
+            if(SmartSettings.IsThreadSafeMode)
+                typeCache =
+                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
+                        System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
+                            method)>;
+            else
+                typeCache =
+                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
+                    System.Collections.Generic.Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
+            
             var obj = new {Obj = new MiscObject { MethodReturnValue = "The Method Value"}};
             
             // Invoke formatter 1st time
@@ -195,9 +207,18 @@ namespace SmartFormat.Tests.Extensions
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
-            var typeCache =
-                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
+            IDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
+                method)>? typeCache;
 
+            if(SmartSettings.IsThreadSafeMode)
+                typeCache =
+                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
+                        System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
+                            method)>;
+            else
+                typeCache =
+                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
+                        System.Collections.Generic.Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
             var obj = new {Obj = new MiscObject { Field = "The Field Value"}};
             
             // Invoke formatter 1st time
@@ -218,9 +239,18 @@ namespace SmartFormat.Tests.Extensions
             var formatter = Smart.CreateDefaultSmartFormat();
             var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
             reflectionSource.IsTypeCacheEnabled = false;
-            var typeCache =
-                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
+            IDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
+                method)>? typeCache;
 
+            if(SmartSettings.IsThreadSafeMode)
+                typeCache =
+                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
+                        System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
+                            method)>;
+            else
+                typeCache =
+                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
+                        System.Collections.Generic.Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
             var obj = new {Obj = new MiscObject { Field = "The Field Value", MethodReturnValue = "The Method Value"}};
             
             // Invoke formatter, expecting results, but empty cache

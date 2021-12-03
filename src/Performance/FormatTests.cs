@@ -127,7 +127,7 @@ NullOutput
             for (var i = 0; i < N; i++)
             {
                  using var output = GetOutput(_placeholderFormat);
-                _literalFormatter.FormatInto(output, _placeholderFormat, LoremIpsum);
+                _literalFormatter.FormatInto(output, null, _placeholderFormat, LoremIpsum);
                 _ = output.ToString();
             }
         }
@@ -138,7 +138,7 @@ NullOutput
             for (var i = 0; i < N; i++)
             {
                 using var output = GetOutput(_placeholder0005Format);
-                _literalFormatter.FormatInto(output, _placeholder0005Format, LoremIpsum, LoremIpsum, LoremIpsum, LoremIpsum, LoremIpsum);
+                _literalFormatter.FormatInto(output, null, _placeholder0005Format, LoremIpsum, LoremIpsum, LoremIpsum, LoremIpsum, LoremIpsum);
                 _ = output.ToString();
             }
         }
@@ -149,7 +149,7 @@ NullOutput
             for (var i = 0; i < N; i++)
             {
                 using var output = GetOutput(_literal0010CharFormat);
-                _literalFormatter.FormatInto(output, _literal0010CharFormat);
+                _literalFormatter.FormatInto(output, null, _literal0010CharFormat);
                 _ = output.ToString();
             }
         }
@@ -160,7 +160,7 @@ NullOutput
             for (var i = 0; i < N; i++)
             {
                 using var output = GetOutput(_literal3000CharFormat);
-                _literalFormatter.FormatInto(output, _literal3000CharFormat);
+                _literalFormatter.FormatInto(output, null, _literal3000CharFormat);
                 _ = output.ToString();
             }
         }
@@ -171,7 +171,7 @@ NullOutput
             for (var i = 0; i < N; i++)
             {
                 using var output = GetOutput(_literal6000PlaceholderFormat);
-                _literalFormatter.FormatInto(output, _literal6000PlaceholderFormat, LoremIpsum);
+                _literalFormatter.FormatInto(output, null, _literal6000PlaceholderFormat, LoremIpsum);
                 _ = output.ToString();
             }
         }
@@ -182,7 +182,7 @@ NullOutput
             for (var i = 0; i < N; i++)
             {
                 using var output = GetOutput(_literal18kEscPlaceholderFormat);
-                _literalFormatter.FormatInto(output, _literal18kEscPlaceholderFormat, LoremIpsum);
+                _literalFormatter.FormatInto(output, null, _literal18kEscPlaceholderFormat, LoremIpsum);
                 _ = output.ToString();
             }
         }

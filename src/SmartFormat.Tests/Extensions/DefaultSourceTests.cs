@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
 

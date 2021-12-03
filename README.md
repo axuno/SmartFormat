@@ -10,11 +10,18 @@
 
 [![Paypal-Donations](https://img.shields.io/badge/Donate-PayPal-important.svg?style=flat-square)](https://www.paypal.com/donate?hosted_button_id=KSC3LRAR26AHN)
 
-**SmartFormat** is a **string composition** library written in C# which is basically compatible with string.Format. More than that **SmartFormat** can format data with named placeholders, lists, pluralization and other smart extensions.
+**SmartFormat** is a **string composition** library written in C# which can be a drop-in replacement for `string.Format`. More than that **Smart.Format** can format data with named placeholders, lists, localization, pluralization and other smart extensions.
+
+* High performance with low memory footprint
+* Exact control of whitespace text output
+* `string.Format` compatibility mode and `Smart.Format` enhanced mode
+* Minimal, intuitive syntax
+* Many built-in extensions, custom extensions are easy to integrate
 
 ### Supported Frameworks
 * .Net Framework 4.6.1 and later
-* .Net Standard 2.0 and later (including .Net 5.0)
+* .Net Standard 2.0
+* .Net Standard 2.1 and later for best optimizations
  
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/)
@@ -29,6 +36,3 @@ See [changelog](CHANGES.md) for changes.
 
 **See the [list of changes](https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md) already merged into branch `version/v3`**
 
-<hr>
-
-We have started to work on a new version of ```SmartFormat.Net``` and **would like to collect your input using [GitHub Discussions](https://github.com/axuno/SmartFormat/discussions/139)**. 

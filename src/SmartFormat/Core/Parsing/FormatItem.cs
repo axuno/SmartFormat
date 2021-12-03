@@ -5,6 +5,7 @@
 
 using System;
 using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -17,33 +18,10 @@ namespace SmartFormat.Core.Parsing
         private string? _toStringCache;
 
         /// <summary>
-        /// Obsolete. Gets the base format string.
-        /// </summary>
-        [Obsolete("Use property 'BaseString' instead")]
-        public string baseString => BaseString;
-
-        /// <summary>
         /// Gets the base format string.
         /// </summary>
-        public string BaseString { get; }
+        public string BaseString { get; protected set; } = string.Empty;
         
-        /// <summary>
-        /// Obsolete. The end index is pointing to ONE POSITION AFTER the last character of item.
-        /// </summary>
-        [Obsolete("Use property 'EndIndex' instead")]
-        public int endIndex
-        {
-            get
-            {
-                return EndIndex;
-            }
-
-            set
-            {
-                EndIndex = value;
-            }
-        }
-
         /// <summary>
         /// The end index is pointing to ONE POSITION AFTER the last character of item.
         /// </summary>
@@ -55,23 +33,6 @@ namespace SmartFormat.Core.Parsing
         /// </example>
         public int EndIndex { get; set; }
         
-        /// <summary>
-        /// Obsolete. The start index is pointing to the first character of item.
-        /// </summary>
-        [Obsolete("Use property 'StartIndex' instead")]
-        public int startIndex
-        {
-            get
-            {
-                return StartIndex;
-            }
-
-            set
-            {
-                StartIndex = value;
-            }
-        }
-
         /// <summary>
         /// The start index is pointing to the first character of item.
         /// </summary>
@@ -91,21 +52,41 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// The settings for formatter and parser.
         /// </summary>
-        public SmartSettings SmartSettings { get; }
+        public SmartSettings SmartSettings { get; protected set; } = InitializationObject.SmartSettings;
 
         /// <summary>
-        /// CTOR.
+        /// The parent <see cref="FormatItem"/> of this instance, <see langword="null"/> if not parent exists.
+        /// </summary>
+        public FormatItem? ParentFormatItem { get; private set; }
+
+        /// <summary>
+        /// Initializes the <see cref="FormatItem"/> or the derived class.
         /// </summary>
         /// <param name="smartSettings"></param>
+        /// <param name="parent">The parent <see cref="FormatItem"/> or <see langword="null"/>.</param>
         /// <param name="baseString">The base format string.</param>
         /// <param name="startIndex">The start index of the <see cref="FormatItem"/> within the base format string.</param>
         /// <param name="endIndex">The end index of the <see cref="FormatItem"/> within the base format string.</param>
-        protected FormatItem(SmartSettings smartSettings, string baseString, int startIndex, int endIndex)
+        protected virtual void Initialize(SmartSettings smartSettings, FormatItem? parent, string baseString, int startIndex, int endIndex)
         {
+            ParentFormatItem = parent;
             SmartSettings = smartSettings;
             BaseString = baseString;
             StartIndex = startIndex;
             EndIndex = endIndex;
+        }
+
+        /// <summary>
+        /// Clears the <see cref="FormatItem"/> or the derived class.
+        /// </summary>
+        public virtual void Clear()
+        {
+            _toStringCache = null;
+            BaseString = string.Empty;
+            EndIndex = 0;
+            StartIndex = 0;
+            SmartSettings = InitializationObject.SmartSettings;
+            ParentFormatItem = null;
         }
 
         /// <summary>

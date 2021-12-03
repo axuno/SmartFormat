@@ -11,28 +11,30 @@ using SmartFormat.Core.Extensions;
 namespace SmartFormat.Core.Output
 {
     /// <summary>
-    /// Wraps a <see cref="ZStringBuilder"/> so it can be used for output.
-    /// This is used for the default output.
+    /// Wraps an UTF-16 <see cref="ZStringBuilder"/> so that it can be used for output.
+    /// <see cref="ZStringOutput"/> is used for the default output.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// Note: <see cref="ZStringOutput"/> cannot be used for object pooling,
+    /// because it contains a <see langword="struct"/> and a stack only returns a copy of the <see langword="struct"/>.
+    /// </para>
     /// <see cref="StringBuilder"/>, <see cref="ZStringBuilder"/>,
-    /// <see cref="UnicodeEncoding"/> and <see langword="string"/> objects use <b>UTF-16</b> encoding to store characters.
+    /// <see cref="UnicodeEncoding"/> and <see langword="string"/> objects also use <b>UTF-16</b> encoding to store characters.
     /// </remarks>
     public class ZStringOutput : IOutput, IDisposable
     {
-        private ZStringBuilder _output;
-
         /// <summary>
         /// Returns the <see cref="ZStringBuilder"/> used for output.
         /// </summary>
-        public ZStringBuilder Output => _output; // Use with a backing field!
+        public ZStringBuilder Output { get; }
 
         /// <summary>
         /// Creates a new instance of <see cref="ZStringOutput"/>.
         /// </summary>
         public ZStringOutput()
         {
-            _output = Utilities.ZStringExtensions.CreateStringBuilder();
+            Output = Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
         }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace SmartFormat.Core.Output
         /// <param name="capacity">The estimated capacity required. This will reduce or avoid incremental buffer increases.</param>
         public ZStringOutput(int capacity)
         {
-            _output = Utilities.ZStringExtensions.CreateStringBuilder(capacity);
+            Output = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(capacity);
         }
 
         /// <summary>
@@ -49,25 +51,25 @@ namespace SmartFormat.Core.Output
         /// </summary>
         public ZStringOutput(ZStringBuilder stringBuilder)
         {
-            _output = stringBuilder;
+            Output = stringBuilder;
         }
 
         ///<inheritdoc/>
         public void Write(string text, IFormattingInfo? formattingInfo = null)
         {
-            _output.Append(text);
+            Output.Append(text);
         }
 
         ///<inheritdoc/>
         public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
         {
-            _output.Append(text);
+            Output.Append(text);
         }
 
         ///<inheritdoc/>
         public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
         {
-            _output.Append(stringBuilder);
+            Output.Append(stringBuilder);
         }
 
         /// <summary>
@@ -75,7 +77,7 @@ namespace SmartFormat.Core.Output
         /// </summary>
         public override string ToString()
         {
-            return _output.ToString();
+            return Output.ToString();
         }
 
         /// <summary>
@@ -86,7 +88,7 @@ namespace SmartFormat.Core.Output
         {
             if (disposing)
             {
-                _output.Dispose();
+                Output.Dispose();
             }
         }
 

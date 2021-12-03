@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -17,22 +19,45 @@ namespace SmartFormat.Core.Parsing
     [Serializable]
     public class ParsingErrors : Exception
     {
-        private readonly Format _result;
+        private Format _result = InitializationObject.Format;
+
+        #region: Create, initialize, return to pool :
 
         /// <summary>
-        /// Creates a new instance of <see cref="ParsingErrors"/>.
+        /// CTOR for object pooling.
+        /// Immediately after creating the instance, an overload of 'Initialize' must be called.
+        /// </summary>
+        public ParsingErrors()
+        {
+            // Inserted for clarity and documentation
+        }
+
+        /// <summary>
+        /// Initializes the instance of <see cref="ParsingErrors"/>.
         /// </summary>
         /// <param name="result">The <see cref="Format"/> that caused the error.</param>
-        public ParsingErrors(Format result)
+        /// <returns>This <see cref="ParsingErrors"/> instance.</returns>
+        public ParsingErrors Initialize(Format result)
         {
             _result = result;
-            Issues = new List<ParsingIssue>();
+            return this;
         }
+
+        /// <summary>
+        /// Clears the <see cref="Issues"/> list.
+        /// <para>This method gets called by <see cref="ParsingErrorsPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
+        /// </summary>
+        public void Clear()
+        {
+            Issues.Clear();
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets a <see cref="IList{T}"/> of <see cref="ParsingIssue"/>s./>
         /// </summary>
-        public List<ParsingIssue> Issues { get; }
+        public List<ParsingIssue> Issues { get; } = new();
 
         /// <summary>
         /// Returns <see langword="true"/> if the <see cref="IList{T}"/> of <see cref="ParsingIssue"/>s contains elements.

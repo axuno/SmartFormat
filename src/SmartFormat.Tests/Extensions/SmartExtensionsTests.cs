@@ -2,8 +2,6 @@
 using System.IO;
 using System.Text;
 using NUnit.Framework;
-using SmartFormat.Core.Output;
-using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
 {

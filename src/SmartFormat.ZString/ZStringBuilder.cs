@@ -8,7 +8,11 @@ namespace SmartFormat.ZString
     /// A 1:1 wrapper around <see cref="Utf16ValueStringBuilder"/>,
     /// so that we don't have to reference Cysharp.Text classes directly.
     /// </summary>
-    public struct ZStringBuilder : IDisposable
+    /// <remarks>
+    /// We cannot add/get <see cref="ZStringBuilder"/> into/from a list or stack,
+    /// because it contains a value type <see langword="struct"/> <see cref="Utf16ValueStringBuilder"/>.
+    /// </remarks>
+    public class ZStringBuilder : IDisposable
     {
         /**********************************
         The only required additional method is:
@@ -330,8 +334,14 @@ namespace SmartFormat.ZString
         /// <summary>Copy inner buffer to the destination span.</summary>
         public bool TryCopyTo(Span<char> destination, out int charsWritten) => _vsb.TryCopyTo(destination, out charsWritten);
 
-        /// <summary>Converts the value of this instance to a System.String.</summary>
-        public string ToString() => _vsb.ToString();
+        /// <summary>
+        /// Converts the value of this instance to a system.String.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="Utf16ValueStringBuilder"/> creates the string from the buffer.
+        /// Using <i>string.Create</i> here does not bring better results.
+        /// </remarks>
+        public override string ToString() => _vsb.ToString();
 
         /// <summary>IBufferWriter.GetMemory.</summary>
         public Memory<char> GetMemory(int sizeHint) => _vsb.GetMemory(sizeHint);
