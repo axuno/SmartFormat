@@ -9,7 +9,7 @@ using SmartFormat.Pooling.SpecializedPools;
 namespace SmartFormat.Pooling.SmartPools
 {
     /// <summary>
-    /// The abstract base class for specialized pools.
+    /// The abstract base class for smart pools.
     /// </summary>
     /// <typeparam name="T">The <see langword="type"/> of the smart pool.</typeparam>
     internal abstract class SmartPoolAbstract<T> : SpecializedPoolAbstract<T> where T : class
@@ -20,7 +20,7 @@ namespace SmartFormat.Pooling.SmartPools
         /// <returns>A not yet initialized <see typeparamref ="T"/> instance from the object pool.</returns>
         public override T Get()
         {
-            return Pool.Get();
+            return base.Get();
         }
 
         /// <summary>
@@ -29,8 +29,7 @@ namespace SmartFormat.Pooling.SmartPools
         /// <returns>A <see cref="PooledObject{T}"/> with a not yet initialized <see paramref="T"/> instance from the object pool.</returns>
         public override PooledObject<T> Get(out T instance)
         {
-            instance = Get();
-            return new PooledObject<T>(instance, Pool);
+            return base.Get(out instance);
         }
     }
 }

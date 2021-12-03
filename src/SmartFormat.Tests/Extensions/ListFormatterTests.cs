@@ -216,8 +216,7 @@ namespace SmartFormat.Tests.Extensions
             var listSourceAndFormat = new ListFormatter();
             smart.AddExtensions(listSourceAndFormat, new DefaultSource(), new ReflectionSource());
             smart.AddExtensions(listSourceAndFormat, new DefaultFormatter());
-            smart = Smart.CreateDefaultSmartFormat();
-
+            
             var numbers = new List<string?> {"dummy", listElement};
 
             var data = new {Numbers = numbers};

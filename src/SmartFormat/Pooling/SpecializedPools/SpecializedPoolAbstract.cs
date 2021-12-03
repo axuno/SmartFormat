@@ -72,6 +72,12 @@ namespace SmartFormat.Pooling.SpecializedPools
         /// </returns>
         public virtual PooledObject<T> Get(out T instance)
         {
+            if (!PoolSettings.IsPoolingEnabled)
+            {
+                instance = Policy.FunctionOnCreate();
+                return new PooledObject<T>(instance, Pool);
+            }
+
             instance = Get();
             return new PooledObject<T>(instance, Pool);
         }

@@ -1,29 +1,50 @@
 Latest Changes
 ====
 
-What's new in v3.0.0-alpha.4
+What's new in v3.0.0-alpha.5
 ====
 
+Changes to release v2.7.x
+
 ### 1. Significant boost in performance
-After implementing a zero allocation `ValueStringBuilder` based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193) and [#228](https://github.com/axuno/SmartFormat/pull/228):
+a) After implementing a **zero allocation `ValueStringBuilder`** based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193) and [#228](https://github.com/axuno/SmartFormat/pull/228):
    * Parsing is 10% faster with 50-80% less GC and memory allocation
    * Formatting is up to 40% faster with 50% less GC and memory allocation
-   * Since [#228](https://github.com/axuno/SmartFormat/pull/228) there no more `Cysharp.Text` classes used in the `SmartFormat` namespace
-     * Created `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
-     * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
+b) After implementing **Object Pools** for all classes which are frequently instantiated, GC and memory allocation again went down significantly. See the test results below.
 
-More optimizations:
+See also: <a href="#ThreadSafety">thread safety</a> and <a href="#ObjectPooling">object pooling</a>
 
-   a) `ReflectionSource`
+**More optimizations:**
+
+c) `ReflectionSource`
    
    * Added a type cache which increases speed by factor 4. Thanks to [@karljj1](https://github.com/karljj1). ([#155](https://github.com/axuno/SmartFormat/pull/155)). 
-   * Type caching can be disabled ([#217](https://github.com/axuno/SmartFormat/pull/217))
-   * Dictionary for type cache changed to `ConcurrentDictionary` ([#217](https://github.com/axuno/SmartFormat/pull/217))
-   * `TypeCache` is accessible from a derived class ([#217](https://github.com/axuno/SmartFormat/pull/217))
+   * Depending on `SmartSettings.IsThreadSafe` the type cache is `ConcurrentDictionary` or `Dictionary`.
+ 
+d) `StringSource`
+
+    The `StringSource` takes over a part of the functionality, which has been implemented in `ReflectionSource` in v2. Compared to reflection **with** caching, speed is 20% better at 25% less memory allocation.  
+
+e) `DictionarySource`
    
-   b) `DictionarySource`
-   
-   * Speed increased by 10% with less GC pressure ([#189](https://github.com/axuno/SmartFormat/pull/189))
+   Speed increased by 10% with less GC pressure ([#189](https://github.com/axuno/SmartFormat/pull/189))
+
+#### Performance Test Results
+
+The test setup for `ObjectPoolPerformanceTests` is included in the repo. It's obvious, that test results depend a lot on the input format string and the type of data arguments. Still, the results give a good impression of the improvements in `v3.0` compared to `v2.7`.
+
+Results under NetStandard2.1:
+```
+|         Method |     N |     Mean |   Error |  StdDev |      Gen 0 |     Gen 1 | Gen 2 | Allocated |
+|--------------- |------ |---------:|--------:|--------:|-----------:|----------:|------:|----------:|
+SmartFormat v2.7.1
+| Format         | 10000 | 223.9 ms | 1.48 ms | 1.38 ms | 21333.3333 |         - |     - |    172 MB |
+SmartFormat v3.0-alpha.5
+| SingleThread   | 10000 | 108.2 ms | 0.52 ms | 0.49 ms |  3200.0000 |         - |     - |     26 MB |
+| ThreadSafe     | 10000 | 128.0 ms | 1.29 ms | 1.21 ms |  6000.0000 |         - |     - |     48 MB |
+| PoolingDisabled| 10000 | 157.3 ms | 1.74 ms | 1.63 ms | 11000.0000 | 5500.0000 |     - |     88 MB |
+```
+Note: `PoolingDisabled` is just for showing the advantage of object pooling, which was added in `v3.0-alpha.5`.
 
 ### 2. Exact control of whitespace text output
 This was an issue in v2 and was going back to combining `string.Format` compatibility with *Smart.Format* features. This is resolved by setting the desired mode with `SmartSettings.StringFormatCompatibility` (defaults to `false`). ([#172](https://github.com/axuno/SmartFormat/pull/172))
@@ -66,7 +87,7 @@ var result = Smart.Format("Email {0:ismatch("^\(\(\\w+\([-+.]\\w+\)*@\\w+\([-.]\
 ```Csharp
 var temperatures = new[] {-20, -10, -15};
 // parse once
-var parsedFormat = new Parser().ParseFormat("Temperature is {Temp}°.");
+using var parsedFormat = new Parser().ParseFormat("Temperature is {Temp}°.");
 // one SmartFormatter instance
 var formatter = Smart.CreateDefaultSmartFormat();
 foreach (var current in temperatures)
@@ -91,7 +112,7 @@ In v2, Alignment of output values was limited to the `DefaultFormatter`. It's ab
 * Modified `ListFormatter` so that items can be aligned (but the spacers stay untouched).
 
 ### 8. Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178), [#216](https://github.com/axuno/SmartFormat/pull/216))
-The `StringSource` takes over functionality, which have been implemented in `ReflectionSource` in v2. Compared to reflection caching, speed is 20% better at 25% less memory allocation.
+The `StringSource` takes over a part of the functionality, which has been implemented in `ReflectionSource` in v2. Compared to reflection **with** caching, speed is 20% better at 25% less memory allocation.  
 
 `StringSource` brings the following built-in methods (as selector names):
 * Length
@@ -140,7 +161,7 @@ Smart.Format("{TheValue:isnull:The value is null|The value is {}}", new {TheValu
 // Result: "The value is 1234"
 ```
 
-### 11. Added `LocalizationFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/207)
+### 11. Added `LocalizationFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/207))
 
 #### Features
   * Added `LocalizationFormatter` to localize literals and placeholders
@@ -273,6 +294,57 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
     Smart.Format("{0:time(fr):hours minutes}", timeSpan);
     // result: "25 heures 1 minute"
    ```
+<a id="ThreadSafety"></a>
+### 20. Thread Safety
+
+SmartFormat makes heavy use of caching and object pooling for expensive operations, which both require `static` containers. 
+
+a) Instantiating `SmartFormatter`s from different threads: 
+
+    `SmartSettings.IsThreadSafeMode=true` **must** be set, so that thread safe containers are used. This brings an inherent performance penalty.
+
+     **Note:** The simplified `Smart.Format(...)` API overloads use a static `SmartFormatter` instance which is **not** thread safe. Call `Smart.CreateDefaultSmartFormat()` to create a default `Formatter`.
+
+a) Instantiating `SmartFormatter`s from a single thread: 
+
+    `SmartSettings.IsThreadSafeMode=false` **should** be set for avoiding the multithreading overhead and thus for best performance. 
+
+    The simplified `Smart.Format(...)` API overloads are allowed here.
+
+<a id="ObjectPooling"></a>
+### 21. How to benefit from object pooling
+
+In order to return "smart" objects back to the object pool, its important to use one of the following patterns.
+
+Examples:
+
+**a) Single thread context** (no need to care about object pooling)
+```CSharp 
+var resultString = Smart.Format("format string", args);
+```
+
+**b) Recommended: Auto-dispose `Format`** (e.g.: caching, multi treading context)
+```CSharp 
+var smart = Smart.CreateDefaultSmartFormat();
+// Note "using" for auto-disposing the parsedFormat
+using var parsedFormat = new Parser().ParseFormat("format string", args);
+var resultString = smart.Format(parsedFormat);
+```
+
+**c) Call `Format.Dispose()`** (e.g.: caching, multi treading context)
+```CSharp
+var smart = Smart.CreateDefaultSmartFormat();
+var parsedFormat = new Parser().ParseFormat("format string", args);
+var resultString = smart.Format(parsedFormat);
+// Don't use (or reference) "parsedFormat" after disposing
+parsedFormat.Dispose();
+```
+
+### 22. Miscellaneous
+   * Since [#228](https://github.com/axuno/SmartFormat/pull/228) there are no more `Cysharp.Text` classes used in the `SmartFormat` namespace
+      * Created class `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
+      * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
+
 
 v2.7.1
 ===
@@ -314,9 +386,9 @@ Supported frameworks now are:
 v2.5.1.0
 ===
 * Added ```System.Text.Json.JsonElement``` to the JsonSource extension. ```Newtonsoft.Json``` is still included.
-* Added a demo version as a netcoreapp3.1 WindowsDesktop App
+* Added a demo version as a net5.0 WindowsDesktop App
 * Supported framworks now are: 
-  * .Net Framework 4.6.2, 4.7.2 and 4.8 (```System.Text.Json``` is not supported for .Net Framework 4.5.x and thus had to be dropped)
+  * .Net Framework 4.6.1, 4.7.2 and 4.8 (```System.Text.Json``` is not supported for .Net Framework 4.5.x and thus had to be dropped)
   * .Net Standard 2.0 and 2.1
 * Updated the [Wiki](https://github.com/axuno/SmartFormat/wiki)
 

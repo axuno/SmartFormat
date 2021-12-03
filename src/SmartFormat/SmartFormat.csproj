@@ -1,17 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
+        <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.</Description>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
-        <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>
         <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
         <PackageId>SmartFormat.NET</PackageId>
         <PackageReleaseNotes>See the change log for details of this release:
-https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
+https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md
+Give it a try.
+        </PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseFile></PackageLicenseFile>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
@@ -19,8 +22,6 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
         <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
         <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-        <PackageLicenseFile></PackageLicenseFile>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <!-- EmbedUntrackedSources for deterministic build -->
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <Nullable>enable</Nullable>
@@ -33,7 +34,7 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="" />
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="\" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

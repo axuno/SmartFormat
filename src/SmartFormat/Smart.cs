@@ -11,10 +11,11 @@ using SmartFormat.Extensions;
 namespace SmartFormat
 {
     /// <summary>
-    /// This class holds a Default instance of a <see cref="SmartFormatter"/>.
+    /// This class holds a <see cref="Default"/> instance of a <see cref="SmartFormatter"/>.
     /// The default instance has all extensions registered.
-    /// For optimized performance, create a <see cref="SmartFormatter"/> instance and register the
-    /// particular extensions that are needed.
+    /// <para>For optimized performance, create a <see cref="SmartFormatter"/> instance and register the
+    /// particular extensions that are needed.</para>
+    /// <para><see cref="Smart"/> methods are not thread safe.</para>
     /// </summary>
     public static class Smart
     {

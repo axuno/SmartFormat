@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 using SmartFormat.Pooling;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
@@ -42,35 +44,44 @@ namespace SmartFormat.Tests.Pooling
             Assert.That(code: () => SplitListPool.Instance.Return(InitializationObject.SplitList), Throws.InstanceOf<PoolingException>());
         }
 
-        [Test]
-        public void No_Active_Pool_Items_After_Smart_Format()
+        private static void DoSomeFormattingWork()
         {
-            var pools = GetAllSmartPoolsCleared();
-
-            const string twoPlaceholders = "{0} {1}";
-            const string listFormat = "{0.Count} items: {0:list:{}|, |, and }";
+            const string indexPlaceholders = "All items: {0[0]}, {0[1]}, and {0[2]}";
+            const string listPlaceholders = "Total items: {0.Count}. All items: {0:list:{}|, |, and }";
+            var list = new List<int> { 1, 2, 3 };
+            
+            var smart = new SmartFormatter();
+            var listSourceAndFormat = new ListFormatter();
+            smart.AddExtensions(listSourceAndFormat, new StringSource(), new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(listSourceAndFormat, new DefaultFormatter());
 
             // Do some formatting work
             for (var i = 0; i < 4; i++)
             {
                 // Parse and format
-                _ = Smart.Format(twoPlaceholders, 0, 1);
-                _ = Smart.Format(listFormat, new List<int>{1,2,3});
+                _ = Smart.Format(indexPlaceholders, list);
+                _ = Smart.Format(listPlaceholders, list);
 
                 // Cache parsed format result, and format
-                using (var formatParsed = new Parser().ParseFormat(twoPlaceholders))
+                using (var formatParsed = new Parser().ParseFormat(indexPlaceholders))
                 {
-                    var smart = Smart.CreateDefaultSmartFormat();
-                    smart.Format(formatParsed, 0, 1);
-                    smart.Format(formatParsed, 0, 1);
+                    _ = smart.Format(formatParsed, list);
+                    _ = smart.Format(formatParsed, list);
                 }
-                using (var formatParsed = new Parser().ParseFormat(listFormat))
+                using (var formatParsed = new Parser().ParseFormat(listPlaceholders))
                 {
-                    var smart = Smart.CreateDefaultSmartFormat();
-                    smart.Format(formatParsed, new List<int>{1,2,3});
-                    smart.Format(formatParsed, new List<int>{1,2,3});
+                    _ = smart.Format(formatParsed, list);
+                    _ = smart.Format(formatParsed, list);
                 }
             }
+        }
+
+        [Test]
+        public void No_Active_Pool_Items_After_Smart_Format()
+        {
+            var pools = GetAllSmartPoolsCleared();
+
+            DoSomeFormattingWork();
 
             foreach (var p in pools)
             {
@@ -83,6 +94,23 @@ namespace SmartFormat.Tests.Pooling
                 Console.WriteLine();
                 Assert.That(p.Counters.CountActive, Is.EqualTo(0), string.Join(" ", nameof(IPoolCounters.CountActive), p.Type?.ToString()));
                 Assert.That(p.Counters.CountInactive, Is.GreaterThan(0), string.Join(" ", nameof(IPoolCounters.CountInactive), p.Type?.ToString()));
+            }
+        }
+
+        [Test]
+        public void Pooling_Disabled_Leaves_Pools_Empty()
+        {
+            var pools = GetAllSmartPoolsCleared();
+            var savedPoolingEnabled = PoolSettings.IsPoolingEnabled; 
+            PoolSettings.IsPoolingEnabled = false;
+
+            DoSomeFormattingWork();
+
+            PoolSettings.IsPoolingEnabled = savedPoolingEnabled;
+
+            foreach (var p in pools)
+            {
+                Assert.That(p.Counters!.CountAll, Is.EqualTo(0), "CountAll");
             }
         }
     }
