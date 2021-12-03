@@ -4,7 +4,7 @@
 		<Description>Unit tests for SmartFormat</Description>
 		<AssemblyTitle>SmartFormat.Test</AssemblyTitle>
 		<Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <TargetFrameworks>net462;netcoreapp3.1;net5.0</TargetFrameworks>
+        <TargetFrameworks>net462;net5.0</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<AssemblyName>SmartFormat.Tests</AssemblyName>
@@ -37,21 +37,6 @@
     <ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp3.1'">
         <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
         <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
-    </ItemGroup>
-
-	<!-- Make sure we also test netstandard2.0 assemblies -->
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1'">
-        <Reference Include="SmartFormat.ZString">
-            <HintPath>..\SmartFormat\bin\$(Configuration)\netstandard2.0\SmartFormat.ZString.dll</HintPath>
-        </Reference>
-        <Reference Include="SmartFormat">
-            <HintPath>..\SmartFormat\bin\$(Configuration)\netstandard2.0\SmartFormat.dll</HintPath>
-        </Reference>
-		<!-- Packages used by SmartFormat.* assemblies -->
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="System.Memory" Version="4.5.4" />
-        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-        <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 
 	<ItemGroup>
