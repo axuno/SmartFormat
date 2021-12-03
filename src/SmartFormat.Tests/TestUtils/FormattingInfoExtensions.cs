@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Settings;
@@ -19,8 +18,8 @@ namespace SmartFormat.Tests.TestUtils
             var formatter = new SmartFormatter(new SmartSettings());
             var formatParsed = formatter.Parser.ParseFormat(format);
             // use StringOutput because we don't have to care about disposing.
-            var formatDetails = new FormatDetails(formatter, formatParsed, data, null, new StringOutput());
-            return new FormattingInfo(formatDetails, formatDetails.OriginalFormat, data);
+            var formatDetails = new FormatDetails().Initialize(formatter, formatParsed, data, null, new StringOutput());
+            return new FormattingInfo().Initialize(formatDetails, formatDetails.OriginalFormat, data);
         }
     }
 }

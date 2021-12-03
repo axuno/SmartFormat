@@ -6,9 +6,9 @@
 using System;
 using System.Collections.Generic;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Formatting
 {
@@ -18,14 +18,23 @@ namespace SmartFormat.Core.Formatting
     public class FormattingInfo : IFormattingInfo, ISelectorInfo
     {
         /// <summary>
+        /// CTOR for object pooling.
+        /// Immediately after creating the instance, an overload of 'Initialize' must be called.
+        /// </summary>
+        public FormattingInfo()
+        {
+            FormatDetails = InitializationObject.FormatDetails;
+        }
+
+        /// <summary>
         /// Creates a new class instance, that contains fields and methods which are necessary for formatting.
         /// </summary>
         /// <param name="formatDetails"></param>
         /// <param name="format"></param>
         /// <param name="currentValue"></param>
-        public FormattingInfo(FormatDetails formatDetails, Format format, object? currentValue)
-            : this(null, formatDetails, format, currentValue)
+        public FormattingInfo Initialize(FormatDetails formatDetails, Format format, object? currentValue)
         {
+            return Initialize(null, formatDetails, format, currentValue);
         }
 
         /// <summary>
@@ -35,7 +44,7 @@ namespace SmartFormat.Core.Formatting
         /// <param name="formatDetails"></param>
         /// <param name="format">The <see cref="Parsing.Format"/> argument is used with <see cref="CreateChild(Parsing.Format,object?)"/></param>
         /// <param name="currentValue"></param>
-        public FormattingInfo(FormattingInfo? parent, FormatDetails formatDetails, Format format, object? currentValue)
+        public FormattingInfo Initialize (FormattingInfo? parent, FormatDetails formatDetails, Format format, object? currentValue)
         {
             Parent = parent;
             CurrentValue = currentValue;
@@ -44,6 +53,8 @@ namespace SmartFormat.Core.Formatting
             // inherit alignment
             if (parent != null) Alignment = parent.Alignment;
             else if (format.ParentPlaceholder != null) Alignment = format.ParentPlaceholder.Alignment;
+
+            return this;
         }
 
         /// <summary>
@@ -53,7 +64,7 @@ namespace SmartFormat.Core.Formatting
         /// <param name="formatDetails"></param>
         /// <param name="placeholder"></param>
         /// <param name="currentValue"></param>
-        public FormattingInfo(FormattingInfo? parent, FormatDetails formatDetails, Placeholder placeholder,
+        public FormattingInfo Initialize (FormattingInfo? parent, FormatDetails formatDetails, Placeholder placeholder,
             object? currentValue)
         {
             Parent = parent;
@@ -63,12 +74,39 @@ namespace SmartFormat.Core.Formatting
             CurrentValue = currentValue;
             // inherit alignment
             Alignment = placeholder.Alignment;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Returns this instance and its <see cref="FormattingInfo"/> children to the object pool.
+        /// This method gets called by <see cref="FormattingInfoPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.
+        /// </summary>
+        public void ReturnToPool()
+        {
+            Parent = null;
+            // Assign new value, but leave existing references untouched
+            FormatDetails = InitializationObject.FormatDetails;
+            Placeholder = null;
+            Selector = null;
+            Alignment = 0;
+            
+            Format = null;
+            CurrentValue = null;
+
+            // Children can safely be returned
+            foreach (var c in Children)
+            {
+                FormattingInfoPool.Instance.Return(c);
+            }
+
+            Children.Clear();
         }
 
         /// <summary>
         /// Gets the parent <see cref="FormattingInfo"/>.
         /// </summary>
-        public FormattingInfo? Parent { get; }
+        public FormattingInfo? Parent { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Parsing.Selector"/>.
@@ -78,7 +116,7 @@ namespace SmartFormat.Core.Formatting
         /// <summary>
         /// Gets the <see cref="FormatDetails"/>.
         /// </summary>
-        public FormatDetails FormatDetails { get; }
+        public FormatDetails FormatDetails { get; private set; }
 
         /// <summary>
         /// Gets or sets the current value.
@@ -105,7 +143,12 @@ namespace SmartFormat.Core.Formatting
         /// <summary>
         /// Gets the <see cref="Format"/>.
         /// </summary>
-        public Format? Format { get; }
+        public Format? Format { get; private set; }
+
+        /// <summary>
+        /// Gets the list of child <see cref="FormattingInfo"/>s created by this instance.
+        /// </summary>
+        internal List<FormattingInfo> Children { get; } = new();
 
         /// <summary>
         /// Writes the <see cref="string"/> parameter to the <see cref="Output.IOutput"/>
@@ -181,7 +224,9 @@ namespace SmartFormat.Core.Formatting
 
         private FormattingInfo CreateChild(Format format, object? currentValue)
         {
-            return new FormattingInfo(this, FormatDetails, format, currentValue);
+            var fi = FormattingInfoPool.Instance.Get().Initialize(this, FormatDetails, format, currentValue);
+            Children.Add(fi);
+            return fi;
         }
 
         /// <summary>
@@ -191,7 +236,9 @@ namespace SmartFormat.Core.Formatting
         /// <returns>The child <see cref="IFormattingInfo"/>.</returns>
         public FormattingInfo CreateChild(Placeholder placeholder)
         {
-            return new FormattingInfo(this, FormatDetails, placeholder, CurrentValue);
+            var fi = FormattingInfoPool.Instance.Get().Initialize(this, FormatDetails, placeholder, CurrentValue);
+            Children.Add(fi);
+            return fi;
         }
 
         private void PreAlign(int textLength)
@@ -204,21 +251,6 @@ namespace SmartFormat.Core.Formatting
         {
             var filler = -Alignment - textLength;
             if (filler > 0) FormatDetails.Output.Write(new string(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler), this);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="FormattingInfo"/>.
-        /// </summary>
-        /// <param name="format">The input format string.</param>
-        /// <param name="data">The data argument.</param>
-        /// <returns>A new instance of <see cref="FormattingInfo"/>.</returns>
-        internal static FormattingInfo Create(string format, IList<object?> data)
-        {
-            var formatter = new SmartFormatter(new SmartSettings());
-            var formatParsed = formatter.Parser.ParseFormat(format);
-            // use StringOutput because we don't have to care about disposing.
-            var formatDetails = new FormatDetails(formatter, formatParsed, data, null, new StringOutput());
-            return new FormattingInfo(formatDetails, formatDetails.OriginalFormat, data);
         }
     }
 }

@@ -6,7 +6,8 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Text;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -29,16 +30,28 @@ namespace SmartFormat.Core.Parsing
         private string? _toStringCache;
         private readonly List<Selector> _selectors = new();
 
+        #region: Create, initialize, return to pool :
+
         /// <summary>
-        /// CTOR.
+        /// CTOR for object pooling.
+        /// Immediately after creating the instance, an overload of 'Initialize' must be called.
+        /// </summary>
+        public Placeholder()
+        {
+            // Inserted for clarity and documentation
+        }
+
+        /// <summary>
+        /// Initializes the instance of <see cref="Placeholder"/>.
         /// </summary>
         /// <param name="parent">The parent <see cref="Format"/> of the placeholder</param>
         /// <param name="startIndex">The index inside the input string, where the placeholder starts.</param>
         /// <param name="nestedDepth">The nesting level of this placeholder.</param>
-        public Placeholder(Format parent, int startIndex, int nestedDepth) : base(
-            parent.SmartSettings, parent.BaseString, startIndex, parent.EndIndex)
+        /// <returns>This <see cref="Placeholder"/> instance.</returns>
+        public Placeholder Initialize (Format parent, int startIndex, int nestedDepth)
         {
-            Parent = parent;
+            base.Initialize(parent.SmartSettings, parent, parent.BaseString, startIndex, parent.EndIndex);
+            
             // inherit alignment
             if (parent.ParentPlaceholder != null) Alignment = parent.ParentPlaceholder.Alignment;
             NestedDepth = nestedDepth;
@@ -46,18 +59,56 @@ namespace SmartFormat.Core.Parsing
             FormatterNameLength = 0;
             FormatterOptionsStartIndex = startIndex;
             FormatterOptionsLength = 0;
+            
+            return this;
+        }
+
+        /// <inheritdoc />
+        public override void Clear()
+        {
+            base.Clear();
+
+            _formatterNameCache = null;
+            _formatterOptionsCache = null;
+            _formatterOptionsRawCache = null;
+            _toStringCache = null;
+
+            NestedDepth = 0;
+            Alignment = 0;
+            FormatterNameStartIndex = 0;
+            FormatterNameLength = 0;
+            FormatterOptionsStartIndex = 0;
+            FormatterOptionsLength = 0;
         }
 
         /// <summary>
-        /// Gets the parent <see cref="Parsing.Format"/>.
+        /// Return items we own to the object pools.
+        /// <para>This method gets called by <see cref="LiteralTextPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
         /// </summary>
-        public Format Parent { get; }
+        public void ReturnToPool()
+        {
+            Clear();
+
+            if (Format != null)
+            {
+                FormatPool.Instance.Return(Format);
+                Format = null;
+            }
+
+            foreach (var selector in Selectors)
+            {
+                selector.Clear();
+                SelectorPool.Instance.Return(selector);
+            }
+            Selectors.Clear();
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets the parent <see cref="Parsing.Format"/>.
         /// </summary>
-        [Obsolete("Use property 'Parent' instead")]
-        public Format parent => Parent;
+        public Format Parent => (Format) ParentFormatItem!; // never null after Initialize(...)
 
         /// <summary>
         /// Gets or sets the nesting level the <see cref="Placeholder"/>.
@@ -142,7 +193,7 @@ namespace SmartFormat.Core.Parsing
                 // The default max array length of ArrayPool<char>.Shared is 1,048,576.
                 var pool = ArrayPool<char>.Create(Length > 1024 ? Length : 1024, 1024);
                 var resultBuffer = pool.Rent(Length);
-                System.Diagnostics.Debug.Assert(resultBuffer.Length >= Length, "ArrayPool buffer size");
+                System.Diagnostics.Debug.Assert(resultBuffer.Length >= Length, "ArrayPool buffer size is smaller than it should be");
 
                 try
                 {
@@ -177,7 +228,7 @@ namespace SmartFormat.Core.Parsing
         {
             if (_toStringCache != null) return _toStringCache;
 
-            using var sb = Utilities.ZStringExtensions.CreateStringBuilder(Length);
+            using var sb = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(Length);
             sb.Append(SmartSettings.Parser.PlaceholderBeginChar);
             foreach (var s in Selectors)
             {

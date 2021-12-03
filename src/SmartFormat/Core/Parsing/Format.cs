@@ -6,67 +6,131 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
+using SmartFormat.Pooling.SpecializedPools;
 
 namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Represents a parsed format string.
     /// Contains a list of <see cref="FormatItem" />s,
-    /// including <see cref="LiteralText" />s
-    /// and <see cref="Placeholder" />s.
+    /// including <see cref="LiteralText" />s and <see cref="Placeholder" />s.
+    /// <para>Note: <see cref="Format"/> is <see cref="IDisposable"/>.</para>
     /// </summary>
-    public class Format : FormatItem
+    public sealed class Format : FormatItem, IDisposable
     {
         private string? _toStringCache;
         private string? _literalTextCache;
 
-        #region: Constructors :
+        #region: Create, initialize, return to pool :
 
         /// <summary>
-        /// Creates a new instance of <see cref="Format"/>.
+        /// CTOR for object pooling.
+        /// Immediately after creating the instance, an overload of 'Initialize' must be called.
         /// </summary>
-        /// <param name="smartSettings"></param>
-        /// <param name="baseString"></param>
-        public Format(SmartSettings smartSettings, string baseString) : base(smartSettings, baseString, 0,
-            baseString.Length)
+        public Format()
         {
-            ParentPlaceholder = null;
+            // Inserted for clarity and documentation
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Format"/>.
+        /// Initializes the <see cref="Format"/> instance.
+        /// </summary>
+        /// <param name="smartSettings"></param>
+        /// <param name="baseString"></param>
+        /// <returns>This <see cref="Format"/> instance.</returns>
+        public Format Initialize(SmartSettings smartSettings, string baseString)
+        {
+            base.Initialize(smartSettings, null, baseString, 0, baseString.Length);
+            ParentPlaceholder = null;
+            return this;
+        }
+
+        /// <summary>
+        /// Initializes the instance of <see cref="Format"/>.
         /// </summary>
         /// <param name="smartSettings"></param>
         /// <param name="parent">The parent <see cref="Placeholder"/>.</param>
         /// <param name="startIndex">The start index within the format base string.</param>
-        public Format(SmartSettings smartSettings, Placeholder parent, int startIndex) : base(smartSettings, parent.BaseString, startIndex, parent.EndIndex)
+        /// <returns>This <see cref="Format"/> instance.</returns>
+        public Format Initialize(SmartSettings smartSettings, Placeholder parent, int startIndex)
         {
+            base.Initialize(smartSettings, parent, parent.BaseString, startIndex, parent.EndIndex);
             ParentPlaceholder = parent;
+            return this;
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Format"/>.
+        /// Initializes the instance of <see cref="Format"/>.
         /// </summary>
         /// <param name="smartSettings"></param>
         /// <param name="baseString">The base format string-</param>
         /// <param name="startIndex">The start index within the format base string.</param>
         /// <param name="endIndex">The end index within the format base string.</param>
-        public Format(SmartSettings smartSettings, string baseString, int startIndex, int endIndex) : base(smartSettings, baseString, startIndex, endIndex)
+        /// <returns>This <see cref="Format"/> instance.</returns>
+        public Format Initialize(SmartSettings smartSettings, string baseString, int startIndex, int endIndex)
         {
+            base.Initialize(smartSettings, null, baseString, startIndex, endIndex);
             ParentPlaceholder = null;
+            return this;
+        }
+
+        /// <summary>
+        /// Initializes the instance of <see cref="Format"/>.
+        /// </summary>
+        /// <param name="smartSettings"></param>
+        /// <param name="baseString">The base format string-</param>
+        /// <param name="startIndex">The start index within the format base string.</param>
+        /// <param name="endIndex">The end index within the format base string.</param>
+        /// <param name="hasNested"><see langword="true"/> if the nested formats exist.</param>
+        /// <returns>This <see cref="Format"/> instance.</returns>
+        public Format Initialize(SmartSettings smartSettings, string baseString, int startIndex, int endIndex, bool hasNested)
+        {
+            base.Initialize(smartSettings, null, baseString, startIndex, endIndex);
+            ParentPlaceholder = null;
+            HasNested = hasNested;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Return items we own to the object pools.
+        /// This method gets called by <see cref="FormatPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.
+        /// </summary>
+        public void ReturnToPool()
+        {
+            // Clear the format
+            Clear();
+
+            ParentPlaceholder = null;
+            HasNested = false;
+            
+            // Return and clear FormatItems we own
+            foreach (var item in Items.Where(i => ReferenceEquals(this, i.ParentFormatItem)))
+            {
+                ReturnFormatItemToPool(item);
+            }
+            Items.Clear();
+
+            // Return and clear the list of SplitLists
+            foreach (var splitList in _listOfSplitLists)
+            {
+                SplitListPool.Instance.Return(splitList);
+            }
+            _listOfSplitLists.Clear();
+            // Items of _splitCache are returned via _listOfSplitLists
+            _splitCache = null;
+            
+            _toStringCache = null;
+            _literalTextCache = null;
         }
 
         #endregion
 
         #region: Fields and Properties :
-
-        /// <summary>
-        /// Gets the parent <see cref="Placeholder"/>.
-        /// </summary>
-        [Obsolete("Use property 'ParentPlaceholder' instead.")]
-        public Placeholder? parent => ParentPlaceholder;
 
         /// <summary>
         /// Gets the parent <see cref="Placeholder"/>.
@@ -81,7 +145,7 @@ namespace SmartFormat.Core.Parsing
         /// <summary>
         /// Returns <see langword="true"/>, if the <see cref="Format"/> is nested.
         /// </summary>
-        public bool HasNested { get; set; }
+        public bool HasNested { get; internal set; }
 
         #endregion
 
@@ -118,7 +182,7 @@ namespace SmartFormat.Core.Parsing
             // If startIndex and endIndex already match this item, we're done:
             if (start == StartIndex && end == EndIndex) return this;
 
-            var substring = new Format(SmartSettings, BaseString, start, end);
+            var substring = FormatPool.Instance.Get().Initialize(SmartSettings, BaseString, start, end);
             foreach (var item in Items)
             {
                 if (item.EndIndex <= start)
@@ -129,9 +193,10 @@ namespace SmartFormat.Core.Parsing
                 var newItem = item;
                 if (item is LiteralText)
                 {
-                    // See if we need to slice the LiteralText:
+                    // See if we need to slice the LiteralText
                     if (start > item.StartIndex || item.EndIndex > end)
-                        newItem = new LiteralText(substring.SmartSettings, substring.BaseString, Math.Max(start, item.StartIndex),Math.Min(end, item.EndIndex));
+                        newItem = LiteralTextPool.Instance.Get().Initialize(substring.SmartSettings, substring,
+                            substring.BaseString, Math.Max(start, item.StartIndex), Math.Min(end, item.EndIndex));
                 }
                 else
                 {
@@ -168,9 +233,8 @@ namespace SmartFormat.Core.Parsing
         public int IndexOf(char search, int start)
         {
             start = StartIndex + start;
-            foreach (var item in Items)
+            foreach (var item in Items.Where(item => item.EndIndex >= start))
             {
-                if (item.EndIndex < start) continue;
                 if (item is not LiteralText literalItem) continue;
 
                 if (start < literalItem.StartIndex) start = literalItem.StartIndex;
@@ -186,9 +250,9 @@ namespace SmartFormat.Core.Parsing
 
         #region: FindAll :
 
-        private IList<int> FindAll(char search, int maxCount)
+        private List<int> FindAll(char search, int maxCount)
         {
-            var results = new List<int>();
+            var results = ListPool<int>.Instance.Get();
             var index = 0;
             while (maxCount != 0)
             {
@@ -206,8 +270,11 @@ namespace SmartFormat.Core.Parsing
 
         #region: Split :
 
-        private char _splitCacheChar;
+        // set the default
+        private char _splitCacheChar = '\0'; 
+        // Items of the _splitCache are returned to the pool using _listOfSplitLists
         private IList<Format>? _splitCache;
+        private readonly List<SplitList> _listOfSplitLists = new();
 
         /// <summary>
         /// Splits the <see cref="Format"/> items by the given search character.
@@ -234,139 +301,12 @@ namespace SmartFormat.Core.Parsing
         public IList<Format> Split(char search, int maxCount)
         {
             var splits = FindAll(search, maxCount);
-            return new SplitList(this, splits);
-        }
+            var splitList = SplitListPool.Instance.Get().Initialize(this, splits);
 
-        /// <summary>
-        /// Contains the results of a Split operation.
-        /// This allows deferred splitting of items.
-        /// </summary>
-        private class SplitList : IList<Format>
-        {
-            #region Constructor
-
-            private readonly Format _format;
-            private readonly IList<int> _splits;
-
-            public SplitList(Format format, IList<int> splits)
-            {
-                _format = format;
-                _splits = splits;
-            }
-
-            #endregion
-
-            #region IList
-
-            public Format this[int index]
-            {
-                get
-                {
-                    if (index > _splits.Count) throw new ArgumentOutOfRangeException(nameof(index));
-
-                    if (_splits.Count == 0) return _format;
-
-                    if (index == 0) return _format.Substring(0, _splits[0]);
-
-                    if (index == _splits.Count) return _format.Substring(_splits[index - 1] + 1);
-
-                    // Return the format between the splits:
-                    var startIndex = _splits[index - 1] + 1;
-                    return _format.Substring(startIndex, _splits[index] - startIndex);
-                }
-                set
-                {
-                    throw new NotSupportedException();
-                }
-            }
-
-            public void CopyTo(Format[] array, int arrayIndex)
-            {
-                var length = _splits.Count + 1;
-                for (var i = 0; i < length; i++) array[arrayIndex + i] = this[i];
-            }
-
-            public int Count => _splits.Count + 1;
-
-            public bool IsReadOnly => true;
-
-            #endregion
-
-            #region NotSupported IList Interface
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public int IndexOf(Format item)
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public void Insert(int index, Format item)
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public void RemoveAt(int index)
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public void Add(Format item)
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public void Clear()
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public bool Contains(Format item)
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public bool Remove(Format item)
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            public IEnumerator<Format> GetEnumerator()
-            {
-                throw new NotSupportedException();
-            }
-
-            /// <summary>
-            /// This method is not implemented.
-            /// </summary>
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                throw new NotSupportedException();
-            }
-
-            #endregion
+            // Keep track of the split lists we create,
+            // so that they can be returned to the object pool for later reuse.
+            _listOfSplitLists.Add(splitList);
+            return splitList;
         }
 
         #endregion
@@ -385,7 +325,7 @@ namespace SmartFormat.Core.Parsing
         {
             if (_literalTextCache != null) return _literalTextCache;
 
-            using var sb = Utilities.ZStringExtensions.CreateStringBuilder(this);
+            using var sb = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(this);
             foreach (var item in Items)
                 if (item is LiteralText literalItem) sb.Append(literalItem.AsSpan());
 
@@ -401,10 +341,79 @@ namespace SmartFormat.Core.Parsing
         {
             if (_toStringCache != null) return _toStringCache;
 
-            using var sb = Utilities.ZStringExtensions.CreateStringBuilder(this);
+            using var sb = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(this);
             foreach (var item in Items) sb.Append(item.AsSpan());
             _toStringCache = sb.ToString();
             return _toStringCache;
+        }
+
+        #endregion
+
+        private static void ReturnFormatItemToPool(FormatItem formatItem)
+        {
+            switch (formatItem)
+            {
+                case LiteralText literal:
+                    LiteralTextPool.Instance.Return(literal);
+                    break;
+
+                case Format format:
+                    FormatPool.Instance.Return(format);
+                    break;
+
+                case Placeholder placeholder:
+                    PlaceholderPool.Instance.Return(placeholder);
+                    break;
+
+                case Selector selector:
+                    SelectorPool.Instance.Return(selector);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Unhandled type '{formatItem.GetType()}'", nameof(formatItem));
+            }
+        }
+
+        #region : Disposable Pattern :
+
+        /// <summary>
+        /// Returns this instance to the object pool.
+        /// <para>Do not use this instance after calling.</para>
+        /// </summary>
+        /// <param name="disposing"></param>
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Clearing this instance is done when returning it to the pool
+                FormatPool.Instance.Return(this);
+            }
+        }
+
+        /// <summary>
+        /// Returns this instance to the object pool, which also clears all objects it owns.
+        /// <para>Do not use this instance after calling <see cref="Dispose()"/></para>
+        /// </summary>
+        /// <code>
+        /// // Example:
+        /// var settings = new SmartSettings();
+        /// using var formatParsed = new Parser(settings).ParseFormat("inputFormat");
+        /// var formatter = new SmartFormatter(settings);
+        /// for (var i = 0; i &lt; 10; i++)
+        /// {
+        ///    var result = formatter.Format(formatParsed, i);    
+        /// }
+        /// </code>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc/>
+        ~Format()
+        {
+            Dispose(false);
         }
 
         #endregion

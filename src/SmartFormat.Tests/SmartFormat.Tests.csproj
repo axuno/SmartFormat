@@ -5,7 +5,7 @@
 		<AssemblyTitle>SmartFormat.Test</AssemblyTitle>
 		<Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
         <TargetFrameworks>net462;net5.0</TargetFrameworks>
-		<DefineConstants>$(DefineConstants)</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<AssemblyName>SmartFormat.Tests</AssemblyName>
 		<AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
@@ -18,16 +18,26 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
 		<PackageReference Include="NUnit" Version="3.13.2" />
-		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-        <PackageReference Include="FluentAssertions" Version="6.1.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
+        <PackageReference Include="FluentAssertions" Version="6.2.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
-	  <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
-	</ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <WarningLevel>4</WarningLevel>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <WarningLevel>3</WarningLevel>
+        <DefineConstants>RELEASE</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
+        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+    </ItemGroup>
 
 	<ItemGroup>
 	  <Compile Update="Localization\LocTest1.Designer.cs">

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using FluentAssertions.Formatting;
+﻿using System.Globalization;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
