@@ -12,7 +12,8 @@ namespace SmartFormat.Core.Settings
     /// <see cref="SmartFormat" /> settings to be applied for parsing and formatting.
     /// <see cref="SmartSettings"/> are used to initialize instances.
     /// Properties should be considered as 'init-only' like implemented in C# 9.
-    /// Any changes after passing settings as argument to CTORs may not have effect. 
+    /// Any changes after passing settings as argument to CTORs may not have effect,
+    /// unless explicitly mentioned.
     /// </summary>
     public class SmartSettings
     {
@@ -24,9 +25,19 @@ namespace SmartFormat.Core.Settings
         }
 
         /// <summary>
+        /// Gets or sets the thread safety mode.
+        /// Thread safety is relevant for global caching, lists and object pools,
+        /// which can be filled from different threads concurrently.
+        /// <para><see langword="true"/> does <b>not</b> guarantee thread safety of all classes.</para>
+        /// Default is <see langword="false"/>.
+        /// </summary>
+        public static bool IsThreadSafeMode { get; set; } = false;
+
+        /// <summary>
         /// Uses <c>string.Format</c>-compatible escaping of curly braces, {{ and }},
         /// instead of the <c>Smart.Format</c> default escaping, \{ and \}.
-        /// Custom formatters cannot be parsed.
+        /// <para>Custom formatters cannot be parsed / used, if set to <see langword="true"/>.</para>
+        /// <para>Default is <see langword="false"/>.</para>
         /// </summary>
         public bool StringFormatCompatibility { get; set; } = false;
 
@@ -102,5 +113,11 @@ namespace SmartFormat.Core.Settings
         /// Gets the settings for <see cref="Localization"/>.
         /// </summary>
         public Localization Localization { get; set; } = new();
+        
+        /// <summary>
+        /// Gets the global static <see cref="PoolSettings"/> for object pooling.
+        /// <para>These settings must be defined before any class calling the object pools is instantiated. They cannot be changed later.</para>
+        /// </summary>
+        public PoolSettings Pooling { get; set; }
     }
 }

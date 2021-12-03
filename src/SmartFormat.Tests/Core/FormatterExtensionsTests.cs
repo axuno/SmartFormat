@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Core
 {
@@ -65,7 +62,7 @@ namespace SmartFormat.Tests.Core
         {
             foreach (var formatter in GetAllFormatters().Where(f => f.CanAutoDetect))
             {
-                var fi = FormattingInfo.Create("", new List<object?> {new()});
+                var fi = FormattingInfoExtensions.Create("", new List<object?> {new()});
                 Assert.That(() => formatter.TryEvaluateFormat(fi),
                     Throws.Nothing);
             }

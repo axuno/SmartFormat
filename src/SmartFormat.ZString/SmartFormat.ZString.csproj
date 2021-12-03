@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
-        <RootNamespace>Cysharp.Text</RootNamespace>
+        <RootNamespace>SmartFormat.ZString</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1701;1702;1591</NoWarn>

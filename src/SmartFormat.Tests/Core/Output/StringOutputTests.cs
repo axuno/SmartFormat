@@ -18,7 +18,7 @@ namespace SmartFormat.Tests.Core.Output
         [Test]
         public void Output_Of_String()
         {
-            var so = new StringOutput();
+            var so = new StringOutput(16);
             so.Write("text", null!);
             Assert.AreEqual("text", so.ToString());
         }
@@ -27,7 +27,7 @@ namespace SmartFormat.Tests.Core.Output
         public void Output_Of_ValueStringBuilder()
         {
             var so = new StringOutput();
-            using var sb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
+            using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
             sb.Append("text");
             so.Write(sb, null!);
             Assert.AreEqual("text", so.ToString());

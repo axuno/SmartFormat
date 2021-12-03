@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
 
@@ -29,7 +25,7 @@ namespace SmartFormat.Tests.Core.Output
         [Test]
         public void Output_Of_ValueStringBuilder()
         {
-            using var sb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
+            using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
             sb.Append("text");
             var so = new NullOutput();
             Assert.DoesNotThrow(() =>so.Write(sb, null));

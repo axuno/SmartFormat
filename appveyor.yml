@@ -19,6 +19,7 @@ for:
       - git config --global core.autocrlf true
     build_script:
       - ps: cd $env:APPVEYOR_BUILD_FOLDER\src
+      - ps: dotnet --version
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
       - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618

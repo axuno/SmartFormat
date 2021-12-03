@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Tests.Core.Output
 {
@@ -14,14 +11,15 @@ namespace SmartFormat.Tests.Core.Output
         [Test]
         public void Create_With_Capacity()
         {
-            using var zStringOutput = new ZStringOutput(SmartFormat.Utilities.ZStringExtensions.DefaultBufferSize + 10000);
+            using var zStringOutput = new ZStringOutput(SmartFormat.Utilities.ZStringBuilderExtensions.DefaultBufferSize + 10000);
+            Assert.That(zStringOutput.Output, Is.InstanceOf<ZStringBuilder>());
             Assert.That(zStringOutput, Is.Not.Null);
         }
 
         [Test]
         public void Create_With_Other_ValueStringBuilder()
         {
-            using var vsb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
+            using var vsb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
             vsb.Append("text");
             using var zStringOutput = new ZStringOutput(vsb);
             Assert.That(zStringOutput, Is.Not.Null);
@@ -48,7 +46,7 @@ namespace SmartFormat.Tests.Core.Output
         public void Output_Of_ValueStringBuilder()
         {
             var so = new ZStringOutput();
-            using var sb = SmartFormat.Utilities.ZStringExtensions.CreateStringBuilder();
+            using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
             sb.Append("text");
             so.Write(sb, null);
             Assert.AreEqual("text", so.ToString());

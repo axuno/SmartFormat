@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
-using SmartFormat.Core.Formatting;
+﻿using NUnit.Framework;
 using SmartFormat.Core.Output;
-using SmartFormat.Core.Parsing;
 using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core
@@ -36,7 +33,7 @@ namespace SmartFormat.Tests.Core
             var formatString = "{Name}, {City}";
             var format = formatter.Parser.ParseFormat(formatString);
             var output = new StringOutput();
-            formatter.FormatInto(output, format, data);
+            formatter.FormatInto(output, null, format, data);
             Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
         }
 
@@ -48,7 +45,7 @@ namespace SmartFormat.Tests.Core
             var formatString = "{Name}, {City}";
             var format = formatter.Parser.ParseFormat(formatString);
             using var output = new ZStringOutput();
-            formatter.FormatInto(output, format, data);
+            formatter.FormatInto(output, null, format, data);
             Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
         }
     }

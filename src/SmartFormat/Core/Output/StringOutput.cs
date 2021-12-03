@@ -6,6 +6,8 @@
 using System;
 using System.Text;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Output
@@ -78,6 +80,18 @@ namespace SmartFormat.Core.Output
 #else
             _output.Append(stringBuilder.ToString());
 #endif
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <summary>
+        /// Clears the <see cref="StringBuilder"/> used to create the output.
+        /// <para>This method gets called by <see cref="StringOutputPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
+        /// </summary>
+        public void Clear()
+        {
+            _output.Clear();
         }
 
         /// <summary>
