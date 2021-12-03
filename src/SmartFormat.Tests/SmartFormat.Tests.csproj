@@ -34,7 +34,7 @@
         <DefineConstants>RELEASE</DefineConstants>
     </PropertyGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp3.1'">
+    <ItemGroup>
         <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
         <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
     </ItemGroup>

@@ -10,7 +10,7 @@ Changes to release v2.7.x
 a) After implementing a **zero allocation `ValueStringBuilder`** based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193) and [#228](https://github.com/axuno/SmartFormat/pull/228):
    * Parsing is 10% faster with 50-80% less GC and memory allocation
    * Formatting is up to 40% faster with 50% less GC and memory allocation
-b) After implementing **Object Pools** for all classes which are frequently instantiated, GC and memory allocation again went down significantly. See the test results below.
+b) After implementing **Object Pools** ([#229](https://github.com/axuno/SmartFormat/pull/229)) for all classes which are frequently instantiated, GC and memory allocation again went down significantly. See the test results below.
 
 See also: <a href="#ThreadSafety">thread safety</a> and <a href="#ObjectPooling">object pooling</a>
 
@@ -295,7 +295,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
     // result: "25 heures 1 minute"
    ```
 <a id="ThreadSafety"></a>
-### 20. Thread Safety
+### 20. Thread Safety ([#229](https://github.com/axuno/SmartFormat/pull/229))
 
 SmartFormat makes heavy use of caching and object pooling for expensive operations, which both require `static` containers. 
 
@@ -312,7 +312,7 @@ a) Instantiating `SmartFormatter`s from a single thread:
     The simplified `Smart.Format(...)` API overloads are allowed here.
 
 <a id="ObjectPooling"></a>
-### 21. How to benefit from object pooling
+### 21. How to benefit from object pooling ([#229](https://github.com/axuno/SmartFormat/pull/229))
 
 In order to return "smart" objects back to the object pool, its important to use one of the following patterns.
 
