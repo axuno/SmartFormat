@@ -324,6 +324,13 @@ namespace SmartFormat.ZString
             _vsb.Replace(oldValue, newValue, startIndex, count);
 
         /// <summary>
+        /// Replaces the contents of a single position within the builder.
+        /// </summary>
+        /// <param name="newChar">The character to use at the position.</param>
+        /// <param name="replaceIndex">The index to replace.</param>
+        public void ReplaceAt(char newChar, int replaceIndex) => _vsb.ReplaceAt(newChar, replaceIndex);
+
+        /// <summary>
         /// Removes a range of characters from this builder.
         /// </summary>
         /// <remarks>
