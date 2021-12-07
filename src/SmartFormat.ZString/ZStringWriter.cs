@@ -84,7 +84,7 @@ namespace Cysharp.Text
             }
             AssertNotDisposed();
 
-            sb.Append(buffer.AsSpan(index, count));
+            sb.Append(buffer, index, count);
         }
 
         public override void Write(string value)
@@ -161,7 +161,6 @@ namespace Cysharp.Text
             return sb.ToString();
         }
 
-#if !UNITY_2018_3_OR_NEWER
 
         public 
 #if !NETSTANDARD2_0 && !NETFRAMEWORK
@@ -215,7 +214,6 @@ namespace Cysharp.Text
             WriteLine(buffer.Span);
             return Task.CompletedTask;
         }
-#endif
 
         private void AssertNotDisposed()
         {
