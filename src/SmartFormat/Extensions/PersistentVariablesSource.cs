@@ -14,34 +14,51 @@ using SmartFormat.Extensions.PersistentVariables;
 namespace SmartFormat.Extensions
 {
     /// <summary>
-    /// Provides (global) variables of type <see cref="VariablesGroup"/> to the <see cref="SmartFormatter"/>
+    /// Provides persistent variables of type <see cref="VariablesGroup"/> to the <see cref="SmartFormatter"/>
     /// that do not need to be passed in as arguments when formatting a string.
     /// <para>The smart string should take the placeholder format like {groupName.variableName}.</para>
     /// <para>Note: <see cref="IVariablesGroup"/>s from args to SmartFormatter.Format(...) take precedence over <see cref="PersistentVariablesSource"/>.</para>
     /// </summary>
     public class PersistentVariablesSource : ISource, IDictionary<string, VariablesGroup>
     {
-        internal class NameGroupPair
+        /// <summary>
+        /// Contains <see cref="VariablesGroup"/>s and their name.
+        /// </summary>
+        protected internal class NameGroupPair
         {
+            /// <summary>
+            /// CTOR.
+            /// </summary>
+            /// <param name="name">The name of the <see cref="VariablesGroup"/>.</param>
+            /// <param name="group">The <see cref="VariablesGroup"/>.</param>
             public NameGroupPair(string name, VariablesGroup group)
             {
                 Name = name;
                 Group = group;
             }
 
+            /// <summary>
+            /// Gets the name of the <see cref="VariablesGroup"/>.
+            /// </summary>
             public string Name { get; }
 
+            /// <summary>
+            /// Gets the <see cref="VariablesGroup"/>.
+            /// </summary>
             public VariablesGroup Group { get; }
         }
 
-        private readonly IDictionary<string, NameGroupPair> _groupLookup = SmartSettings.IsThreadSafeMode
+        /// <summary>
+        /// The container for <see cref="VariablesGroup"/>s.
+        /// </summary>
+        protected IDictionary<string, NameGroupPair> GroupLookup = SmartSettings.IsThreadSafeMode
             ? new ConcurrentDictionary<string, NameGroupPair>()
             : new Dictionary<string, NameGroupPair>();
 
         /// <summary>
         /// The number of stored variables.
         /// </summary>
-        public int Count => _groupLookup.Values.Count;
+        public int Count => GroupLookup.Values.Count;
 
         /// <summary>
         /// Implemented as part of IDictionary. Will always return <see langword="false"/>.
@@ -51,21 +68,24 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// Gets the names of stored <see cref="VariablesGroup"/>s.
         /// </summary>
-        public ICollection<string> Keys => _groupLookup.Keys;
+        public ICollection<string> Keys => GroupLookup.Keys;
 
         /// <summary>
         /// Gets the values of stored <see cref="VariablesGroup"/>s.
         /// </summary>
-        public ICollection<VariablesGroup> Values => _groupLookup.Values.Select(k => k.Group).ToList();  //NOSONAR
+        /// <remarks>
+        /// Just implemented as part of <see cref="IDictionary"/>.
+        /// </remarks>
+        public ICollection<VariablesGroup> Values => GroupLookup.Values.Select(k => k.Group).ToList(); //NOSONAR
 
         /// <summary>
-        /// Gets the <see cref="VariablesGroup"/> that matches <paramref name="name"/>.
+        /// Gets the <see cref="VariablesGroup"/> that matches the <paramref name="name"/>.
         /// </summary>
         /// <param name="name">The name of the <see cref="VariablesGroup"/> to return.</param>
-        /// <returns></returns>
+        /// <returns>The <see cref="VariablesGroup"/> that matches <paramref name="name"/></returns>
         public VariablesGroup this[string name]
         {
-            get => _groupLookup[name].Group;
+            get => GroupLookup[name].Group;
             set => Add(name, value);
         }
 
@@ -77,7 +97,7 @@ namespace SmartFormat.Extensions
         /// <returns><see langword="true"/> if a group could be found or <see langword="false"/> if one could not.</returns>
         public bool TryGetValue(string name, out VariablesGroup value)
         {
-            if (_groupLookup.TryGetValue(name, out var v))
+            if (GroupLookup.TryGetValue(name, out var v))
             {
                 value = v.Group;
                 return true;
@@ -100,7 +120,7 @@ namespace SmartFormat.Extensions
 
             var pair = new NameGroupPair(name, group);
 
-            _groupLookup[name] = pair;
+            GroupLookup[name] = pair;
         }
 
         /// <inheritdoc cref="Add(string, VariablesGroup)"/>
@@ -113,9 +133,9 @@ namespace SmartFormat.Extensions
         /// <returns><see langword="true"/> if a <see cref="VariablesGroup"/> with a matching name was found and removed, or <see langword="true"/> if one was not.</returns>
         public bool Remove(string name)
         {
-            if (_groupLookup.TryGetValue(name, out var v))
+            if (GroupLookup.TryGetValue(name, out var v))
             {
-                _groupLookup.Remove(name);
+                GroupLookup.Remove(name);
                 return true;
             }
 
@@ -130,7 +150,7 @@ namespace SmartFormat.Extensions
         /// </summary>
         public void Clear()
         {
-            _groupLookup.Clear();
+            GroupLookup.Clear();
         }
 
         /// <summary>
@@ -138,7 +158,7 @@ namespace SmartFormat.Extensions
         /// </summary>
         /// <param name="name">The name of the global variable group to check for.</param>
         /// <returns><see langword="true"/> if a <see cref="VariablesGroup"/> is found with the same name.</returns>
-        public bool ContainsKey(string name) => _groupLookup.ContainsKey(name);
+        public bool ContainsKey(string name) => GroupLookup.ContainsKey(name);
 
         /// <inheritdoc cref="ContainsKey(string)"/>
         public bool Contains(KeyValuePair<string, VariablesGroup> item) =>
@@ -151,18 +171,22 @@ namespace SmartFormat.Extensions
         /// <param name="arrayIndex">The index to start copying into.</param>
         public void CopyTo(KeyValuePair<string, VariablesGroup>[] array, int arrayIndex)
         {
-            foreach (var entry in _groupLookup)
+            foreach (var entry in GroupLookup)
                 array[arrayIndex++] = new KeyValuePair<string, VariablesGroup>(entry.Key, entry.Value.Group);
         }
 
         /// <summary>
-        /// Creates a Shallow Copy of this <see cref="PersistentVariablesSource"/> instance.
+        /// Creates a new instance of <see cref="PersistentVariablesSource"/>, respecting current <see cref="SmartSettings"/>,
+        /// with containing variables as a Shallow Copy.
         /// </summary>
-        /// <returns>A Shallow Copy of this <see cref="PersistentVariablesSource"/> instance.</returns>
+        /// <returns>
+        /// A new instance of <see cref="PersistentVariablesSource"/>, respecting current <see cref="SmartSettings"/>,
+        /// with containing variables as a Shallow Copy.
+        /// </returns>
         public PersistentVariablesSource Clone()
         {
             var pvs = new PersistentVariablesSource();
-            foreach (var entry in _groupLookup)
+            foreach (var entry in GroupLookup)
                 pvs.Add(entry.Key, entry.Value.Group);
 
             return pvs;
@@ -175,7 +199,7 @@ namespace SmartFormat.Extensions
         IEnumerator<KeyValuePair<string, VariablesGroup>> IEnumerable<KeyValuePair<string, VariablesGroup>>.
             GetEnumerator()
         {
-            return _groupLookup.Select(v => new KeyValuePair<string, VariablesGroup>(v.Key, v.Value.Group)).GetEnumerator();
+            return GroupLookup.Select(v => new KeyValuePair<string, VariablesGroup>(v.Key, v.Value.Group)).GetEnumerator();
         }
 
         /// <summary>
@@ -184,7 +208,7 @@ namespace SmartFormat.Extensions
         /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
-            return _groupLookup.Select(v => new KeyValuePair<string, VariablesGroup>(v.Key, v.Value.Group)).GetEnumerator();
+            return GroupLookup.Select(v => new KeyValuePair<string, VariablesGroup>(v.Key, v.Value.Group)).GetEnumerator();
         }
 
         /// <inheritdoc/>

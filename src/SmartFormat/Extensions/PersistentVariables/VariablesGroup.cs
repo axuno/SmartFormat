@@ -10,7 +10,7 @@ namespace SmartFormat.Extensions.PersistentVariables
     /// <summary>
     /// A collection of <see cref="IVariable"/>s that can be used
     /// as arguments to the Format(...) overloads of <see cref="SmartFormatter"/>,
-    /// or it can be added to <see cref="PersistentVariablesSource"/>.
+    /// or it can be added to a <seealso cref="PersistentVariablesSource"/> or a <seealso cref="GlobalVariablesSource.Instance"/>
     /// <br/>
     /// Each instance of <see cref="VariablesGroup"/> keeps its own collection.
     /// <para>
@@ -38,11 +38,17 @@ namespace SmartFormat.Extensions.PersistentVariables
         /// <summary>
         /// Gets all the <see cref="IVariable"/>s for this group.
         /// </summary>
-        public ICollection<IVariable> Values => _variableLookup.Values.Select(s => s.Variable).ToList();  //NOSONAR
+        /// <remarks>
+        /// Just implemented as part of <see cref="IDictionary"/>.
+        /// </remarks>
+        public ICollection<IVariable> Values => _variableLookup.Values.Select(s => s.Variable).ToList(); //NOSONAR
 
         /// <summary>
-        /// Implemented as part of IDictionary. Always returns <see langword="false"/>.
+        /// Always returns <see langword="false"/>.
         /// </summary>
+        /// <remarks>
+        /// Just implemented as part of <see cref="IDictionary"/>.
+        /// </remarks>
         public bool IsReadOnly => false;
 
         /// <summary>
