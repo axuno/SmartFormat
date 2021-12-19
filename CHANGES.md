@@ -111,7 +111,7 @@ In v2, Alignment of output values was limited to the `DefaultFormatter`. It's ab
 * Introduced `FormatterSettings.AlignmentFillCharacter`, to customize the the fill character. Default is space (0x20), like with `string.Format`.
 * Modified `ListFormatter` so that items can be aligned (but the spacers stay untouched).
 
-### 9. Added `PersistentVariableSource` and `GlobalVariableSource`
+### 9. Added `PersistentVariableSource` and `GlobalVariableSource` ([#233](https://github.com/axuno/SmartFormat/pull/233))
 
 Both provide global variables that are stored in `VariablesGroup` containers to the `SmartFormatter`. These variables are not passed in as arguments when formatting a string. Instead, they are taken from these registered `ISource`s.
 
