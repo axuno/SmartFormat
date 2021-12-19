@@ -164,19 +164,19 @@ namespace SmartFormat.Tests.Extensions
         {
             // The top container
             // It gets its name later, when being added to the PersistentVariablesSource
-            var varGrp = new VariablesGroup();
+            var varGroup = new VariablesGroup();
             
             // Add a (nested) VariablesGroup named 'group' to the top container
-            varGrp.Add("group", new VariablesGroup
+            varGroup.Add("group", new VariablesGroup
             {
                 // Add variables to the nested group
                 { "groupString", new StringVariable("groupStringValue") },
                 { "groupDateTime", new Variable<DateTime>(new DateTime(2024, 12, 31)) }
             });
             // Add more variables to the top group container
-            varGrp.Add(new KeyValuePair<string, IVariable>("topInteger", new IntVariable(12345)));
+            varGroup.Add(new KeyValuePair<string, IVariable>("topInteger", new IntVariable(12345)));
             var stringVar = new StringVariable("topStringValue");
-            varGrp.Add("topString", stringVar);
+            varGroup.Add("topString", stringVar);
 
             // The formatter for persistent variables requires only 2 extensions
             var smart = new SmartFormatter();
@@ -185,7 +185,7 @@ namespace SmartFormat.Tests.Extensions
             var pvs = new PersistentVariablesSource
             {
                 // Here, the top container gets its name
-                { "global", varGrp }
+                { "global", varGroup }
             };
             smart.AddExtensions(0, pvs);
 

@@ -2,6 +2,12 @@
 // Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
 // Licensed under the MIT license.
 
+
+/*
+   Credits to Needle (https://github.com/needle-tools)
+   and their PersistentVariablesSource extension to Smart.Format
+   at https://github.com/needle-mirror/com.unity.localization/blob/master/Runtime/Smart%20Format/Extensions/PersistentVariablesSource.cs
+*/
 using System;
 
 namespace SmartFormat.Extensions.PersistentVariables
