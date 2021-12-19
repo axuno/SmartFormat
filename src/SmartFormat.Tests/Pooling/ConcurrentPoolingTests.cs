@@ -73,33 +73,25 @@ namespace SmartFormat.Tests.Pooling
             SmartSettings.IsThreadSafeMode = currentThreadSafeMode;
             ResetAllPools(currentThreadSafeMode);
 
-            // Used to make sure the counter is consecutive across threads,
-            // because Interlocked.Read/Write cannot.
-            Semaphore semaphoreObject = new (initialCount: 1, maximumCount: 1);
             const int maxLoops = 100;
             var options = new ParallelOptions { MaxDegreeOfParallelism = 10 };
             SmartSettings.IsThreadSafeMode = true;
             var list = new ConcurrentBag<string>();
-            long counter = 1;
 
             Assert.That(() =>
                 Parallel.For(1L, maxLoops, options, (i, loopState) =>
                 {
-                    semaphoreObject.WaitOne();
-                    var threadLocalCounter = counter++;
-                    semaphoreObject.Release();
-
                     using var formatParsed = new Parser().ParseFormat("Number: {0:00000}");
                     var smart = new SmartFormatter();
                     smart.AddExtensions(new DefaultSource());
                     smart.AddExtensions(new DefaultFormatter());
-                    list.Add(smart.Format(formatParsed, threadLocalCounter));
+                    list.Add(smart.Format(formatParsed, i));
                 }), Throws.Nothing);
 
             var result = list.OrderBy(e => e);
             long compareCounter = 1;
             
-            Assert.That(counter, Is.EqualTo(maxLoops));
+            Assert.That(list.Count, Is.EqualTo(maxLoops - 1));
             Assert.That(result.All(r => r == $"Number: {compareCounter++:00000}"));
 
             foreach (var p in GetAllPoolCounters())
