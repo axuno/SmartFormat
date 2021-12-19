@@ -14,10 +14,10 @@ namespace SmartFormat.Extensions.PersistentVariables
         /// <summary>
         /// Gets the variable with the matching key if one exists.
         /// </summary>
-        /// <param name="key">The variable key or name to match.</param>
+        /// <param name="name">The variable name to match.</param>
         /// <param name="value">The found variable or <c>null</c> if one could not be found.</param>
         /// <returns><c>true</c> if a variable could be found or <c>false</c> if one could not.</returns>
-        bool TryGetValue(string key, out IVariable value);
+        bool TryGetValue(string name, out IVariable value);
     }
 
     /// <summary>
