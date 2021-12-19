@@ -38,9 +38,7 @@ namespace SmartFormat.Extensions.PersistentVariables
         /// <summary>
         /// Gets all the <see cref="IVariable"/>s for this group.
         /// </summary>
-        #pragma warning disable CA1819 // Properties should not make collection or array copies
-        public ICollection<IVariable> Values => _variableLookup.Values.Select(s => s.Variable).ToList();
-        #pragma warning restore CA1819 // Properties should not make collection or array copies
+        public ICollection<IVariable> Values => _variableLookup.Values.Select(s => s.Variable).ToList();  //NOSONAR
 
         /// <summary>
         /// Implemented as part of IDictionary. Always returns <see langword="false"/>.

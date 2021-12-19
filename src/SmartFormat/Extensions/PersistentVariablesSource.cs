@@ -56,9 +56,7 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// Gets the values of stored <see cref="VariablesGroup"/>s.
         /// </summary>
-        #pragma warning disable CA1819 // Properties should not make collection or array copies
-        public ICollection<VariablesGroup> Values => _groupLookup.Values.Select(k => k.Group).ToList();
-        #pragma warning restore CA1819 // Properties should not make collection or array copies
+        public ICollection<VariablesGroup> Values => _groupLookup.Values.Select(k => k.Group).ToList();  //NOSONAR
 
         /// <summary>
         /// Gets the <see cref="VariablesGroup"/> that matches <paramref name="name"/>.
