@@ -16,6 +16,25 @@ namespace SmartFormat.Utilities
     /// </summary>
     public static class TimeSpanUtility
     {
+        private static TimeSpanFormatOptions _rangeMin;
+        private static TimeSpanFormatOptions _truncate;
+        private static bool _lessThan;
+        private static bool _abbreviate;
+        private static Func<double, double>? _round;
+        private static TimeTextInfo? _timeTextInfo;
+
+        static TimeSpanUtility()
+        {
+            // Create our defaults:
+            DefaultFormatOptions =
+                TimeSpanFormatOptions.AbbreviateOff
+                | TimeSpanFormatOptions.LessThan
+                | TimeSpanFormatOptions.TruncateAuto
+                | TimeSpanFormatOptions.RangeSeconds
+                | TimeSpanFormatOptions.RangeDays;
+            AbsoluteDefaults = DefaultFormatOptions;
+        }
+
         #region: ToTimeString :
 
         /// <summary>
@@ -38,38 +57,39 @@ namespace SmartFormat.Utilities
             
             // Extract the individual options:
             var rangeMax = options.Mask(TimeSpanFormatOptions._Range).AllFlags().Last();
-            var rangeMin = options.Mask(TimeSpanFormatOptions._Range).AllFlags().First();
-            var truncate = options.Mask(TimeSpanFormatOptions._Truncate).AllFlags().First();
-            var lessThan = options.Mask(TimeSpanFormatOptions._LessThan) != TimeSpanFormatOptions.LessThanOff;
-            var abbreviate = options.Mask(TimeSpanFormatOptions._Abbreviate) != TimeSpanFormatOptions.AbbreviateOff;
-            var round = lessThan ? (Func<double, double>) Math.Floor : Math.Ceiling;
+            _rangeMin = options.Mask(TimeSpanFormatOptions._Range).AllFlags().First();
+            _truncate = options.Mask(TimeSpanFormatOptions._Truncate).AllFlags().First();
+            _lessThan = options.Mask(TimeSpanFormatOptions._LessThan) != TimeSpanFormatOptions.LessThanOff;
+            _abbreviate = options.Mask(TimeSpanFormatOptions._Abbreviate) != TimeSpanFormatOptions.AbbreviateOff;
+            _round = _lessThan ? (Func<double, double>) Math.Floor : Math.Ceiling;
+            _timeTextInfo = timeTextInfo;
 
-            switch (rangeMin)
+            switch (_rangeMin)
             {
                 case TimeSpanFormatOptions.RangeWeeks:
-                    fromTime = TimeSpan.FromDays(round(fromTime.TotalDays / 7) * 7);
+                    fromTime = TimeSpan.FromDays(_round(fromTime.TotalDays / 7) * 7);
                     break;
                 case TimeSpanFormatOptions.RangeDays:
-                    fromTime = TimeSpan.FromDays(round(fromTime.TotalDays));
+                    fromTime = TimeSpan.FromDays(_round(fromTime.TotalDays));
                     break;
                 case TimeSpanFormatOptions.RangeHours:
-                    fromTime = TimeSpan.FromHours(round(fromTime.TotalHours));
+                    fromTime = TimeSpan.FromHours(_round(fromTime.TotalHours));
                     break;
                 case TimeSpanFormatOptions.RangeMinutes:
-                    fromTime = TimeSpan.FromMinutes(round(fromTime.TotalMinutes));
+                    fromTime = TimeSpan.FromMinutes(_round(fromTime.TotalMinutes));
                     break;
                 case TimeSpanFormatOptions.RangeSeconds:
-                    fromTime = TimeSpan.FromSeconds(round(fromTime.TotalSeconds));
+                    fromTime = TimeSpan.FromSeconds(_round(fromTime.TotalSeconds));
                     break;
                 case TimeSpanFormatOptions.RangeMilliSeconds:
-                    fromTime = TimeSpan.FromMilliseconds(round(fromTime.TotalMilliseconds));
+                    fromTime = TimeSpan.FromMilliseconds(_round(fromTime.TotalMilliseconds));
                     break;
             }
 
             // Create our result:
             var textStarted = false;
             var result = new StringBuilder();
-            for (var i = rangeMax; i >= rangeMin; i = (TimeSpanFormatOptions) ((int) i >> 1))
+            for (var i = rangeMax; i >= _rangeMin; i = (TimeSpanFormatOptions) ((int) i >> 1))
             {
                 // Determine the value and title:
                 int value;
@@ -100,49 +120,20 @@ namespace SmartFormat.Utilities
                         fromTime -= TimeSpan.FromMilliseconds(value);
                         break;
                     default:
-                        // This code is unreachable, but it prevents compile-errors.
-                        throw new ArgumentException("TimeSpanUtility");
+                        // Should never happen. Ensures 'value' and 'fromTime' are always set.
+                        continue;
                 }
-
 
                 //Determine whether to display this value
-                var displayThisValue = false;
+                if (!ShouldTruncate(value, textStarted, out var displayThisValue)) continue;
 
-                switch (truncate)
-                {
-                    case TimeSpanFormatOptions.TruncateShortest:
-                        if (textStarted) continue; // continue with next for
-                        if (value > 0) displayThisValue = true;
-                        break;
-                    case TimeSpanFormatOptions.TruncateAuto:
-                        if (value > 0) displayThisValue = true;
-                        break;
-                    case TimeSpanFormatOptions.TruncateFill:
-                        if (textStarted || value > 0) displayThisValue = true;
-                        break;
-                    case TimeSpanFormatOptions.TruncateFull:
-                        displayThisValue = true;
-                        break;
-                }
-
-                // we need to display SOMETHING (even if it's zero)
-                if (i == rangeMin && textStarted == false)
-                {
-                    displayThisValue = true;
-                    if (lessThan && value < 1)
-                    {
-                        // Output the "less than 1 unit" text:
-                        var unitTitle = timeTextInfo.GetUnitText(rangeMin, 1, abbreviate);
-                        result.Append(timeTextInfo.GetLessThanText(unitTitle));
-                        displayThisValue = false;
-                    }
-                }
+                PrepareOutput(value, i == _rangeMin, textStarted, result, ref displayThisValue);
 
                 // Output the value:
                 if (displayThisValue)
                 {
                     if (textStarted) result.Append(' ');
-                    var unitTitle = timeTextInfo.GetUnitText(i, value, abbreviate);
+                    var unitTitle = _timeTextInfo.GetUnitText(i, value, _abbreviate);
                     result.Append(unitTitle);
                     textStarted = true;
                 }
@@ -151,21 +142,49 @@ namespace SmartFormat.Utilities
             return result.ToString();
         }
 
+        private static bool ShouldTruncate(int value, bool textStarted, out bool displayThisValue)
+        {
+            displayThisValue = false;
+            switch (_truncate)
+            {
+                case TimeSpanFormatOptions.TruncateShortest:
+                    if (textStarted) return false; // continue with next for
+                    if (value > 0) displayThisValue = true;
+                    return true;
+                case TimeSpanFormatOptions.TruncateAuto:
+                    if (value > 0) displayThisValue = true;
+                    return true;
+                case TimeSpanFormatOptions.TruncateFill:
+                    if (textStarted || value > 0) displayThisValue = true;
+                    return true;
+                case TimeSpanFormatOptions.TruncateFull:
+                    displayThisValue = true;
+                    return true;
+            }
+
+            // Should never happen
+            return false;
+        }
+
+        private static void PrepareOutput(int value, bool isRangeMin, bool hasTextStarted, StringBuilder result, ref bool displayThisValue)
+        {
+            // we need to display SOMETHING (even if it's zero)
+            if (isRangeMin && !hasTextStarted)
+            {
+                displayThisValue = true;
+                if (_lessThan && value < 1)
+                {
+                    // Output the "less than 1 unit" text:
+                    var unitTitle = _timeTextInfo!.GetUnitText(_rangeMin, 1, _abbreviate);
+                    result.Append(_timeTextInfo.GetLessThanText(unitTitle));
+                    displayThisValue = false;
+                }
+            }
+        }
+
         #endregion
 
         #region: DefaultFormatOptions :
-
-        static TimeSpanUtility()
-        {
-            // Create our defaults:
-            DefaultFormatOptions =
-                TimeSpanFormatOptions.AbbreviateOff
-                | TimeSpanFormatOptions.LessThan
-                | TimeSpanFormatOptions.TruncateAuto
-                | TimeSpanFormatOptions.RangeSeconds
-                | TimeSpanFormatOptions.RangeDays;
-            AbsoluteDefaults = DefaultFormatOptions;
-        }
 
         /// <summary>
         /// These are the default options that will be used when no option is specified.

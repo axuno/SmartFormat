@@ -144,8 +144,31 @@ namespace SmartFormat.Extensions
             var v2Compatibility = options != string.Empty && formatText == string.Empty;
             var formattingOptions = v2Compatibility ? options : formatText;
 
-            TimeSpan? fromTime = null;
+            var fromTime = GetFromTime(current, formattingOptions);
             
+            if (fromTime is null)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (formatterName == string.Empty)
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formatterName}' can only process types of {nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}");
+            }
+
+            var timeTextInfo = GetTimeTextInfo(formattingInfo, v2Compatibility);
+            
+            var timeSpanFormatOptions = TimeSpanFormatOptionsConverter.Parse(v2Compatibility ? options : formatText);
+            var timeString = fromTime.Value.ToTimeString(timeSpanFormatOptions, timeTextInfo);
+            formattingInfo.Write(timeString);
+            return true;
+        }
+
+        private static TimeSpan? GetFromTime(object? current, string? formattingOptions)
+        {
+            TimeSpan? fromTime = null;
+
             switch (current)
             {
                 case TimeSpan timeSpan:
@@ -165,23 +188,7 @@ namespace SmartFormat.Extensions
                     break;
             }
 
-            if (fromTime is null)
-            {
-                // Auto detection calls just return a failure to evaluate
-                if (formatterName == string.Empty)
-                    return false;
-
-                // throw, if the formatter has been called explicitly
-                throw new FormatException(
-                    $"Formatter named '{formatterName}' can only process types of {nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}");
-            }
-
-            var timeTextInfo = GetTimeTextInfo(formattingInfo, v2Compatibility);
-            
-            var timeSpanFormatOptions = TimeSpanFormatOptionsConverter.Parse(v2Compatibility ? options : formatText);
-            var timeString = fromTime.Value.ToTimeString(timeSpanFormatOptions, timeTextInfo);
-            formattingInfo.Write(timeString);
-            return true;
+            return fromTime;
         }
 
         private TimeTextInfo GetTimeTextInfo(IFormattingInfo formattingInfo, bool v2Compatibility)
