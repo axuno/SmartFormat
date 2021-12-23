@@ -145,11 +145,11 @@ namespace SmartFormat.Utilities
         /// <summary>
         /// Adds a <see cref="TimeTextInfo"/> for a language.
         /// </summary>
-        /// <param name="twoLetterISOLanguageName">The string to get the associated <see cref="System.Globalization.CultureInfo"/></param>
+        /// <param name="twoLetterIsoLanguageName">The string to get the associated <see cref="System.Globalization.CultureInfo"/></param>
         /// <param name="timeTextInfo">The localized <see cref="TimeTextInfo"/></param>
-        public static void AddLanguage(string twoLetterISOLanguageName, TimeTextInfo timeTextInfo)
+        public static void AddLanguage(string twoLetterIsoLanguageName, TimeTextInfo timeTextInfo)
         {
-            var c = twoLetterISOLanguageName.ToLower();
+            var c = twoLetterIsoLanguageName.ToLower();
             _customLanguage.Add(c, timeTextInfo);
         }
 
@@ -157,7 +157,7 @@ namespace SmartFormat.Utilities
         /// Gets the <see cref="TimeTextInfo"/> for a certain language.
         /// If the language is not implemented, the result will be <see langword="null"/>.
         /// </summary>
-        /// <param name="twoLetterISOLanguageName"></param>
+        /// <param name="twoLetterIsoLanguageName"></param>
         /// <returns>
         /// The <see cref="TimeTextInfo"/> for a certain language.
         /// If the language is not implemented, the result will be <see langword="null"/>.
@@ -166,12 +166,12 @@ namespace SmartFormat.Utilities
         /// Custom languages can be added with <see cref="AddLanguage"/>.
         /// Custom languages override any built-in language with the same twoLetterISOLanguageName.
         /// </remarks>
-        public static TimeTextInfo? GetTimeTextInfo(string twoLetterISOLanguageName)
+        public static TimeTextInfo? GetTimeTextInfo(string twoLetterIsoLanguageName)
         {
-            if (_customLanguage.TryGetValue(twoLetterISOLanguageName, out var timeTextInfo))
+            if (_customLanguage.TryGetValue(twoLetterIsoLanguageName, out var timeTextInfo))
                 return timeTextInfo;
 
-            return twoLetterISOLanguageName switch
+            return twoLetterIsoLanguageName switch
             {
                 "en" => English,
                 "fr" => French,
