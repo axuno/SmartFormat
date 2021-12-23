@@ -16,8 +16,6 @@ namespace SmartFormat.Utilities
     /// </summary>
     public static class TimeSpanUtility
     {
-        private static TimeSpanFormatOptions _options;
-        private static TimeSpanFormatOptions _rangeMax;
         private static TimeSpanFormatOptions _rangeMin;
         private static TimeSpanFormatOptions _truncate;
         private static bool _lessThan;
@@ -55,14 +53,14 @@ namespace SmartFormat.Utilities
         {
             // If there are any missing options, merge with the defaults:
             // Also, as a safeguard against missing DefaultFormatOptions, let's also merge with the AbsoluteDefaults:
-            _options = options.Merge(DefaultFormatOptions).Merge(AbsoluteDefaults);
+            options = options.Merge(DefaultFormatOptions).Merge(AbsoluteDefaults);
             
             // Extract the individual options:
-            _rangeMax = _options.Mask(TimeSpanFormatOptions._Range).AllFlags().Last();
-            _rangeMin = _options.Mask(TimeSpanFormatOptions._Range).AllFlags().First();
-            _truncate = _options.Mask(TimeSpanFormatOptions._Truncate).AllFlags().First();
-            _lessThan = _options.Mask(TimeSpanFormatOptions._LessThan) != TimeSpanFormatOptions.LessThanOff;
-            _abbreviate = _options.Mask(TimeSpanFormatOptions._Abbreviate) != TimeSpanFormatOptions.AbbreviateOff;
+            var rangeMax = options.Mask(TimeSpanFormatOptions._Range).AllFlags().Last();
+            _rangeMin = options.Mask(TimeSpanFormatOptions._Range).AllFlags().First();
+            _truncate = options.Mask(TimeSpanFormatOptions._Truncate).AllFlags().First();
+            _lessThan = options.Mask(TimeSpanFormatOptions._LessThan) != TimeSpanFormatOptions.LessThanOff;
+            _abbreviate = options.Mask(TimeSpanFormatOptions._Abbreviate) != TimeSpanFormatOptions.AbbreviateOff;
             _round = _lessThan ? (Func<double, double>) Math.Floor : Math.Ceiling;
             _timeTextInfo = timeTextInfo;
 
@@ -91,7 +89,7 @@ namespace SmartFormat.Utilities
             // Create our result:
             var textStarted = false;
             var result = new StringBuilder();
-            for (var i = _rangeMax; i >= _rangeMin; i = (TimeSpanFormatOptions) ((int) i >> 1))
+            for (var i = rangeMax; i >= _rangeMin; i = (TimeSpanFormatOptions) ((int) i >> 1))
             {
                 // Determine the value and title:
                 int value;
@@ -168,10 +166,10 @@ namespace SmartFormat.Utilities
             return false;
         }
 
-        private static void PrepareOutput(int value, bool isRangeMin, bool textStarted, StringBuilder result, ref bool displayThisValue)
+        private static void PrepareOutput(int value, bool isRangeMin, bool hasTextStarted, StringBuilder result, ref bool displayThisValue)
         {
             // we need to display SOMETHING (even if it's zero)
-            if (isRangeMin && textStarted == false)
+            if (isRangeMin && !hasTextStarted)
             {
                 displayThisValue = true;
                 if (_lessThan && value < 1)
