@@ -310,7 +310,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
 
-### 20. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221))
+### 20. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221), [#234](https://github.com/axuno/SmartFormat/pull/234))
 
 * Constructor with string argument for default language is obsolete.
 * Property `DefaultTwoLetterISOLanguageName` is obsolete.
@@ -323,21 +323,23 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
 * **New:** Custom languages can now easily be added to `CommonLanguagesTimeTextInfo`. Custom languages override built-in definitions.
     ```CSharp
     var language = "nl"; // dummy - it's English, not Dutch ;-)
-    TimeTextInfo custom = new(
-        pluralRule: PluralRules.GetPluralRule(language),
-        week: new[] { "{0} week", "{0} weeks" },
-        day: new[] { "{0} day", "{0} days" },
-        hour: new[] { "{0} hour", "{0} hours" },
-        minute: new[] { "{0} minute", "{0} minutes" },
-        second: new[] { "{0} second", "{0} seconds" },
-        millisecond: new[] { "{0} millisecond", "{0} milliseconds" },
-        w: new[] { "{0}w" },
-        d: new[] { "{0}d" },
-        h: new[] { "{0}h" },
-        m: new[] { "{0}m" },
-        s: new[] { "{0}s" },
-        ms: new[] { "{0}ms" },
-        lessThan: "less than {0}");
+    TimeTextInfo custom = new()
+    {
+        PluralRule = PluralRules.GetPluralRule(language),
+        Ptxt_week = new[] { "{0} week", "{0} weeks" },
+        Ptxt_day = new[] { "{0} day", "{0} days" },
+        Ptxt_hour = new[] { "{0} hour", "{0} hours" },
+        Ptxt_minute = new[] { "{0} minute", "{0} minutes" },
+        Ptxt_second = new[] { "{0} second", "{0} seconds" },
+        Ptxt_millisecond = new[] { "{0} millisecond", "{0} milliseconds" },
+        Ptxt_w = new[] { "{0}w" },
+        Ptxt_d = new[] { "{0}d" },
+        Ptxt_h = new[] { "{0}h" },
+        Ptxt_m = new[] { "{0}m" },
+        Ptxt_s = new[] { "{0}s" },
+        Ptxt_ms = new[] { "{0}ms" },
+        Ptxt_lessThan = "less than {0}"
+    };
     CommonLanguagesTimeTextInfo.AddLanguage(language, custom)
     ```
 * **Changed:** 
