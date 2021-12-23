@@ -173,39 +173,53 @@ namespace SmartFormat.Core.Parsing
         {
             start = StartIndex + start;
             var end = start + length;
-            // Validate the arguments:
-            if (start < StartIndex || start > EndIndex)
-                throw new ArgumentOutOfRangeException(nameof(start));
-            if (end > EndIndex)
-                throw new ArgumentOutOfRangeException(nameof(length));
 
-            // If startIndex and endIndex already match this item, we're done:
-            if (start == StartIndex && end == EndIndex) return this;
-
-            var substring = FormatPool.Instance.Get().Initialize(SmartSettings, BaseString, start, end);
-            foreach (var item in Items)
+            void ValidateArguments()
             {
-                if (item.EndIndex <= start)
-                    continue; // Skip first items
-                if (end <= item.StartIndex)
-                    break; // Done
-
-                var newItem = item;
-                if (item is LiteralText)
-                {
-                    // See if we need to slice the LiteralText
-                    if (start > item.StartIndex || item.EndIndex > end)
-                        newItem = LiteralTextPool.Instance.Get().Initialize(substring.SmartSettings, substring,
-                            substring.BaseString, Math.Max(start, item.StartIndex), Math.Min(end, item.EndIndex));
-                }
-                else
-                {
-                    // item is a placeholder -- we can't split a placeholder though.
-                    substring.HasNested = true;
-                }
-
-                substring.Items.Add(newItem);
+                if (start < StartIndex || start > EndIndex)
+                    throw new ArgumentOutOfRangeException(nameof(start));
+                if (end > EndIndex)
+                    throw new ArgumentOutOfRangeException(nameof(length));
             }
+
+            bool NothingToDo()
+            {
+                // If startIndex and endIndex already match this item, we're done:
+                return start == StartIndex && end == EndIndex;
+            }
+
+            void ProcessItems(Format substring)
+            {
+                foreach (var item in Items)
+                {
+                    if (item.EndIndex <= start)
+                        continue; // Skip first items
+                    if (end <= item.StartIndex)
+                        break; // Done
+
+                    var newItem = item;
+                    if (item is LiteralText)
+                    {
+                        // See if we need to slice the LiteralText
+                        if (start > item.StartIndex || item.EndIndex > end)
+                            newItem = LiteralTextPool.Instance.Get().Initialize(substring.SmartSettings, substring,
+                                substring.BaseString, Math.Max(start, item.StartIndex), Math.Min(end, item.EndIndex));
+                    }
+                    else
+                    {
+                        // item is a placeholder -- we can't split a placeholder though.
+                        substring.HasNested = true;
+                    }
+
+                    substring.Items.Add(newItem);
+                }
+            }
+
+            ValidateArguments();
+            if (NothingToDo()) return this;
+            
+            var substring = FormatPool.Instance.Get().Initialize(SmartSettings, BaseString, start, end);
+            ProcessItems(substring);
 
             return substring;
         }

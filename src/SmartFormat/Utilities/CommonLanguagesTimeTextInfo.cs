@@ -19,122 +19,128 @@ namespace SmartFormat.Utilities
         /// <summary>
         /// Gets the <see cref="TimeTextInfo"/> for the English language.
         /// </summary>
-        public static TimeTextInfo English => new(
-            pluralRule: PluralRules.GetPluralRule("en"),
-            week: new[] { "{0} week", "{0} weeks" },
-            day: new[] { "{0} day", "{0} days" },
-            hour: new[] { "{0} hour", "{0} hours" },
-            minute: new[] { "{0} minute", "{0} minutes" },
-            second: new[] { "{0} second", "{0} seconds" },
-            millisecond: new[] { "{0} millisecond", "{0} milliseconds" },
-            w: new[] { "{0}w" },
-            d: new[] { "{0}d" },
-            h: new[] { "{0}h" },
-            m: new[] { "{0}m" },
-            s: new[] { "{0}s" },
-            ms: new[] { "{0}ms" },
-            lessThan: "less than {0}"
-        );
-
+        public static TimeTextInfo English => new()
+        {
+            PluralRule = PluralRules.GetPluralRule("en"),
+            Ptxt_week = new[] { "{0} week", "{0} weeks" },
+            Ptxt_day = new[] { "{0} day", "{0} days" },
+            Ptxt_hour = new[] { "{0} hour", "{0} hours" },
+            Ptxt_minute = new[] { "{0} minute", "{0} minutes" },
+            Ptxt_second = new[] { "{0} second", "{0} seconds" },
+            Ptxt_millisecond = new[] { "{0} millisecond", "{0} milliseconds" },
+            Ptxt_w = new[] { "{0}w" },
+            Ptxt_d = new[] { "{0}d" },
+            Ptxt_h = new[] { "{0}h" },
+            Ptxt_m = new[] { "{0}m" },
+            Ptxt_s = new[] { "{0}s" },
+            Ptxt_ms = new[] { "{0}ms" },
+            Ptxt_lessThan = "less than {0}"
+        };
+        
         /// <summary>
         /// Gets the <see cref="TimeTextInfo"/> for the French language.
         /// </summary>
-        public static TimeTextInfo French => new(
-            PluralRules.GetPluralRule("fr"),
-            new[] { "{0} semaine", "{0} semaines" },
-            new[] { "{0} jour", "{0} jours" },
-            new[] { "{0} heure", "{0} heures" },
-            new[] { "{0} minute", "{0} minutes" },
-            new[] { "{0} seconde", "{0} secondes" },
-            new[] { "{0} milliseconde", "{0} millisecondes" },
-            new[] { "{0}sem" },
-            new[] { "{0}j" },
-            new[] { "{0}h" },
-            new[] { "{0}m" },
-            new[] { "{0}s" },
-            new[] { "{0}ms" },
-            "moins que {0}"
-        );
+        public static TimeTextInfo French => new()
+        {
+            PluralRule = PluralRules.GetPluralRule("fr"),
+            Ptxt_week = new[] { "{0} semaine", "{0} semaines" },
+            Ptxt_day = new[] { "{0} jour", "{0} jours" },
+            Ptxt_hour = new[] { "{0} heure", "{0} heures" },
+            Ptxt_minute = new[] { "{0} minute", "{0} minutes" },
+            Ptxt_second = new[] { "{0} seconde", "{0} secondes" },
+            Ptxt_millisecond = new[] { "{0} milliseconde", "{0} millisecondes" },
+            Ptxt_w = new[] { "{0}sem" },
+            Ptxt_d = new[] { "{0}j" },
+            Ptxt_h = new[] { "{0}h" },
+            Ptxt_m = new[] { "{0}m" },
+            Ptxt_s = new[] { "{0}s" },
+            Ptxt_ms = new[] { "{0}ms" },
+            Ptxt_lessThan = "moins que {0}"
+        };
 
         /// <summary>
         /// Gets the <see cref="TimeTextInfo"/> for the Spanish language.
         /// </summary>
-        public static TimeTextInfo Spanish => new(
-            PluralRules.GetPluralRule("es"),
-            new[] { "{0} semana", "{0} semanas" },
-            new[] { "{0} día", "{0} días" },
-            new[] { "{0} hore", "{0} horas" },
-            new[] { "{0} minuto", "{0} minutos" },
-            new[] { "{0} segundo", "{0} segundos" },
-            new[] { "{0} milisegundo", "{0} milisegundos" },
-            new[] { "{0}sem" },
-            new[] { "{0}d" },
-            new[] { "{0}h" },
-            new[] { "{0}m" },
-            new[] { "{0}s" },
-            new[] { "{0}ms" },
-            "menos que {0}"
-        );
+        public static TimeTextInfo Spanish => new()
+        {
+            PluralRule = PluralRules.GetPluralRule("es"),
+            Ptxt_week = new[] { "{0} semana", "{0} semanas" },
+            Ptxt_day = new[] { "{0} día", "{0} días" },
+            Ptxt_hour = new[] { "{0} hore", "{0} horas" },
+            Ptxt_minute = new[] { "{0} minuto", "{0} minutos" },
+            Ptxt_second = new[] { "{0} segundo", "{0} segundos" },
+            Ptxt_millisecond = new[] { "{0} milisegundo", "{0} milisegundos" },
+            Ptxt_w = new[] { "{0}sem" },
+            Ptxt_d = new[] { "{0}d" },
+            Ptxt_h = new[] { "{0}h" },
+            Ptxt_m = new[] { "{0}m" },
+            Ptxt_s = new[] { "{0}s" },
+            Ptxt_ms = new[] { "{0}ms" },
+            Ptxt_lessThan = "menos que {0}"
+        };
 
         /// <summary>
         /// Gets the <see cref="TimeTextInfo"/> for the Portuguese language.
         /// </summary>
-        public static TimeTextInfo Portuguese => new(
-            PluralRules.GetPluralRule("pt"),
-            new[] { "{0} semana", "{0} semanas" },
-            new[] { "{0} dia", "{0} dias" },
-            new[] { "{0} hora", "{0} horas" },
-            new[] { "{0} minuto", "{0} minutos" },
-            new[] { "{0} segundo", "{0} segundos" },
-            new[] { "{0} milissegundo", "{0} milissegundos" },
-            new[] { "{0}sem" },
-            new[] { "{0}d" },
-            new[] { "{0}h" },
-            new[] { "{0}m" },
-            new[] { "{0}s" },
-            new[] { "{0}ms" },
-            "menos do que {0}"
-        );
+        public static TimeTextInfo Portuguese => new()
+        {
+            PluralRule = PluralRules.GetPluralRule("pt"),
+            Ptxt_week = new[] { "{0} semana", "{0} semanas" },
+            Ptxt_day = new[] { "{0} dia", "{0} dias" },
+            Ptxt_hour = new[] { "{0} hora", "{0} horas" },
+            Ptxt_minute = new[] { "{0} minuto", "{0} minutos" },
+            Ptxt_second = new[] { "{0} segundo", "{0} segundos" },
+            Ptxt_millisecond = new[] { "{0} milissegundo", "{0} milissegundos" },
+            Ptxt_w = new[] { "{0}sem" },
+            Ptxt_d = new[] { "{0}d" },
+            Ptxt_h = new[] { "{0}h" },
+            Ptxt_m = new[] { "{0}m" },
+            Ptxt_s = new[] { "{0}s" },
+            Ptxt_ms = new[] { "{0}ms" },
+            Ptxt_lessThan = "menos do que {0}"
+        };
 
         /// <summary>
         /// Gets the <see cref="TimeTextInfo"/> for the Italian language.
         /// </summary>
-        public static TimeTextInfo Italian => new(
-            PluralRules.GetPluralRule("it"),
-            new[] { "{0} settimana", "{0} settimane" },
-            new[] { "{0} giorno", "{0} giorni" },
-            new[] { "{0} ora", "{0} ore" },
-            new[] { "{0} minuto", "{0} minuti" },
-            new[] { "{0} secondo", "{0} secondi" },
-            new[] { "{0} millisecondo", "{0} millisecondi" },
-            new[] { "{0}set" },
-            new[] { "{0}g" },
-            new[] { "{0}h" },
-            new[] { "{0}m" },
-            new[] { "{0}s" },
-            new[] { "{0}ms" },
-            "meno di {0}"
-        );
+        public static TimeTextInfo Italian => new()
+        {
+            PluralRule = PluralRules.GetPluralRule("it"),
+            Ptxt_week = new[] { "{0} settimana", "{0} settimane" },
+            Ptxt_day = new[] { "{0} giorno", "{0} giorni" },
+            Ptxt_hour = new[] { "{0} ora", "{0} ore" },
+            Ptxt_minute = new[] { "{0} minuto", "{0} minuti" },
+            Ptxt_second = new[] { "{0} secondo", "{0} secondi" },
+            Ptxt_millisecond = new[] { "{0} millisecondo", "{0} millisecondi" },
+            Ptxt_w = new[] { "{0}set" },
+            Ptxt_d = new[] { "{0}g" },
+            Ptxt_h = new[] { "{0}h" },
+            Ptxt_m = new[] { "{0}m" },
+            Ptxt_s = new[] { "{0}s" },
+            Ptxt_ms = new[] { "{0}ms" },
+            Ptxt_lessThan = "meno di {0}"
+        };
 
         /// <summary>
         /// Gets the <see cref="TimeTextInfo"/> for the German language.
         /// </summary>
-        public static TimeTextInfo German => new(
-            PluralRules.GetPluralRule("de"),
-            new[] { "{0} Woche", "{0} Wochen" },
-            new[] { "{0} Tag", "{0} Tage" },
-            new[] { "{0} Stunde", "{0} Stunden" },
-            new[] { "{0} Minute", "{0} Minuten" },
-            new[] { "{0} Sekunde", "{0} Sekunden" },
-            new[] { "{0} Millisekunde", "{0} Millisekunden" },
-            new[] { "{0}w" },
-            new[] { "{0}t" },
-            new[] { "{0}h" },
-            new[] { "{0}m" },
-            new[] { "{0}s" },
-            new[] { "{0}ms" },
-            "weniger als {0}"
-        );
+        public static TimeTextInfo German => new()
+        {
+            PluralRule = PluralRules.GetPluralRule("de"),
+            Ptxt_week = new[] { "{0} Woche", "{0} Wochen" },
+            Ptxt_day = new[] { "{0} Tag", "{0} Tage" },
+            Ptxt_hour = new[] { "{0} Stunde", "{0} Stunden" },
+            Ptxt_minute = new[] { "{0} Minute", "{0} Minuten" },
+            Ptxt_second = new[] { "{0} Sekunde", "{0} Sekunden" },
+            Ptxt_millisecond = new[] { "{0} Millisekunde", "{0} Millisekunden" },
+            Ptxt_w = new[] { "{0}w" },
+            Ptxt_d = new[] { "{0}t" },
+            Ptxt_h = new[] { "{0}h" },
+            Ptxt_m = new[] { "{0}m" },
+            Ptxt_s = new[] { "{0}s" },
+            Ptxt_ms = new[] { "{0}ms" },
+            Ptxt_lessThan = "weniger als {0}"
+        };
 
         /// <summary>
         /// Adds a <see cref="TimeTextInfo"/> for a language.
