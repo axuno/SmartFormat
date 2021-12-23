@@ -209,32 +209,44 @@ namespace SmartFormat.Utilities
         {
             if (c == 2) return n < 2 ? 0 : 1;
 
-            if (c == 3)
-                switch (n)
-                {
-                    case 0:
-                        return 0;
-                    case > 0 and < 2:
-                        return 1;
-                    case > 2:
-                        return 2;
-                }
+            if (c == 3) return GetC3Value(n);
 
-            if (c == 4)
-                switch (n)
-                {
-                    case < 0:
-                        return 0;
-                    case 0:
-                        return 1;
-                    case > 0 and < 2:
-                        return 2;
-                    case > 2:
-                        return 3;
-                }
+            if (c == 4) return GetC4Value(n);
 
             return -1;
         }; // DualFromZeroToTwo: one (n == 0..2 fractionate and n != 2), other
+
+        private static int GetC3Value(decimal n)
+        {
+            switch (n)
+            {
+                case 0:
+                    return 0;
+                case > 0 and < 2:
+                    return 1;
+                case > 2:
+                    return 2;
+                default:
+                    return -1;
+            }
+        }
+
+        private static int GetC4Value(decimal n)
+        {
+            switch (n)
+            {
+                case < 0:
+                    return 0;
+                case 0:
+                    return 1;
+                case > 0 and < 2:
+                    return 2;
+                case > 2:
+                    return 3;
+                default:
+                    return -1;
+            }
+        }
         
         private static PluralRuleDelegate TripleOneTwoOther => (n, c) => n == 1 ? 0 : n == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
         private static PluralRuleDelegate RussianSerboCroatian => (n, c) =>
