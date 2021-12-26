@@ -61,7 +61,7 @@ namespace SmartFormat.Extensions
 
             // See if the value is a number or an Enum:
             var currentIsNumber =
-                current is byte or short or int or long or float or double or decimal or Enum;
+                current is byte or short or ushort or int or uint or long or ulong or float or double or decimal or Enum;
 
             var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
 
