@@ -36,8 +36,9 @@ namespace SmartFormat.Extensions
 
             // See if the value is a number:
             var currentIsNumber =
-                current is byte || current is short || current is int || current is long
-                || current is float || current is double || current is decimal;
+                current is byte or short or ushort or int or uint or long or ulong or float or double or decimal
+                    or Enum;
+
             // An Enum is a number too:
 
             if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
