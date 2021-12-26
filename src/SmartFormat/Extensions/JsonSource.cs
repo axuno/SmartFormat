@@ -46,12 +46,43 @@ namespace SmartFormat.Extensions
             // Note: Operators are processed by ListFormatter
             public static bool TryEvaluateSelector(ISelectorInfo selectorInfo)
             {
-                var jsonObject = selectorInfo.CurrentValue as JObject;
+                // Check for nullable and null value
+                var current = selectorInfo.CurrentValue switch
+                {
+                    JObject jsonObject => jsonObject.HasValues ? jsonObject : null,
+                    JValue jsonValue => jsonValue.Value,
+                    _ => selectorInfo.CurrentValue
+                };
+            
+                if (current is null) return false;
 
-                var result = jsonObject?.GetValue(selectorInfo.SelectorText,
+                return selectorInfo.CurrentValue switch
+                {
+                    // Note: Operators are processed by ListFormatter
+                
+                    JObject jObject => TryEvaluateJObject(jObject, selectorInfo),
+                    JValue jValue => TryEvaluateJValue(jValue, selectorInfo),
+                    _ => false
+                };
+            }
+
+            private static bool TryEvaluateJObject(JObject jsonObject, ISelectorInfo selectorInfo)
+            {
+                var jToken = jsonObject.GetValue(selectorInfo.SelectorText,
                     selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison());
 
-                selectorInfo.Result = result ?? throw new FormatException($"'{selectorInfo.SelectorText}'");
+                selectorInfo.Result = jToken?.Type switch {
+                    null => throw new FormatException($"'{selectorInfo.SelectorText}'"),
+                    JTokenType.Null => null,
+                    _ => jToken
+                };
+
+                return true;
+            }
+
+            private static bool TryEvaluateJValue(JValue jsonValue, ISelectorInfo selectorInfo)
+            {
+                selectorInfo.Result = jsonValue;
                 return true;
             }
         }

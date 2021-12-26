@@ -1,6 +1,11 @@
 Latest Changes
 ====
 
+v2.7.2
+===
+* **Fixed**: `ConditionalFormatter` processes unsigned numbers in arguments correctly.
+* **Fixed**: `JsonSource`: Corrected handling of `null` values in NewtonSoftJson objects.
+
 v2.7.1
 ===
 * **Fixed**: [#179](https://github.com/axuno/SmartFormat/issues/179) DualFromZeroToTwo plural rule. Thanks to [@OhSoGood](https://github.com/OhSoGood)

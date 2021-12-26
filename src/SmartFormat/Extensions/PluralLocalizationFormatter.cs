@@ -48,9 +48,7 @@ namespace SmartFormat.Extensions
             // We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
             // in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
             // 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
-            if (current is byte || current is short || current is int || current is long
-                || current is float || current is double || current is decimal
-                || current is ushort || current is uint || current is ulong)
+            if (current is byte or short or ushort or int or uint  or long or ulong or float or double or decimal)
                 value = Convert.ToDecimal(current);
             else if (current is IEnumerable<object> objects)
                 value = objects.Count();
