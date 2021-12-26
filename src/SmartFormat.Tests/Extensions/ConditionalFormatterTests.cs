@@ -123,5 +123,16 @@ namespace SmartFormat.Tests.Extensions
             var actualOutput = smart.Format(format, arg0);
             Assert.AreEqual(expectedOutput, actualOutput);
         }
+
+        [Test]
+        public void Should_Process_Signed_And_Unsigned_Numbers()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            foreach (var number in new object[]
+                         { (long)123, (ulong)123, (short)123, (ushort)123, (int)123, (uint)123 })
+            {
+                Assert.That(smart.Format("{0:cond:=123?yes|no}", number), Is.EqualTo("yes"));
+            }
+        }
     }
 }
