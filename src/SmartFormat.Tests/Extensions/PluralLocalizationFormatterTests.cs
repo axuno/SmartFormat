@@ -238,5 +238,16 @@ namespace SmartFormat.Tests.Extensions
             actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
             Assert.AreEqual("person", actualResult);
         }
+
+        [Test]
+        public void Should_Process_Signed_And_Unsigned_Numbers()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            foreach (var number in new object[]
+                         { (long)123, (ulong)123, (short)123, (ushort)123, (int)123, (uint)123 })
+            {
+                Assert.That(smart.Format("{0:plural(en):zero|one|many}", number), Is.EqualTo("many"));
+            }
+        }
     }
 }
