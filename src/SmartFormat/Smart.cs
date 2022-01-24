@@ -110,7 +110,7 @@ namespace SmartFormat
         public static SmartFormatter CreateDefaultSmartFormat(SmartSettings? settings = null)
         {
             // Register all default extensions here:
-            var formatter = new SmartFormatter(settings);
+            var smart = new SmartFormatter(settings);
             
             // Add all extensions:
             // Note, the order is important; the extensions
@@ -119,7 +119,7 @@ namespace SmartFormat
             var listSourceAndFormatter = new ListFormatter();
 
             // sources for specific types must be in the list before ReflectionSource
-            formatter.AddExtensions(
+            smart.AddExtensions(
                 new StringSource(),
                 (ISource) listSourceAndFormatter, // ListFormatter should be one of the first source extensions
                 new DictionarySource(),
@@ -132,7 +132,7 @@ namespace SmartFormat
                 // The DefaultSource reproduces the string.Format behavior:
                 new DefaultSource()
             );
-            formatter.AddExtensions(
+            smart.AddExtensions(
                 (IFormatter) listSourceAndFormatter, // ListFormatter should be one of the first formatter extensions
                 //new PluralLocalizationFormatter(),
                 new ConditionalFormatter(),
@@ -145,7 +145,7 @@ namespace SmartFormat
                 new DefaultFormatter()
             );
 
-            return formatter;
+            return smart;
         }
 
         #endregion
