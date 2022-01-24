@@ -124,9 +124,9 @@ namespace SmartFormat
                 (ISource) listSourceAndFormatter, // ListFormatter should be one of the first source extensions
                 new DictionarySource(),
                 new ValueTupleSource(),
-                new SystemTextJsonSource(),
-                new NewtonsoftJsonSource(),
-                new XmlSource(),
+                //new SystemTextJsonSource(),
+                //new NewtonsoftJsonSource(),
+                //new XmlSource(),
                 new ReflectionSource(),
 
                 // The DefaultSource reproduces the string.Format behavior:
@@ -134,12 +134,12 @@ namespace SmartFormat
             );
             formatter.AddExtensions(
                 (IFormatter) listSourceAndFormatter, // ListFormatter should be one of the first formatter extensions
-                new PluralLocalizationFormatter(),
+                //new PluralLocalizationFormatter(),
                 new ConditionalFormatter(),
                 new IsMatchFormatter(),
                 new NullFormatter(),
-                new TimeFormatter(),
-                new XElementFormatter(),
+                //new TimeFormatter(),
+                //new XElementFormatter(),
                 new ChooseFormatter(),
                 new SubStringFormatter(),
                 new DefaultFormatter()

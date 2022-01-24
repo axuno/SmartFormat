@@ -7,6 +7,7 @@ using System;
 using System.Globalization;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Extensions.Time.Utilities;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions

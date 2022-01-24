@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Reflection;
 using SmartFormat.Utilities;
+using SmartFormat.Extensions.Time.Utilities;
 
 namespace SmartFormat.Tests.Utilities
 {

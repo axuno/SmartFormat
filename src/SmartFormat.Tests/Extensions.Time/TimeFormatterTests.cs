@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using SmartFormat.Extensions.Time.Utilities;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions
@@ -11,7 +12,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class TimeFormatterTests
     {
-        private static SmartFormatter GetStandardFormatter()
+        private static SmartFormatter GetFormatter()
         {
             var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
             {
@@ -21,8 +22,7 @@ namespace SmartFormat.Tests.Extensions
 
             if (smart.GetFormatterExtension<TimeFormatter>() is null)
             {
-                var timeFormatter = new TimeFormatter();
-                smart.AddExtensions(timeFormatter);
+                smart.AddExtensions(new TimeFormatter());
             }
 
             return smart;
@@ -43,7 +43,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void UseTimeFormatter_WithIllegalLanguage()
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
             timeFormatter.FallbackLanguage = string.Empty;
 
@@ -56,7 +56,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Setting_Unknown_FallbackLanguage_Should_Throw()
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
             Exception? ex = null;
             try
@@ -75,7 +75,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase(false)]
         public void UseTimeFormatter_With_Unimplemented_Language(bool useFallbackLanguage)
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
             timeFormatter.FallbackLanguage = useFallbackLanguage ? "en" : string.Empty;
 
@@ -89,7 +89,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void UseTimeFormatter_WithLegalLanguage()
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
 
             Assert.DoesNotThrow(() => smart.Format("{0:time(en):noless}", new TimeSpan(1,2,3)));
             Assert.DoesNotThrow(() => smart.Format(CultureInfo.GetCultureInfo("en"), "{0:time:noless}", new TimeSpan(1,2,3)));
@@ -98,14 +98,14 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Explicit_Formatter_With_Unsupported_ArgType_Should_Throw()
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             Assert.That(() => smart.Format("{0:time:}", DateTime.UtcNow), Throws.Exception.TypeOf<FormattingException>());
         }
 
         [Test]
         public void Formatter_With_NestedFormat_Should_Throw()
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             Assert.That(() => smart.Format("{0:time:{}}", DateTime.UtcNow), Throws.Exception.TypeOf<FormattingException>());
         }
 
@@ -131,7 +131,7 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Defaults(string format, string language, string expected)
         {
             var args = GetArgs();
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             var actual = smart.Format(CultureInfo.GetCultureInfo(language), format, args);
             Assert.That(actual, Is.EqualTo(expected));
         }
@@ -157,7 +157,7 @@ namespace SmartFormat.Tests.Extensions
         public void Test_Options(string format, string expected)
         {
             var args = GetArgs();
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             
             var actual = smart.Format(format, args);
             Assert.That(actual, Is.EqualTo(expected));
@@ -170,7 +170,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase(-23)]
         public void TimeSpanFromGivenTimeToCurrentTime(int diffHours)
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             // test will work in any TimeZone
             var now = DateTime.Now;
             var dateTime = now.AddHours(diffHours);
@@ -200,7 +200,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase(-23)]
         public void TimeSpanOffsetFromGivenTimeToCurrentTime(int diffHours)
         {
-            var smart = GetStandardFormatter();
+            var smart = GetFormatter();
             // test will work in any TimeZone
             var now = DateTimeOffset.Now;
             var dateTimeOffset = now.AddHours(diffHours);

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SmartFormat.Utilities
+namespace SmartFormat.Extensions.Time.Utilities
 {
     /// <summary>
     /// Utility class to format a <see cref="TimeSpan"/> as a <see langword="string"/>.

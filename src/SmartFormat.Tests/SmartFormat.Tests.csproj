@@ -35,8 +35,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
-        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+        <ProjectReference Include="..\SmartFormat.Net\SmartFormat.Net.csproj" />
     </ItemGroup>
 
 	<ItemGroup>

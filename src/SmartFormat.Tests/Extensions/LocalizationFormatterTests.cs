@@ -14,7 +14,7 @@ namespace SmartFormat.Tests.Extensions
     {
         private static SmartFormatter GetFormatterWithRegisteredResource(CaseSensitivityType caseSensitivity = CaseSensitivityType.CaseSensitive, FormatErrorAction formatErrorAction = FormatErrorAction.ThrowError)
         {
-            var formatter = new LocalizationFormatter {CanAutoDetect = false};
+            var localizationFormatter = new LocalizationFormatter {CanAutoDetect = false};
             var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
             {
                 CaseSensitivity = caseSensitivity,
@@ -25,7 +25,8 @@ namespace SmartFormat.Tests.Extensions
                 },
                 Formatter = { ErrorAction = formatErrorAction }
             });
-            smart.AddExtensions(formatter);
+            smart.AddExtensions(localizationFormatter);
+            smart.AddExtensions(1, new PluralLocalizationFormatter());
 
             return smart;
         }

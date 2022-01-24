@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
@@ -52,7 +55,7 @@ namespace SmartFormat.Tests.Extensions
             var smart = new SmartFormatter(settings ?? new SmartSettings());
             // NewtonsoftJsonSource MUST be registered before ReflectionSource (which is not required here)
             // We also need the ListFormatter to process arrays
-            smart.AddExtensions(new ListFormatter(), new DefaultSource(), new NewtonsoftJsonSource());
+            smart.AddExtensions(new ListFormatter(), new NewtonsoftJsonSource(), new DefaultSource());
             smart.AddExtensions(new ListFormatter(), new NullFormatter(), new DefaultFormatter());
             return smart;
         }

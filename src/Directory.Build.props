@@ -4,7 +4,7 @@
         <Product>SmartFormat</Product>
         <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
         <Company>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Company>
-        <Copyright>Copyright 2011-2021 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
+        <Copyright>Copyright 2011-2022 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
         <RepositoryUrl>https://github.com/axuno/SmartFormat.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <Version>3.0.0-alpha.5</Version>

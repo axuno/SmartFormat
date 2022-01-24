@@ -13,6 +13,14 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class ValueTupleSourceTests
     {
+        private static SmartFormatter GetSmartFormatter(SmartSettings? settings = null)
+        {
+            var smart = new SmartFormatter(settings ?? new SmartSettings());
+            smart.AddExtensions(new ValueTupleSource(), new DictionarySource(), new ReflectionSource(), new DefaultSource());
+            smart.AddExtensions(new NullFormatter(), new DefaultFormatter());
+            return smart;
+        }
+
         [Test]
         public void Format_With_ValueTuples()
         {
@@ -27,7 +35,7 @@ namespace SmartFormat.Tests.Extensions
             var expected = $"Name: {addr.Person.FirstName} {addr.Person.LastName}\n" +
                            $"Dictionaries: {dict1["dict1key"]}, {dict2["dict2key"]}";
 
-            var formatter = Smart.CreateDefaultSmartFormat();
+            var formatter = GetSmartFormatter();
             var result = formatter.Format(format, (addr, dict1, dict2));
 
             Assert.AreEqual(expected, result);
@@ -44,7 +52,7 @@ namespace SmartFormat.Tests.Extensions
 
             var expected = $"Name: {addr.Person.FirstName} {addr.City?.AreaCode}";
 
-            var formatter = Smart.CreateDefaultSmartFormat();
+            var formatter = GetSmartFormatter();
 
             if (shouldSucceed)
             {
@@ -73,7 +81,7 @@ namespace SmartFormat.Tests.Extensions
             var expected = $"Name: {addr.Person.FirstName} {addr.Person.LastName}\n" +
                            $"Dictionaries: {dict1["dict1key"]}, {dict2["dict2key"]}";
 
-            var formatter = Smart.CreateDefaultSmartFormat();
+            var formatter = GetSmartFormatter();
             var result = formatter.Format(format, null!, (addr, dict1, dict2));
 
             Assert.AreEqual(expected, result);
@@ -95,16 +103,16 @@ namespace SmartFormat.Tests.Extensions
             var clubOrMember = new { Member = new { Name = "Joe" }, Club = new { Name = "The Strikers" } };
             var clubNoMember = new { Member = default(object), Club = new { Name = "The Strikers" } };
             var say = new { Hello = "Good morning" };
-            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings
+            var smart = GetSmartFormatter(new SmartSettings
             {
                 Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError},
                 Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}
             });
 
-            var result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", (clubOrMember, say));
+            var result = smart.Format("{Member:isnull:{Club.Name}|{Name}} - {Hello}", (clubOrMember, say));
             Assert.AreEqual($"{clubOrMember.Member.Name} - {say.Hello}", result);
 
-            result = formatter.Format("{Member:choose(null):{Club.Name}|{Name}} - {Hello}", (clubNoMember, say));
+            result = smart.Format("{Member:isnull:{Club.Name}|{Name}} - {Hello}", (clubNoMember, say));
             Assert.AreEqual($"{clubOrMember.Club.Name} - {say.Hello}", result);
         }
 

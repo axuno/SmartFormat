@@ -5,8 +5,9 @@
 
 using System;
 using System.Collections.Generic;
+using SmartFormat.Utilities;
 
-namespace SmartFormat.Utilities
+namespace SmartFormat.Extensions.Time.Utilities
 {
     /// <summary>
     /// Supplies the localized text used for <see cref="TimeSpan"/> formatting.

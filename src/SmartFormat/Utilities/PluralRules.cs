@@ -5,12 +5,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace SmartFormat.Utilities
 {
     /// <summary>
     /// Assigns the ISO language code to a pluralization rule.
+    /// <see cref="PluralRules"/> are used by extensions like <c>TimeFormatter</c> and <c>PluralLocalizationFormatter</c>
     /// </summary>
     public static class PluralRules
     {

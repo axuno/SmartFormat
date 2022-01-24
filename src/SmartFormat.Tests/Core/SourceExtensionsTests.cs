@@ -12,7 +12,7 @@ using SmartFormat.Tests.TestUtils;
 namespace SmartFormat.Tests.Core
 {
     [TestFixture]
-    public class FormatterExtensionsTests
+    public class SourceExtensionsTests
     {
         private static List<T> GetExtensions<T>()
         {
@@ -28,25 +28,11 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Formatters_Can_Be_Initialized()
+        public void Sources_Can_Be_Initialized()
         {
-            foreach (var formatter in GetExtensions<IFormatter>())
+            foreach (var source in GetExtensions<ISource>())
             {
-                var guid = Guid.NewGuid().ToString("N");
-                var negatedAutoDetection = formatter.CanAutoDetect;
-                formatter.Name = guid;
-                formatter.GetType().GetProperty("Names")?.SetValue(formatter, new[] {guid}); // "Names" property is obsolete
-                
-                Assert.That(formatter.GetType().GetProperty("Names")?.GetValue(formatter), Is.EqualTo(new[]{guid}));  // "Names" property is obsolete
-                Assert.That(formatter.Name, Is.EqualTo(guid));
-                
-                if (formatter is not TemplateFormatter)
-                {
-                    formatter.CanAutoDetect = negatedAutoDetection;
-                    Assert.That(formatter.CanAutoDetect, Is.EqualTo(negatedAutoDetection));
-                }
-
-                if (formatter is IInitializer initializer)
+                if (source is IInitializer initializer)
                 {
                     Assert.That(() => initializer.Initialize(new SmartFormatter()), Throws.Nothing);
                 }
@@ -54,64 +40,22 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void Formatters_AutoDetection_Should_Not_Throw()
-        {
-            foreach (var formatter in GetExtensions<IFormatter>().Where(f => f.CanAutoDetect))
-            {
-                var fi = FormattingInfoExtensions.Create("", new List<object?> {new()});
-                Assert.That(() => formatter.TryEvaluateFormat(fi),
-                    Throws.Nothing);
-            }
-        }
-
-        [Test]
-        public void AddKnownFormatterExtensions()
+        public void Add_Known_SourceExtensions()
         {
             var sf = new SmartFormatter();
 
-            // formatters are in arbitrary order
-            var allFormatters = GetExtensions<IFormatter>();
-            foreach (var formatter in allFormatters)
+            // sources are in arbitrary order
+            var allSources = GetExtensions<ISource>();
+            foreach (var source in allSources)
             {
-                var index = WellKnownExtensions.GetIndexToInsert(sf.FormatterExtensions, formatter);
-                sf.AddExtensions(index, formatter);
+                var index = WellKnownExtensions.GetIndexToInsert(sf.SourceExtensions, source);
+                sf.AddExtensions(index, source);
             }
 
-            var orderedFormatters = allFormatters.OrderBy(f => WellKnownExtensions.Formatters[f.GetType().FullName])
+            var orderedSources = allSources.OrderBy(f => WellKnownExtensions.Sources[f.GetType().FullName])
                 .ToList().AsReadOnly();
 
-            CollectionAssert.AreEqual(orderedFormatters, sf.GetFormatterExtensions());
-        }
-
-        #region: Default Extensions :
-
-        [Test]
-        [TestCase("{0:cond:zero|one|two}", 0, "zero")]
-        [TestCase("{0:cond:zero|one|two}", 1, "one")]
-        [TestCase("{0:cond:zero|one|two}", 2, "two")]
-        [TestCase("{0:list:+{}|, |, and }", new []{ 1, 2, 3 }, "+1, +2, and +3")]
-        [TestCase("{0:list:+{}|, |, and }", new []{ 1, 2, 3 }, "+1, +2, and +3")]
-        [TestCase("{0:d()}", 5, "5")]
-        [TestCase("{0:d:N2}", 5, "5.00")]
-        public void Invoke_extensions_by_name(string format, object arg0, string expectedResult)
-        {
-            var smart = Smart.CreateDefaultSmartFormat();
-            var actualResult = smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
-            Assert.AreEqual(expectedResult, actualResult);
-        }
-
-        #endregion
-
-        [Test]
-        [TestCase(true, "yes (probably)")]
-        [TestCase(false, "no (possibly)")]
-        public void Conditional_Formatter_With_Parenthesis(bool value, string expected)
-        {
-            var smart = Smart.CreateDefaultSmartFormat();
-            // explicit conditional formatter
-            Assert.AreEqual(expected, smart.Format("{value:cond:yes (probably)|no (possibly)}", new { value }));
-            // implicit
-            Assert.AreEqual(expected, smart.Format("{value:yes (probably)|no (possibly)}", new { value }));
+            CollectionAssert.AreEqual(orderedSources, sf.GetSourceExtensions());
         }
 
         #region: Custom Extensions :
