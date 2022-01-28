@@ -48,11 +48,11 @@ namespace SmartFormat.Tests.Extensions
 }";
         private static SmartFormatter GetFormatterWithJsonSource(SmartSettings? settings = null)
         {
-            var smart = new SmartFormatter(settings ?? new SmartSettings());
-            // SystemTextJsonSource MUST be registered before ReflectionSource (which is not required here)
-            // We also need the ListFormatter to process arrays
-            smart.AddExtensions(new ListFormatter(), new DefaultSource(), new SystemTextJsonSource());
-            smart.AddExtensions(new ListFormatter(), new NullFormatter(), new DefaultFormatter());
+            var smart = new SmartFormatter(settings ?? new SmartSettings())
+                // SystemTextJsonSource MUST be registered before ReflectionSource (which is not required here)
+                // We also need the ListFormatter to process arrays
+                .AddExtensions(new ListFormatter(), new DefaultSource(), new SystemTextJsonSource())
+                .AddExtensions(new ListFormatter(), new NullFormatter(), new DefaultFormatter());
             return smart;
         }
 

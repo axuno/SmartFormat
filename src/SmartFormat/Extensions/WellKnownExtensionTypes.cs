@@ -15,13 +15,10 @@ namespace SmartFormat.Extensions
     /// <summary>
     /// Helper class for dealing with well-known <see cref="ISource"/> and <see cref="IFormatter"/> extensions.
     /// </summary>
-    public static class WellKnownExtensions
+    public static class WellKnownExtensionTypes
     {
-        private static HashSet<Type>? _transientIFormatterTypes;
-        private static HashSet<Type>? _singletonIFormatterTypes;
-
-        private static HashSet<Type>? _transientISourceTypes;
-        private static HashSet<Type>? _singletonISourceTypes;
+        private static HashSet<(Type ExtensionType, bool IsSingleton)>? _formatterTypes;
+        private static HashSet<(Type ExtensionType, bool IsSingleton)>? _sourceTypes;
 
         /// <summary>
         /// Well-known <see cref="ISource"/> implementations in the sequence how they should (not must!) be invoked.
@@ -98,26 +95,26 @@ namespace SmartFormat.Extensions
         /// Gets all referenced transient and singleton <see cref="IFormatter"/> and <see cref="ISource"/> extensions.
         /// </summary>
         /// <typeparam name="T"><see cref="IFormatter"/> or <see cref="ISource"/>.</typeparam>
-        /// <returns>A <see cref="ValueTuple"/> with <see cref="Type"/> <see cref="HashSet{T}"/>s of TransientExtensions and SingletonExtensions.</returns>
+        /// <returns>A <see cref="ValueTuple"/> with <see cref="Type"/> <see cref="HashSet{T}"/>s all extensions and a flag, if an extension is a singleton.</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        internal static (HashSet<Type> TransientExtensions, HashSet<Type> SingletonExtensions) GetReferencedExtensions<T>()
+        internal static HashSet<(Type ExtensionType, bool IsSingleton)> GetReferencedExtensions<T>()
         {
-            // Note: Assembly.GetCallingAssembly() is the assembly calling this method directly
+            // Note: Assembly.GetCallingAssembly() is the assembly calling this method *directly*
 
             if (typeof(T).IsAssignableFrom(typeof(IFormatter)))
             {
-                if (_transientIFormatterTypes is null || _singletonIFormatterTypes is null)
-                    (_transientIFormatterTypes, _singletonIFormatterTypes) = FetchReferencedExtensions<T>(Assembly.GetCallingAssembly());
+                if (_formatterTypes is null)
+                    _formatterTypes = FetchReferencedExtensions<T>(Assembly.GetCallingAssembly());
 
-                return (_transientIFormatterTypes, _singletonIFormatterTypes);
+                return _formatterTypes;
             }
 
             if (typeof(T).IsAssignableFrom(typeof(ISource)))
             {
-                if (_transientISourceTypes is null || _singletonISourceTypes is null)
-                    (_transientISourceTypes, _singletonISourceTypes) = FetchReferencedExtensions<T>(Assembly.GetCallingAssembly());
+                if (_sourceTypes is null)
+                    _sourceTypes = FetchReferencedExtensions<T>(Assembly.GetCallingAssembly());
 
-                return (_transientISourceTypes, _singletonISourceTypes);
+                return _sourceTypes;
             }
 
             throw new InvalidOperationException(
@@ -130,9 +127,9 @@ namespace SmartFormat.Extensions
         /// </summary>
         /// <param name="callingAssembly">The assembly which originally invoked this method.</param>
         /// <typeparam name="T"><see cref="IFormatter"/> or <see cref="ISource"/>.</typeparam>
-        /// <returns>A <see cref="ValueTuple"/> with <see cref="Type"/> <see cref="HashSet{T}"/>s of TransientExtensions and SingletonExtensions.</returns>
+        /// <returns>A <see cref="ValueTuple"/> with <see cref="Type"/> <see cref="HashSet{T}"/>s all extensions and a flag, if an extension is a singleton.</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private static (HashSet<Type> TransientExtensions, HashSet<Type> SingletonExtensions) FetchReferencedExtensions<T>(Assembly callingAssembly)
+        private static HashSet<(Type ExtensionType, bool IsSingleton)> FetchReferencedExtensions<T>(Assembly callingAssembly)
         {
             // Select classes implementing T, having a public and parameterless constructor
             static bool TransientCondition(Type t) => typeof(T).IsAssignableFrom(t)
@@ -146,26 +143,37 @@ namespace SmartFormat.Extensions
                                                       && t.GetProperty("Instance",
                                                           BindingFlags.Static | BindingFlags.Public) != null;
 
-            var allTransientExtensionTypes = new HashSet<Type>();
-            var allSingletonExtensionTypes = new HashSet<Type>();
+            var allExtensionTypes = new HashSet<(Type ExtensionType, bool IsSingleton)>();
 
-            /*****************************************************
-             Get all extensions from core SmartFormat and referenced extension package assemblies
-            ******************************************************/
+            // Get all extensions from core SmartFormat and referenced extension package assemblies
             foreach (var assembly in callingAssembly.GetReferencedAssemblies())
             {
                 // Loads into the Default Load Context, dependencies are loaded automatically
                 var referencedTypes = Assembly.Load(assembly).GetTypes();
                 referencedTypes
                     .Where(TransientCondition)
-                    .ToList().ForEach(t => allTransientExtensionTypes.Add(t));
+                    .ToList().ForEach(t => allExtensionTypes.Add((t, false)));
                 referencedTypes
                     .Where(SingletonCondition)
-                    .ToList().ForEach(t => allSingletonExtensionTypes.Add(t));
+                    .ToList().ForEach(t => allExtensionTypes.Add((t, true)));
             }
 
-            return (allTransientExtensionTypes, allSingletonExtensionTypes);
+            return allExtensionTypes;
         }
 
+        /// <summary>
+        /// Creates an instance of the given type.
+        /// </summary>
+        /// <typeparam name="T"><see cref="IFormatter"/> or <see cref="ISource"/>.</typeparam>
+        /// <param name="wellKnown">A <see cref="ValueTuple"/> containing <see cref="Type"/> and <see langword="bool"/>.</param>
+        /// <returns>An instance of the given type.</returns>
+        internal static T CreateInstanceForType<T>((Type ExtensionType, bool IsSingleton) wellKnown)
+        {
+            if (wellKnown.IsSingleton)
+                return (T) wellKnown.ExtensionType.GetProperty("Instance", BindingFlags.Static | BindingFlags.Public)!.GetValue(wellKnown);
+
+            // It's a transient type
+            return (T) Activator.CreateInstance(Type.GetType(wellKnown.ExtensionType.AssemblyQualifiedName!)!);
+        }
     }
 }

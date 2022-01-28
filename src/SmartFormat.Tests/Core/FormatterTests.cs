@@ -18,9 +18,9 @@ namespace SmartFormat.Tests.Core
 
         private static SmartFormatter GetSimpleFormatter()
         {
-            var formatter = new SmartFormatter(); 
-            formatter.AddExtensions(new DefaultFormatter());
-            formatter.AddExtensions(new ReflectionSource(), new DefaultSource());
+            var formatter = new SmartFormatter()
+                .AddExtensions(new DefaultFormatter())
+                .AddExtensions(new ReflectionSource(), new DefaultSource());
             return formatter;
         }
 

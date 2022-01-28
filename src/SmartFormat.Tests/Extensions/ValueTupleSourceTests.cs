@@ -15,9 +15,10 @@ namespace SmartFormat.Tests.Extensions
     {
         private static SmartFormatter GetSmartFormatter(SmartSettings? settings = null)
         {
-            var smart = new SmartFormatter(settings ?? new SmartSettings());
-            smart.AddExtensions(new ValueTupleSource(), new DictionarySource(), new ReflectionSource(), new DefaultSource());
-            smart.AddExtensions(new NullFormatter(), new DefaultFormatter());
+            var smart = new SmartFormatter(settings ?? new SmartSettings())
+                .AddExtensions(new ValueTupleSource(), new DictionarySource(), new ReflectionSource(),
+                    new DefaultSource())
+                .AddExtensions(new NullFormatter(), new DefaultFormatter());
             return smart;
         }
 

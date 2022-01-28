@@ -16,7 +16,7 @@ namespace SmartFormat.Tests.Extensions
         public static SmartFormatter GetFormatter(SmartSettings? smartSettings = null)
         {
             var smart = Smart.CreateDefaultSmartFormat(smartSettings ?? new SmartSettings());
-            smart.AddExtensions(1, new PluralLocalizationFormatter());
+            smart.InsertExtension(1, new PluralLocalizationFormatter());
             return smart;
         }
 
@@ -268,11 +268,12 @@ namespace SmartFormat.Tests.Extensions
                 : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
             
             var formatter = new SmartFormatter();
-            formatter.AddExtensions(new ReflectionSource());
-            // Note: If pluralization AND conditional formatters are registered, the formatter
-            //       name MUST be included in the format string, because both could return successful automatic evaluation
-            // Here, we register only pluralization:
-            formatter.AddExtensions(new PluralLocalizationFormatter{CanAutoDetect = markAsDefault}, new DefaultFormatter());
+            formatter.AddExtensions(new ReflectionSource())
+                // Note: If pluralization AND conditional formatters are registered, the formatter
+                //       name MUST be included in the format string, because both could return successful automatic evaluation
+                // Here, we register only pluralization:
+                .AddExtensions(new PluralLocalizationFormatter { CanAutoDetect = markAsDefault },
+                    new DefaultFormatter());
             var result = formatter.Format(CultureInfo.GetCultureInfo("en"), format, data);
             
             Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));

@@ -147,9 +147,9 @@ namespace SmartFormat.Tests.Extensions
             var expected = $"Address: {addr.City?.ZipCode} {addr.City?.Name} {addr.City?.AreaCode}\n" +
                            $"Name: {addr.Person.FirstName} {addr.Person.LastName}";
 
-            var smart = new SmartFormatter();
-            smart.AddExtensions(new DefaultSource(), new DictionarySource());
-            smart.AddExtensions(new DefaultFormatter());
+            var smart = new SmartFormatter()
+                .AddExtensions(new DefaultSource(), new DictionarySource())
+                .AddExtensions(new DefaultFormatter());
             
             var result = smart.Format(format, addrDict);
 

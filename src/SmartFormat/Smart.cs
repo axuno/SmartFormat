@@ -96,32 +96,26 @@ namespace SmartFormat
         /// <summary>
         /// Gets or sets the default <see cref="SmartFormatter"/>.
         /// If not set, the <see cref="CreateDefaultSmartFormat"/> will be used.
-        /// It is recommended to set the <see cref="Default"/> <see cref="SmartFormatter"/> with the extensions that are actually needed.
+        /// It is recommended to set the <see langword="static"/> <see cref="Default"/> <see cref="SmartFormatter"/> with the extensions that are actually needed.
         /// </summary>
         public static SmartFormatter Default { get; set; } = CreateDefaultSmartFormat();
 
         /// <summary>
-        /// Creates a <see cref="SmartFormatter"/> with all extensions registered.
+        /// Creates a <see cref="SmartFormatter"/> with core extensions registered.
         /// For optimized performance, create a <see cref="SmartFormatter"/> instance and register the
-        /// particular extensions that are needed.
+        /// particular extensions that are really needed.
         /// </summary>
         /// <param name="settings">The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.</param>
-        /// <returns>A <see cref="SmartFormatter"/> with all extensions registered.</returns>
+        /// <returns>A <see cref="SmartFormatter"/> with core extensions registered.</returns>
         public static SmartFormatter CreateDefaultSmartFormat(SmartSettings? settings = null)
         {
             // Register all default extensions here:
-            var smart = new SmartFormatter(settings);
-            
-            // Add all extensions:
-            // Note, the order is important; the extensions
-            // will be executed in this order:
-
-            var listSourceAndFormatter = new ListFormatter();
-
+            var smart = new SmartFormatter(settings)
             // sources for specific types must be in the list before ReflectionSource
-            smart.AddExtensions(
+            .AddExtensions(
                 new StringSource(),
-                (ISource) listSourceAndFormatter, // ListFormatter should be one of the first source extensions
+                // will automatically be added to the IFormatter list, too
+                new ListFormatter(),
                 new DictionarySource(),
                 new ValueTupleSource(),
                 //new SystemTextJsonSource(),
@@ -131,9 +125,8 @@ namespace SmartFormat
 
                 // The DefaultSource reproduces the string.Format behavior:
                 new DefaultSource()
-            );
-            smart.AddExtensions(
-                (IFormatter) listSourceAndFormatter, // ListFormatter should be one of the first formatter extensions
+            )
+            .AddExtensions(
                 //new PluralLocalizationFormatter(),
                 new ConditionalFormatter(),
                 new IsMatchFormatter(),

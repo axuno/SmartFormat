@@ -16,17 +16,17 @@ namespace SmartFormat.Tests.Extensions
         {
             var localizationFormatter = new LocalizationFormatter {CanAutoDetect = false};
             var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
-            {
-                CaseSensitivity = caseSensitivity,
-                Localization =
                 {
-                    LocalizationProvider = new LocalizationProvider(true, LocTest1.ResourceManager)
-                        { FallbackCulture = null, ReturnNameIfNotFound = false }
-                },
-                Formatter = { ErrorAction = formatErrorAction }
-            });
-            smart.AddExtensions(localizationFormatter);
-            smart.AddExtensions(1, new PluralLocalizationFormatter());
+                    CaseSensitivity = caseSensitivity,
+                    Localization =
+                    {
+                        LocalizationProvider = new LocalizationProvider(true, LocTest1.ResourceManager)
+                            { FallbackCulture = null, ReturnNameIfNotFound = false }
+                    },
+                    Formatter = { ErrorAction = formatErrorAction }
+                })
+                .AddExtensions(localizationFormatter)
+                .AddExtensions(new PluralLocalizationFormatter());
 
             return smart;
         }

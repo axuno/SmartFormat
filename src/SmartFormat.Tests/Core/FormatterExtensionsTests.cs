@@ -14,16 +14,16 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class FormatterExtensionsTests
     {
-        private static List<T> GetExtensions<T>()
+        private static List<T> GetExtensions<T>() where T: IFormatter
         {
-            var (transientExtensionTypes, singletonExtensionTypes) =
-                WellKnownExtensions.GetReferencedExtensions<T>();
+            var formatterExtensions =
+                WellKnownExtensionTypes.GetReferencedExtensions<T>();
             
             // Create instances of all T types
-            var toReturn = transientExtensionTypes
-                .Select(it => (T)Activator.CreateInstance(Type.GetType(it.AssemblyQualifiedName!)!)!)
+            var toReturn = formatterExtensions
+                .Select(WellKnownExtensionTypes.CreateInstanceForType<T>)
                 .ToList();
-            toReturn.AddRange(singletonExtensionTypes.Select(st => (T) st.GetProperty("Instance", BindingFlags.Static | BindingFlags.Public)!.GetValue(st)!));
+            
             return toReturn;
         }
 
@@ -65,19 +65,16 @@ namespace SmartFormat.Tests.Core
         }
 
         [Test]
-        public void AddKnownFormatterExtensions()
+        public void Add_Known_FormatterExtensions_In_Recommended_Order()
         {
             var sf = new SmartFormatter();
 
-            // formatters are in arbitrary order
+            // Formatters are in arbitrary order
             var allFormatters = GetExtensions<IFormatter>();
-            foreach (var formatter in allFormatters)
-            {
-                var index = WellKnownExtensions.GetIndexToInsert(sf.FormatterExtensions, formatter);
-                sf.AddExtensions(index, formatter);
-            }
+            // This should add formatters to the list in the recommended order
+            sf.AddExtensions(allFormatters.ToArray());
 
-            var orderedFormatters = allFormatters.OrderBy(f => WellKnownExtensions.Formatters[f.GetType().FullName])
+            var orderedFormatters = allFormatters.OrderBy(f => WellKnownExtensionTypes.Formatters[f.GetType().FullName!])
                 .ToList().AsReadOnly();
 
             CollectionAssert.AreEqual(orderedFormatters, sf.GetFormatterExtensions());
@@ -167,9 +164,10 @@ namespace SmartFormat.Tests.Core
 
         private static SmartFormatter GetFormatterWithTestExtensions()
         {
-            var testFormatter = new SmartFormatter(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
-            testFormatter.AddExtensions(new TestExtension1(), new TestExtension2(), new DefaultFormatter());
-            testFormatter.AddExtensions(new DefaultSource());
+            var testFormatter = new SmartFormatter(new SmartSettings
+                    { Formatter = new FormatterSettings { ErrorAction = FormatErrorAction.ThrowError } })
+                .AddExtensions(new TestExtension1(), new TestExtension2()).InsertExtension(2, new DefaultFormatter())
+                .AddExtensions(new DefaultSource());
             return testFormatter;
         }
 

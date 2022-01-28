@@ -12,9 +12,9 @@ namespace SmartFormat.Tests.Extensions
     {
         private static SmartFormatter GetSmartFormatter(SmartSettings? settings = null)
         {
-            var smart = Smart.CreateDefaultSmartFormat(settings ?? new SmartSettings());
-            smart.AddExtensions(new XElementFormatter());
-            smart.AddExtensions(new XmlSource());
+            var smart = Smart.CreateDefaultSmartFormat(settings ?? new SmartSettings())
+                .AddExtensions(new XElementFormatter())
+                .AddExtensions(new XmlSource());
             return smart;
         }
 
