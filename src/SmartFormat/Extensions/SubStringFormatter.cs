@@ -85,7 +85,7 @@ namespace SmartFormat.Extensions
             return true;
         }
 
-        (int startPos, int length) GetStartAndLength(string currentValue, string[] parameters)
+        private static (int startPos, int length) GetStartAndLength(string currentValue, string[] parameters)
         {
             var startPos = int.Parse(parameters[0]);
             var length = parameters.Length > 1 ? int.Parse(parameters[1]) : 0;
