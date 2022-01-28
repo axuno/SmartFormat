@@ -104,31 +104,6 @@ namespace SmartFormat
         }
 
         /// <summary>
-        /// Adds the <see cref="ISource"/> extensions at the <paramref name="position"/> of the <see cref="GetSourceExtensions()"/> list of this formatter,
-        /// if the <see cref="Type"/> has not been added before.
-        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
-        /// </summary>
-        /// <param name="position">The position in the <see cref="SourceExtensions"/> list where new extensions will be added.</param>
-        /// <param name="sourceExtension"></param>
-        /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        ///        <paramref name="position" /> is less than 0.
-        ///         -or-
-        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
-        /// </exception>
-        public SmartFormatter InsertExtension(int position, ISource sourceExtension)
-        {
-            if (_sourceExtensions.Any(sx => sx.GetType() == sourceExtension.GetType())) return this;
-
-            if (sourceExtension is IInitializer sourceToInitialize)
-                sourceToInitialize.Initialize(this);
-
-            _sourceExtensions.Insert(position, sourceExtension);
-
-            return this;
-        }
-
-        /// <summary>
         /// Adds <see cref="IFormatter"/> extensions to the <see cref="GetFormatterExtensions()"/> list of this formatter,
         /// if the <see cref="Type"/> has not been added before. <see cref="WellKnownExtensionTypes.Formatters"/> are inserted
         /// at the recommended position, all others are added at the end of the list.
@@ -152,6 +127,31 @@ namespace SmartFormat
                 // Also add the class as a source, if possible
                 if (formatter is ISource source && SourceExtensions.All(sx => sx.GetType() != source.GetType())) AddExtensions(source);
             }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISource"/> extensions at the <paramref name="position"/> of the <see cref="GetSourceExtensions()"/> list of this formatter,
+        /// if the <see cref="Type"/> has not been added before.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </summary>
+        /// <param name="position">The position in the <see cref="SourceExtensions"/> list where new extensions will be added.</param>
+        /// <param name="sourceExtension"></param>
+        /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        ///        <paramref name="position" /> is less than 0.
+        ///         -or-
+        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
+        /// </exception>
+        public SmartFormatter InsertExtension(int position, ISource sourceExtension)
+        {
+            if (_sourceExtensions.Any(sx => sx.GetType() == sourceExtension.GetType())) return this;
+
+            if (sourceExtension is IInitializer sourceToInitialize)
+                sourceToInitialize.Initialize(this);
+
+            _sourceExtensions.Insert(position, sourceExtension);
 
             return this;
         }

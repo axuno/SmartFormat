@@ -23,25 +23,24 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// Well-known <see cref="ISource"/> implementations in the sequence how they should (not must!) be invoked.
         /// </summary>
-        public static Dictionary<string, int> Sources = new(StringComparer.InvariantCulture)
-        {
+        public static Dictionary<string, int> Sources { get; } = new(StringComparer.InvariantCulture) {
             { "SmartFormat.Extensions.GlobalVariablesSource", 1000 },
             { "SmartFormat.Extensions.PersistentVariablesSource", 2000 },
             { "SmartFormat.Extensions.StringSource", 3000 },
             { "SmartFormat.Extensions.ListFormatter", 4000 },
             { "SmartFormat.Extensions.DictionarySource", 5000 },
             { "SmartFormat.Extensions.ValueTupleSource", 6000 },
-            { "SmartFormat.Extensions.SystemTextJsonSource", 7000},
-            { "SmartFormat.Extensions.NewtonsoftJsonSource", 8000},
+            { "SmartFormat.Extensions.SystemTextJsonSource", 7000 },
+            { "SmartFormat.Extensions.NewtonsoftJsonSource", 8000 },
             { "SmartFormat.Extensions.XmlSource", 9000 },
-            { "SmartFormat.Extensions.ReflectionSource", 10000},
-            { "SmartFormat.Extensions.DefaultSource", 11000}
+            { "SmartFormat.Extensions.ReflectionSource", 10000 },
+            { "SmartFormat.Extensions.DefaultSource", 11000 }
         };
 
         /// <summary>
         /// Well-known <see cref="IFormatter"/> implementations in the sequence how they should (not must!) be invoked.
         /// </summary>
-        public static Dictionary<string, int> Formatters = new(StringComparer.InvariantCulture)
+        public static Dictionary<string, int> Formatters { get; } = new(StringComparer.InvariantCulture)
         {
             { "SmartFormat.Extensions.ListFormatter", 1000 },
             { "SmartFormat.Extensions.PluralLocalizationFormatter", 2000 },
@@ -81,7 +80,7 @@ namespace SmartFormat.Extensions
                 var found = wellKnownList.TryGetValue(currentExtensions[i].GetType().FullName, out var index);
                 if (!found) continue;
 
-                if (found && index > indexOfNewExt)
+                if (index > indexOfNewExt)
                     continue;
 
                 return i + 1;
