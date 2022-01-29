@@ -244,6 +244,12 @@ namespace SmartFormat.Tests.Extensions
 
             actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
             Assert.AreEqual("person", actualResult);
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes}", new string[3], "several");
+            Assert.AreEqual("plusieurs personnes", actualResult);
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes|beaucoup de personnes}", new string[3], "several");
+            Assert.AreEqual("beaucoup de personnes", actualResult);
         }
 
         [Test]
