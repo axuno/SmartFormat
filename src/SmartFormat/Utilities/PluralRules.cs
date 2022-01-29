@@ -9,6 +9,7 @@ using System.Collections.Generic;
 namespace SmartFormat.Utilities
 {
 #pragma warning disable S3776 // disable sonar cognitive complexity warnings
+#pragma warning disable S3358 // disable sonar ternary operations warnings
 
     /// <summary>
     /// Assigns the ISO language code to a pluralization rule.
@@ -369,7 +370,7 @@ namespace SmartFormat.Utilities
         {
             return value % 1 == 0 && value >= min && value <= max;
         }
-
+#pragma warning restore S3358
 #pragma warning restore S3776
     }
 }
