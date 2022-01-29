@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 namespace SmartFormat.Utilities
 {
+#pragma warning disable S3776 // disable sonar cognitive complexity warnings
+
     /// <summary>
     /// Assigns the ISO language code to a pluralization rule.
     /// <see cref="PluralRules"/> are used by extensions like <c>TimeFormatter</c> and <c>PluralLocalizationFormatter</c>
@@ -367,5 +369,7 @@ namespace SmartFormat.Utilities
         {
             return value % 1 == 0 && value >= min && value <= max;
         }
+
+#pragma warning restore S3776
     }
 }
