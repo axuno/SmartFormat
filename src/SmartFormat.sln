@@ -27,8 +27,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Net", "SmartFor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Extensions.Time", "SmartFormat.Extensions.Time\SmartFormat.Extensions.Time.csproj", "{62553041-4606-47FC-B44E-8D6D51F23E22}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Extensions.Pluralization", "SmartFormat.Extensions.Pluralization\SmartFormat.Extensions.Pluralization.csproj", "{EEA13F33-8259-411E-8F59-7857B33A1CAE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,14 +131,6 @@ Global
 		{62553041-4606-47FC-B44E-8D6D51F23E22}.Release|Any CPU.Build.0 = Release|Any CPU
 		{62553041-4606-47FC-B44E-8D6D51F23E22}.Release|x86.ActiveCfg = Release|Any CPU
 		{62553041-4606-47FC-B44E-8D6D51F23E22}.Release|x86.Build.0 = Release|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Debug|x86.Build.0 = Debug|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Release|x86.ActiveCfg = Release|Any CPU
-		{EEA13F33-8259-411E-8F59-7857B33A1CAE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

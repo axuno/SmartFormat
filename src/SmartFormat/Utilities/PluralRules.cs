@@ -199,10 +199,16 @@ namespace SmartFormat.Utilities
 
         private static PluralRuleDelegate DualOneOther => (value, pluralWordsCount) =>
         {
-            if (pluralWordsCount == 2) return value == 1 ? 0 : 1;
-            if (pluralWordsCount == 3) return value == 0 ? 0 : value == 1 ? 1 : 2;
-            if (pluralWordsCount == 4) return value < 0 ? 0 : value == 0 ? 1 : value == 1 ? 2 : 3;
-            return -1;
+            return pluralWordsCount switch {
+                2 => value == 1 ? 0 : 1,
+                3 => value switch {
+                    0 => 0,
+                    1 => 1,
+                    _ => 2
+                },
+                4 => value < 0 ? 0 : value == 0 ? 1 : value == 1 ? 2 : 3,
+                _ => -1
+            };
         }; // Dual: one (n == 1), other
 
         private static PluralRuleDelegate DualWithZero =>
@@ -221,34 +227,23 @@ namespace SmartFormat.Utilities
 
         private static int GetWordsCount3Value(decimal n)
         {
-            switch (n)
-            {
-                case 0:
-                    return 0;
-                case > 0 and < 2:
-                    return 1;
-                case > 2:
-                    return 2;
-                default:
-                    return -1;
-            }
+            return n switch {
+                0 => 0,
+                > 0 and < 2 => 1,
+                > 2 => 2,
+                _ => -1
+            };
         }
 
         private static int GetWordsCount4Value(decimal n)
         {
-            switch (n)
-            {
-                case < 0:
-                    return 0;
-                case 0:
-                    return 1;
-                case > 0 and < 2:
-                    return 2;
-                case > 2:
-                    return 3;
-                default:
-                    return -1;
-            }
+            return n switch {
+                < 0 => 0,
+                0 => 1,
+                > 0 and < 2 => 2,
+                > 2 => 3,
+                _ => -1
+            };
         }
         
         private static PluralRuleDelegate TripleOneTwoOther => (value, pluralWordsCount) => value == 1 ? 0 : value == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
@@ -264,23 +259,29 @@ namespace SmartFormat.Utilities
             (value % 100).Between(11, 99) ? 4 : // many
             5; // other
         private static PluralRuleDelegate Breton => (value, pluralWordsCount) =>
-            value == 0 ? 0 : // zero
-            value == 1 ? 1 : // one
-            value == 2 ? 2 : // two
-            value == 3 ? 3 : // few
-            value == 6 ? 4 : // many
-            5; // other
+            value switch
+            {
+                0 => 0, // zero
+                1 => 1, // one
+                2 => 2, // two
+                3 => 3, // few
+                6 => 4, // many
+                _ => 5  // other
+            }; 
         private static PluralRuleDelegate Czech => (value, pluralWordsCount) =>
             value == 1 ? 0 : // one
             value.Between(2, 4) ? 1 : // few
             2;
         private static PluralRuleDelegate Welsh => (value, pluralWordsCount) =>
-            value == 0 ? 0 : // zero
-            value == 1 ? 1 : // one
-            value == 2 ? 2 : // two
-            value == 3 ? 3 : // few
-            value == 6 ? 4 : // many
-            5;
+            value switch
+            {
+                0 => 0, // zero
+                1 => 1, // one
+                2 => 2, // two
+                3 => 3, // few
+                6 => 4, // many
+                _ => 5  // other
+            };
         private static PluralRuleDelegate Manx => (value, pluralWordsCount) =>
             (value % 10).Between(1, 2) || value % 20 == 0
                 ? 0
@@ -288,7 +289,7 @@ namespace SmartFormat.Utilities
                 1;
         private static PluralRuleDelegate Langi => (value, pluralWordsCount) =>
             value == 0 ? 0 : // zero
-            value > 0 && value < 2 ? 1 : // one
+            value is > 0 and < 2 ? 1 : // one
             2;
         private static PluralRuleDelegate Lithuanian => (value, pluralWordsCount) =>
             value % 10 == 1 && !(value % 100).Between(11, 19) ? 0 : // one

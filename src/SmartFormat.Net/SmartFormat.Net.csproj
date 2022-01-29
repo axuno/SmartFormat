@@ -57,7 +57,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SmartFormat.Extensions.Pluralization\SmartFormat.Extensions.Pluralization.csproj" />
         <ProjectReference Include="..\SmartFormat.Extensions.Time\SmartFormat.Extensions.Time.csproj" />
         <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
         <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />

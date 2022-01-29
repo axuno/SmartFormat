@@ -85,12 +85,6 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_English_Unsigned()
         {
-            /**
-             * Different pattern for this test because simply casting ints to u* types
-             * for use in TestCase or ExpectedResults will pass with the old code
-             * but actually declaring them as u* doesn't.
-             */
-
             var smart = GetFormatter();
             const string format = "There {0:plural(en):is|are} {0} {0:plural(en):item|items} remaining";
 

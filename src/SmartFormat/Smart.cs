@@ -101,12 +101,28 @@ namespace SmartFormat
         public static SmartFormatter Default { get; set; } = CreateDefaultSmartFormat();
 
         /// <summary>
-        /// Creates a <see cref="SmartFormatter"/> with core extensions registered.
+        /// Creates a new <see cref="SmartFormatter"/> instance with core extensions registered.
         /// For optimized performance, create a <see cref="SmartFormatter"/> instance and register the
         /// particular extensions that are really needed.
+        /// <para>
+        /// See <see cref="WellKnownExtensionTypes.Formatters"/> and <see cref="WellKnownExtensionTypes.Sources"/>
+        /// for a complete list of well-known types.
+        /// </para>
         /// </summary>
         /// <param name="settings">The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.</param>
-        /// <returns>A <see cref="SmartFormatter"/> with core extensions registered.</returns>
+        /// <returns>A <see cref="SmartFormatter"/> with core extensions registered:
+        /// <para>
+        /// <see cref="ISource"/>s:
+        /// <see cref="StringSource"/>, <see cref="ListFormatter"/>, <see cref="DictionarySource"/>,
+        /// <see cref="ValueTupleSource"/>, <see cref="ReflectionSource"/>, <see cref="DefaultSource"/>.
+        /// </para>
+        /// <para>
+        /// <see cref="IFormatter"/>s:
+        /// <see cref="ListFormatter"/>, <see cref="PluralLocalizationFormatter"/>,
+        /// <see cref="ConditionalFormatter"/>, <see cref="IsMatchFormatter"/>, <see cref="NullFormatter"/>,
+        /// <see cref="ChooseFormatter"/>, <see cref="SubStringFormatter"/>, <see cref="DefaultFormatter"/>.
+        /// </para>
+        /// </returns>
         public static SmartFormatter CreateDefaultSmartFormat(SmartSettings? settings = null)
         {
             // Register all default extensions here:
@@ -118,23 +134,18 @@ namespace SmartFormat
                 new ListFormatter(),
                 new DictionarySource(),
                 new ValueTupleSource(),
-                //new SystemTextJsonSource(),
-                //new NewtonsoftJsonSource(),
-                //new XmlSource(),
                 new ReflectionSource(),
-
-                // The DefaultSource reproduces the string.Format behavior:
+                // for string.Format behavior
                 new DefaultSource()
             )
             .AddExtensions(
-                //new PluralLocalizationFormatter(),
+                new PluralLocalizationFormatter(),
                 new ConditionalFormatter(),
                 new IsMatchFormatter(),
                 new NullFormatter(),
-                //new TimeFormatter(),
-                //new XElementFormatter(),
                 new ChooseFormatter(),
                 new SubStringFormatter(),
+                // for string.Format behavior
                 new DefaultFormatter()
             );
 
