@@ -1,7 +1,7 @@
 Latest Changes
 ====
 
-What's new in v3.0.0-alpha.5
+What's new in v3.0.0-rc.1
 ====
 
 Changes to release v2.7.x
