@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using SmartFormat.Core.Extensions;
 
@@ -40,28 +41,33 @@ namespace SmartFormat.Extensions
                 // Note: Operators are processed by ListFormatter
                 
                 JObject jObject => TryEvaluateJObject(jObject, selectorInfo),
-                JValue jValue => TryEvaluateJValue(jValue, selectorInfo),
+                JToken jToken => TryEvaluateJToken(jToken, selectorInfo), // JValue derives from JToken
                 _ => false
             };
         }
 
         private static bool TryEvaluateJObject(JObject jsonObject, ISelectorInfo selectorInfo)
         {
-            var jToken = jsonObject.GetValue(selectorInfo.SelectorText,
+            var jsonToken = jsonObject.GetValue(selectorInfo.SelectorText,
                 selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison());
 
-            selectorInfo.Result = jToken?.Type switch {
-                null => throw new FormatException($"'{selectorInfo.SelectorText}'"),
-                JTokenType.Null => null,
-                _ => jToken
-            };
-
-            return true;
+            return jsonToken is not null && TryEvaluateJToken(jsonToken, selectorInfo);
         }
 
-        private static bool TryEvaluateJValue(JValue jsonValue, ISelectorInfo selectorInfo)
+        private static bool TryEvaluateJToken(JToken jsonToken, ISelectorInfo selectorInfo)
         {
-            selectorInfo.Result = jsonValue;
+            selectorInfo.Result = jsonToken.Type switch {
+                JTokenType.Null => null,
+                JTokenType.Boolean => jsonToken.Value<bool>(),
+                JTokenType.Integer => jsonToken.Value<int>(),
+                JTokenType.Float => jsonToken.Value<float>(),
+                JTokenType.String => jsonToken.Value<string>(),
+                JTokenType.Object => jsonToken.Value<object>(),
+                JTokenType.Array => jsonToken.ToObject<List<object>>(),
+                JTokenType.Date => jsonToken.Value<DateTime>(),
+                JTokenType.TimeSpan => jsonToken.Value<TimeSpan>(),
+                _ => jsonToken
+            };
             return true;
         }
     }

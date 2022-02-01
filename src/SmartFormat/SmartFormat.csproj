@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.</Description>
+        <Description>This package contains the core SmartFormat assemblies with core extensions built-in.
+
+SmartFormat is a string composition library written in C#.
+It can format various data sources into a string with a minimal, intuitive syntax. 
+It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
+        </Description>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>
-        <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
-        <SignAssembly>true</SignAssembly>
-        <PackageId>SmartFormat.NET</PackageId>
+        <PackageId>SmartFormat</PackageId>
         <PackageReleaseNotes>See the change log for details of this release:
 https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md
 Give it a try.
@@ -19,22 +20,43 @@ Give it a try.
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
+        <PackageTags>string-format stringformat string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Nullable>enable</Nullable>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
         <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
         <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-        <!-- EmbedUntrackedSources for deterministic build -->
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
 
     <PropertyGroup>
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="\" />
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Memory" Version="4.5.4" />
+        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,8 +70,6 @@ Give it a try.
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <WarningLevel>3</WarningLevel>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <DefineConstants>RELEASE</DefineConstants>
     </PropertyGroup>
 
@@ -63,21 +83,10 @@ Give it a try.
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="System.Memory" Version="4.5.4" />
-        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-        <PackageReference Include="System.Text.Json" Version="4.7.2" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj">
             <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
             <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-          <IncludeAssets>SmartFormat.ZString.dll</IncludeAssets>
+            <IncludeAssets>SmartFormat.ZString.dll</IncludeAssets>
         </ProjectReference>
     </ItemGroup>
 

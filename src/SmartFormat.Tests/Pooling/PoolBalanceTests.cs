@@ -50,10 +50,9 @@ namespace SmartFormat.Tests.Pooling
             const string listPlaceholders = "Total items: {0.Count}. All items: {0:list:{}|, |, and }";
             var list = new List<int> { 1, 2, 3 };
             
-            var smart = new SmartFormatter();
-            var listSourceAndFormat = new ListFormatter();
-            smart.AddExtensions(listSourceAndFormat, new StringSource(), new ReflectionSource(), new DefaultSource());
-            smart.AddExtensions(listSourceAndFormat, new DefaultFormatter());
+            var smart = new SmartFormatter()
+                .AddExtensions(new ListFormatter(), new StringSource(), new ReflectionSource(), new DefaultSource())
+                .AddExtensions(new DefaultFormatter());
 
             // Do some formatting work
             for (var i = 0; i < 4; i++)

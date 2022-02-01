@@ -1,9 +1,9 @@
-version: 3.0.0.{build}
+version: 3.0.0.{build}  # Only change for mayor versions (e.g. 4.0.0)
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
   - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2019
+    appveyor_build_worker_image: Visual Studio 2022
   - job_name: linux
     appveyor_build_worker_image: Ubuntu
 matrix:
@@ -20,7 +20,7 @@ for:
     build_script:
       - ps: cd $env:APPVEYOR_BUILD_FOLDER\src
       - ps: dotnet --version
-      - ps: dotnet restore --verbosity quiet
+      - ps: dotnet restore SmartFormat.sln --verbosity quiet
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
       - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
       - ps: |
@@ -33,7 +33,7 @@ for:
 
           # Only pack for the main project, exclude forks
           if ($env:APPVEYOR_PROJECT_SLUG -eq 'smartformat')  {
-              dotnet pack SmartFormat --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
+              dotnet pack SmartFormat.Deploy.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
           }
     test_script:
       - cmd: nuget install Appveyor.TestLogger
@@ -42,7 +42,9 @@ for:
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net5.0.xml" -n net5.0win
     artifacts:
       - path: 'artifacts\*.nupkg'
+        type: NuGetPackage
       - path: 'artifacts\*.snupkg'
+        type: NuGetPackage
     deploy:
       - provider: NuGet
         api_key:
@@ -56,8 +58,8 @@ for:
     build_script:
       - cd $APPVEYOR_BUILD_FOLDER/src
       - dotnet --version
-      - dotnet sln remove ./Demo/Demo.csproj ./Demo.NetFramework/Demo.NetFramework.csproj
-      - dotnet restore --verbosity quiet
+      - dotnet sln SmartFormat.sln remove ./Demo/Demo.csproj ./Demo.NetFramework/Demo.NetFramework.csproj
+      - dotnet restore SmartFormat.sln --verbosity quiet
       - dotnet add ./SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
       - dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:

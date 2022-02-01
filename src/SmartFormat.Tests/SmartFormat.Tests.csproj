@@ -35,8 +35,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SmartFormat.Net\SmartFormat.Net.csproj" />
         <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
-        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
     </ItemGroup>
 
 	<ItemGroup>
@@ -61,6 +61,10 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LocTest2.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Extensions.Pluralization\" />
 	</ItemGroup>
 
 </Project>

@@ -83,14 +83,22 @@ namespace SmartFormat.Core.Settings
             set => Parser.ConvertCharacterStringLiterals = value;
         }
 
-        internal IEqualityComparer<string> GetCaseSensitivityComparer()
+        /// <summary>
+        /// Gets the <see cref="StringComparer"/> that belongs to the <see cref="CaseSensitivity"/> setting.
+        /// </summary>
+        /// <returns>The <see cref="StringComparer"/> that belongs to the <see cref="CaseSensitivity"/> setting.</returns>
+        public IEqualityComparer<string> GetCaseSensitivityComparer()
         {
             return CaseSensitivity == CaseSensitivityType.CaseSensitive
                 ? StringComparer.Ordinal
                 : StringComparer.OrdinalIgnoreCase;
         }
 
-        internal StringComparison GetCaseSensitivityComparison()
+        /// <summary>
+        /// Gets the <see cref="StringComparison"/> that belongs to the <see cref="CaseSensitivity"/> setting.
+        /// </summary>
+        /// <returns>The <see cref="StringComparison"/> that belongs to the <see cref="CaseSensitivity"/> setting.</returns>
+        public StringComparison GetCaseSensitivityComparison()
         {
             return CaseSensitivity == CaseSensitivityType.CaseSensitive
                 ? StringComparison.Ordinal

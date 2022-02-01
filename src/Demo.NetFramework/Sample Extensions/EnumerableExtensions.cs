@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-// This file is for any extensions that might apply to IEnumerable, ICollection, or IList.
-namespace SmartFormat.Tests.TestUtils
+namespace SmartFormat.Demo.Sample_Extensions
 {
     public static class EnumerableExtensions
     {
@@ -325,6 +324,5 @@ namespace SmartFormat.Tests.TestUtils
         }
 
         #endregion
-
     }
 }

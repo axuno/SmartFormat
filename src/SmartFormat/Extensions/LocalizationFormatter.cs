@@ -18,7 +18,6 @@ namespace SmartFormat.Extensions
     public class LocalizationFormatter : IFormatter, IInitializer
     {
         private SmartFormatter? _formatter;
-        private readonly bool _canHandleAutoDetection = false;
         
         /// <summary>
         /// Storage for localized versions of <see cref="Format"/>s
@@ -36,19 +35,16 @@ namespace SmartFormat.Extensions
 
         /// <inheritdoc/>
         /// <remarks>
-        /// <see cref="TemplateFormatter"/> never can handle auto-detection.
+        /// <see cref="LocalizationFormatter"/> never can handle auto-detection.
         /// </remarks>
         /// <exception cref="ArgumentException"></exception>
         public bool CanAutoDetect
         {
-            get
-            {
-                return _canHandleAutoDetection;
-            }
+            get => false;
 
             set
             {
-                if (value) throw new ArgumentException($"{nameof(TemplateFormatter)} cannot handle auto-detection");
+                if (value) throw new ArgumentException($"{nameof(LocalizationFormatter)} cannot handle auto-detection");
             }
         }
 
