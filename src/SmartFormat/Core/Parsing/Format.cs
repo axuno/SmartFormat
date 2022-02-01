@@ -173,12 +173,8 @@ namespace SmartFormat.Core.Parsing
         {
             start = StartIndex + start;
             var end = start + length;
-            // Validate the arguments:
-            if (start < StartIndex || start > EndIndex)
-                throw new ArgumentOutOfRangeException(nameof(start));
-            if (end > EndIndex)
-                throw new ArgumentOutOfRangeException(nameof(length));
-
+            ValidateArguments(start, length);
+            
             // If startIndex and endIndex already match this item, we're done:
             if (start == StartIndex && end == EndIndex) return this;
 
@@ -208,6 +204,15 @@ namespace SmartFormat.Core.Parsing
             }
 
             return substring;
+        }
+
+        private void ValidateArguments(int start, int length)
+        {
+            var end = start + length;
+            if (start < StartIndex || start > EndIndex)
+                throw new ArgumentOutOfRangeException(nameof(start));
+            if (end > EndIndex)
+                throw new ArgumentOutOfRangeException(nameof(length));
         }
 
         #endregion

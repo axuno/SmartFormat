@@ -151,10 +151,10 @@ namespace SmartFormat.Tests.Extensions
                 tasks.Add(Task.Factory.StartNew(val =>
                 {
                     Thread.Sleep(5 * (int)(val ?? 100));
-                    var smart = new SmartFormatter();
-                    smart.AddExtensions(new StringSource(), new ListFormatter(), new DefaultSource());
-                    smart.AddExtensions(new ListFormatter(), new DefaultFormatter());
-                    string ret = smart.Format(format, wheres);
+                    var smart = new SmartFormatter()
+                        .AddExtensions(new StringSource(), new ListFormatter(), new DefaultSource())
+                        .AddExtensions(new DefaultFormatter());
+                    var ret = smart.Format(format, wheres);
                     
                     Thread.Sleep(5 * (int)(val ?? 100)); /* add some delay to force ThreadPool swapping */
                     return ret;
@@ -179,11 +179,10 @@ namespace SmartFormat.Tests.Extensions
         public void Objects_Not_Implementing_IList_Are_Not_Processed()
         {
             var items = new[] { "one", "two", "three" };
-            
-            var formatter = new SmartFormatter();
-            var listFormatter = new ListFormatter();
-            formatter.AddExtensions((ISource) listFormatter, new DefaultSource());
-            formatter.AddExtensions((IFormatter)listFormatter, new DefaultFormatter());
+
+            var formatter = new SmartFormatter()
+                .AddExtensions(new ListFormatter(), new DefaultSource())
+                .AddExtensions(new DefaultFormatter());
 
             Assert.AreEqual("one, two, and three", formatter.Format("{0:list:{}|, |, and }", new object[] { items }));
         }
@@ -213,9 +212,8 @@ namespace SmartFormat.Tests.Extensions
         public void Should_Return_Indexed_List_Element(string? listElement, string expected)
         {
             var smart = new SmartFormatter();
-            var listSourceAndFormat = new ListFormatter();
-            smart.AddExtensions(listSourceAndFormat, new DefaultSource(), new ReflectionSource());
-            smart.AddExtensions(listSourceAndFormat, new DefaultFormatter());
+            smart.AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource());
+            smart.AddExtensions(new DefaultFormatter());
             
             var numbers = new List<string?> {"dummy", listElement};
 
@@ -230,11 +228,9 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Null_IList_Nullable_Should_Return_Null()
         {
-            var smart = new SmartFormatter();
-            var listSourceAndFormatter = new ListFormatter();
-            smart.AddExtensions(listSourceAndFormatter, new DefaultSource(), new ReflectionSource());
-            smart.AddExtensions(listSourceAndFormatter, new DefaultFormatter());
-            smart = Smart.CreateDefaultSmartFormat();
+            var smart = new SmartFormatter()
+                .AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource())
+                .AddExtensions(new DefaultFormatter());
             
             var data = new {Numbers = default(object)};
             var indexResult1 = smart.Format(">{Numbers?.0}<", data); // index method 1

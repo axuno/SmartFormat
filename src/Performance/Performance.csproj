@@ -13,6 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SmartFormat.Extensions.Newtonsoft.Json\SmartFormat.Extensions.Newtonsoft.Json.csproj" />
+    <ProjectReference Include="..\SmartFormat.Extensions.System.Text.Json\SmartFormat.Extensions.System.Text.Json.csproj" />
     <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
     <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
   </ItemGroup>

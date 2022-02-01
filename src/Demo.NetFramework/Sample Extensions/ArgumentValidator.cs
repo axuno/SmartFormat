@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace SmartFormat.Tests.TestUtils
+namespace SmartFormat.Demo.Sample_Extensions
 {
     public class ArgumentValidator
     {

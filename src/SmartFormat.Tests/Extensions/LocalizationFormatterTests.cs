@@ -14,18 +14,19 @@ namespace SmartFormat.Tests.Extensions
     {
         private static SmartFormatter GetFormatterWithRegisteredResource(CaseSensitivityType caseSensitivity = CaseSensitivityType.CaseSensitive, FormatErrorAction formatErrorAction = FormatErrorAction.ThrowError)
         {
-            var formatter = new LocalizationFormatter {CanAutoDetect = false};
+            var localizationFormatter = new LocalizationFormatter {CanAutoDetect = false};
             var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
-            {
-                CaseSensitivity = caseSensitivity,
-                Localization =
                 {
-                    LocalizationProvider = new LocalizationProvider(true, LocTest1.ResourceManager)
-                        { FallbackCulture = null, ReturnNameIfNotFound = false }
-                },
-                Formatter = { ErrorAction = formatErrorAction }
-            });
-            smart.AddExtensions(formatter);
+                    CaseSensitivity = caseSensitivity,
+                    Localization =
+                    {
+                        LocalizationProvider = new LocalizationProvider(true, LocTest1.ResourceManager)
+                            { FallbackCulture = null, ReturnNameIfNotFound = false }
+                    },
+                    Formatter = { ErrorAction = formatErrorAction }
+                })
+                .AddExtensions(localizationFormatter)
+                .AddExtensions(new PluralLocalizationFormatter());
 
             return smart;
         }

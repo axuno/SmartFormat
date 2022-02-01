@@ -3,11 +3,10 @@
 // Licensed under the MIT license.
 // 
 
-using System;
 using System.Collections.Generic;
-using System.Globalization;
+using SmartFormat.Utilities;
 
-namespace SmartFormat.Utilities
+namespace SmartFormat.Extensions.Time.Utilities
 {
     /// <summary>
     /// The class contains <see cref="TimeTextInfo"/> definitions for common languages.

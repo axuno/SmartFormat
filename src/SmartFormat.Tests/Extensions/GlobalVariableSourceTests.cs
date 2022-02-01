@@ -21,11 +21,11 @@ namespace SmartFormat.Tests.Extensions
 
             var smart1 = new SmartFormatter();
             smart1.FormatterExtensions.Add(new DefaultFormatter());
-            smart1.AddExtensions(0, GlobalVariablesSource.Instance);
+            smart1.InsertExtension(0, GlobalVariablesSource.Instance);
 
             var smart2 = new SmartFormatter();
             smart2.FormatterExtensions.Add(new DefaultFormatter());
-            smart2.AddExtensions(0, GlobalVariablesSource.Instance);
+            smart2.InsertExtension(0, GlobalVariablesSource.Instance);
 
             var result1 = smart1.Format(formatString);
             var result2 = smart2.Format(formatString);

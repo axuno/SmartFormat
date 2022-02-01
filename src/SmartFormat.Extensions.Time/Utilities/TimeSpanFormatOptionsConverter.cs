@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace SmartFormat.Utilities
+namespace SmartFormat.Extensions.Time.Utilities
 {
     internal static class TimeSpanFormatOptionsConverter
     {

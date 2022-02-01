@@ -76,88 +76,113 @@ namespace SmartFormat
         public IReadOnlyList<IFormatter> GetFormatterExtensions() => _formatterExtensions.AsReadOnly();
 
         /// <summary>
-        /// Adds the extensions at the beginning of the <see cref="SourceExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
-        /// Each extension must implement <see cref="ISource"/>.
+        /// Adds <see cref="ISource"/> extensions to the <see cref="GetSourceExtensions()"/> list of this formatter,
+        /// if the <see cref="Type"/> has not been added before. <see cref="WellKnownExtensionTypes.Sources"/> are inserted
+        /// at the recommended position, all others are added at the end of the list.
+        /// <para>
         /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </para>
+        /// <para>
+        /// Extensions implementing <see cref="ISource"/> <b>and</b> <see cref="IFormatter"/>
+        /// will be auto-registered for both.
+        /// </para>
         /// </summary>
-        public void AddExtensions(params ISource[] sourceExtensions)
-        {
-            AddExtensions(0, sourceExtensions);
-        }
-
-        /// <summary>
-        /// Adds the extensions at the <paramref name="position"/> of the <see cref="SourceExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
-        /// Each extension must implement <see cref="ISource"/>.
-        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
-        /// </summary>
-        /// <param name="position">The position in the <see cref="SourceExtensions"/> list where new extensions will be added.</param>
-        /// <param name="sourceExtensions"></param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        ///        <paramref name="position" /> is less than 0.
-        ///         -or-
-        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
-        /// </exception>
-        public void AddExtensions(int position, params ISource[] sourceExtensions)
+        /// <param name="sourceExtensions"><see cref="ISource"/> extensions in an arbitrary order.</param>
+        /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
+        public SmartFormatter AddExtensions(params ISource[] sourceExtensions)
         {
             foreach (var source in sourceExtensions)
             {
-                if (_sourceExtensions.Any(sx => sx.GetType() == source.GetType())) continue;
+                var index = WellKnownExtensionTypes.GetIndexToInsert(SourceExtensions, source);
+                _ = InsertExtension(index, source);
 
-                if(source is IInitializer sourceToInitialize) 
-                    sourceToInitialize.Initialize(this);
-                    
-                _sourceExtensions.Insert(position, source);
-                position++;
+                // Also add the class as a formatter, if possible
+                if (source is IFormatter formatter && FormatterExtensions.All(fx => fx.GetType() != formatter.GetType())) AddExtensions(formatter);
             }
+
+            return this;
         }
 
         /// <summary>
-        /// Adds the extensions at the beginning of the <see cref="FormatterExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
-        /// Each extension must implement <see cref="IFormatter"/>.
+        /// Adds <see cref="IFormatter"/> extensions to the <see cref="GetFormatterExtensions()"/> list of this formatter,
+        /// if the <see cref="Type"/> has not been added before. <see cref="WellKnownExtensionTypes.Formatters"/> are inserted
+        /// at the recommended position, all others are added at the end of the list.
+        /// <para>
         /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </para>
+        /// <para>
+        /// Extensions implementing <see cref="ISource"/> <b>and</b> <see cref="IFormatter"/>
+        /// will be auto-registered for both.
+        /// </para>
         /// </summary>
-        /// <param name="formatterExtensions"></param>
-        /// <exception cref="T:System.ArgumentException">
-        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Name"/> that already exist.
-        /// </exception>
-        public void AddExtensions(params IFormatter[] formatterExtensions)
+        /// <param name="formatterExtensions"><see cref="ISource"/> extensions in an arbitrary order.</param>
+        /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
+        public SmartFormatter AddExtensions(params IFormatter[] formatterExtensions)
         {
-            AddExtensions(0, formatterExtensions);
+            foreach (var formatter in formatterExtensions)
+            {
+                var index = WellKnownExtensionTypes.GetIndexToInsert(FormatterExtensions, formatter);
+                _ = InsertExtension(index, formatter);
+
+                // Also add the class as a source, if possible
+                if (formatter is ISource source && SourceExtensions.All(sx => sx.GetType() != source.GetType())) AddExtensions(source);
+            }
+
+            return this;
         }
 
         /// <summary>
-        /// Adds the extensions at the <paramref name="position"/> of the <see cref="FormatterExtensions"/> list of this formatter, if the <see cref="Type"/> has not been added before.
-        /// Each extension must implement <see cref="IFormatter"/>.
+        /// Adds the <see cref="ISource"/> extensions at the <paramref name="position"/> of the <see cref="GetSourceExtensions()"/> list of this formatter,
+        /// if the <see cref="Type"/> has not been added before.
         /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
         /// </summary>
-        /// <param name="formatterExtensions"></param>
-        /// <param name="position">The position in the <see cref="FormatterExtensions"/> list where new extensions will be added.</param>
+        /// <param name="position">The position in the <see cref="SourceExtensions"/> list where new extensions will be added.</param>
+        /// <param name="sourceExtension"></param>
+        /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
         /// <exception cref="T:System.ArgumentOutOfRangeException">
         ///        <paramref name="position" /> is less than 0.
         ///         -or-
         ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
-        ///        <paramref name="formatterExtensions" /> have <see cref="IFormatter.Name"/> that already exist.
-        /// </exception>
-        public void AddExtensions(int position, params IFormatter[] formatterExtensions)
+        public SmartFormatter InsertExtension(int position, ISource sourceExtension)
         {
-            foreach (var format in formatterExtensions)
-            {
-                // Extension type exists
-                if (_formatterExtensions.Any(fx => fx.GetType() == format.GetType())) 
-                    continue;
-                
-                // Extension name exists
-                if(_formatterExtensions.Any(fx => fx.Name.Equals(format.Name)))
-                    throw new ArgumentException($"Formatter '{format.GetType().Name}' uses existing name.", nameof(formatterExtensions));
+            if (_sourceExtensions.Any(sx => sx.GetType() == sourceExtension.GetType())) return this;
 
-                if(format is IInitializer sourceToInitialize) 
-                    sourceToInitialize.Initialize(this);
+            if (sourceExtension is IInitializer sourceToInitialize)
+                sourceToInitialize.Initialize(this);
 
-                _formatterExtensions.Insert(position, format);
-                position++;
-            }
+            _sourceExtensions.Insert(position, sourceExtension);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ISource"/> extensions at the <paramref name="position"/> of the <see cref="GetSourceExtensions()"/> list of this formatter,
+        /// if the <see cref="Type"/> has not been added before.
+        /// If the extension implements <see cref="IInitializer"/>, <see cref="IInitializer.Initialize"/> will be invoked.
+        /// </summary>
+        /// <param name="position">The position in the <see cref="SourceExtensions"/> list where new extensions will be added.</param>
+        /// <param name="formatterExtension"></param>
+        /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        ///        <paramref name="position" /> is less than 0.
+        ///         -or-
+        ///         <paramref name="position" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.
+        /// </exception>
+        public SmartFormatter InsertExtension(int position, IFormatter formatterExtension)
+        {
+            if (_formatterExtensions.Any(sx => sx.GetType() == formatterExtension.GetType())) return this;
+
+            // Extension name is in use by a different type
+            if(_formatterExtensions.Any(fx => fx.Name.Equals(formatterExtension.Name)))
+                throw new ArgumentException($"Formatter '{formatterExtension.GetType().Name}' uses existing name.", nameof(formatterExtension));
+
+            if (formatterExtension is IInitializer formatterToInitialize)
+                formatterToInitialize.Initialize(this);
+
+            _formatterExtensions.Insert(position, formatterExtension);
+
+            return this;
         }
 
         /// <summary>

@@ -18,9 +18,9 @@ namespace SmartFormat.Tests.Core
 
         private static SmartFormatter GetSimpleFormatter()
         {
-            var formatter = new SmartFormatter(); 
-            formatter.AddExtensions(new DefaultFormatter());
-            formatter.AddExtensions(new ReflectionSource(), new DefaultSource());
+            var formatter = new SmartFormatter()
+                .AddExtensions(new DefaultFormatter())
+                .AddExtensions(new ReflectionSource(), new DefaultSource());
             return formatter;
         }
 
@@ -128,27 +128,6 @@ namespace SmartFormat.Tests.Core
             // {} and () must and can only be escaped inside options
             var format = @":\{{Name:choose(\(\{.Joe.\}\)):Joe|(.Not\:Joe.)}\}:";
             Assert.That(smart.Format(format, arg), Is.EqualTo(expected));
-        }
-
-        [TestCase(1, "There {People.Count:plural:is a person.|are {} people.}", false)]
-        [TestCase(2, "There {People.Count:plural:is a person.|are {} people.}", false)]
-        [TestCase(1, "There {People.Count:is a person.|are {} people.}", true)]
-        [TestCase(2, "There {People.Count:is a person.|are {} people.}", true)]
-        public void Nested_PlaceHolders_Pluralization(int numOfPeople, string format, bool markAsDefault)
-        {
-            var data = numOfPeople == 1
-                ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
-                : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
-            
-            var formatter = new SmartFormatter();
-            formatter.AddExtensions(new ReflectionSource());
-            // Note: If pluralization AND conditional formatters are registers, the formatter
-            //       name MUST be included in the format string, because both could return successful evaluation
-            // Here, we register only pluralization:
-            formatter.AddExtensions(new PluralLocalizationFormatter{CanAutoDetect = markAsDefault}, new DefaultFormatter());
-            var result = formatter.Format(CultureInfo.GetCultureInfo("en"), format, data);
-            
-            Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
         }
 
         [Test]

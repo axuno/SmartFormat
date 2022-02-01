@@ -6,21 +6,20 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1701;1702;1591</NoWarn>
-
         <!-- NuGet Packaging -->
-        <PackageVersion>$(Version)</PackageVersion>
+        <IsPackable>false</IsPackable>
         <Company>Cysharp</Company>
         <Authors>Cysharp</Authors>
         <Copyright>© Cysharp, Inc.</Copyright>
         <PackageTags>string;</PackageTags>
         <Description>Zero allocation StringBuilder for .NET Core and Unity.</Description>
-        <PackageProjectUrl>https://github.com/Cysharp/ZString</PackageProjectUrl>
-        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
-        <PackageIcon>../src/SmartFormat.ZString/repo/src/ZString/Icon.png</PackageIcon>
+        <PackageIcon>SmartFormat_365x365.png</PackageIcon>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">

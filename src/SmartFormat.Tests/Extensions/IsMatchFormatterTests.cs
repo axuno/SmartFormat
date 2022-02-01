@@ -18,8 +18,9 @@ namespace SmartFormat.Tests.Extensions
 
         public IsMatchFormatterTests()
         {
-            _formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
-            _formatter.AddExtensions(new IsMatchFormatter {RegexOptions = RegexOptions.CultureInvariant});
+            _formatter = Smart.CreateDefaultSmartFormat(new SmartSettings
+                    { Formatter = new FormatterSettings { ErrorAction = FormatErrorAction.ThrowError } })
+                .AddExtensions(new IsMatchFormatter { RegexOptions = RegexOptions.CultureInvariant });
         }
         
         [TestCase("{theKey:ismatch(^.+123.+$):Okay - {}|No match content}", RegexOptions.None, "Okay - Some123Content")]

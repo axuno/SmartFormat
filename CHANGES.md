@@ -409,11 +409,107 @@ var resultString = smart.Format(parsedFormat);
 parsedFormat.Dispose();
 ```
 
-### 23. Miscellaneous
+### 23. Packages ([#238](https://github.com/axuno/SmartFormat/pull/238))
+
+#### 23.1 Package overview
+
+SmartFormat has the following NuGet packages:
+
+**a) SmartFormat.NET**
+
+This is package which references all other packages below.
+
+**b) SmartFormat**
+
+SmartFormat is the core package. It comes with the most frequently used extensions built-in:
+
+  1) Source extensions:
+
+  * `GlobalVariablesSource`
+  * `PersistentVariablesSource`
+  * `StringSource` ✔️
+  * `ListFormatter` (implementing `ISource`) ✔️
+  * `DictionarySource` ✔️
+  * `ValueTupleSource` ✔️
+  * `ReflectionSource` ✔️
+  * `DefaultSource` ✔️
+
+  2) Formatter extensions:
+
+  * `ListFormatter` (implementing `IFormatter`) ✔️
+  * `PluralLocalizationFormatter` ✔️
+  * `ConditionalFormatter` ✔️
+  * `IsMatchFormatter` ✔️
+  * `NullFormatter` ✔️
+  * `LocalizationFormatter`
+  * `TemplateFormatter`
+  * `ChooseFormatter` ✔️
+  * `SubStringFormatter` ✔️
+  * `DefaultFormatter` ✔️
+
+> **Breaking change:**
+> 
+> Note that only extensions marked (✔️) are included when calling `Smart.CreateDefaultFormatter(...)`. These default extensions differ from previous versions.
+
+Some extensions (like `PersistentVariablesSource` and `TemplateFormatter`) require configuration to be useful.
+
+**c) SmartFormat.Extensions.System.Text.Json**
+
+This package is a SmartFormat extension for formatting `System.Text.Json` types as a source.
+
+**d) SmartFormat.Extensions.Newtonsoft.Json**
+
+This package is a SmartFormat extension for formatting `Newtonsoft.Json` types as a source.
+
+**e) SmartFormat.Extensions.Xml**
+
+This package is a SmartFormat extension for reading and formatting `System.Xml.Linq.XElement`s.
+
+**f) SmartFormat.Extensions.Time**
+
+This package is a SmartFormat extension for formatting `System.DateTime`, `System.DateTimeOffset` and `System.TimeSpan` types.
+
+#### 23.2 Add extensions to the `SmartFormatter`
+
+**a) The easy way**
+
+Call `Smart.CreateDefaultFormatter(...)` and get a ready-to-use `SmartFormatter`. The same happens under the hood when calling one of the `Smart.Format(...)` methods.
+
+**b) The tailor-made alternative**
+
+When it comes to performance, it is advisable to add only those specific extensions that are needed. Just like this:
+
+```CSharp
+var formatter = new SmartFormatter()
+    .AddExtensions(new ReflectionSource())
+    .AddExtensions(new PluralLocalizationFormatter(), new DefaultFormatter());
+```
+> **Breaking change:**
+>
+> In v3.0 all `WellKnownExtensionTypes.Sources` and `WellKnownExtensionTypes.Formatters` are *automatically* inserted to the extension list at the place *where they usually should be*.
+
+Any extension can, however, be inserted to the desired position in the extension list:
+* `SmartFormatter.InsertExtension(int position, IFormatter sourceExtension)`
+* `SmartFormatter.InsertExtension(int position, IFormatter formatterExtension)`
+
+This can be useful especially when adding your custom extensions. You should call `SmartFormatter.InsertExtension(...)` *after* `SmartFormatter.AddExtensions(...)`:
+
+```CSharp
+var formatter = new SmartFormatter()
+    .AddExtensions(new ReflectionSource())
+    .AddExtensions(new PluralLocalizationFormatter(), new DefaultFormatter())
+    .InsertExtension(0, new MyCustomFormatter());
+```
+
+### 24. Miscellaneous
    * Since [#228](https://github.com/axuno/SmartFormat/pull/228) there are no more `Cysharp.Text` classes used in the `SmartFormat` namespace
       * Created class `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
       * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
 
+v2.7.2
+===
+* **Fixed**: `ConditionalFormatter` processes unsigned numbers in arguments correctly.
+* **Fixed**: `JsonSource`: Corrected handling of `null` values in `Newtonsoft.Json` objects.
 
 v2.7.1
 ===
