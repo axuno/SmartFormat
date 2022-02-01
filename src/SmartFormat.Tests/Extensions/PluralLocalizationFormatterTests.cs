@@ -267,8 +267,8 @@ namespace SmartFormat.Tests.Extensions
                 ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
                 : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
             
-            var formatter = new SmartFormatter();
-            formatter.AddExtensions(new ReflectionSource())
+            var formatter = new SmartFormatter()
+                .AddExtensions(new ReflectionSource())
                 // Note: If pluralization AND conditional formatters are registered, the formatter
                 //       name MUST be included in the format string, because both could return successful automatic evaluation
                 // Here, we register only pluralization:
