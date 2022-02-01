@@ -82,9 +82,9 @@ namespace SmartFormat.Tests.Pooling
                 Parallel.For(1L, maxLoops, options, (i, loopState) =>
                 {
                     using var formatParsed = new Parser().ParseFormat("Number: {0:00000}");
-                    var smart = new SmartFormatter();
-                    smart.AddExtensions(new DefaultSource());
-                    smart.AddExtensions(new DefaultFormatter());
+                    var smart = new SmartFormatter()
+                        .AddExtensions(new DefaultSource())
+                        .AddExtensions(new DefaultFormatter());
                     list.Add(smart.Format(formatParsed, i));
                 }), Throws.Nothing);
 

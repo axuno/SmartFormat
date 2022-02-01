@@ -62,14 +62,7 @@ namespace SmartFormat.Extensions
                 return true;
             }
 
-            var startPos = int.Parse(parameters[0]);
-            var length = parameters.Length > 1 ? int.Parse(parameters[1]) : 0;
-            if (startPos < 0)
-                startPos = currentValue.Length + startPos;
-            if (startPos > currentValue.Length)
-                startPos = currentValue.Length;
-            if (length < 0)
-                length = currentValue.Length - startPos + length;
+            var (startPos, length) = GetStartAndLength(currentValue, parameters);
 
             switch(OutOfRangeBehavior)
             {
@@ -90,6 +83,20 @@ namespace SmartFormat.Extensions
             formattingInfo.Write(substring);
 
             return true;
+        }
+
+        private static (int startPos, int length) GetStartAndLength(string currentValue, string[] parameters)
+        {
+            var startPos = int.Parse(parameters[0]);
+            var length = parameters.Length > 1 ? int.Parse(parameters[1]) : 0;
+            if (startPos < 0)
+                startPos = currentValue.Length + startPos;
+            if (startPos > currentValue.Length)
+                startPos = currentValue.Length;
+            if (length < 0)
+                length = currentValue.Length - startPos + length;
+
+            return (startPos, length);
         }
 
         /// <summary>

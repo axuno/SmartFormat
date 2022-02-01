@@ -84,8 +84,7 @@ namespace SmartFormat.Tests.Core
         [TestCase(-10)]
         public void ListFormatter_NestedFormats_Alignment(int alignment)
         {
-            var smart = GetSimpleFormatter();
-            smart.AddExtensions((IFormatter) new ListFormatter());
+            var smart = GetSimpleFormatter().AddExtensions((IFormatter) new ListFormatter());
 
             var items = new [] { "one", "two", "three" };
             var result = smart.Format($"{{items,{alignment}:list:{{}}|, |, and }}", new { items }); // important: not only "items" as the parameter

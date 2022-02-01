@@ -11,9 +11,9 @@ namespace SmartFormat.Tests.Extensions
     {
         private static SmartFormatter GetFormatter(SmartSettings? settings = null)
         {
-            var smart = new SmartFormatter(settings ?? new SmartSettings());
-            smart.AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource());
-            smart.AddExtensions(new NullFormatter(), new ListFormatter(), new DefaultFormatter());
+            var smart = new SmartFormatter(settings ?? new SmartSettings())
+                .AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource())
+                .AddExtensions(new NullFormatter(), new ListFormatter(), new DefaultFormatter());
             return smart;
         }
 
@@ -72,8 +72,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase(123, 2000, "2,000.00")] // first + nested choose formatter, option 2
         public void May_Contain_Nested_Formats(int? nullableInt, int valueIfNotNull, string expected)
         {
-            var smart = GetFormatter();
-            smart.AddExtensions(new ChooseFormatter());
+            var smart = GetFormatter().AddExtensions(new ChooseFormatter());
             var data = new { NullableInt = nullableInt, IntValueIfNotNull = valueIfNotNull};
             var result = smart.Format(CultureInfo.InvariantCulture, "{NullableInt:isnull:Was null|{IntValueIfNotNull:choose(1000|2000):1k|{:N2}}}", data);
 

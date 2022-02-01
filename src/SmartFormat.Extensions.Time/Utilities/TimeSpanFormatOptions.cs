@@ -5,7 +5,7 @@
 
 using System;
 
-namespace SmartFormat.Utilities
+namespace SmartFormat.Extensions.Time.Utilities
 {
     /// <summary>
     /// <para>Determines all options for time formatting.</para>

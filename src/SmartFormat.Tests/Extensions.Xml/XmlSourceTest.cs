@@ -1,13 +1,23 @@
 ﻿using System.Xml.Linq;
+using FluentAssertions.Formatting;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Extensions
 {
     [TestFixture]
     public class XmlSourceTest
     {
+        private static SmartFormatter GetSmartFormatter(SmartSettings? settings = null)
+        {
+            var smart = Smart.CreateDefaultSmartFormat(settings ?? new SmartSettings())
+                .AddExtensions(new XElementFormatter())
+                .AddExtensions(new XmlSource());
+            return smart;
+        }
+
         public const string TwoLevelXml = "<root>" +
                                       "<Person>" +
                                       "  <FirstName>Joe</FirstName>" +
@@ -42,7 +52,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_SingleLevelXml_Replaced()
         {
             // arrange
-            var smart = Smart.CreateDefaultSmartFormat();
+            var smart = GetSmartFormatter();
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
             var res = smart.Format("Mr. {FirstName:xml:} {LastName:xml:}", xmlEl);
@@ -54,7 +64,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_SingleLevelXml_CanAccessWithIndex0()
         {
             // arrange
-            var smart = Smart.CreateDefaultSmartFormat();
+            var smart = GetSmartFormatter();
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
             var res = smart.Format("Mr. {FirstName.0:xml:}", xmlEl);
@@ -66,7 +76,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_XmlWithNamespaces_IgnoringNamespace()
         {
             // arrange
-            var smart = Smart.CreateDefaultSmartFormat();
+            var smart = GetSmartFormatter();
             var xmlEl = XElement.Parse(OneLevelXmlWithNameSpaces);
             // act
             var res = smart.Format("Mr. {FirstName:xml:} {LastName:xml:}", xmlEl);
@@ -77,7 +87,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Format_SingleLevelXml_TemplateWithCurlyBraces_Escaped()
         {
-            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings {StringFormatCompatibility = false});
+            var smart = GetSmartFormatter(new SmartSettings {StringFormatCompatibility = false});
             // arrange
             var xmlEl = XElement.Parse(OneLevelXml);
             // act
@@ -90,7 +100,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_MultipleElement_AccessibleByIndex()
         {
             // arrange
-            var smart = Smart.CreateDefaultSmartFormat();
+            var smart = GetSmartFormatter();
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
             var res = smart.Format("Mr. {FirstName.1:xml:} {LastName:xml:}", xmlEl);
@@ -102,7 +112,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_MultipleElement_WithoutIndexesReturnsFirst()
         {
             // arrange
-            var smart = Smart.CreateDefaultSmartFormat();
+            var smart = GetSmartFormatter();
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
             var res = smart.Format("Mr. {FirstName:xml:}", xmlEl);
@@ -114,7 +124,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_MultipleElement_FormatsCount()
         {
             // arrange
-            var smart = Smart.CreateDefaultSmartFormat();
+            var smart = GetSmartFormatter();
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
             var res = smart.Format("There{FirstName.Count:cond: is {} Doe | are {} Does}", xmlEl);
@@ -126,7 +136,7 @@ namespace SmartFormat.Tests.Extensions
         public void Format_MultipleElement_FormatsAsList()
         {
             // arrange
-            var smart = Smart.CreateDefaultSmartFormat();
+            var smart = GetSmartFormatter();
             var xmlEl = XElement.Parse(XmlMultipleFirstNameStr);
             // act
             var res = smart.Format("There are{FirstName:list: {}|,|, and} Doe", xmlEl);
@@ -137,7 +147,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Format_TwoLevelXml_InvalidSelectors_Throws()
         {
-            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
+            var smart = GetSmartFormatter(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
             // arrange
             var xmlEl = XElement.Parse(TwoLevelXml);
             // act

@@ -1,13 +1,16 @@
-# Rules in this file were initially inferred by Visual Studio IntelliCode from the 
-# SmartFormat\src\SmartFormat\ codebase based on best match to current usage at 21 Dec 2020
 [*.cs]
 
 #Core editorconfig formatting - indentation
 
 #use soft tabs (spaces) for indentation
 indent_style = space
+indent_size = 4
+tab_width = 4
 
 #Formatting - new line options
+
+trim_trailing_whitespace = true
+insert_final_newline = true
 
 #place catch statements on a new line
 csharp_new_line_before_catch = true

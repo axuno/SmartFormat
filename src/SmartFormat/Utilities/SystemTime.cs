@@ -8,9 +8,10 @@ using System;
 namespace SmartFormat.Utilities
 {
     /// <summary>
-    /// Used for getting DateTime.Now or DateOffset.Now. Time is changeable for unit testing
+    /// Used for getting DateTime.Now or DateOffset.Now.
+    /// Mainly used for unit tests.
     /// </summary>
-    internal static class SystemTime
+    public static class SystemTime
     {
         #region : DateTime.Now :
 

@@ -187,7 +187,7 @@ namespace SmartFormat.Tests.Extensions
                 // Here, the top container gets its name
                 { "global", varGroup }
             };
-            smart.AddExtensions(0, pvs);
+            smart.InsertExtension(0, pvs);
 
             // Act
             // Note: We don't need args to the formatter for globals
@@ -209,7 +209,7 @@ namespace SmartFormat.Tests.Extensions
 
             var smart = new SmartFormatter();
             smart.FormatterExtensions.Add(new DefaultFormatter());
-            smart.AddExtensions(0, new PersistentVariablesSource());
+            smart.InsertExtension(0, new PersistentVariablesSource());
             var resultExisting = smart.Format("{existing}", varGrp);
 
             Assert.That(resultExisting, Is.EqualTo("existing-value"));
@@ -240,7 +240,7 @@ namespace SmartFormat.Tests.Extensions
 
             var smart = new SmartFormatter();
             smart.FormatterExtensions.Add(new DefaultFormatter());
-            smart.AddExtensions(0, new PersistentVariablesSource {{"global", persistentGrp}});
+            smart.InsertExtension(0, new PersistentVariablesSource {{"global", persistentGrp}});
 
             // Setup equivalent VariablesGroup to use as an argument to Smart.Format(...)
 
