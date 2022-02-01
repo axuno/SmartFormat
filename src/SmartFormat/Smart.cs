@@ -127,7 +127,7 @@ namespace SmartFormat
         {
             // Register all default extensions here:
             var smart = new SmartFormatter(settings)
-            // sources for specific types must be in the list before ReflectionSource
+            // Extension are sorted automatically
             .AddExtensions(
                 new StringSource(),
                 // will automatically be added to the IFormatter list, too

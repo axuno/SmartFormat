@@ -33,6 +33,7 @@ namespace SmartFormat.Extensions
             { "SmartFormat.Extensions.SystemTextJsonSource", 7000 },
             { "SmartFormat.Extensions.NewtonsoftJsonSource", 8000 },
             { "SmartFormat.Extensions.XmlSource", 9000 },
+            // sources for specific types must be in the list before ReflectionSource
             { "SmartFormat.Extensions.ReflectionSource", 10000 },
             { "SmartFormat.Extensions.DefaultSource", 11000 }
         };

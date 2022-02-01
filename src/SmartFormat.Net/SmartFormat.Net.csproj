@@ -1,7 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.</Description>
+        <Description>This package contains the core SmartFormat assemblies with core extensions built-in,
+and includes references to additional SmartFormat.Extensions packages.
+
+SmartFormat is a string composition library written in C#.
+It can format various data sources into a string with a minimal, intuitive syntax. 
+It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
+        </Description>
         <AssemblyTitle>SmartFormat.Net</AssemblyTitle>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -19,18 +25,36 @@
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
+        <PackageTags>string-format stringformat string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
 
     <PropertyGroup>
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+        <ProjectReference Include="..\SmartFormat.Extensions.Newtonsoft.Json\SmartFormat.Extensions.Newtonsoft.Json.csproj" />
+        <ProjectReference Include="..\SmartFormat.Extensions.System.Text.Json\SmartFormat.Extensions.System.Text.Json.csproj" />
+        <ProjectReference Include="..\SmartFormat.Extensions.Time\SmartFormat.Extensions.Time.csproj" />
+        <ProjectReference Include="..\SmartFormat.Extensions.Xml\SmartFormat.Extensions.Xml.csproj" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -44,26 +68,8 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <WarningLevel>3</WarningLevel>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <DefineConstants>RELEASE</DefineConstants>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\SmartFormat.Extensions.Time\SmartFormat.Extensions.Time.csproj" />
-        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
-        <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
-        <ProjectReference Include="..\SmartFormat.Extensions.Newtonsoft.Json\SmartFormat.Extensions.Newtonsoft.Json.csproj" />
-        <ProjectReference Include="..\SmartFormat.Extensions.System.Text.Json\SmartFormat.Extensions.System.Text.Json.csproj" />
-        <ProjectReference Include="..\SmartFormat.Extensions.Xml\SmartFormat.Extensions.Xml.csproj" />
-    </ItemGroup>
 
 </Project>
 

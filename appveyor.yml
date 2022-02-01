@@ -1,9 +1,9 @@
-version: 3.0.0.{build}
+version: 3.0.0.{build}  # Only change for mayor versions (e.g. 4.0.0)
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
   - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2019
+    appveyor_build_worker_image: Visual Studio 2022
   - job_name: linux
     appveyor_build_worker_image: Ubuntu
 matrix:
@@ -42,7 +42,9 @@ for:
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net5.0.xml" -n net5.0win
     artifacts:
       - path: 'artifacts\*.nupkg'
+        type: NuGetPackage
       - path: 'artifacts\*.snupkg'
+        type: NuGetPackage
     deploy:
       - provider: NuGet
         api_key:
