@@ -409,7 +409,7 @@ var resultString = smart.Format(parsedFormat);
 parsedFormat.Dispose();
 ```
 
-### 23. Packages
+### 23. Packages ([#238](https://github.com/axuno/SmartFormat/pull/238))
 
 #### 23.1 Package overview
 
