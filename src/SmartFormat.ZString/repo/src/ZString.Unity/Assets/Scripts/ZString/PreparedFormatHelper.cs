@@ -20,12 +20,13 @@ namespace Cysharp.Text
             int len = format.Length;
 
             var copyFrom = 0;
+            var formatSpan = format.AsSpan();
 
             while (true)
             {
                 while (i < len)
                 {
-                    var parserScanResult = FormatParser.ScanFormatString(format, ref i);
+                    var parserScanResult = FormatParser.ScanFormatString(formatSpan, ref i);
 
                     if (ParserScanResult.NormalChar == parserScanResult && i < len)
                     {
@@ -83,12 +84,13 @@ namespace Cysharp.Text
             int len = format.Length;
 
             var copyFrom = 0;
+            var formatSpan = format.AsSpan();
 
             while (true)
             {
                 while (i < len)
                 {
-                    var parserScanResult = FormatParser.ScanFormatString(format, ref i);
+                    var parserScanResult = FormatParser.ScanFormatString(formatSpan, ref i);
 
                     if (ParserScanResult.NormalChar == parserScanResult && i < len)
                     {

@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Cysharp.Text
@@ -225,33 +224,6 @@ namespace Cysharp.Text
             AppendLine();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Append(string value, int startIndex, int count)
-        {
-            if (value == null)
-            {
-                if (startIndex == 0 && count == 0)
-                {
-                    return;
-                }
-                else
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-            }
-
-#if UNITY_2018_3_OR_NEWER || NETSTANDARD2_0
-            var maxLen = UTF8NoBom.GetMaxByteCount(count);
-            if (buffer.Length - index < maxLen)
-            {
-                Grow(count);
-            }
-            index += UTF8NoBom.GetBytes(value, startIndex, count, buffer, index);
-#else
-            Append(value.AsSpan(startIndex, count));
-#endif
-        }
-
         /// <summary>Appends the string representation of a specified value to this instance.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(string value)
@@ -294,17 +266,6 @@ namespace Cysharp.Text
         {
             Append(value);
             AppendLine();
-        }
-
-        public void AppendLiteral(ReadOnlySpan<byte> value)
-        {
-            if ((buffer.Length - index) < value.Length)
-            {
-                Grow(value.Length);
-            }
-
-            value.CopyTo(buffer.AsSpan(index));
-            index += value.Length;
         }
 
         /// <summary>Appends the string representation of a specified value to this instance.</summary>
@@ -356,12 +317,6 @@ namespace Cysharp.Text
         public Task WriteToAsync(Stream stream)
         {
             return stream.WriteAsync(buffer, 0, index);
-        }
-
-        /// <summary>Write inner buffer to stream.</summary>
-        public Task WriteToAsync(Stream stream, CancellationToken cancellationToken)
-        {
-            return stream.WriteAsync(buffer, 0, index, cancellationToken);
         }
 
         /// <summary>Encode the innner utf8 buffer to a System.String.</summary>
