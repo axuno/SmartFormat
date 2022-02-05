@@ -35,7 +35,6 @@ It uses extensions to provide named placeholders, localization, pluralization, g
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>

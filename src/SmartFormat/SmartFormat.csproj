@@ -31,7 +31,6 @@ Give it a try.
         <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
         <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
         <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-        <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
 
@@ -40,7 +39,6 @@ Give it a try.
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>

@@ -40,12 +40,12 @@ It uses extensions to provide named placeholders, localization, pluralization, g
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
-        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
     </ItemGroup>
 
     <ItemGroup>
