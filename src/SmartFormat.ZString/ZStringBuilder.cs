@@ -360,6 +360,70 @@ namespace SmartFormat.ZString
         public void Advance(int count) => _vsb.Advance(count);
 
         /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1>(ReadOnlySpan<char> format, T1 arg1) => _vsb.AppendFormat(format, arg1);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2>(ReadOnlySpan<char> format, T1 arg1, T2 arg2) => _vsb.AppendFormat(format, arg1, arg2);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3) =>
+            _vsb.AppendFormat(format, arg1, arg2, arg3);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4) =>
+            _vsb.AppendFormat(format, arg1, arg2, arg3, arg4);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) =>
+            _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5,
+            T6 arg6) => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5,
+            T6 arg6, T7 arg7) => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5,
+            T6 arg6, T7 arg7, T8 arg8) => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)  => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)  => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9, arg10);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11)  => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9, arg10, arg11);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12)  => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9, arg10, arg11, arg12);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12, T13 arg13)  => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9, arg10, arg11, arg12, arg13);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12, T13 arg13, T14 arg14)  => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(ReadOnlySpan<char> format, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12, T13 arg13, T14 arg14, T15 arg15) => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
+        public void AppendFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(ReadOnlySpan<char> format, T1 arg1,
+            T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12,
+            T13 arg13, T14 arg14, T15 arg15, T16 arg16) => _vsb.AppendFormat(format, arg1, arg2, arg3, arg4, arg5, arg6,
+            arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16);
+
+        /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
         public void AppendFormat<T1>(string format, T1 arg1) => _vsb.AppendFormat(format, arg1);
 
         /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
