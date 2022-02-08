@@ -123,7 +123,7 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test] /* added due to problems with [ThreadStatic] see: https://github.com/axuno/SmartFormat.NET/pull/23 */
-        public void WithThreadPool_ShouldNotMixupCollectionIndex()
+        public void WithThreadPool_ShouldNotMixUpCollectionIndex()
         {
             void ResetAllPools(bool goThreadSafe)
             {
@@ -143,6 +143,7 @@ namespace SmartFormat.Tests.Extensions
             const string format = "wheres-Index={Index} - List: {0:{}| and }";
             const string expected = "wheres-Index=-1 - List: test1 and test2";
 
+            // The same variable will be access from different threads
             var wheres = new List<string>{"test1", "test2"};
             var tasks = new List<Task<string>>();
 
@@ -175,18 +176,6 @@ namespace SmartFormat.Tests.Extensions
             ResetAllPools(savedIsThreadSafeMode);
         }
 
-        [Test]
-        public void Objects_Not_Implementing_IList_Are_Not_Processed()
-        {
-            var items = new[] { "one", "two", "three" };
-
-            var formatter = new SmartFormatter()
-                .AddExtensions(new ListFormatter(), new DefaultSource())
-                .AddExtensions(new DefaultFormatter());
-
-            Assert.AreEqual("one, two, and three", formatter.Format("{0:list:{}|, |, and }", new object[] { items }));
-        }
-
         [TestCase("{0:list:{} = {Index}|, }", "A = 0, B = 1, C = 2, D = 3, E = 4")] // Index holds the current index of the iteration
         [TestCase("{1:list:{Index}: {ToCharArray:list:{} = {Index}|, }|; }", "0: O = 0, n = 1, e = 2; 1: T = 0, w = 1, o = 2; 2: T = 0, h = 1, r = 2, e = 3, e = 4; 3: F = 0, o = 1, u = 2, r = 3; 4: F = 0, i = 1, v = 2, e = 3")] // Index can be nested, ToCharArray() requires StringSource or ReflectionSource
         [TestCase("{0:list:{} = {1.Index}|, }", "A = One, B = Two, C = Three, D = Four, E = Five")] // Index is used to synchronize 2 lists
@@ -199,7 +188,19 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
-        public void Test_Not_An_IList_Argument()
+        public void Objects_Implementing_IList_Are_Processed()
+        {
+            var items = new[] { "one", "two", "three" };
+
+            var formatter = new SmartFormatter()
+                .AddExtensions(new ListFormatter(), new DefaultSource())
+                .AddExtensions(new DefaultFormatter());
+
+            Assert.AreEqual("one, two, and three", formatter.Format("{0:list:{}|, |, and }", new object[] { items }));
+        }
+
+        [Test]
+        public void Objects_Not_Implementing_IList_Are_Not_Processed()
         {
             var smart = Smart.CreateDefaultSmartFormat();
             Assert.That(() => smart.Format("{0:list:{}|, |, and }", "not a list"),
@@ -232,12 +233,31 @@ namespace SmartFormat.Tests.Extensions
                 .AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource())
                 .AddExtensions(new DefaultFormatter());
             
-            var data = new {Numbers = default(object)};
+            var data = new {Numbers = default(IList<object>?)};
+            // Numbers are marked as nullable
             var indexResult1 = smart.Format(">{Numbers?.0}<", data); // index method 1
             var indexResult2 = smart.Format(">{Numbers?[0]}<", data); // index method 2
 
             Assert.That(indexResult1, Is.EqualTo("><"));
             Assert.That(indexResult2, Is.EqualTo("><"));
+        }
+
+        [Test]
+        public void Null_IList_Not_Nullable_Should_Throw()
+        {
+            var smart = new SmartFormatter()
+                .AddExtensions(new ListFormatter(), new DefaultSource(), new ReflectionSource())
+                .AddExtensions(new DefaultFormatter());
+            
+            var data = new {Numbers = default(IList<object>?)};
+
+            // Numbers are NOT marked as nullable
+            Assert.That(() => smart.Format(">{Numbers.0}<", data),
+                Throws.Exception.TypeOf<FormattingException>().And.Message
+                    .Contains("{Numbers.0}"));
+            Assert.That(() => smart.Format(">{Numbers[0]}<", data),
+                Throws.Exception.TypeOf<FormattingException>().And.Message
+                    .Contains("{Numbers[0]}"));
         }
     }
 }
