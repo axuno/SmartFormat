@@ -3,8 +3,8 @@
     <PropertyGroup>
         <Description>This package contains the core SmartFormat assemblies with core extensions built-in.
 
-SmartFormat is a string composition library written in C#.
-It can format various data sources into a string with a minimal, intuitive syntax. 
+SmartFormat is a lightweight text templating library written in C#.
+It can format various data sources into a string with a minimal, intuitive syntax similar to string.Format.
 It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
         </Description>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
@@ -20,7 +20,7 @@ Give it a try.
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageTags>string-format stringformat string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
+        <PackageTags>string-format stringformat template templating string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -31,7 +31,6 @@ Give it a try.
         <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
         <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
         <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-        <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
 
@@ -40,7 +39,6 @@ Give it a try.
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>

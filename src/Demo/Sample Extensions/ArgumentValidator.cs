@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-
+#nullable enable
 namespace SmartFormat.Demo.Sample_Extensions
 {
     public class ArgumentValidator
