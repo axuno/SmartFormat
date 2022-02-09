@@ -279,8 +279,8 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
         }
 
-        [TestCase(1, "There {People.Count:plural:|is a person|.\t|are {} people|.}", "There |is a person|.")]
-        [TestCase(2, "There {People.Count:plural:|is a person|.\t|are {} people|.}", "There |are 2 people|.")]
+        [TestCase(1, "There {People.Count:plural(en):|is a person|.\t|are {} people|.}", "There |is a person|.")]
+        [TestCase(2, "There {People.Count:plural(en):|is a person|.\t|are {} people|.}", "There |are 2 people|.")]
         public void Pluralization_With_Changed_SplitChar(int numOfPeople, string format, string expected)
         {
             var data = numOfPeople == 1
