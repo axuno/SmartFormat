@@ -72,6 +72,11 @@ namespace SmartFormat.Extensions
         ///<inheritdoc/>
         public bool CanAutoDetect { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
+        public char SplitChar { get; set; } = '|';
+
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
@@ -82,7 +87,7 @@ namespace SmartFormat.Extensions
             if (format == null || format.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') return false;
             
             // Extract the plural words from the format string:
-            var pluralWords = format.Split('|');
+            var pluralWords = format.Split(SplitChar);
             // This extension requires at least two plural words:
             if (pluralWords.Count == 1)
             {

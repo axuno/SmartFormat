@@ -26,9 +26,9 @@ namespace SmartFormat.Extensions
         public bool CanAutoDetect { get; set; } = false;
 
         /// <summary>
-        /// The delimiter to separate parameters, defaults to comma.
+        /// Gets or sets the character used to split the option text literals.
         /// </summary>
-        public char ParameterDelimiter { get; set; } = ',';
+        public char SplitChar { get; set; } = ',';
 
         /// <summary>
         /// Get or set the string to display for NULL values, defaults to <see cref="string.Empty"/>.
@@ -43,7 +43,7 @@ namespace SmartFormat.Extensions
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
-            var parameters = formattingInfo.FormatterOptions.Split(ParameterDelimiter) ?? Array.Empty<string>();
+            var parameters = formattingInfo.FormatterOptions.Split(SplitChar);
             if (formattingInfo.CurrentValue is not (string or null) || parameters.Length == 1 && parameters[0].Length == 0)
             {
                 // Auto detection calls just return a failure to evaluate
@@ -61,7 +61,7 @@ namespace SmartFormat.Extensions
                 formattingInfo.Write(NullDisplayString);
                 return true;
             }
-
+            
             var (startPos, length) = GetStartAndLength(currentValue, parameters);
 
             switch(OutOfRangeBehavior)

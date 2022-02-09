@@ -44,8 +44,19 @@ namespace SmartFormat.Tests.Extensions
             // less than 2 format options should throw exception
             Assert.Throws<FormattingException>(() =>
                 _formatter.Format("{theKey:ismatch(^.+123.+$):Dummy content}", _variable));
-            Assert.DoesNotThrow(() =>
-                _formatter.Format("{theKey:ismatch(^.+123.+$):Dummy content|2nd option}", _variable));
+        }
+
+        // The "{}" in the format will (as always) output the matching variable
+        [TestCase("{theKey:ismatch(^.+123.+$):|Has match for '{}'|\t|No match|}", "|Has match for 'Some123Content'|")]
+        [TestCase("{theKey:ismatch(^.+999.+$):|Has match for '{}'|\t|No match|}", "|No match|")]
+        public void Test_With_Changed_SplitChar(string format, string expected)
+        {
+            var variable = new Dictionary<string, object> { {"theKey", "Some123Content"}};
+            var smart = Smart.CreateDefaultSmartFormat();
+            // Set SplitChar from | to TAB, so we can use | for the output string
+            smart.GetFormatterExtension<IsMatchFormatter>()!.SplitChar = '\t';
+            var result = smart.Format(format, variable);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [Test]

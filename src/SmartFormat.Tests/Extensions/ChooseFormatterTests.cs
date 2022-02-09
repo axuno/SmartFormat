@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
@@ -31,6 +32,16 @@ namespace SmartFormat.Tests.Extensions
         {
             var smart = Smart.CreateDefaultSmartFormat();
             Assert.AreEqual(expectedResult, smart.Format(format, arg0));
+        }
+
+        [Test]
+        public void Choose_With_Changed_SplitChar()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            // Set SplitChar from | to TAB, so we can use | for the output string
+            smart.GetFormatterExtension<ChooseFormatter>()!.SplitChar = '\t';
+            var result = smart.Format("{0:choose(1\t2\t3):|one|\t|two|\t|three|}", 2);
+            Assert.That(result, Is.EqualTo("|two|"));
         }
 
         [TestCase("{0:choose(true|True):one|two|default}", true, "two")]

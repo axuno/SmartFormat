@@ -34,6 +34,11 @@ namespace SmartFormat.Extensions
 
         ///<inheritdoc/>
         public bool CanAutoDetect { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
+        public char SplitChar { get; set; } = '|';
         
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
@@ -45,7 +50,7 @@ namespace SmartFormat.Extensions
             if (format?.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') format = format.Substring(1);
 
             // See if the format string contains un-nested "|":
-            var parameters = format is not null ? format.Split('|') : new List<Format>(0);
+            var parameters = format is not null ? format.Split(SplitChar) : new List<Format>(0);
 
             // Check whether arguments can be handled by this formatter
             if (format is null || parameters.Count == 1)

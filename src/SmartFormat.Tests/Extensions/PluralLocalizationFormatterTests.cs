@@ -278,5 +278,23 @@ namespace SmartFormat.Tests.Extensions
             
             Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
         }
+
+        [TestCase(1, "There {People.Count:plural:|is a person|.\t|are {} people|.}", "There |is a person|.")]
+        [TestCase(2, "There {People.Count:plural:|is a person|.\t|are {} people|.}", "There |are 2 people|.")]
+        public void Pluralization_With_Changed_SplitChar(int numOfPeople, string format, string expected)
+        {
+            var data = numOfPeople == 1
+                ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
+                : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
+
+            var smart = new SmartFormatter()
+                .AddExtensions(new ReflectionSource())
+                // Set SplitChar from | to TAB, so we can use | for the output string
+                .AddExtensions(new PluralLocalizationFormatter { SplitChar = '\t'},
+                    new DefaultFormatter());
+            
+            var result = smart.Format(format, data);
+            Assert.That(result, Is.EqualTo(expected));
+        }
     }
 }
