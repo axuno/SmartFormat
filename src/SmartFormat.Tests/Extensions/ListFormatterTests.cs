@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
@@ -133,7 +132,29 @@ namespace SmartFormat.Tests.Extensions
             smart.Test(new[] {format}, args, new[] {expected});
         }
 
-        [Test] /* added due to problems with [ThreadStatic] see: https://github.com/axuno/SmartFormat.NET/pull/23 */
+        [Test, Description("Format a list of lists")]
+        public void List_Of_Lists_With_Element_Format()
+        {
+            var data = new List<int[]> {
+                new[] { 1, 2, 3 },
+                new[] { 4, 5, 6 },
+                new[] { 7, 8, 9 }
+            };
+
+            var formatter = new SmartFormatter()
+                .AddExtensions(new ListFormatter(), new DefaultSource())
+                .AddExtensions(new DefaultFormatter());
+
+            var expected = "001, 002, 003\n" + "004, 005, 006\n" + "007, 008, 009";
+            var result = formatter.Format("{0:list:{:list:{:000}|, |, }|\n|\n}", data);
+            //                                   |       |        | |       |      |
+            //                                   |       |  element format  |      |
+            //                                   |       |___ inner list ___|      |
+            //                                   |___________ outer list __________|
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
         public void WithThreadPool_ShouldNotMixUpCollectionIndex()
         {
             void ResetAllPools(bool goThreadSafe)
