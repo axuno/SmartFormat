@@ -153,6 +153,7 @@ namespace SmartFormat.Extensions
             if (pluralRuleProvider != null) return pluralRuleProvider.GetPluralRule();
 
             // No CustomPluralRuleProvider, so use the CultureInfo
+
             return PluralRules.GetPluralRule(culture.TwoLetterISOLanguageName);
         }
 
@@ -165,7 +166,12 @@ namespace SmartFormat.Extensions
                 if (formattingInfo.FormatDetails.Provider is CultureInfo ci)
                     cultureInfo = ci;
                 else
-                    cultureInfo = CultureInfo.CurrentUICulture; // also used this way by ResourceManager
+                    cultureInfo = CultureInfo.CurrentUICulture;
+
+                // There is no pluralization rule for invariant culture (TwoLetterISOLanguageName == "iv"),
+                // so we take English as default
+                if(cultureInfo.Equals(CultureInfo.InvariantCulture))
+                    cultureInfo = CultureInfo.GetCultureInfo("en");
             }
             else
             {
