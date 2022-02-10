@@ -39,6 +39,17 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
+        public void Simple_List_Changed_SplitChar()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            // Set SplitChar from | to TAB, so we can use | for the output string
+            smart.GetFormatterExtension<ListFormatter>()!.SplitChar = '\t';
+            var items = new[] { "one", "two", "three" };
+            var result = smart.Format("{0:list:{}\t|\t|}", new object[] { items }); // important: not only "items" as the parameter
+            Assert.AreEqual("one|two|three", result);
+        }
+
+        [Test]
         public void Empty_List()
         {
             var smart = Smart.CreateDefaultSmartFormat();

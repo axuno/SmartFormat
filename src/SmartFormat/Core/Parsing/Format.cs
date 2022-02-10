@@ -296,13 +296,12 @@ namespace SmartFormat.Core.Parsing
 
             return _splitCache;
         }
-
         /// <summary>
         /// Splits the <see cref="Format"/> items by the given search character.
         /// </summary>
         /// <param name="search">e search character used to split.</param>
         /// <param name="maxCount">The maximum number of <see cref="IList"/> of type <see cref="Format"/>.</param>
-        /// <returns></returns>
+        /// <returns>An <see cref="IList{T}"/> of <see cref="Format"/>s.</returns>
         public IList<Format> Split(char search, int maxCount)
         {
             var splits = FindAll(search, maxCount);

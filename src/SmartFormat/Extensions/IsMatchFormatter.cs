@@ -33,11 +33,16 @@ namespace SmartFormat.Extensions
         ///<inheritdoc/>
         public bool CanAutoDetect { get; set; } = false;
 
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
+        public char SplitChar { get; set; } = '|';
+
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var expression = formattingInfo.FormatterOptions;
-            var formats = formattingInfo.Format?.Split('|');
+            var formats = formattingInfo.Format?.Split(SplitChar);
 
             // Check whether arguments can be handled by this formatter
             if (formats is null || formats.Count != 2)

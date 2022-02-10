@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 
@@ -36,6 +37,17 @@ namespace SmartFormat.Tests.Extensions
             var args = new object[]{false, true};
             var smart = Smart.CreateDefaultSmartFormat();
             smart.Test(format, args, expected);
+        }
+
+        [TestCase("{0:cond:|Yes|\t|No|}", 0, "|Yes|")]
+        [TestCase("{0:cond:|Yes|\t|No|}", 1, "|No|")]
+        public void Test_With_Changed_SplitChar(string format, int arg, string expected)
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            // Set SplitChar from | to TAB, so we can use | for the output string
+            smart.GetFormatterExtension<ConditionalFormatter>()!.SplitChar = '\t';
+            var result = smart.Format(format, arg);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [Test]
