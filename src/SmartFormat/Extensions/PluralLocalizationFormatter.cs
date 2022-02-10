@@ -72,6 +72,11 @@ namespace SmartFormat.Extensions
         ///<inheritdoc/>
         public bool CanAutoDetect { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
+        public char SplitChar { get; set; } = '|';
+
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
@@ -82,7 +87,7 @@ namespace SmartFormat.Extensions
             if (format == null || format.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') return false;
             
             // Extract the plural words from the format string:
-            var pluralWords = format.Split('|');
+            var pluralWords = format.Split(SplitChar);
             // This extension requires at least two plural words:
             if (pluralWords.Count == 1)
             {
@@ -148,6 +153,7 @@ namespace SmartFormat.Extensions
             if (pluralRuleProvider != null) return pluralRuleProvider.GetPluralRule();
 
             // No CustomPluralRuleProvider, so use the CultureInfo
+
             return PluralRules.GetPluralRule(culture.TwoLetterISOLanguageName);
         }
 
@@ -160,7 +166,12 @@ namespace SmartFormat.Extensions
                 if (formattingInfo.FormatDetails.Provider is CultureInfo ci)
                     cultureInfo = ci;
                 else
-                    cultureInfo = CultureInfo.CurrentUICulture; // also used this way by ResourceManager
+                    cultureInfo = CultureInfo.CurrentUICulture;
+
+                // There is no pluralization rule for invariant culture (TwoLetterISOLanguageName == "iv"),
+                // so we take English as default
+                if(cultureInfo.Equals(CultureInfo.InvariantCulture))
+                    cultureInfo = CultureInfo.GetCultureInfo("en");
             }
             else
             {

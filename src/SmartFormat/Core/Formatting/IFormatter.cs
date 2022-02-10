@@ -22,7 +22,7 @@ namespace SmartFormat.Core.Extensions
         /// (when no formatter name is specified in the input format string).
         /// For example, "{0:N2}" will implicitly call extensions marked as <see cref="CanAutoDetect"/>.
         /// Implicit formatter invocations should not throw exceptions.
-        /// With <see cref="CanAutoDetect"/>=<see langword="false"/>, the formatter can only be
+        /// With <see cref="CanAutoDetect"/> == <see langword="false"/>, the formatter can only be
         /// called by its name in the input format string.
         /// </summary>
         /// <remarks>

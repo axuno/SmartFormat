@@ -309,6 +309,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   a) Get the culture from the `FormattingInfo.FormatterOptions`.<br/>
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
+  d) `CultureInfo.InvariantCulture` maps to `CultureInfo.GetCultureInfo("en")` ([#243](https://github.com/axuno/SmartFormat/pull/243))
 
 ### 20. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221), [#234](https://github.com/axuno/SmartFormat/pull/234))
 
@@ -502,9 +503,24 @@ var formatter = new SmartFormatter()
 ```
 
 ### 24. Miscellaneous
-   * Since [#228](https://github.com/axuno/SmartFormat/pull/228) there are no more `Cysharp.Text` classes used in the `SmartFormat` namespace
-      * Created class `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
-      * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
+
+a) Cyhsarp.Text
+
+Since [#228](https://github.com/axuno/SmartFormat/pull/228) there are no more `Cysharp.Text` classes used in the `SmartFormat` namespace
+    * Created class `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
+    * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
+
+b) Split character for options and formats
+
+Since [#243](https://github.com/axuno/SmartFormat/pull/243) the character to split options and formats can be changed. This allows having the default split character `|` as part of the output string.
+Affects `ChooseFormatter`, `ConditionalFormatter`, `IsMatchFormatter`, `ListFormatter`, `PluralLocalizationFormatter`, `SubStringFormatter`. Example:
+```Csharp
+var smart = Smart.CreateDefaultSmartFormat();
+// Change SplitChar from | to TAB, so we can use | for the output string
+smart.GetFormatterExtension<ConditionalFormatter>()!.SplitChar = '\t';
+_ = smart.Format({0:cond:|No|\t|Yes|}", 1);
+// Result: "|Yes|"
+```
 
 v2.7.2
 ===

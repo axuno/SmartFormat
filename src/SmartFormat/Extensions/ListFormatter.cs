@@ -58,6 +58,11 @@ namespace SmartFormat.Extensions
         public bool CanAutoDetect { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// </summary>
+        public char SplitChar { get; set; } = '|';
+
+        /// <summary>
         /// This allows an integer to be used as a selector to index an array (or list).
         /// This is better described using an example:
         /// CustomFormat("{Dates.2.Year}", {#1/1/2000#, #12/31/2999#, #9/9/9999#}) = "9999"
@@ -155,7 +160,7 @@ namespace SmartFormat.Extensions
 
             // See if the format string contains un-nested "|":
             using var splitListPooledObject = SplitListPool.Instance.Get(out var splitList);
-            var parameters = (SplitList) (format is not null ? format.Split('|', 4) : splitList);
+            var parameters = (SplitList) (format is not null ? format.Split(SplitChar, 4) : splitList);
             
             // Check whether arguments can be handled by this formatter
             if (format is null || parameters.Count < 2 || current is not IEnumerable currentAsEnumerable 
@@ -186,7 +191,7 @@ namespace SmartFormat.Extensions
             if (!itemFormat.HasNested)
             {
                 // The format is not nested,
-                // so we will treat it as an itemFormat:
+                // so we will treat it as an ItemFormat:
                 var newItemFormat = FormatPool.Instance.Get().Initialize(_smartSettings, itemFormat.BaseString,
                     itemFormat.StartIndex, itemFormat.EndIndex, true);
 

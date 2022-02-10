@@ -138,8 +138,18 @@ namespace SmartFormat.Tests.Extensions
             var smart = GetFormatter();
             var ssf = smart.GetFormatterExtension<SubStringFormatter>();
             ssf!.NullDisplayString = "???";
-            ssf!.ParameterDelimiter = '*';
-            Assert.AreEqual(ssf.NullDisplayString, smart.Format("{Name:substr(0*3)}", new Dictionary<string, string?> { { "Name", null } }));
+            Assert.AreEqual(ssf.NullDisplayString, smart.Format("{Name:substr(0,3)}", new Dictionary<string, string?> { { "Name", null } }));
+        }
+
+        [Test]
+        public void Test_With_Changed_SplitChar()
+        {
+            var smart = GetFormatter();
+            var currentSplitChar = smart.GetFormatterExtension<SubStringFormatter>()!.SplitChar;
+            // Change SplitChar from default ',' to '|'
+            smart.GetFormatterExtension<SubStringFormatter>()!.SplitChar = '|';
+            Assert.AreEqual("Joh", smart.Format("{Name:substr(-4|-1)}", _people.First()));
+            Assert.That(currentSplitChar, Is.EqualTo(',')); // make sure there was a change
         }
 
         [Test]
