@@ -518,7 +518,7 @@ Smart.Format("{placeholder}", new KeyValuePair<string, object?>("placeholder", "
 `KeyValuePairSource` is included in `Smart.CreateDefaultFormatter()`.
 
 
-### 26. Advanced features for `IsMatchFormatter` ([#245](https://github.com/axuno/SmartFormat/pull/244))
+### 26. Advanced features for `IsMatchFormatter` ([#245](https://github.com/axuno/SmartFormat/pull/245))
 
 The `IsMatchFormatter` is a formatter with evaluation of regular expressions.
 
