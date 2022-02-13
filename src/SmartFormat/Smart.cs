@@ -114,7 +114,7 @@ namespace SmartFormat
         /// <para>
         /// <see cref="ISource"/>s:
         /// <see cref="StringSource"/>, <see cref="ListFormatter"/>, <see cref="DictionarySource"/>,
-        /// <see cref="ValueTupleSource"/>, <see cref="ReflectionSource"/>, <see cref="DefaultSource"/>.
+        /// <see cref="ValueTupleSource"/>, <see cref="ReflectionSource"/>, <see cref="DefaultSource"/>, <see cref="KeyValuePairSource"/>
         /// </para>
         /// <para>
         /// <see cref="IFormatter"/>s:
@@ -136,7 +136,8 @@ namespace SmartFormat
                 new ValueTupleSource(),
                 new ReflectionSource(),
                 // for string.Format behavior
-                new DefaultSource()
+                new DefaultSource(),
+                new KeyValuePairSource()
             )
             .AddExtensions(
                 new PluralLocalizationFormatter(),
