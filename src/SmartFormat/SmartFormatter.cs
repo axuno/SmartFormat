@@ -387,6 +387,8 @@ namespace SmartFormat
                 var childFormattingInfo = formattingInfo.CreateChild(placeholder);
                 try
                 {
+                    // Note: If there is no selector (like {:0.00}),
+                    // FormattingInfo.CurrentValue is left unchanged
                     EvaluateSelectors(childFormattingInfo);
                 }
                 catch (Exception ex)
