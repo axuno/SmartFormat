@@ -8,7 +8,7 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class KeyValuePairSourceTests
     {
-        private SmartFormatter GetFormatter()
+        private static SmartFormatter GetFormatter()
         {
             var smart = new SmartFormatter();
             smart.AddExtensions(new KeyValuePairSource());
