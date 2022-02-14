@@ -56,6 +56,8 @@ Add unicode escape characters like `"\u1234"`. Thanks to [@karljj1](https://gith
 
 The mode can be set with `SmartSettings.StringFormatCompatibility`. By default, `SmartSettings.StringFormatCompatibility` is `false`. ([#173](https://github.com/axuno/SmartFormat/pull/173), [#175](https://github.com/axuno/SmartFormat/pull/175))
 
+Reasoning: The distinction was necessary because of syntax conflicts between SmartFormat extensions and `string.Format`. It brings a more concise and clear set of formatting rules and full `string.Format` compatibility even in "edge cases".
+
 **a) *Smart.Format* features mode**
    * Brings the full set of features implemented in *Smart.Format*
    * Curly braces are escaped the *Smart.Format* way with `\{` and `\}`.
@@ -369,17 +371,17 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
 
 SmartFormat makes heavy use of caching and object pooling for expensive operations, which both require `static` containers. 
 
-a) Instantiating `SmartFormatter`s from different threads: 
+#### a) Instantiating `SmartFormatter`s from different threads: 
+    
+With `SmartSettings.IsThreadSafeMode=true` **must** be set, so that thread safe containers are used. This brings an inherent performance penalty.
 
-    `SmartSettings.IsThreadSafeMode=true` **must** be set, so that thread safe containers are used. This brings an inherent performance penalty.
+**Note:** The simplified `Smart.Format(...)` API overloads use a static `SmartFormatter` instance which is **not** thread safe. Call `Smart.CreateDefaultSmartFormat()` to create a default `SmartFormatter`.
 
-     **Note:** The simplified `Smart.Format(...)` API overloads use a static `SmartFormatter` instance which is **not** thread safe. Call `Smart.CreateDefaultSmartFormat()` to create a default `Formatter`.
+#### b) Instantiating `SmartFormatter`s from a single thread: 
 
-a) Instantiating `SmartFormatter`s from a single thread: 
+With `SmartSettings.IsThreadSafeMode=false` **should** be set for avoiding the multithreading overhead and thus for best performance. 
 
-    `SmartSettings.IsThreadSafeMode=false` **should** be set for avoiding the multithreading overhead and thus for best performance. 
-
-    The simplified `Smart.Format(...)` API overloads are allowed here.
+The static `Smart.Format(...)` API overloads are allowed here.
 
 <a id="ObjectPooling"></a>
 ### 22. How to benefit from object pooling ([#229](https://github.com/axuno/SmartFormat/pull/229))
@@ -451,7 +453,7 @@ SmartFormat is the core package. It comes with the most frequently used extensio
 
 > **Breaking change:**
 > 
-> Note that only extensions marked (✔️) are included when calling `Smart.CreateDefaultFormatter(...)`. These default extensions differ from previous versions.
+> Note that only extensions marked (✔️) are included when calling `Smart.CreateDefaultFormatter(...)` amd also when using `Smart.Format(...)`. These default extensions differ from previously included extensions.
 
 Some extensions (like `PersistentVariablesSource` and `TemplateFormatter`) require configuration to be useful.
 

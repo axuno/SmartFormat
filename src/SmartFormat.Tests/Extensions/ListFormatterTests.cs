@@ -87,7 +87,6 @@ namespace SmartFormat.Tests.Extensions
                 Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}
             });
 
-            // Note: it's faster to add the named formatter, than finding it implicitly by "trial and error".
             var result = smart.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C
             Assert.AreEqual("Person A, Person B, and Person C", result);
             result = smart.Format("{0:list:{Name}|, |, and }", model.Persons);  // Person A, and Person C
