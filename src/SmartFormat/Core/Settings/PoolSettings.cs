@@ -1,4 +1,8 @@
-﻿namespace SmartFormat.Core.Settings
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
+// Licensed under the MIT license.
+
+namespace SmartFormat.Core.Settings
 {
     /// <summary>
     /// Contains global static settings for all object pools.

@@ -1,4 +1,8 @@
-﻿using System;
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
+// Licensed under the MIT license.
+
+using System;
 
 namespace SmartFormat.Pooling.ObjectPools
 {

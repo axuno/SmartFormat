@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Product>SmartFormat</Product>
         <Company>SmartFormat</Company>
-        <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
+        <Authors>axuno gGmbH, Scott Rippey, SmartFormat Project maintainers and contributors.</Authors>
         <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
         <Copyright>Copyright 2011-$(CurrentYear) SmartFormat Project</Copyright>
         <RepositoryUrl>https://github.com/axuno/SmartFormat.git</RepositoryUrl>

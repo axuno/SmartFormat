@@ -1,7 +1,6 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
 using System.Globalization;

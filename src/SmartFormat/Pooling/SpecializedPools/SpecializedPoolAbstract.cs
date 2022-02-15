@@ -1,3 +1,7 @@
+// 
+// Copyright SmartFormat Project maintainers and contributors.
+// Licensed under the MIT license.
+
 using System;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.ObjectPools;
