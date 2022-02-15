@@ -1,11 +1,8 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 
