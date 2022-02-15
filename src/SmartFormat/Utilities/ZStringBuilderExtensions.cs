@@ -1,4 +1,8 @@
-﻿using SmartFormat.Core.Parsing;
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
+// Licensed under the MIT license.
+
+using SmartFormat.Core.Parsing;
 using SmartFormat.ZString;
 
 namespace SmartFormat.Utilities
