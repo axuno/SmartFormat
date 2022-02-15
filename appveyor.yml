@@ -24,7 +24,7 @@ for:
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
       - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
       - ps: |
-          $version = "3.0.0-rc.1"
+          $version = "3.0.0-rc.2"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
 
           if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
