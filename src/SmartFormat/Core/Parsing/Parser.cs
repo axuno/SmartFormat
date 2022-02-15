@@ -86,7 +86,7 @@ using SmartFormat.Pooling.SmartPools;
         /// <summary>
         /// Includes a-z and A-Z in the list of allowed selector chars.
         /// </summary>
-        [Obsolete("Alphanumeric selectors are always enabled")]
+        [Obsolete("Alphanumeric selectors are always enabled", true)]
         public void AddAlphanumericSelectors()
         {
             // Do nothing - this is the standard behavior
@@ -96,7 +96,7 @@ using SmartFormat.Pooling.SmartPools;
         /// Adds specific characters to the allowed selector chars.
         /// </summary>
         /// <param name="chars"></param>
-        [Obsolete("Use 'Settings.Parser.AddCustomSelectorChars' instead.")]
+        [Obsolete("Use 'Settings.Parser.AddCustomSelectorChars' instead.", true)]
         public void AddAdditionalSelectorChars(string chars)
         {
             _parserSettings.AddCustomSelectorChars(chars.ToCharArray());
@@ -108,7 +108,7 @@ using SmartFormat.Pooling.SmartPools;
         /// that splits the selectors.
         /// </summary>
         /// <param name="chars"></param>
-        [Obsolete("Use 'Settings.Parser.AddCustomOperatorChars' instead.")]
+        [Obsolete("Use 'Settings.Parser.AddCustomOperatorChars' instead.", true)]
         public void AddOperators(string chars)
         {
             _parserSettings.AddCustomOperatorChars(chars.ToCharArray());
@@ -433,9 +433,11 @@ using SmartFormat.Pooling.SmartPools;
 
             // See what is the next character
             var indexNextChar = _index.SafeAdd(_index.Current, 1);
+            if (indexNextChar >= _inputFormat.Length)
+                throw new ArgumentException($"Unrecognized escape sequence at the end of the literal");
 
             // **** Alternative brace escaping with { or } following the escape character ****
-            if (indexNextChar < _inputFormat.Length && (_inputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar || _inputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar))
+            if (_inputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar || _inputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar)
             {
                 // Finish the last text item:
                 if (_index.Current != _index.LastEnd) _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _index.Current));

@@ -156,5 +156,13 @@ namespace SmartFormat.Tests.Core
             var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {StringFormatCompatibility = true});
             Assert.That(formatter.Format(format, arg0), Is.EqualTo(string.Format(format, arg0)));
         }
+
+        [Test]
+        public void Escaped_Curly_Braces_At_Begin_And_End_Should_Work()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {StringFormatCompatibility = true});
+            var result = formatter.Format("{{{0}}}", 99999);
+            Assert.That(result, Is.EqualTo($"{{{99999}}}"));
+        }
     }
 }

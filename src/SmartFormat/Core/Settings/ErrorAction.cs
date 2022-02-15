@@ -10,7 +10,7 @@ namespace SmartFormat.Core.Settings
     /// <summary>
     /// Determines how format errors are handled.
     /// </summary>
-    [Obsolete("Use 'ParseErrorAction' or 'FormatErrorAction' instead.", false)]
+    [Obsolete("Use 'ParseErrorAction' or 'FormatErrorAction' instead.", true)]
     public enum ErrorAction
     {
         /// <summary>Throws an exception. This is only recommended for debugging, so that formatting errors can be easily found.</summary>

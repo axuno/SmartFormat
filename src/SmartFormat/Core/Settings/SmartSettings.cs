@@ -45,7 +45,7 @@ namespace SmartFormat.Core.Settings
         /// Gets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
         /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
-        [Obsolete("Use 'SmartSettings.Formatter.ErrorAction' instead.", false)]
+        [Obsolete("Use 'SmartSettings.Formatter.ErrorAction' instead.", true)]
         public ErrorAction FormatErrorAction
         {
             get => (ErrorAction) Formatter.ErrorAction;
@@ -56,7 +56,7 @@ namespace SmartFormat.Core.Settings
         /// Gets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormat.Core.Parsing.Parser" />.
         /// The default is <see cref="ErrorAction.ThrowError"/>.
         /// </summary>
-        [Obsolete("Use 'SmartSettings.Parser.ErrorAction' instead.", false)]
+        [Obsolete("Use 'SmartSettings.Parser.ErrorAction' instead.", true)]
         public ErrorAction ParseErrorAction
         {
             get => (ErrorAction) Parser.ErrorAction;
@@ -76,7 +76,7 @@ namespace SmartFormat.Core.Settings
         /// If false, character string literals are not converted, just like with this string.Format:
         /// string.Format(@"\t")  will return the 2 characters "\" and "t"
         /// </summary>
-        [Obsolete("Use SmartSettings.Parser.ConvertCharacterStringLiterals instead", false)]
+        [Obsolete("Use SmartSettings.Parser.ConvertCharacterStringLiterals instead", true)]
         public bool ConvertCharacterStringLiterals
         {
             get => Parser.ConvertCharacterStringLiterals;
