@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core
 {
@@ -70,6 +71,27 @@ namespace SmartFormat.Tests.Core
             var result = smart.Format(@"{0:list:{}|\n|\nand }", new object[] { items });
             
             Assert.AreEqual("one\ntwo\nand three", result);
+        }
+
+        [Test, Description("Illegal escape sequence should always throw")]
+        public void IllegalEscapeSequenceThrowsException()
+        {
+            var smart = new SmartFormatter().AddExtensions(new DefaultSource()).AddExtensions(new DefaultFormatter());
+            Assert.That(code: () => {
+                smart.Format(@"\z Illegal escape sequence at the beginning of the text");
+            },Throws.ArgumentException.And.Message.Contains("escape sequence"));
+
+            Assert.That(code: () => {
+                smart.Format(@"Illegal escape sequence \z somewhere in text");
+            },Throws.ArgumentException.And.Message.Contains("escape sequence"));
+
+            Assert.That(code: () => {
+                smart.Format(@"Illegal escape sequence at end of line = \z");
+            }, Throws.ArgumentException.And.Message.Contains("escape sequence"));
+
+            Assert.That(code: () => {
+                smart.Format(@"Illegal escape sequence starts at end of line = \");
+            },Throws.ArgumentException.And.Message.Contains("escape sequence"));
         }
     }
 }

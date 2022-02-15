@@ -35,8 +35,8 @@ namespace SmartFormat.Extensions
             { "SmartFormat.Extensions.XmlSource", 9000 },
             // sources for specific types must be in the list before ReflectionSource
             { "SmartFormat.Extensions.ReflectionSource", 10000 },
-            { "SmartFormat.Extensions.DefaultSource", 11000 },
-            { "SmartFormat.Extensions.KeyValuePairSource", 12000 }
+            { "SmartFormat.Extensions.KeyValuePairSource", 11000 },
+            { "SmartFormat.Extensions.DefaultSource", 12000 }
         };
 
         /// <summary>

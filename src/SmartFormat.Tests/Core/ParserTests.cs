@@ -24,7 +24,7 @@ namespace SmartFormat.Tests.Core
         [TestCase(" aaa {bbb.ccc: ddd {eee} fff } ggg ")]
         [TestCase("{aaa} {bbb}")]
         [TestCase("{}")]
-        [TestCase("{a:{b:{c:{d} } } }")]
+        [TestCase("{a:{b:{c:{d}}}}")]
         [TestCase("{a}")]
         [TestCase(" aaa {bbb_bbb.CCC} ddd ")]
         public void Basic_Parser_Test(string format)
@@ -430,7 +430,6 @@ namespace SmartFormat.Tests.Core
         public void Nested_format_with_literal_escaping()
         {
             var parser = GetRegularParser();
-            // necessary because of the consecutive }}}, which would otherwise be escaped as }} and lead to "missing brace" exception:
             var placeholders = parser.ParseFormat("{c1:{c2:{c3}}}");
 
             var c1 = (Placeholder) placeholders.Items[0];
@@ -547,14 +546,14 @@ namespace SmartFormat.Tests.Core
                 // Group Sel_1 is empty
                 Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
                 // Concatenate because of regex simplification for 2 selectors
-                Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value + reMatches[0].Groups["Sel_2_Op"].Value));
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value + reMatches[0].Groups["Sel_2_Op"].Value));
             }
             else
             {
                 Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
-                Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
                 Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1"].Value));
-                Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
                 Assert.That(placeholder.Selectors[2].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
             }
         }
