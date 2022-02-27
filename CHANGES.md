@@ -296,7 +296,7 @@ The default is `false`.
 
 If `true`, the`Parser` will parse all content inside &lt;script&gt; and &lt;style&gt; tags as `LiteralText`. All other places may still contain `Placeholder`s.
 
-This is because &lt;script&gt; and &lt;style&gt; tags may contain curly or square braces, that interfere with the SmartFormat {`Placeholder`}.
+This is because &lt;script&gt; and &lt;style&gt; tags may contain curly or square braces, that interfere with the *SmartFormat* {`Placeholder`}.
 
 Best results can only be expected with clean HTML: balanced opening and closing tags, single and double quotes. Also, do not use angle brackets, single and double quotes in script or style comments.
 
