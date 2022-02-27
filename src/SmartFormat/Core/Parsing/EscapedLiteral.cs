@@ -33,7 +33,7 @@ namespace SmartFormat.Core.Parsing
         private static readonly Dictionary<char, char> FormatterOptionsLookupTable = new() {
             // Smart.Format characters used in formatter options
             {'(', '('},
-            {')', ')'},
+            {')', ')'}
         };
 
         /// <summary>
