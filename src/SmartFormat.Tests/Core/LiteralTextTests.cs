@@ -31,8 +31,8 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void AllSupportedCharacterLiteralsAsUnicode()
         {
-            const string formatWithFileBehavior = @"All supported literal characters: \' \"" \\ \a \b \f \n \r \t \v \0 \u2022!";
-            const string formatWithCodeBehavior = "All supported literal characters: \' \" \\ \a \b \f \n \r \t \v \0 \u2022!";
+            const string formatWithFileBehavior = @"All supported literal characters: \\ \a \b \f \n \r \t \v \0 \u2022!";
+            const string formatWithCodeBehavior = "All supported literal characters: \\ \a \b \f \n \r \t \v \0 \u2022!";
 
             var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = true}});
 

@@ -10,13 +10,16 @@
 
 [![Paypal-Donations](https://img.shields.io/badge/Donate-PayPal-important.svg?style=flat-square)](https://www.paypal.com/donate?hosted_button_id=KSC3LRAR26AHN)
 
-**SmartFormat** is a **string composition** library written in C# which can be a drop-in replacement for `string.Format`. More than that **Smart.Format** can format data with named placeholders, lists, localization, pluralization and other smart extensions.
+**SmartFormat** is a is a **lightweight text templating** library written in C# which can be a drop-in replacement for `string.Format`. More than that **SmartFormat** can format data with named placeholders, lists, localization, pluralization and other smart extensions.
 
 * High performance with low memory footprint
+* Minimal, intuitive syntax
+* Formatting takes place exclusively at runtime
 * Exact control of whitespace text output
 * `string.Format` compatibility mode and `Smart.Format` enhanced mode
-* Minimal, intuitive syntax
-* Many built-in extensions, custom extensions are easy to integrate
+* Most common data sources work out-of-the-box
+* Many built-in formatting extensions
+* Custom formatting and source extensions are easy to integrate
 
 ### Supported Frameworks
 * .Net Framework 4.6.1 and later

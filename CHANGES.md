@@ -47,20 +47,20 @@ SmartFormat v3.0-alpha.5
 Note: `PoolingDisabled` is just for showing the advantage of object pooling, which was added in `v3.0-alpha.5`.
 
 ### 2. Exact control of whitespace text output
-This was an issue in v2 and was going back to combining `string.Format` compatibility with *Smart.Format* features. This is resolved by setting the desired mode with `SmartSettings.StringFormatCompatibility` (defaults to `false`). ([#172](https://github.com/axuno/SmartFormat/pull/172))
+This was an issue in v2 and was going back to combining `string.Format` compatibility with *SmartFormat* features. This is resolved by setting the desired mode with `SmartSettings.StringFormatCompatibility` (defaults to `false`). ([#172](https://github.com/axuno/SmartFormat/pull/172))
 
 ### 3. Literals may contain any Unicode characters ([#166](https://github.com/axuno/SmartFormat/pull/166))
 Add unicode escape characters like `"\u1234"`. Thanks to [@karljj1](https://github.com/karljj1).
 
-### 4. Separate modes for "*Smart.Format* features" and "`string.Format` compatibility"
+### 4. Separate modes for "*SmartFormat* features" and "`string.Format` compatibility"
 
 The mode can be set with `SmartSettings.StringFormatCompatibility`. By default, `SmartSettings.StringFormatCompatibility` is `false`. ([#173](https://github.com/axuno/SmartFormat/pull/173), [#175](https://github.com/axuno/SmartFormat/pull/175))
 
 Reasoning: The distinction was necessary because of syntax conflicts between SmartFormat extensions and `string.Format`. It brings a more concise and clear set of formatting rules and full `string.Format` compatibility even in "edge cases".
 
-**a) *Smart.Format* features mode**
-   * Brings the full set of features implemented in *Smart.Format*
-   * Curly braces are escaped the *Smart.Format* way with `\{` and `\}`.
+**a) *SmartFormat* features mode**
+   * Brings the full set of features implemented in *SmartFormat*
+   * Curly braces are escaped the *SmartFormat* way with `\{` and `\}`.
    * As long as special characters `(){}:\` are escaped with `\`, any character is allowed anywhere. Note: This applies also for the colon.
 
 **b) `string.Format` compatibility mode**
@@ -208,7 +208,7 @@ Smart.Format("{0.ToLower.TrimStart.TrimEnd.ToBase64}", " ABCDE ");
 
 C# like `nullable` notation allows to display `Nullable<T>` types.
 
-The *Smart.Format* notation is `"{SomeNullable?.Property}"`. If `SomeNullable` is null, the expression is evaluated as `string.Empty`.
+The *SmartFormat* notation is `"{SomeNullable?.Property}"`. If `SomeNullable` is null, the expression is evaluated as `string.Empty`.
 
 The nullable operator can also be used for evaluating a list index. E.g.: `Smart.Format("{TheList?[1]}")` will output `string.Empty`, if the list variable is null.
 
@@ -346,11 +346,11 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
     CommonLanguagesTimeTextInfo.AddLanguage(language, custom)
     ```
 * **Changed:** 
-  a) This notation - using formats as formatter options - was allowed in *Smart.Format v2.x*, but is now depreciated. It is still detected and working, as long as the format part is left empty
+  a) This notation - using formats as formatter options - was allowed in *SmartFormat* *v2.x*, but is now depreciated. It is still detected and working, as long as the format part is left empty
     ```CSharp
     var formatDepreciated = "{0:time(abbr hours noless)}";
     ```
-  b) This format string is recommended for *Smart.Format v3* and later. It allows for including the language as an option to the `TimeFormatter`:
+  b) This format string is recommended for *SmartFormat* *v3* and later. It allows for including the language as an option to the `TimeFormatter`:
     ```CSharp
     // Without language option:
     var formatRecommended = "{0:time:abbr hours noless:}";
