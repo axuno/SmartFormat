@@ -82,9 +82,8 @@ namespace SmartFormat.Extensions
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
             
-            // Ignore formats that start with "?" (this can be used to bypass this extension)
-            if (format == null || format.BaseString.Length > 0 && format.BaseString[format.StartIndex] == ':') return false;
-            
+            if (format == null) return false;
+
             // Extract the plural words from the format string:
             var pluralWords = format.Split(SplitChar);
             // This extension requires at least two plural words:
