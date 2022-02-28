@@ -121,6 +121,7 @@ namespace SmartFormat.Tests.Extensions
         [TestCase("+", @"\+", @"\\+")]
         [TestCase("*", @"\*", @"\\*")]
         [TestCase("^", @"\^", @"\\^")]
+        [TestCase("$", @"\$", @"\\$")]
         [TestCase(".", @"\.", @"\\.")]
         [TestCase("[", @"\[", @"\\[")]
         [TestCase("]", @"\]", @"\\]")]
@@ -137,7 +138,10 @@ namespace SmartFormat.Tests.Extensions
             var smart = GetFormatter();
             // To be escaped with backslash for PCRE RegEx:  ".^$*+?()[]{}\|"
             var regEx = new Regex(regExEscaped);
+
+            Assert.That(EscapedLiteral.EscapeCharLiterals('\\', regExEscaped, 0, regExEscaped.Length, true), Is.EqualTo(optionsEscaped));
             Assert.IsTrue(regEx.Match(search).Success);
+
             var result = smart.Format("{0:ismatch(" + optionsEscaped + "):found {}|}", search);
             Assert.That(result, Is.EqualTo("found " + search));
         }

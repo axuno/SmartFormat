@@ -26,7 +26,7 @@ namespace SmartFormat.Tests.Core
             else Assert.That(found, Is.False);
         }
 
-        [TestCase(@"\\ \' abc\\", @"\ ' abc\", false)] // included in look-up table
+        [TestCase(@"\\ \{ \} abc\\", @"\ { } abc\", false)] // included in look-up table
         [TestCase(@"\zabc\", @"\z", true)] // not included in look-up table
         public void UnEscapeCharLiterals_General_Test(string input, string expected, bool shouldThrow)
         {
@@ -75,7 +75,8 @@ namespace SmartFormat.Tests.Core
         }
 
         [TestCase(@"abc", @"abc")] // not to escape
-        [TestCase("\'\"\\\n", @"\'\""\\\n")] // to escape
+        //[TestCase("\'\"\\\n", @"\'\""\\\n")] // to escape
+        [TestCase("{}\\\n", @"\{\}\\\n")] // to escape
         public void EscapeCharLiterals_General_Test(string input, string expected)
         {
             var result = new string(EscapedLiteral.EscapeCharLiterals('\\', input, 0, input.Length, false).ToArray());
