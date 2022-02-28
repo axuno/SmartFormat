@@ -16,9 +16,9 @@ namespace SmartFormat.Core.Parsing
     {
         private static readonly Dictionary<char, char> GeneralLookupTable = new() {
             // General
-            {'\'', '\''},
-            {'\"', '\"'},
             {'\\', '\\'},
+            {'{', '{'},
+            {'}', '}'},
             {'0', '\0'},
             {'a', '\a'},
             {'b', '\b'},
@@ -33,9 +33,7 @@ namespace SmartFormat.Core.Parsing
         private static readonly Dictionary<char, char> FormatterOptionsLookupTable = new() {
             // Smart.Format characters used in formatter options
             {'(', '('},
-            {')', ')'},
-            {'{', '{'},
-            {'}', '}'}
+            {')', ')'}
         };
 
         /// <summary>
