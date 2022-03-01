@@ -42,7 +42,7 @@ namespace SmartFormat.Tests.Extensions
             Assert.That((int) vg[var1Name].GetValue()!, Is.EqualTo(1234));
             Assert.That((string) vg[var2Name].GetValue()!, Is.EqualTo("theValue"));
             Assert.That(vg.Keys.Count, Is.EqualTo(3));
-            Assert.That(vg.Keys.Contains(var1Name));
+            Assert.That(vg.ContainsKey(var1Name));
             Assert.That(vg.Values.Count, Is.EqualTo(3));
             Assert.That(vg.Values.Contains(var1));
             Assert.That(vg.Values.Contains(var2));

@@ -38,7 +38,7 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(pvs[groupName1], Is.EqualTo(vg1));
             Assert.That(pvs[groupName2], Is.EqualTo(vg2));
             Assert.That(pvs.Keys.Count, Is.EqualTo(2));
-            Assert.That(pvs.Keys.Contains(groupName1));
+            Assert.That(pvs.ContainsKey(groupName1));
             Assert.That(pvs.Values.Count, Is.EqualTo(2));
             Assert.That(pvs.Values.Contains(vg1));
             Assert.That(pvs.Values.Contains(vg2));

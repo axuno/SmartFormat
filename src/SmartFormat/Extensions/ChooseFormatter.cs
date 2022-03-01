@@ -4,8 +4,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
@@ -56,13 +58,10 @@ namespace SmartFormat.Extensions
             return true;
         }
 
-        private static Format DetermineChosenFormat(IFormattingInfo formattingInfo, IList<Format> choiceFormats,
+        private Format DetermineChosenFormat(IFormattingInfo formattingInfo, IList<Format> choiceFormats,
             string[] chooseOptions)
         {
-            var currentValue = formattingInfo.CurrentValue;
-            var currentValueString = currentValue == null ? "null" : currentValue.ToString();
-
-            var chosenIndex = Array.IndexOf(chooseOptions, currentValueString);
+            var chosenIndex = GetChosenIndex(formattingInfo, chooseOptions, out var currentValueString);
 
             // Validate the number of formats:
             if (choiceFormats.Count < chooseOptions.Length)
@@ -80,5 +79,46 @@ namespace SmartFormat.Extensions
             var chosenFormat = choiceFormats[chosenIndex];
             return chosenFormat;
         }
+
+        private int GetChosenIndex(IFormattingInfo formattingInfo, string[] chooseOptions, out string currentValueString)
+        {
+            string valAsString;
+
+            // null and bool types are always case-insensitive
+            switch (formattingInfo.CurrentValue)
+            {
+                case null:
+                    valAsString = currentValueString = "null";
+                    return Array.FindIndex(chooseOptions,
+                        t => t.Equals(valAsString, StringComparison.OrdinalIgnoreCase));
+                case bool boolVal:
+                    valAsString = currentValueString = boolVal.ToString();
+                    return Array.FindIndex(chooseOptions,
+                        t => t.Equals(valAsString, StringComparison.OrdinalIgnoreCase));
+            }
+            
+            valAsString = currentValueString = formattingInfo.CurrentValue.ToString();
+
+            return Array.FindIndex(chooseOptions,
+                t => t.Equals(valAsString, GetStringComparison(formattingInfo.FormatDetails.Settings.CaseSensitivity)));
+        }
+
+        private StringComparison GetStringComparison(CaseSensitivityType caseSensitivityFromSettings)
+        {
+            var toUse = caseSensitivityFromSettings == CaseSensitivity
+                ? caseSensitivityFromSettings
+                : CaseSensitivity;
+
+            return toUse == CaseSensitivityType.CaseSensitive
+                ? StringComparison.CurrentCulture
+                : StringComparison.CurrentCultureIgnoreCase;
+        }
+
+        /// <summary>
+        /// Sets or gets the <see cref="CaseSensitivityType"/> for option strings.
+        /// Defaults to <see cref="CaseSensitivityType.CaseSensitive"/>.
+        /// Comparison of option strings is culture-aware.
+        /// </summary>
+        public CaseSensitivityType CaseSensitivity { get; set; } = CaseSensitivityType.CaseSensitive;
     }
 }
