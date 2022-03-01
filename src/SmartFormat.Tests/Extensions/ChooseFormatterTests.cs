@@ -44,15 +44,22 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(result, Is.EqualTo("|two|"));
         }
 
-        [TestCase("{0:choose(true|True):one|two|default}", true, "two")]
-        [TestCase("{0:choose(true|TRUE):one|two|default}", true, "default")]
-        [TestCase("{0:choose(string|String):one|two|default}", "String", "two")]
-        [TestCase("{0:choose(string|STRING):one|two|default}", "String", "default")]
-        [TestCase("{0:choose(ignore|Ignore):one|two|default}", SmartFormat.Core.Settings.FormatErrorAction.Ignore, "two")]
-        [TestCase("{0:choose(ignore|IGNORE):one|two|default}", SmartFormat.Core.Settings.FormatErrorAction.Ignore, "default")]
-        public void Choose_should_be_case_sensitive(string format, object arg0, string expectedResult)
+        // bool and null args: always case-insensitive
+        [TestCase("{0:choose(true|false):one|two|default}", false, true, "one")]
+        [TestCase("{0:choose(True|FALSE):one|two|default}", false, false, "two")]
+        [TestCase("{0:choose(null):is null|default}", false, default, "is null")]
+        [TestCase("{0:choose(NULL):is null|default}", false, default, "is null")]
+        // strings
+        [TestCase("{0:choose(string|String):one|two|default}", true, "String", "two")]
+        [TestCase("{0:choose(string|STRING):one|two|default}", true, "String", "default")]
+        // Enum
+        [TestCase("{0:choose(ignore|Ignore):one|two|default}", true, FormatErrorAction.Ignore, "two")]
+        [TestCase("{0:choose(ignore|IGNORE):one|two|default}", true, FormatErrorAction.Ignore, "default")]
+        public void Choose_should_be_case_sensitive(string format, bool caseSensitive, object arg0, string expectedResult)
         {
             var smart = Smart.CreateDefaultSmartFormat();
+            smart.GetFormatterExtension<ChooseFormatter>()!.CaseSensitivity =
+                caseSensitive ? CaseSensitivityType.CaseSensitive : CaseSensitivityType.CaseInsensitive;
             Assert.AreEqual(expectedResult, smart.Format(format, arg0));
         }
         
@@ -132,6 +139,20 @@ namespace SmartFormat.Tests.Extensions
             var result = smart.Format(CultureInfo.InvariantCulture, "{NullableInt:choose(null):{IntValueIfNull:choose(1000|2000):1k|2k}|{:N2}}", data);
 
             Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test, Description("Case-insensitive option string comparison")]
+        public void Choose_Should_Use_CultureInfo_For_Option_Strings()
+        {
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.GetFormatterExtension<ChooseFormatter>()!.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+            var result1 = smart.Format(CultureInfo.GetCultureInfo("de"), "{0:choose(ä|ü):umlautA|umlautU}", "Ä");
+            var result2 = smart.Format(CultureInfo.GetCultureInfo("de"), "{0:choose(ä|ü):umlautA|umlautU}", "ä");
+
+            Assert.That(result1, Is.EqualTo("umlautA"));
+            Assert.That(result2, Is.EqualTo("umlautA"));
         }
     }
 }

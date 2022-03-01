@@ -582,6 +582,15 @@ _ = smart.Format({0:cond:|No|\t|Yes|}", 1);
 // Result: "|Yes|"
 ```
 
+c) ChooseFormatter [#253](https://github.com/axuno/SmartFormat/pull/253)
+
+    Modified `ChooseFormatter` case-sensitivity for option strings. This modification is compatible with v2.
+
+    * `bool` and `null` as string: always case-insensitive
+    * using `SmartSettings.CaseSensitivity` unless overridden with `ChooseFormatter.CaseSensitivity`
+    * option strings comparison is culture-aware
+
+
 v2.7.2
 ===
 * **Fixed**: `ConditionalFormatter` processes unsigned numbers in arguments correctly.
