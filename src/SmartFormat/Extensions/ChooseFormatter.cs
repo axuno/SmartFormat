@@ -16,6 +16,8 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class ChooseFormatter : IFormatter
     {
+        private CultureInfo? _cultureInfo;
+
         /// <summary>
         /// Gets or sets the character used to split the option text literals.
         /// </summary>
@@ -50,6 +52,8 @@ namespace SmartFormat.Extensions
                 throw new FormatException(
                     $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 format options.");
             }
+
+            _cultureInfo = formattingInfo.FormatDetails.Provider as CultureInfo ?? CultureInfo.CurrentUICulture;
 
             var chosenFormat = DetermineChosenFormat(formattingInfo, formats, chooseOptions);
 
@@ -98,20 +102,23 @@ namespace SmartFormat.Extensions
             }
             
             valAsString = currentValueString = formattingInfo.CurrentValue.ToString();
-
+            
             return Array.FindIndex(chooseOptions,
-                t => t.Equals(valAsString, GetStringComparison(formattingInfo.FormatDetails.Settings.CaseSensitivity)));
+                t => AreEqual(t, valAsString, formattingInfo.FormatDetails.Settings.CaseSensitivity));
         }
 
-        private StringComparison GetStringComparison(CaseSensitivityType caseSensitivityFromSettings)
+        private bool AreEqual(string s1, string s2, CaseSensitivityType caseSensitivityFromSettings)
         {
+            System.Diagnostics.Debug.Assert(_cultureInfo is not null);
+            var culture = _cultureInfo!;
+
             var toUse = caseSensitivityFromSettings == CaseSensitivity
                 ? caseSensitivityFromSettings
                 : CaseSensitivity;
 
             return toUse == CaseSensitivityType.CaseSensitive
-                ? StringComparison.CurrentCulture
-                : StringComparison.CurrentCultureIgnoreCase;
+                ? culture.CompareInfo.Compare(s1, s2, CompareOptions.None) == 0
+                : culture.CompareInfo.Compare(s1, s2, CompareOptions.IgnoreCase) == 0;
         }
 
         /// <summary>

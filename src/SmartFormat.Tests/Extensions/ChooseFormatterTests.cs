@@ -140,5 +140,19 @@ namespace SmartFormat.Tests.Extensions
 
             Assert.That(result, Is.EqualTo(expected));
         }
+
+        [Test, Description("Case-insensitive option string comparison")]
+        public void Choose_Should_Use_CultureInfo_For_Option_Strings()
+        {
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.GetFormatterExtension<ChooseFormatter>()!.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+            var result1 = smart.Format(CultureInfo.GetCultureInfo("de"), "{0:choose(ä|ü):umlautA|umlautU}", "Ä");
+            var result2 = smart.Format(CultureInfo.GetCultureInfo("de"), "{0:choose(ä|ü):umlautA|umlautU}", "ä");
+
+            Assert.That(result1, Is.EqualTo("umlautA"));
+            Assert.That(result2, Is.EqualTo("umlautA"));
+        }
     }
 }
