@@ -111,7 +111,7 @@ namespace SmartFormat.Tests.Extensions
             _ = smart.Format("{:L(es):WeTranslateText}");
             var result = smart.Format("{:L(es):WeTranslateText}");
 
-            Assert.That(locFormatter!.LocalizedFormatCache!.Keys.Contains(result), Is.True);
+            Assert.That(locFormatter!.LocalizedFormatCache!.ContainsKey(result), Is.True);
         }
 
         [TestCase("{:L():WeTranslateText}", "Traducimos el texto", "es")]
