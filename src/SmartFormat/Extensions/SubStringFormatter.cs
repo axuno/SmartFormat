@@ -12,6 +12,8 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class SubStringFormatter : IFormatter
     {
+        private char _splitChar = ',';
+
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
         /// </summary>
@@ -26,8 +28,13 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Gets or sets the character used to split the option text literals.
+        /// Valid characters are: | (pipe) , (comma)  ~ (tilde)
         /// </summary>
-        public char SplitChar { get; set; } = ',';
+        public char SplitChar
+        {
+            get => _splitChar;
+            set => _splitChar = Utilities.Validation.GetValidSplitCharOrThrow(value);
+        }
 
         /// <summary>
         /// Get or set the string to display for NULL values, defaults to <see cref="string.Empty"/>.

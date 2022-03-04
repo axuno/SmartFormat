@@ -33,7 +33,9 @@ namespace SmartFormat.Tests.Extensions
         {
             var smart = Smart.CreateDefaultSmartFormat();
             var items = new[] { "one", "two", "three" };
-            var result = smart.Format("{0:list:{}|, |, and }", new object[] { items }); // important: not only "items" as the parameter
+            // Important: You cannot use "items" as an indexed parameter directly,
+            // as it would be used as arg0="one", arg1="two", arg2="three"
+            var result = smart.Format("{0:list:{}|, |, and }", (System.Collections.IList) items);
             Assert.AreEqual("one, two, and three", result);
         }
 
@@ -41,10 +43,10 @@ namespace SmartFormat.Tests.Extensions
         public void Simple_List_Changed_SplitChar()
         {
             var smart = Smart.CreateDefaultSmartFormat();
-            // Set SplitChar from | to TAB, so we can use | for the output string
-            smart.GetFormatterExtension<ListFormatter>()!.SplitChar = '\t';
+            // Set SplitChar from | to ~, so we can use | for the output string
+            smart.GetFormatterExtension<ListFormatter>()!.SplitChar = '~';
             var items = new[] { "one", "two", "three" };
-            var result = smart.Format("{0:list:{}\t|\t|}", new object[] { items }); // important: not only "items" as the parameter
+            var result = smart.Format("{0:list:{}~|~|}", (System.Collections.IList) items);
             Assert.AreEqual("one|two|three", result);
         }
 

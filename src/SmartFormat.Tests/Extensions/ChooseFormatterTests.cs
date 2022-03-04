@@ -38,9 +38,9 @@ namespace SmartFormat.Tests.Extensions
         public void Choose_With_Changed_SplitChar()
         {
             var smart = Smart.CreateDefaultSmartFormat();
-            // Set SplitChar from | to TAB, so we can use | for the output string
-            smart.GetFormatterExtension<ChooseFormatter>()!.SplitChar = '\t';
-            var result = smart.Format("{0:choose(1\t2\t3):|one|\t|two|\t|three|}", 2);
+            // Set SplitChar from | to ~, so we can use | for the output string
+            smart.GetFormatterExtension<ChooseFormatter>()!.SplitChar = '~';
+            var result = smart.Format("{0:choose(1~2~3):|one|~|two|~|three|}", 2);
             Assert.That(result, Is.EqualTo("|two|"));
         }
 

@@ -39,13 +39,13 @@ namespace SmartFormat.Tests.Extensions
             smart.Test(format, args, expected);
         }
 
-        [TestCase("{0:cond:|Yes|\t|No|}", 0, "|Yes|")]
-        [TestCase("{0:cond:|Yes|\t|No|}", 1, "|No|")]
+        [TestCase("{0:cond:|Yes|~|No|}", 0, "|Yes|")]
+        [TestCase("{0:cond:|Yes|~|No|}", 1, "|No|")]
         public void Test_With_Changed_SplitChar(string format, int arg, string expected)
         {
             var smart = Smart.CreateDefaultSmartFormat();
-            // Set SplitChar from | to TAB, so we can use | for the output string
-            smart.GetFormatterExtension<ConditionalFormatter>()!.SplitChar = '\t';
+            // Set SplitChar from | to ~, so we can use | for the output string
+            smart.GetFormatterExtension<ConditionalFormatter>()!.SplitChar = '~';
             var result = smart.Format(format, arg);
             Assert.That(result, Is.EqualTo(expected));
         }
