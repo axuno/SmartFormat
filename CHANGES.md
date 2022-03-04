@@ -570,15 +570,15 @@ Since [#228](https://github.com/axuno/SmartFormat/pull/228) there are no more `C
     * Created class `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
     * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
 
-b) Split character for options and formats
+b) Split character for options and formats ([#243](https://github.com/axuno/SmartFormat/pull/243), [#254](https://github.com/axuno/SmartFormat/pull/254))
 
-Since [#243](https://github.com/axuno/SmartFormat/pull/243) the character to split options and formats can be changed. This allows having the default split character `|` as part of the output string.
+The character to split options and formats can be changed. This allows having the default split character `|` as part of the output string.
 Affects `ChooseFormatter`, `ConditionalFormatter`, `IsMatchFormatter`, `ListFormatter`, `PluralLocalizationFormatter`, `SubStringFormatter`. Example:
 ```Csharp
 var smart = Smart.CreateDefaultSmartFormat();
-// Change SplitChar from | to TAB, so we can use | for the output string
-smart.GetFormatterExtension<ConditionalFormatter>()!.SplitChar = '\t';
-_ = smart.Format({0:cond:|No|\t|Yes|}", 1);
+// Change SplitChar from | to ~, so we can use | for the output string
+smart.GetFormatterExtension<ConditionalFormatter>()!.SplitChar = '~';
+_ = smart.Format({0:cond:|No|~|Yes|}", 1);
 // Result: "|Yes|"
 ```
 
