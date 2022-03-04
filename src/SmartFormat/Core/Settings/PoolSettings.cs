@@ -11,7 +11,7 @@ namespace SmartFormat.Core.Settings
     {
         /// <summary>
         /// Gets or sets whether object pools will tackle created and returned objects.
-        /// The pools are still used for creating new instances, but without tracking.
+        /// If <see langword="false"/>, the pools are still used for creating new instances, but without tracking.
         /// <para>The setting is respected by all subclasses of <see cref="Pooling.SpecializedPools.SpecializedPoolAbstract{T}"/>.</para>
         /// Default is <see langword="true"/>.<br/>
         /// This setting will have immediate effect at any time.

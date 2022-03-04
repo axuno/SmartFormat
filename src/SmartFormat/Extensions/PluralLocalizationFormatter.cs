@@ -17,6 +17,8 @@ namespace SmartFormat.Extensions
     /// </summary>
     public class PluralLocalizationFormatter : IFormatter
     {
+        private char _splitChar = '|';
+
         /// <summary>
         /// CTOR for the plugin with rules for many common languages.
         /// </summary>
@@ -73,8 +75,13 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Gets or sets the character used to split the option text literals.
+        /// Valid characters are: | (pipe) , (comma)  ~ (tilde)
         /// </summary>
-        public char SplitChar { get; set; } = '|';
+        public char SplitChar
+        {
+            get => _splitChar;
+            set => _splitChar = Validation.GetValidSplitCharOrThrow(value);
+        }
 
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)

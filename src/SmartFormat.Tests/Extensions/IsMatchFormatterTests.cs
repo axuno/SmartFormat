@@ -53,14 +53,14 @@ namespace SmartFormat.Tests.Extensions
         }
 
         // The "{}" in the format will output the input variable
-        [TestCase("{theValue:ismatch(^.+123.+$):|Has match for '{}'|\t|No match|}", "|Has match for 'Some123Content'|")]
-        [TestCase("{theValue:ismatch(^.+999.+$):|Has match for '{}'|\t|No match|}", "|No match|")]
+        [TestCase("{theValue:ismatch(^.+123.+$):|Has match for '{}'|~|No match|}", "|Has match for 'Some123Content'|")]
+        [TestCase("{theValue:ismatch(^.+999.+$):|Has match for '{}'|~|No match|}", "|No match|")]
         public void Test_With_Changed_SplitChar(string format, string expected)
         {
             var variable = new Dictionary<string, object> { {"theValue", "Some123Content"}};
             var smart = GetFormatter();;
-            // Set SplitChar from | to TAB, so we can use | for the output string
-            smart.GetFormatterExtension<IsMatchFormatter>()!.SplitChar = '\t';
+            // Set SplitChar from | to ~, so we can use | for the output string
+            smart.GetFormatterExtension<IsMatchFormatter>()!.SplitChar = '~';
             var result = smart.Format(format, variable);
             Assert.That(result, Is.EqualTo(expected));
         }

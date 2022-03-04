@@ -20,6 +20,8 @@ namespace SmartFormat.Extensions
     /// </example>
     public class NullFormatter : IFormatter
     {
+        private char _splitChar = '|';
+
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
         /// </summary>
@@ -34,8 +36,13 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Gets or sets the character used to split the option text literals.
+        /// Valid characters are: | (pipe) , (comma)  ~ (tilde)
         /// </summary>
-        public char SplitChar { get; set; } = '|';
+        public char SplitChar
+        {
+            get => _splitChar;
+            set => _splitChar = Utilities.Validation.GetValidSplitCharOrThrow(value);
+        }
 
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)

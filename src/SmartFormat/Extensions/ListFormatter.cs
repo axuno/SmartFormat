@@ -43,6 +43,7 @@ namespace SmartFormat.Extensions
         // Will be overridden during Initialize()
         private SmartSettings _smartSettings = new();
         private bool _isInitialized = false;
+        private char _splitChar = '|';
 
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
@@ -58,8 +59,13 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Gets or sets the character used to split the option text literals.
+        /// Valid characters are: | (pipe) , (comma)  ~ (tilde)
         /// </summary>
-        public char SplitChar { get; set; } = '|';
+        public char SplitChar
+        {
+            get => _splitChar;
+            set => _splitChar = Utilities.Validation.GetValidSplitCharOrThrow(value);
+        }
 
         /// <summary>
         /// This allows an integer to be used as a selector to index an array (or list).
