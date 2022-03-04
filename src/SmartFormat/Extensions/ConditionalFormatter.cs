@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
@@ -22,6 +21,8 @@ namespace SmartFormat.Extensions
                 //   Description:      and/or    comparator     value
                 RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
+        private char _splitChar = '|';
+
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
         /// </summary>
@@ -36,16 +37,21 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Gets or sets the character used to split the option text literals.
+        /// Valid characters are: | (pipe) , (comma)  ~ (tilde)
         /// </summary>
-        public char SplitChar { get; set; } = '|';
-        
+        public char SplitChar
+        {
+            get => _splitChar;
+            set => _splitChar = Validation.GetValidSplitCharOrThrow(value);
+        }
+
         ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
             
-            // See if the format string contains un-nested "|":
+            // See if the format string contains un-nested splits
             var parameters = format is not null ? format.Split(SplitChar) : new List<Format>(0);
 
             // Check whether arguments can be handled by this formatter
@@ -151,8 +157,7 @@ namespace SmartFormat.Extensions
                 default:
                 {
                     // Object: Something|Nothing
-                    var arg = current;
-                    paramIndex = arg != null ? 0 : 1;
+                    paramIndex = current != null ? 0 : 1;
                     break;
                 }
             }

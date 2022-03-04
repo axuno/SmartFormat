@@ -17,12 +17,18 @@ namespace SmartFormat.Extensions
     public class ChooseFormatter : IFormatter
     {
         private CultureInfo? _cultureInfo;
+        private char _splitChar = '|';
 
         /// <summary>
         /// Gets or sets the character used to split the option text literals.
+        /// Valid characters are: | (pipe) , (comma)  ~ (tilde)
         /// </summary>
-        public char SplitChar { get; set; } = '|';
-        
+        public char SplitChar
+        {
+            get => _splitChar;
+            set => _splitChar = Utilities.Validation.GetValidSplitCharOrThrow(value);
+        }
+
         /// <summary>
         /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
         /// </summary>

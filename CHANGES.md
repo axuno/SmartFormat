@@ -33,7 +33,7 @@ e) `DictionarySource`
 
 The test setup for `ObjectPoolPerformanceTests` is included in the repo. It's obvious, that test results depend a lot on the input format string and the type of data arguments. Still, the results give a good impression of the improvements in `v3.0` compared to `v2.7`.
 
-Results under NetStandard2.1:
+Comparison under NetStandard2.1:
 ```
 |         Method |     N |     Mean |   Error |  StdDev |      Gen 0 |     Gen 1 | Gen 2 | Allocated |
 |--------------- |------ |---------:|--------:|--------:|-----------:|----------:|------:|----------:|

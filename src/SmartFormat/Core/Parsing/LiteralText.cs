@@ -3,7 +3,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Buffers;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
