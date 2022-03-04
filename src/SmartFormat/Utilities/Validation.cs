@@ -9,6 +9,10 @@ namespace SmartFormat.Utilities
 {
     internal class Validation
     {
+        protected Validation()
+        {
+            // Nothing to do here
+        }
         public static char GetValidSplitCharOrThrow(char toCheck)
         {
             var valid = new[] { '|', ',', '~' };
