@@ -289,7 +289,7 @@ namespace SmartFormat.Tests.Extensions
 
             var smart = new SmartFormatter()
                 .AddExtensions(new ReflectionSource())
-                // Set SplitChar from | to TAB, so we can use | for the output string
+                // Set SplitChar from | to ~, so we can use | for the output string
                 .AddExtensions(new PluralLocalizationFormatter { SplitChar = '~'},
                     new DefaultFormatter());
             
