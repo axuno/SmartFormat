@@ -4,8 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
 
@@ -27,7 +25,7 @@ namespace SmartFormat.Extensions
         public string[] Names { get; set; } = {"template", "t"};
 
         ///<inheritdoc/>
-        public string Name { get; set; } = "template";
+        public string Name { get; set; } = "t";
 
         /// <inheritdoc/>
         /// <remarks>
