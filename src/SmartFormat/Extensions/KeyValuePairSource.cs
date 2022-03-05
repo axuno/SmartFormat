@@ -22,6 +22,12 @@ namespace SmartFormat.Extensions
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
+            if (selectorInfo.CurrentValue is null && HasNullableOperator(selectorInfo))
+            {
+                selectorInfo.Result = null;
+                return true;
+            }
+
             switch (selectorInfo.CurrentValue)
             {
                 case null:

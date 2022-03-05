@@ -46,5 +46,25 @@ namespace SmartFormat.Tests.Extensions
                 }, Throws.Nothing);
             Assert.That(result, Is.EqualTo(expected));
         }
+
+        [TestCase(null, "")]
+        public void Call_With_KeyValuePair_Nullable(string? theValue, string expected)
+        {
+            // KeyValuePairSource can process nullable notation
+            // This is only required, if it is the only ISource
+            var smart = new SmartFormatter();
+            smart.AddExtensions(new KeyValuePairSource());
+            smart.AddExtensions(new DefaultFormatter());
+
+            var result = string.Empty;
+            Assert.That(
+                code: () =>
+                {
+                    // Nullable Notation:
+                    // If placeholder is null, Anything should not get evaluated
+                    result = smart.Format("{placeholder?.AnyThing}", new KeyValuePair<string, object?>("placeholder", theValue));
+                }, Throws.Nothing);
+            Assert.That(result, Is.EqualTo(expected));
+        }
     }
 }

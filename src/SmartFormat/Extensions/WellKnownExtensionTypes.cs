@@ -22,7 +22,7 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// Well-known <see cref="ISource"/> implementations in the sequence how they should (not must!) be invoked.
         /// </summary>
-        public static Dictionary<string, int> Sources { get; } = new(StringComparer.InvariantCulture) {
+        public static Dictionary<string, int> Sources { get; } = new(StringComparer.Ordinal) {
             { "SmartFormat.Extensions.GlobalVariablesSource", 1000 },
             { "SmartFormat.Extensions.PersistentVariablesSource", 2000 },
             { "SmartFormat.Extensions.StringSource", 3000 },
@@ -41,7 +41,7 @@ namespace SmartFormat.Extensions
         /// <summary>
         /// Well-known <see cref="IFormatter"/> implementations in the sequence how they should (not must!) be invoked.
         /// </summary>
-        public static Dictionary<string, int> Formatters { get; } = new(StringComparer.InvariantCulture)
+        public static Dictionary<string, int> Formatters { get; } = new(StringComparer.Ordinal)
         {
             { "SmartFormat.Extensions.ListFormatter", 1000 },
             { "SmartFormat.Extensions.PluralLocalizationFormatter", 2000 },
