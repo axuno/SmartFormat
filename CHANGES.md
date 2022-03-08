@@ -230,7 +230,45 @@ Smart.Format("{TheValue:isnull:The value is null|The value is {}}", new {TheValu
 // Result: "The value is 1234"
 ```
 
-### 12. Added `LocalizationFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/207))
+### 12. Enhanced `SubStringFormatter` ([#258](https://github.com/axuno/SmartFormat/pull/258))
+
+The only syntax in v2:
+> **{ string : substr(*start*,*length*)** **}**
+
+Added optional *format-placeholder* in v3
+> **{ string : substr(*start*,*length*)** *: {format-placeholder}* **}**
+
+*value*: Only strings can be processed. Other objects cause a `FormattingException`.
+
+*arguments*: The start position and the lenght of the sub-string.
+
+**NEW**<br/>
+*format-placeholder*: A nested `Placeholder` that lets you format the result of the sub-string operation.
+
+#### Examples with Format argument
+
+The Format argument *must* contain nested `Placeholder`, and *may* contain literal text.
+
+**Convert the substring to lower-case**
+
+```CSharp
+Smart.Format("{0:substr(0,2):{ToLower}}", "ABC");
+//                          |        |
+//                          + format +
+//                             arg
+// Outputs: "ab"
+```
+
+**Format the substring chars with the `ListFormatter`**
+
+Format the substring with *literal text* and *placeholder*.
+
+```CSharp
+smart.Format("{0:substr(0,2):First 2 chars\\: {ToLower.ToCharArray:list:'{}'| and }}", "ABC");
+// Outputs: "First 2 chars: 'a' and 'b'"
+```
+
+### 13. Added `LocalizationFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/207))
 
 #### Features
   * Added `LocalizationFormatter` to localize literals and placeholders
@@ -267,14 +305,14 @@ _ = Smart.Format("{0:plural:{:L(fr):{} item}|{:L(fr):{} items}}", 200;
 // result for French: 200 éléments
 ```
 
-### 13. Improved custom `ISource` and `IFormatter` implementations ([#180](https://github.com/axuno/SmartFormat/pull/180))
+### 14. Improved custom `ISource` and `IFormatter` implementations ([#180](https://github.com/axuno/SmartFormat/pull/180))
 Any custom exensions can implement `IInitializer`. Then, the `SmartFormatter` will call `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
 
-### 14. `IFormatter`s have one single, unique name  ([#185](https://github.com/axuno/SmartFormat/pull/185))
+### 15. `IFormatter`s have one single, unique name  ([#185](https://github.com/axuno/SmartFormat/pull/185))
 In v2, `IFormatter`s could have an unlimited number of names. 
 To improve performance, in v3, this is limited to one single, unique name.
 
-### 15. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177), [#201](https://github.com/axuno/SmartFormat/pull/201))
+### 16. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177), [#201](https://github.com/axuno/SmartFormat/pull/201))
 
 Separation of `JsonSource` into 2 `ISource` extensions:
 * `NewtonSoftJsonSource`
@@ -282,14 +320,14 @@ Separation of `JsonSource` into 2 `ISource` extensions:
 
 Fix: `NewtonSoftJsonSource` handles `null` values correctly ([#201](https://github.com/axuno/SmartFormat/pull/201))
 
-### 16. `SmartFormatter` takes `IList<object>` parameters
+### 17. `SmartFormatter` takes `IList<object>` parameters
 Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to [@karljj1](https://github.com/karljj1)) ([#154](https://github.com/axuno/SmartFormat/pull/154))
 
 ### 18. `SmartObjects` have been removed
 * Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`) ([`092b7b1`](https://github.com/axuno/SmartFormat/commit/092b7b1b5873301bdfeb2b62f221f936efc81430))
 
 
-### 18. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
+### 19. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
 
 Introduced experimental `bool ParserSettings.ParseInputAsHtml`.
 The default is `false`.
@@ -303,7 +341,7 @@ Best results can only be expected with clean HTML: balanced opening and closing 
 SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleSharp](https://anglesharp.github.io/) or [HtmlAgilityPack](https://html-agility-pack.net/).
 
 
-### 19. Refactored `PluralLocalizationFormatter` ([#209](https://github.com/axuno/SmartFormat/pull/209))
+### 20. Refactored `PluralLocalizationFormatter` ([#209](https://github.com/axuno/SmartFormat/pull/209))
 
 * Constructor with string argument for default language is obsolete.
 * Property `DefaultTwoLetterISOLanguageName` is obsolete.
@@ -313,7 +351,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
   c) The `CultureInfo.CurrentUICulture`<br/>
   d) `CultureInfo.InvariantCulture` maps to `CultureInfo.GetCultureInfo("en")` ([#243](https://github.com/axuno/SmartFormat/pull/243))
 
-### 20. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221), [#234](https://github.com/axuno/SmartFormat/pull/234))
+### 21. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221), [#234](https://github.com/axuno/SmartFormat/pull/234))
 
 * Constructor with string argument for default language is obsolete.
 * Property `DefaultTwoLetterISOLanguageName` is obsolete.
@@ -367,7 +405,7 @@ SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleS
     // result: "25 heures 1 minute"
    ```
 <a id="ThreadSafety"></a>
-### 21. Thread Safety ([#229](https://github.com/axuno/SmartFormat/pull/229))
+### 22. Thread Safety ([#229](https://github.com/axuno/SmartFormat/pull/229))
 
 SmartFormat makes heavy use of caching and object pooling for expensive operations, which both require `static` containers. 
 
@@ -384,7 +422,7 @@ With `SmartSettings.IsThreadSafeMode=false` **should** be set for avoiding the m
 The static `Smart.Format(...)` API overloads are allowed here.
 
 <a id="ObjectPooling"></a>
-### 22. How to benefit from object pooling ([#229](https://github.com/axuno/SmartFormat/pull/229))
+### 23. How to benefit from object pooling ([#229](https://github.com/axuno/SmartFormat/pull/229))
 
 In order to return "smart" objects back to the object pool, its important to use one of the following patterns.
 
@@ -412,9 +450,9 @@ var resultString = smart.Format(parsedFormat);
 parsedFormat.Dispose();
 ```
 
-### 23. Packages ([#238](https://github.com/axuno/SmartFormat/pull/238))
+### 24. Packages ([#238](https://github.com/axuno/SmartFormat/pull/238))
 
-#### 23.1 Package overview
+#### 24.1 Package overview
 
 SmartFormat has the following NuGet packages:
 
@@ -473,7 +511,7 @@ This package is a SmartFormat extension for reading and formatting `System.Xml.L
 
 This package is a SmartFormat extension for formatting `System.DateTime`, `System.DateTimeOffset` and `System.TimeSpan` types.
 
-#### 23.2 Add extensions to the `SmartFormatter`
+#### 24.2 Add extensions to the `SmartFormatter`
 
 **a) The easy way**
 
