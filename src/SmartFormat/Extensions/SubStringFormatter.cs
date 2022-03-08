@@ -4,11 +4,13 @@
 
 using System;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Parsing;
 
 namespace SmartFormat.Extensions
 {
     /// <summary>
-    /// Formatter to access part of a string.
+    /// Formatter lets you output part of an input string. 
     /// </summary>
     public class SubStringFormatter : IFormatter
     {
@@ -38,11 +40,15 @@ namespace SmartFormat.Extensions
 
         /// <summary>
         /// Get or set the string to display for NULL values, defaults to <see cref="string.Empty"/>.
+        /// <para>
+        /// It will <b>not</b> be used, if a format option is provided to the formatter.
+        /// In this case, the child formatter must handle the NULL result.
+        /// </para>
         /// </summary>
         public string NullDisplayString { get; set; } = string.Empty;
 
         /// <summary>
-        /// Get or set the behavior for when start index and/or length is too great, defaults to <see cref="SubStringOutOfRangeBehavior.ReturnEmptyString"/>.
+        /// Get or set the behavior when start index and/or length are too big, defaults to <see cref="SubStringOutOfRangeBehavior.ReturnEmptyString"/>.
         /// </summary>
         public SubStringOutOfRangeBehavior OutOfRangeBehavior { get; set; } = SubStringOutOfRangeBehavior.ReturnEmptyString;
 
@@ -62,12 +68,35 @@ namespace SmartFormat.Extensions
             }
 
             var currentValue = formattingInfo.CurrentValue?.ToString();
+            
+            var substring = currentValue == null ? ReadOnlySpan<char>.Empty : GetSubstring(currentValue.AsSpan(), parameters);
+
+            var format = formattingInfo.Format;
+            // A format was supplied, so use it if valid
+            if (format is not null && format.Length > 0)
+            {
+                if (!format.HasNested)
+                    throw new FormattingException(formattingInfo.Format, "The format requires a nested placeholder",
+                        format.StartIndex);
+
+                formattingInfo.FormatAsChild(format, currentValue == null ? null : substring.ToString());
+                return true;
+            }
+
+            // Just output the substring directly
             if (currentValue == null)
             {
                 formattingInfo.Write(NullDisplayString);
                 return true;
             }
-            
+
+            formattingInfo.Write(substring);
+
+            return true;
+        }
+
+        private ReadOnlySpan<char> GetSubstring(ReadOnlySpan<char> currentValue, string[] parameters)
+        {
             var (startPos, length) = GetStartAndLength(currentValue, parameters);
 
             switch(OutOfRangeBehavior)
@@ -78,20 +107,18 @@ namespace SmartFormat.Extensions
                     break;
                 case SubStringOutOfRangeBehavior.ReturnStartIndexToEndOfString:
                     if (startPos + length > currentValue.Length)
-                        length = (currentValue.Length - startPos);
+                        length = currentValue.Length - startPos;
                     break;
             }
 
-            var substring = parameters.Length > 1
-                ? currentValue.Substring(startPos, length)
-                : currentValue.Substring(startPos);
-
-            formattingInfo.Write(substring);
-
-            return true;
+            // SubStringOutOfRangeBehavior.ThrowException:
+            // Without prior adjustments, this may throw 
+            return parameters.Length > 1
+                ? currentValue.Slice(startPos, length)
+                : currentValue.Slice(startPos);
         }
 
-        private static (int startPos, int length) GetStartAndLength(string currentValue, string[] parameters)
+        private static (int startPos, int length) GetStartAndLength(ReadOnlySpan<char> currentValue, string[] parameters)
         {
             var startPos = int.Parse(parameters[0]);
             var length = parameters.Length > 1 ? int.Parse(parameters[1]) : 0;
