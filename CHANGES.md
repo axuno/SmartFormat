@@ -166,7 +166,7 @@ var pvs = new PersistentVariablesSource
     { "global", varGroup }
 };
 // Best to put it to the top of source extensions
-smart.AddExtensions(0, pvs);
+smart.InsertExtension(0, pvs);
 
 // Note: We don't need args to the formatter for PersistentVariablesSource variables
 _ = smart.Format(CultureInfo.InvariantCulture,

@@ -26,11 +26,7 @@ namespace SmartFormat.Extensions
                 _ => selectorInfo.CurrentValue
             };
             
-            if (current is null && HasNullableOperator(selectorInfo))
-            {
-                selectorInfo.Result = null;
-                return true;
-            }
+            if (TrySetResultForNullableOperator(selectorInfo)) return true;
 
             if (current is not JsonElement element) return false;
 

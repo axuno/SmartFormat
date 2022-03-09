@@ -24,7 +24,7 @@ namespace SmartFormat.Extensions
     /// <para>The smart string should take the placeholder format like {groupName.variableName}.</para>
     /// <para>Note: <see cref="IVariablesGroup"/>s from args to SmartFormatter.Format(...) take precedence over <see cref="PersistentVariablesSource"/>.</para>
     /// </summary>
-    public class PersistentVariablesSource : ISource, IDictionary<string, VariablesGroup>
+    public class PersistentVariablesSource : Source, IDictionary<string, VariablesGroup>
     {
         /// <summary>
         /// Contains <see cref="VariablesGroup"/>s and their name.
@@ -217,13 +217,19 @@ namespace SmartFormat.Extensions
         }
 
         /// <inheritdoc/>
-        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
+        public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
-            // First, we test the current value
-            // If selectorInfo.SelectorOperator== string.Empty, the CurrentValue comes from an arg to the SmartFormatter.Format(...)
-            // IVariablesGroups from args have priority over PersistentVariablesSource
-            if (selectorInfo.CurrentValue is IVariablesGroup grp && TryEvaluateGroup(selectorInfo, grp)) 
-                return true;
+            switch (selectorInfo.CurrentValue)
+            {
+                case null when TrySetResultForNullableOperator(selectorInfo):
+                    return true;
+
+                // Next, we test the current value
+                // If selectorInfo.SelectorOperator == string.Empty, the CurrentValue comes from an arg to the SmartFormatter.Format(...)
+                // IVariablesGroups from args have priority over PersistentVariablesSource
+                case IVariablesGroup grp when TryEvaluateGroup(selectorInfo, grp):
+                    return true;
+            }
 
             if (TryGetValue(selectorInfo.SelectorText, out var group))
             {

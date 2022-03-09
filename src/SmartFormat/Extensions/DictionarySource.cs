@@ -19,11 +19,7 @@ namespace SmartFormat.Extensions
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             var current = selectorInfo.CurrentValue;
-            if (current is null && HasNullableOperator(selectorInfo))
-            {
-                selectorInfo.Result = null;
-                return true;
-            }
+            if (TrySetResultForNullableOperator(selectorInfo)) return true;
             
             if (current is null) return false;
 
