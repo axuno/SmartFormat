@@ -49,11 +49,36 @@ namespace SmartFormat.Core.Extensions
         /// <remarks>
         /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
         /// </remarks>
-        protected virtual bool HasNullableOperator(ISelectorInfo selectorInfo)
+        private bool HasNullableOperator(ISelectorInfo selectorInfo)
         {
             return _smartSettings != null && selectorInfo.Placeholder != null &&
                    selectorInfo.Placeholder.Selectors.Any(s =>
                        s.OperatorLength > 1 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
+        }
+
+        /// <summary>
+        /// If any of the <see cref="Placeholder"/>'s <see cref="Placeholder.Selectors"/> has
+        /// nullable <c>?</c> as their first operator, and <see cref="ISelectorInfo.CurrentValue"/>
+        /// is <see langword="null"/>, <see cref="ISelectorInfo.Result"/> will be set to <see langword="null"/>.
+        /// </summary>
+        /// <param name="selectorInfo"></param>
+        /// <returns>
+        /// <see langword="true"/>, if any of the <see cref="Placeholder"/>'s
+        /// <see cref="Placeholder.Selectors"/> has  nullable <c>?</c> as their first
+        /// operator, and <see cref="ISelectorInfo.CurrentValue"/> is <see langword="null"/>.
+        /// </returns>
+        /// <remarks>
+        /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '.[')
+        /// </remarks>
+        protected virtual bool TrySetResultForNullableOperator(ISelectorInfo selectorInfo)
+        {
+            if (HasNullableOperator(selectorInfo) && selectorInfo.CurrentValue is null)
+            {
+                selectorInfo.Result = null;
+                return true;
+            }
+
+            return false;
         }
     }
 }
