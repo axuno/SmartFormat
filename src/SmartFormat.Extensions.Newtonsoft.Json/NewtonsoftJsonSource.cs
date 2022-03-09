@@ -26,12 +26,8 @@ namespace SmartFormat.Extensions
                 JValue jsonValue => jsonValue.Value,
                 _ => selectorInfo.CurrentValue
             };
-            
-            if (current is null && HasNullableOperator(selectorInfo))
-            {
-                selectorInfo.Result = null;
-                return true;
-            }
+
+            if (TrySetResultForNullableOperator(selectorInfo)) return true;
 
             if (current is null) return false;
 

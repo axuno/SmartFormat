@@ -45,20 +45,15 @@ namespace SmartFormat.Extensions
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
-            const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
+            
             var current = selectorInfo.CurrentValue;
             
-            if (current is null && HasNullableOperator(selectorInfo))
-            {
-                selectorInfo.Result = null;
-                return true;
-            }
+            if (TrySetResultForNullableOperator(selectorInfo)) return true;
 
             // strings are processed by StringSource
             if (current is null or string) return false; 
             
             var selector = selectorInfo.SelectorText;
-            
             var sourceType = current.GetType();
 
             // Check the type cache, if enabled
@@ -79,6 +74,18 @@ namespace SmartFormat.Extensions
                 return false;
             }
 
+            if (EvaluateMembers(selectorInfo, selector, current, sourceType)) return true;
+
+            // We also cache failures so we don't need to call GetMembers again
+            if (IsTypeCacheEnabled) TypeCache[(sourceType, selector)] = (null, null);
+
+            return false;
+        }
+
+        private bool EvaluateMembers(ISelectorInfo selectorInfo, string selector, object current, Type sourceType)
+        {
+            const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
+            
             // Important:
             // GetMembers (opposite to GetMember!) returns all members, 
             // both those defined by the type represented by the current T:System.Type object 
@@ -96,21 +103,8 @@ namespace SmartFormat.Extensions
                         return true;
                     case MemberTypes.Property:
                     case MemberTypes.Method:
-                        MethodInfo? method;
-                        if (member.MemberType == MemberTypes.Property)
-                        {
-                            //  Selector is a Property which is not WriteOnly
-                            if (member is PropertyInfo { CanRead: true } prop)
-                                method = prop.GetGetMethod();
-                            else
-                                continue;
-                        }
-                        else
-                        {
-                            //  Selector is a method
-                            method = member as MethodInfo;
-                        }
-
+                        if (!TryGetMethodInfo(member, out var method)) continue;
+ 
                         //  Check that this method is valid -- it needs to return a value and has to be parameter-less:
                         //  We are only looking for a parameter-less Function/Property:
                         if (method?.GetParameters().Length > 0) continue;
@@ -126,10 +120,27 @@ namespace SmartFormat.Extensions
                         return true;
                 }
 
-            // We also cache failures so we don't need to call GetMembers again
-            if (IsTypeCacheEnabled) TypeCache[(sourceType, selector)] = (null, null);
-
             return false;
+        }
+
+        private static bool TryGetMethodInfo(MemberInfo member, out MethodInfo? method)
+        {
+            if (member.MemberType == MemberTypes.Property)
+            {
+                //  Selector is a Property which is not WriteOnly
+                if (member is PropertyInfo { CanRead: true } prop)
+                {
+                    method = prop.GetGetMethod();
+                    return true;
+                }
+
+                method = null;
+                return false;
+            }
+
+            //  Selector is a method
+            method = member as MethodInfo;
+            return true;
         }
     }
 }

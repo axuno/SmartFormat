@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
@@ -226,6 +225,31 @@ namespace SmartFormat.Tests.Extensions
 
             Assert.That(pvs.Name, Is.EqualTo("theName"));
             Assert.That(pvs.Group.ContainsKey("varName"), Is.True);
+        }
+
+        [TestCase("not-null", "not-null")]
+        [TestCase(null, "")]
+        public void Should_Handle_null_for_Nullable(object? valueToUse, string expected)
+        {
+            if (valueToUse is "not-null")
+                valueToUse = new KeyValuePair<string, object?>("Anything", "not-null");
+
+            // The group with just one nullable variable
+            var varGroup = new VariablesGroup { { "NullableVar", new ObjectVariable(valueToUse) } };
+
+            var smart = new SmartFormatter();
+            smart.FormatterExtensions.Add(new DefaultFormatter());
+            var pvs = new PersistentVariablesSource
+            {
+                // top container's name
+                { "Global", varGroup }
+            };
+            
+            smart.AddExtensions(new KeyValuePairSource());
+            smart.InsertExtension(0, pvs);
+
+            var result = smart.Format("{Global.NullableVar?.Anything}");
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [Test]

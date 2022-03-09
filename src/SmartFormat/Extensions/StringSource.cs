@@ -71,11 +71,7 @@ namespace SmartFormat.Extensions
         /// <inheritdoc />
         public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
-            if (selectorInfo.CurrentValue is null && HasNullableOperator(selectorInfo))
-            {
-                selectorInfo.Result = null;
-                return true;
-            }
+            if (TrySetResultForNullableOperator(selectorInfo)) return true;
 
             if (selectorInfo.CurrentValue is not string currentValue) return false;
             var selector = selectorInfo.SelectorText;
