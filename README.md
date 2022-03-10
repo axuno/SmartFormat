@@ -16,7 +16,7 @@
 * Minimal, intuitive syntax
 * Formatting takes place exclusively at runtime
 * Exact control of whitespace text output
-* `string.Format` compatibility mode and `Smart.Format` enhanced mode
+* `string.Format` compatibility mode and *SmartFormat* enhanced mode
 * Most common data sources work out-of-the-box
 * Many built-in formatting extensions
 * Custom formatting and source extensions are easy to integrate
@@ -27,15 +27,11 @@
 * .Net Standard 2.1 and later for best optimizations
  
 ### Get started
-[![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/)
-[![NuGet](https://img.shields.io/nuget/vpre/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the NuGet package
+[![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the **full** NuGet package *-or-*
+
+[![NuGet](https://img.shields.io/nuget/v/SmartFormat.svg)](https://www.nuget.org/packages/SmartFormat/) Install the **core** NuGet package
 
 [![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/wiki)
 Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.Net/wiki)
 
-See [changelog](CHANGES.md) for changes.
-
-# Version 3.0
-
-**See the [list of changes](https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md) already merged into branch `version/v3`**
-
+See the [changelog](CHANGES.md) for changes.

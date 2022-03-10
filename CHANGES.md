@@ -1,633 +1,239 @@
 Latest Changes
 ====
 
-What's new in v3.0.0-rc.2
-====
+v3.0.0
+===
 
-Changes to release v2.7.x
+> You'll find a detailed description for all changes including code samples in the **[Wiki](https://github.com/axuno/SmartFormat/wiki)**.
 
-### 1. Significant boost in performance
-a) After implementing a **zero allocation `ValueStringBuilder`** based on [ZString](https://github.com/Cysharp/ZString) with [#193](https://github.com/axuno/SmartFormat/pull/193) and [#228](https://github.com/axuno/SmartFormat/pull/228):
+### Significant boost in performance
+
+After implementing a **zero allocation `ValueStringBuilder`** ([#193](https://github.com/axuno/SmartFormat/pull/193), [#228](https://github.com/axuno/SmartFormat/pull/228)) and **Object Pools** ([#229](https://github.com/axuno/SmartFormat/pull/229)) for all classes which are frequently instantiated:
    * Parsing is 10% faster with 50-80% less GC and memory allocation
    * Formatting is up to 40% faster with 50% less GC and memory allocation
-b) After implementing **Object Pools** ([#229](https://github.com/axuno/SmartFormat/pull/229)) for all classes which are frequently instantiated, GC and memory allocation again went down significantly. See the test results below.
 
-See also: <a href="#ThreadSafety">thread safety</a> and <a href="#ObjectPooling">object pooling</a>
-
-**More optimizations:**
-
-c) `ReflectionSource`
-   
-   * Added a type cache which increases speed by factor 4. Thanks to [@karljj1](https://github.com/karljj1). ([#155](https://github.com/axuno/SmartFormat/pull/155)). 
-   * Depending on `SmartSettings.IsThreadSafe` the type cache is `ConcurrentDictionary` or `Dictionary`.
- 
-d) `StringSource`
-
-    The `StringSource` takes over a part of the functionality, which has been implemented in `ReflectionSource` in v2. Compared to reflection **with** caching, speed is 20% better at 25% less memory allocation.  
-
-e) `DictionarySource`
-   
-   Speed increased by 10% with less GC pressure ([#189](https://github.com/axuno/SmartFormat/pull/189))
-
-#### Performance Test Results
-
-The test setup for `ObjectPoolPerformanceTests` is included in the repo. It's obvious, that test results depend a lot on the input format string and the type of data arguments. Still, the results give a good impression of the improvements in `v3.0` compared to `v2.7`.
-
-Comparison under NetStandard2.1:
+Sample of BenchmarkDotNet results under NetStandard2.1:
 ```
 |         Method |     N |     Mean |   Error |  StdDev |      Gen 0 |     Gen 1 | Gen 2 | Allocated |
 |--------------- |------ |---------:|--------:|--------:|-----------:|----------:|------:|----------:|
-SmartFormat v2.7.1
+SmartFormat v2.7.2 (only SingleThread)
 | Format         | 10000 | 223.9 ms | 1.48 ms | 1.38 ms | 21333.3333 |         - |     - |    172 MB |
-SmartFormat v3.0-alpha.5
+SmartFormat v3.0.0
 | SingleThread   | 10000 | 108.2 ms | 0.52 ms | 0.49 ms |  3200.0000 |         - |     - |     26 MB |
 | ThreadSafe     | 10000 | 128.0 ms | 1.29 ms | 1.21 ms |  6000.0000 |         - |     - |     48 MB |
-| PoolingDisabled| 10000 | 157.3 ms | 1.74 ms | 1.63 ms | 11000.0000 | 5500.0000 |     - |     88 MB |
-```
-Note: `PoolingDisabled` is just for showing the advantage of object pooling, which was added in `v3.0-alpha.5`.
-
-### 2. Exact control of whitespace text output
-This was an issue in v2 and was going back to combining `string.Format` compatibility with *SmartFormat* features. This is resolved by setting the desired mode with `SmartSettings.StringFormatCompatibility` (defaults to `false`). ([#172](https://github.com/axuno/SmartFormat/pull/172))
-
-### 3. Literals may contain any Unicode characters ([#166](https://github.com/axuno/SmartFormat/pull/166))
-Add unicode escape characters like `"\u1234"`. Thanks to [@karljj1](https://github.com/karljj1).
-
-### 4. Separate modes for "*SmartFormat* features" and "`string.Format` compatibility"
-
-The mode can be set with `SmartSettings.StringFormatCompatibility`. By default, `SmartSettings.StringFormatCompatibility` is `false`. ([#173](https://github.com/axuno/SmartFormat/pull/173), [#175](https://github.com/axuno/SmartFormat/pull/175))
-
-Reasoning: The distinction was necessary because of syntax conflicts between SmartFormat extensions and `string.Format`. It brings a more concise and clear set of formatting rules and full `string.Format` compatibility even in "edge cases".
-
-**a) *SmartFormat* features mode**
-   * Brings the full set of features implemented in *SmartFormat*
-   * Curly braces are escaped the *SmartFormat* way with `\{` and `\}`.
-   * As long as special characters `(){}:\` are escaped with `\`, any character is allowed anywhere. Note: This applies also for the colon.
-
-**b) `string.Format` compatibility mode**
-   * SmartFormat acts as a drop-in replacement
-   * On top, it allows for named placeholders besides indexed placeholders.
-   * The `Parser` will not include the formatter name or formatting options. Like with `string.Format`, everything after the `Selector` separator (colon) is considered as format specifier.
-   * Curly braces are escaped the `string.Format` way with `{{` and `}}`. This is the reason for all limitations in `string.Format` compatibility mode
-   * `DefaultFormatter` is the only formatter which will be invoked. `null` will be output as `string.Empty`.
-
-### 5. Unlimited characters in formatter options ([#164](https://github.com/axuno/SmartFormat/pull/164), [#165](https://github.com/axuno/SmartFormat/pull/165))
-
-This was a big limitation in v2. In v3, the `Parser` can parse any character as part of formatter options. This means e.g. no limitations for `RegEx` expressions used in `IsMatchFormatter`. Note: Special characters like `(){}:\` must be escaped with `\`.
-
-Say we want to include in the output, whether an email is valid (simplified):
-```CSharp
-var emailRegEx = "^((\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)\s*[;]{0,1}\s*)+$";
-// ask a little helper to escape the RegEx
-var escaped = EscapedLiteral.EscapeCharLiterals('\\', emailRegEx, 0, emailRegEx.Length, true);
-// insert the escaped literal from the helper
-var result = Smart.Format("Email {0:ismatch("^\(\(\\w+\([-+.]\\w+\)*@\\w+\([-.]\\w+\)*\\.\\w+\([-.]\\w+\)*\)\\s*[;]\{0,1\}\\s*\)+$"):{} is valid|{} NOT valid}", "joe@specimen.com");
-// returns "Email joe@specimen.com is valid"
 ```
 
-### 6. Simplified caching of parser result ([#183](https://github.com/axuno/SmartFormat/pull/183))
-"Parse once, format often" is simplified: The `Parser`'s `Format` result can be directly used as a parameter of the `SmartFormatter`.
-```Csharp
-var temperatures = new[] {-20, -10, -15};
-// parse once
-using var parsedFormat = new Parser().ParseFormat("Temperature is {Temp}°.");
-// one SmartFormatter instance
-var formatter = Smart.CreateDefaultSmartFormat();
-foreach (var current in temperatures)
-{
-    var result = formatter.Format(parsedFormat, new {Temp = current});
-}
-```
-This pattern is **much** faster than calling
-```CSharp
-// combined parsing and formatting
-var result = Smart.Format("Temperature at North Pole is {Temp}°.", new {Temp = current});
-```
-in the *foreach* loop.
+### string.Format Compatibility ([#172](https://github.com/axuno/SmartFormat/pull/172), [#173](https://github.com/axuno/SmartFormat/pull/173), [#175](https://github.com/axuno/SmartFormat/pull/175))
 
-Class `FormatCache` has been removed in v3.
+The main point about `string.Format` compatibility is, how curly braces and colons are processed in the format string.
 
-### 7. Global support for Alignment ([#174](https://github.com/axuno/SmartFormat/pull/174))
-In v2, Alignment of output values was limited to the `DefaultFormatter`. It's about the equivalent to e.g. `string.Format("{0,10}")`. 
+In most cases `string.Format` compatibility does not bring any advantages.
 
-* Alignment is now supported by all `IFormatter`s.
-* Introduced `FormatterSettings.AlignmentFillCharacter`, to customize the the fill character. Default is space (0x20), like with `string.Format`.
-* Modified `ListFormatter` so that items can be aligned (but the spacers stay untouched).
+With `SmartSettings.StringFormatCompatibility = true` *SmartFormat* is fully compatible. The downside, however, ist that custom formatter extensions cannot be parsed and used with this setting.
 
-### 9. Added `PersistentVariableSource` and `GlobalVariableSource` ([#233](https://github.com/axuno/SmartFormat/pull/233))
+With `SmartSettings.StringFormatCompatibility = false` (default), all features of *SmartFormat* are available.
 
-Both provide global variables that are stored in `VariablesGroup` containers to the `SmartFormatter`. These variables are not passed in as arguments when formatting a string. Instead, they are taken from these registered `ISource`s.
-
-`VariablesGroup`s may contain `Variable<T>`s or other `VariablesGroup`s. The depth of such a tree is unlimited.
-
-a) `GlobalVariableSource` variables are static and are shared with all `SmartFormatter` instances.
-b) `PersistentVariableSource` variables are stored per instance.
-
-`PersistentVariableSource` and `GlobalVariableSource` must be configured and registered as `ISource` extensions as shown in the example below.
-
-#### Example
-
-```Text
-PersistentVariablesSource 
-or GlobalVariablesSource (Containers for Variable / VariablesGroup children)
-|
-+---- VariablesGroup "group"
-|     |
-|     +---- StringVariable "groupString", Value: "groupStringValue"
-|     |
-|     +---- Variable<DateTime> "groupDateTime", Value: 2024-12-31
-|	  
-+---- StringVariable "topInteger", Value: 12345
-|
-+---- StringVariable "topString", Value: "topStringValue"
-```
-Here, we use the `PersistentVariablesSource`:
-```CSharp
-// The top container
-// It gets its name later, when being added to the PersistentVariablesSource
-var varGroup = new VariablesGroup();
-
-// Add a (nested) VariablesGroup named 'group' to the top container
-varGroup.Add("group", new VariablesGroup
-{
-    // Add variables to the group
-    { "groupString", new StringVariable("groupStringValue") },
-    { "groupDateTime", new Variable<DateTime>(new DateTime(2024, 12, 31)) }
-});
-// Add more variables to the container
-varGroup.Add("topInteger", new IntVariable(12345));
-varGroup.Add("topString", new StringVariable("topStringValue"));
-
-// The formatter for persistent variables requires only 2 extensions
-var smart = new SmartFormatter();
-smart.FormatterExtensions.Add(new DefaultFormatter());
-var pvs = new PersistentVariablesSource
-{
-    // Here, the top container gets its name
-    { "global", varGroup }
-};
-// Best to put it to the top of source extensions
-smart.InsertExtension(0, pvs);
-
-// Note: We don't need args to the formatter for PersistentVariablesSource variables
-_ = smart.Format(CultureInfo.InvariantCulture,
-    "{global.group.groupString} {global.group.groupDateTime:'groupDateTime='yyyy-MM-dd}");
-// result: "groupStringValue groupDateTime=2024-12-31"
-
-_ = smart.Format("{global.topInteger}");
-// result: "12345"
-
-_ = smart.Format("{global.topString}");
-// result: "topStringValue"
-```
-
-### 9. Added `StringSource` as another `ISource` ([#178](https://github.com/axuno/SmartFormat/pull/178), [#216](https://github.com/axuno/SmartFormat/pull/216))
-The `StringSource` takes over a part of the functionality, which has been implemented in `ReflectionSource` in v2. Compared to reflection **with** caching, speed is 20% better at 25% less memory allocation.  
-
-`StringSource` brings the following built-in methods (as selector names):
-* Length
-* ToUpper
-* ToUpperInvariant
-* ToLower
-* ToLowerInvariant
-* Trim
-* TrimStart
-* TrimEnd
-* ToCharArray
-* Capitalize
-* CapitalizeWords
-* FromBase64
-* ToBase64
-
-All these selector names may be linked. Example with an indexed placeholder:
-```CSharp
-Smart.Format("{0.ToLower.TrimStart.TrimEnd.ToBase64}", " ABCDE ");
-// result: "YWJjZGU="
-```
-
-### 10. Introduced Nullable Notation ([#176](https://github.com/axuno/SmartFormat/pull/176))
-
-C# like `nullable` notation allows to display `Nullable<T>` types.
-
-The *SmartFormat* notation is `"{SomeNullable?.Property}"`. If `SomeNullable` is null, the expression is evaluated as `string.Empty`.
-
-The nullable operator can also be used for evaluating a list index. E.g.: `Smart.Format("{TheList?[1]}")` will output `string.Empty`, if the list variable is null.
-
-**Note:** Trying to evaluate `null` without the nullable operator will result in a formatting exception. This is the same behavior as in v2.
-
-All `Format()` methods accept nullable args (**[#196](https://github.com/axuno/SmartFormat/pull/196)**).
-Opposed to `string.Format` null(able) arguments are allowed.
+Reasoning: The distinction was necessary because of syntax conflicts between *SmartFormat* extensions and `string.Format`. It brings a more concise and clear set of formatting rules and full `string.Format` compatibility even in "edge cases".
 
 
-### 11. Added `NullFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/176), [#199](https://github.com/axuno/SmartFormat/pull/199))
+### Nullable Notation
 
-In the context of Nullable Notation, the `NullFormatter` has been added. It outputs a custom string literal, if the variable is `null`, else another literal (default is `string.Empty`) or `Placeholder`.
+* C# like `nullable` notation allows to display `Nullable<T>` types safely ([#176](https://github.com/axuno/SmartFormat/pull/176)).
 
-Example:
-```CSharp
-Smart.Format("{TheValue:isnull:This value is null}", new {TheValue = null});
-// Result: "This value is null"
-Smart.Format("{TheValue:isnull:The value is null|The value is {}}", new {TheValue = 1234});
-// Result: "The value is 1234"
-```
+* The *SmartFormat* notation is `"{SomeNullable?.Property}"`. If `SomeNullable` is null, the expression is evaluated as `string.Empty`. `"{SomeNullable.Property}"` would throw a `FormattingException`.
 
-### 12. Enhanced `SubStringFormatter` ([#258](https://github.com/axuno/SmartFormat/pull/258))
+### Thread-Safe Caching ([#229](https://github.com/axuno/SmartFormat/pull/229))
 
-The only syntax in v2:
-> **{ string : substr(*start*,*length*)** **}**
+Object Pools, Reflection and other caches can operate in thread-safe mode.
+(`SmartFormatter`s and `Parser`s still require one instance per thread.)
 
-Added optional *format-placeholder* in v3
-> **{ string : substr(*start*,*length*)** *: {format-placeholder}* **}**
+### No Limits for Allowed Characters
 
-*value*: Only strings can be processed. Other objects cause a `FormattingException`.
+* This was a limitation in v2. In v3, the `Parser` can parse any character as part of formatter options. This means e.g. no limitations for `RegEx` expressions used in `IsMatchFormatter`. Note: Special characters like `(){}:\` must be escaped with `\`.
 
-*arguments*: The start position and the lenght of the sub-string.
+* Literals may contain any Unicode characters ([#166](https://github.com/axuno/SmartFormat/pull/166)). Add unicode escape characters like `"\u1234"`. Thanks to [@karljj1](https://github.com/karljj1).
 
-**NEW**<br/>
-*format-placeholder*: A nested `Placeholder` that lets you format the result of the sub-string operation.
+* Global support for Alignment ([#174](https://github.com/axuno/SmartFormat/pull/174)): In v2, Alignment of output values was limited to the `DefaultFormatter`. It's about the equivalent to e.g. `string.Format("{0,10}")`. Alignment is now supported by all `IFormatter`s.
 
-#### Examples with Format argument
+* Full control about output characters, including whitespace.
 
-The Format argument *must* contain nested `Placeholder`, and *may* contain literal text.
+### Improved parsing of HTML input
 
-**Convert the substring to lower-case**
-
-```CSharp
-Smart.Format("{0:substr(0,2):{ToLower}}", "ABC");
-//                          |        |
-//                          + format +
-//                             arg
-// Outputs: "ab"
-```
-
-**Format the substring chars with the `ListFormatter`**
-
-Format the substring with *literal text* and *placeholder*.
-
-```CSharp
-smart.Format("{0:substr(0,2):First 2 chars\\: {ToLower.ToCharArray:list:'{}'| and }}", "ABC");
-// Outputs: "First 2 chars: 'a' and 'b'"
-```
-
-### 13. Added `LocalizationFormatter` ([#176](https://github.com/axuno/SmartFormat/pull/207))
-
-#### Features
-  * Added `LocalizationFormatter` to localize literals and placeholders
-  * Added `ILocalizationProvider` and a standard implemention as `LocalizationProvider`, which handles `resx` resource files. A fallback culture can be set. It will be used, in case no item for a certain culture could be found in any of the resources. `LocalizationProvider` can search an unlimited number of defined resoures.
-  * `SmartSettings` were exended with category `Localization`. That way, custom `IFormatter`s can also make use of localization, if needed.
-  * Added `LocalizationFormattingException`, which is derived from `FormattingException` to easily identify this kind of issues
-
-#### Examples
-Culture-specific results shown here are included in embedded resource files, which are omitted for brevity.
-
-a) Localize pure literals into Spanish:
-```CSharp
-// culture supplied as a format option
-_ = Smart.Format(culture, "{:L(en):WeTranslateText}");
-// culture supplied as an argument to the formatter
-var culture = CultureInfo.GetCultureInfo("es");
-_ = Smart.Format(culture, "{:L:WeTranslateText}");
-// result for both: "Traducimos el texto"
-```
-b) Localized strings may contain placeholders
-```CSharp
-_ = Smart.Format("{0} {1:L(es):has {:#,#} inhabitants}", "X-City", 8900000);
-// result: "X-City tiene 8.900.000 habitantes"
-_ = Smart.Format("{0} {1:L(es):has {:#,#} inhabitants}", "X-City", 8900000);
-// result: "X-City has 8,900,000 inhabitants"
-```
-c) Localization can be used together with other formatters
-```CSharp
-_ = Smart.Format("{0:plural:{:L(en):{} item}|{:L(en):{} items}}", 0;
-// result for English: 0 items
-_ = Smart.Format("{0:plural:{:L(fr):{} item}|{:L(fr):{} items}}", 0;
-// result for French: 0 élément
-_ = Smart.Format("{0:plural:{:L(fr):{} item}|{:L(fr):{} items}}", 200;
-// result for French: 200 éléments
-```
-
-### 14. Improved custom `ISource` and `IFormatter` implementations ([#180](https://github.com/axuno/SmartFormat/pull/180))
-Any custom exensions can implement `IInitializer`. Then, the `SmartFormatter` will call `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list.
-
-### 15. `IFormatter`s have one single, unique name  ([#185](https://github.com/axuno/SmartFormat/pull/185))
-In v2, `IFormatter`s could have an unlimited number of names. 
-To improve performance, in v3, this is limited to one single, unique name.
-
-### 16. JSON support ([#177](https://github.com/axuno/SmartFormat/pull/177), [#201](https://github.com/axuno/SmartFormat/pull/201))
-
-Separation of `JsonSource` into 2 `ISource` extensions:
-* `NewtonSoftJsonSource`
-* `SystemTextJsonSource`
-
-Fix: `NewtonSoftJsonSource` handles `null` values correctly ([#201](https://github.com/axuno/SmartFormat/pull/201))
-
-### 17. `SmartFormatter` takes `IList<object>` parameters
-Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to [@karljj1](https://github.com/karljj1)) ([#154](https://github.com/axuno/SmartFormat/pull/154))
-
-### 18. `SmartObjects` have been removed
-* Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`) ([`092b7b1`](https://github.com/axuno/SmartFormat/commit/092b7b1b5873301bdfeb2b62f221f936efc81430))
-
-
-### 19. Improved parsing of HTML input ([#203](https://github.com/axuno/SmartFormat/pull/203))
-
-Introduced experimental `bool ParserSettings.ParseInputAsHtml`.
+Introduced `bool ParserSettings.ParseInputAsHtml`.
 The default is `false`.
 
 If `true`, the`Parser` will parse all content inside &lt;script&gt; and &lt;style&gt; tags as `LiteralText`. All other places may still contain `Placeholder`s.
 
 This is because &lt;script&gt; and &lt;style&gt; tags may contain curly or square braces, that interfere with the *SmartFormat* {`Placeholder`}.
 
-Best results can only be expected with clean HTML: balanced opening and closing tags, single and double quotes. Also, do not use angle brackets, single and double quotes in script or style comments.
+### Improved Extensions
 
-SmartFormat is not a fully-fledged HTML parser. If this is required, use [AngleSharp](https://anglesharp.github.io/) or [HtmlAgilityPack](https://html-agility-pack.net/).
+#### Split character for options and formats
 
+The character to split options and formats can be changed. This allows having the default split character `|` as part of the output string.
 
-### 20. Refactored `PluralLocalizationFormatter` ([#209](https://github.com/axuno/SmartFormat/pull/209))
+Affects `ChooseFormatter`, `ConditionalFormatter`, `IsMatchFormatter`, `ListFormatter`, `PluralLocalizationFormatter`, `SubStringFormatter`.
 
-* Constructor with string argument for default language is obsolete.
-* Property `DefaultTwoLetterISOLanguageName` is obsolete.
-* Culture is now determined in this sequence (same as with `LocalizationFormatter`):<br/>
+#### `ReflectionSource`
+   
+Added a type cache which increases speed by factor 4.
+Thanks to [@karljj1](https://github.com/karljj1). ([#155](https://github.com/axuno/SmartFormat/pull/155))
+
+#### `DictionarySource`
+   
+Speed increased by 10% with less GC pressure ([#189](https://github.com/axuno/SmartFormat/pull/189)).
+
+#### `IsMatchFormatter`
+
+The `IsMatchFormatter` is a formatter with evaluation of regular expressions. It allows to control its output depending on a `RegEx` match.
+
+**New:** The formatter can output matching group values of a `RegEx` ([#245](https://github.com/axuno/SmartFormat/pull/245)).
+
+#### `PluralLocalizationFormatter` ([#209](https://github.com/axuno/SmartFormat/pull/209))
+
+* Constructor with string argument for default language is removed.
+* Property `DefaultTwoLetterISOLanguageName` is removed.
+* `CultureInfo.InvariantCulture` maps to `CultureInfo.GetCultureInfo("en")` ([#243](https://github.com/axuno/SmartFormat/pull/243)).
+
+Culture is now determined in this sequence (same as with `LocalizationFormatter`):<br/>
   a) Get the culture from the `FormattingInfo.FormatterOptions`.<br/>
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
-  d) `CultureInfo.InvariantCulture` maps to `CultureInfo.GetCultureInfo("en")` ([#243](https://github.com/axuno/SmartFormat/pull/243))
 
-### 21. Refactored `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221), [#234](https://github.com/axuno/SmartFormat/pull/234))
+#### `TimeFormatter` ([#220](https://github.com/axuno/SmartFormat/pull/220), [#221](https://github.com/axuno/SmartFormat/pull/221), [#234](https://github.com/axuno/SmartFormat/pull/234))
 
-* Constructor with string argument for default language is obsolete.
-* Property `DefaultTwoLetterISOLanguageName` is obsolete.
-* Culture is now determined in this sequence (same as with `LocalizationFormatter` and `PluralLocalizationFormatter`):<br/>
+* Constructor with string argument for default language is removed.
+* Property `DefaultTwoLetterISOLanguageName` is removed.
+
+Culture is now determined in this sequence (same as with `LocalizationFormatter`):<br/>
   a) Get the culture from the `FormattingInfo.FormatterOptions`.<br/>
   b) Get the culture from the `IFormatProvider` argument (which may be a `CultureInfo`) to `SmartFormatter.Format(IFormatProvider, string, object?[])`<br/>
   c) The `CultureInfo.CurrentUICulture`<br/>
-* **New:** With the extended `CommonLanguagesTimeTextInfo`, `TimeFormatter` includes French, Spanish, Portuguese, Italian and German as new languages besides English out-of-the-box.
-* **New:** With e.g. `TimeFormatter.FallbackLanguage = "en";`, this fallback language will be used, if no supported language could be found.
-* **New:** Custom languages can now easily be added to `CommonLanguagesTimeTextInfo`. Custom languages override built-in definitions.
-    ```CSharp
-    var language = "nl"; // dummy - it's English, not Dutch ;-)
-    TimeTextInfo custom = new()
-    {
-        PluralRule = PluralRules.GetPluralRule(language),
-        Ptxt_week = new[] { "{0} week", "{0} weeks" },
-        Ptxt_day = new[] { "{0} day", "{0} days" },
-        Ptxt_hour = new[] { "{0} hour", "{0} hours" },
-        Ptxt_minute = new[] { "{0} minute", "{0} minutes" },
-        Ptxt_second = new[] { "{0} second", "{0} seconds" },
-        Ptxt_millisecond = new[] { "{0} millisecond", "{0} milliseconds" },
-        Ptxt_w = new[] { "{0}w" },
-        Ptxt_d = new[] { "{0}d" },
-        Ptxt_h = new[] { "{0}h" },
-        Ptxt_m = new[] { "{0}m" },
-        Ptxt_s = new[] { "{0}s" },
-        Ptxt_ms = new[] { "{0}ms" },
-        Ptxt_lessThan = "less than {0}"
-    };
-    CommonLanguagesTimeTextInfo.AddLanguage(language, custom)
-    ```
-* **Changed:** 
-  a) This notation - using formats as formatter options - was allowed in *SmartFormat* *v2.x*, but is now depreciated. It is still detected and working, as long as the format part is left empty
-    ```CSharp
-    var formatDepreciated = "{0:time(abbr hours noless)}";
-    ```
-  b) This format string is recommended for *SmartFormat* *v3* and later. It allows for including the language as an option to the `TimeFormatter`:
-    ```CSharp
-    // Without language option:
-    var formatRecommended = "{0:time:abbr hours noless:}";
-    // With language option:
-    var formatRecommended = "{0:time(en):abbr hours noless:}";
-    ```
-* PRs for extending built-in languages are welcome.
-* Example:
-    ```Csharp
-    var timeSpan = new TimeSpan(1,1,1,1,1)
-    Smart.Format("{0:time(en):hours minutes}", timeSpan);
-    // result: "25 hours 1 minute"
-    Smart.Format("{0:time(fr):hours minutes}", timeSpan);
-    // result: "25 heures 1 minute"
-   ```
-<a id="ThreadSafety"></a>
-### 22. Thread Safety ([#229](https://github.com/axuno/SmartFormat/pull/229))
 
-SmartFormat makes heavy use of caching and object pooling for expensive operations, which both require `static` containers. 
+Extended `CommonLanguagesTimeTextInfo`, which now includes French, Spanish, Portuguese, Italian and German as new languages besides English out-of-the-box.
 
-#### a) Instantiating `SmartFormatter`s from different threads: 
-    
-With `SmartSettings.IsThreadSafeMode=true` **must** be set, so that thread safe containers are used. This brings an inherent performance penalty.
-
-**Note:** The simplified `Smart.Format(...)` API overloads use a static `SmartFormatter` instance which is **not** thread safe. Call `Smart.CreateDefaultSmartFormat()` to create a default `SmartFormatter`.
-
-#### b) Instantiating `SmartFormatter`s from a single thread: 
-
-With `SmartSettings.IsThreadSafeMode=false` **should** be set for avoiding the multithreading overhead and thus for best performance. 
-
-The static `Smart.Format(...)` API overloads are allowed here.
-
-<a id="ObjectPooling"></a>
-### 23. How to benefit from object pooling ([#229](https://github.com/axuno/SmartFormat/pull/229))
-
-In order to return "smart" objects back to the object pool, its important to use one of the following patterns.
-
-Examples:
-
-**a) Single thread context** (no need to care about object pooling)
-```CSharp 
-var resultString = Smart.Format("format string", args);
-```
-
-**b) Recommended: Auto-dispose `Format`** (e.g.: caching, multi treading context)
-```CSharp 
-var smart = Smart.CreateDefaultSmartFormat();
-// Note "using" for auto-disposing the parsedFormat
-using var parsedFormat = new Parser().ParseFormat("format string", args);
-var resultString = smart.Format(parsedFormat);
-```
-
-**c) Call `Format.Dispose()`** (e.g.: caching, multi treading context)
+This notation - using formats as formatter options - was allowed in *SmartFormat* *v2.x*, but is now depreciated. It is still detected and working, as long as the format part is left empty.
 ```CSharp
-var smart = Smart.CreateDefaultSmartFormat();
-var parsedFormat = new Parser().ParseFormat("format string", args);
-var resultString = smart.Format(parsedFormat);
-// Don't use (or reference) "parsedFormat" after disposing
-parsedFormat.Dispose();
+var formatDepreciated = "{0:time(abbr hours noless)}";
+```
+This format string is recommended for *SmartFormat* *v3* and later. It allows for including the language as an option to the `TimeFormatter`:
+```CSharp
+// Without language option:
+var formatRecommended = "{0:time:abbr hours noless:}";
+// With language option:
+var formatRecommended = "{0:time(en):abbr hours noless:}";
 ```
 
-### 24. Packages ([#238](https://github.com/axuno/SmartFormat/pull/238))
+#### `SubStringFormatter`
 
-#### 24.1 Package overview
+The formatter now accecpts a format argument with a nested `Placeholder` that lets you format the result of the sub-string operation ([#258](https://github.com/axuno/SmartFormat/pull/258)).
 
-SmartFormat has the following NuGet packages:
+Example: Convert the sub-string to lower-case:
+```CSharp
+Smart.Format("{0:substr(0,2):{ToLower}}", "ABC");
+```
 
-**a) SmartFormat.NET**
+#### `ChooseFormatter` [#253](https://github.com/axuno/SmartFormat/pull/253)
 
-This is package which references all other packages below.
+Modified `ChooseFormatter` case-sensitivity for option strings. This modification is compatible with v2:
 
-**b) SmartFormat**
+* `bool` and `null` as string: always case-insensitive
+* using `SmartSettings.CaseSensitivity` unless overridden with `ChooseFormatter.CaseSensitivity`
+* option strings comparison is culture-aware
 
-SmartFormat is the core package. It comes with the most frequently used extensions built-in:
 
-  1) Source extensions:
+### Added Extensions
 
-  * `GlobalVariablesSource`
-  * `PersistentVariablesSource`
-  * `StringSource` ✔️
-  * `ListFormatter` (implementing `ISource`) ✔️
-  * `DictionarySource` ✔️
-  * `ValueTupleSource` ✔️
-  * `ReflectionSource` ✔️
-  * `DefaultSource` ✔️
-  * `KeyValuePairSource` ✔️
+#### `StringSource`
 
-  2) Formatter extensions:
+The `StringSource` takes over a part of the functionality, which has been implemented in `ReflectionSource` in v2. Compared to reflection **with** caching, speed is 20% better at 25% less memory allocation. ([#178](https://github.com/axuno/SmartFormat/pull/178), [#216](https://github.com/axuno/SmartFormat/pull/216))
 
-  * `ListFormatter` (implementing `IFormatter`) ✔️
-  * `PluralLocalizationFormatter` ✔️
-  * `ConditionalFormatter` ✔️
-  * `IsMatchFormatter` ✔️
-  * `NullFormatter` ✔️
-  * `LocalizationFormatter`
-  * `TemplateFormatter`
-  * `ChooseFormatter` ✔️
-  * `SubStringFormatter` ✔️
-  * `DefaultFormatter` ✔️
+#### `KeyValuePairSource` ([#244](https://github.com/axuno/SmartFormat/pull/244))
 
-> **Breaking change:**
-> 
-> Note that only extensions marked (✔️) are included when calling `Smart.CreateDefaultFormatter(...)` amd also when using `Smart.Format(...)`. These default extensions differ from previously included extensions.
+The `KeyValuePairSource` is a simple, cheap and performant way to create named placeholders.
 
-Some extensions (like `PersistentVariablesSource` and `TemplateFormatter`) require configuration to be useful.
+#### JSON support
 
-**c) SmartFormat.Extensions.System.Text.Json**
+Separation of `JsonSource` into 2 `ISource` extensions ([#177](https://github.com/axuno/SmartFormat/pull/177), [#201](https://github.com/axuno/SmartFormat/pull/201)):
+
+* `NewtonSoftJsonSource`
+* `SystemTextJsonSource`
+
+#### `PersistentVariableSource` and `GlobalVariableSource`
+
+Both provide global variables that are stored in `VariablesGroup` containers. These variables are not passed in as arguments when formatting a string. Instead, they are taken from one of these two registered (global) `ISource`s. ([#233](https://github.com/axuno/SmartFormat/pull/233))
+
+Credits to [Needle](https://github.com/needle-tools)
+   and their [PersistentVariablesSource](https://github.com/needle-mirror/com.unity.localization/blob/master/Runtime/Smart%20Format/Extensions/PersistentVariablesSource.cs) extension to *SmartFormat*.
+
+#### `NullFormatter`
+
+In the context of Nullable Notation (see below), the `NullFormatter` has been added. It outputs a custom string literal, if the variable is `null`, else another literal (default is `string.Empty`) or a nested `Placeholder`. ([#176](https://github.com/axuno/SmartFormat/pull/176), [#199](https://github.com/axuno/SmartFormat/pull/199))
+
+#### `LocalizationFormatter`
+
+  * Added `LocalizationFormatter` to localize literals and placeholders ([#207](https://github.com/axuno/SmartFormat/pull/207)).
+
+  * Added `ILocalizationProvider` and a standard implemention as `LocalizationProvider`, which handles `resx` resource files. A fallback culture can be set. `LocalizationProvider` can search an unlimited number of defined resoures.
+
+### Miscellaneous
+
+#### Formatter Name
+
+`IFormatter`s have one single, unique name ([#185](https://github.com/axuno/SmartFormat/pull/185)).
+In v2, `IFormatter`s could have an unlimited number of names. 
+
+#### `IInitializer` Interface
+
+Any (custom) `ISource` and `IFormatter` can implement `IInitializer`. Then, the `SmartFormatter` will call `Initialize(SmartFormatter smartFormatter)` of the extension, before adding it to the extension list ([#180](https://github.com/axuno/SmartFormat/pull/180)).
+
+#### New parameter type for `SmartFormatter.Format(...)`
+
+Added support for `IList<object>` parameters to the `SmartFormatter` (thanks to [@karljj1](https://github.com/karljj1)) ([#154](https://github.com/axuno/SmartFormat/pull/154))
+
+#### `SmartObjects`
+
+Removed obsolete `SmartObjects` (which have been replaced by `ValueTuple`) ([`092b7b1`](https://github.com/axuno/SmartFormat/commit/092b7b1b5873301bdfeb2b62f221f936efc81430))
+
+#### Parsing HTML input
+
+Introduced experimental `bool ParserSettings.ParseInputAsHtml`.
+The default is `false`.
+
+If `true`, the`Parser` will parse all content inside &lt;script&gt; and &lt;style&gt; tags as `LiteralText`. This is because &lt;script&gt; and &lt;style&gt; tags may contain curly or square braces, that interfere with the *SmartFormat* {`Placeholder`}.
+
+ All other places may still contain `Placeholder`s. ([#203](https://github.com/axuno/SmartFormat/pull/203))
+
+#### *SmartFormat* Packages
+
+**SmartFormat.NET**
+
+This is a package which references **all packages** below.
+
+**SmartFormat**
+
+SmartFormat is the **core package**. It comes with the most frequently used extensions built-in.
+
+**SmartFormat.Extensions.System.Text.Json**
 
 This package is a SmartFormat extension for formatting `System.Text.Json` types as a source.
 
-**d) SmartFormat.Extensions.Newtonsoft.Json**
+**SmartFormat.Extensions.Newtonsoft.Json**
 
 This package is a SmartFormat extension for formatting `Newtonsoft.Json` types as a source.
 
-**e) SmartFormat.Extensions.Xml**
+**SmartFormat.Extensions.Xml**
 
 This package is a SmartFormat extension for reading and formatting `System.Xml.Linq.XElement`s.
 
-**f) SmartFormat.Extensions.Time**
+**SmartFormat.Extensions.Time**
 
 This package is a SmartFormat extension for formatting `System.DateTime`, `System.DateTimeOffset` and `System.TimeSpan` types.
 
-#### 24.2 Add extensions to the `SmartFormatter`
+---
+## v2 Releases
 
-**a) The easy way**
-
-Call `Smart.CreateDefaultFormatter(...)` and get a ready-to-use `SmartFormatter`. The same happens under the hood when calling one of the `Smart.Format(...)` methods.
-
-**b) The tailor-made alternative**
-
-When it comes to performance, it is advisable to add only those specific extensions that are needed. Just like this:
-
-```CSharp
-var formatter = new SmartFormatter()
-    .AddExtensions(new ReflectionSource())
-    .AddExtensions(new PluralLocalizationFormatter(), new DefaultFormatter());
-```
-> **Breaking change:**
->
-> In v3.0 all `WellKnownExtensionTypes.Sources` and `WellKnownExtensionTypes.Formatters` are *automatically* inserted to the extension list at the place *where they usually should be*.
-
-Any extension can, however, be inserted to the desired position in the extension list:
-* `SmartFormatter.InsertExtension(int position, IFormatter sourceExtension)`
-* `SmartFormatter.InsertExtension(int position, IFormatter formatterExtension)`
-
-This can be useful especially when adding your custom extensions. You should call `SmartFormatter.InsertExtension(...)` *after* `SmartFormatter.AddExtensions(...)`:
-
-```CSharp
-var formatter = new SmartFormatter()
-    .AddExtensions(new ReflectionSource())
-    .AddExtensions(new PluralLocalizationFormatter(), new DefaultFormatter())
-    .InsertExtension(0, new MyCustomFormatter());
-```
-
-### 25. Introduced new `KeyValuePairSource` ([#244](https://github.com/axuno/SmartFormat/pull/244))
-
-The `KeyValuePairSource` as a simple, cheap and performant way to create named placeholders.
-
-> Important: The type arguments for `KeyValuePair` *must* be `<string, object?>`. `KeyValuePair`s may be nested.
-
-Example:
-```Csharp
-Smart.Format("{placeholder}", new KeyValuePair<string, object?>("placeholder", "some value")
-// Result: "some value"
-```
-
-`KeyValuePairSource` is included in `Smart.CreateDefaultFormatter()`.
-
-
-### 26. Advanced features for `IsMatchFormatter` ([#245](https://github.com/axuno/SmartFormat/pull/245))
-
-The `IsMatchFormatter` is a formatter with evaluation of regular expressions.
-
-**New:** The formatter can output matching group values of a `RegEx`.
-
-#### Example:
-
-We'll evalute this argument with `IsMatchFormatter`:
-```Csharp
-KeyValuePair<string, object> arg = new("theValue", "Some123Content");
-```
-
-##### a) Simple "match or no match" distinction:
-
-This behavior is unchanged.
-
-```Csharp
-_ = Smart.Format("{theValue:ismatch(^.+123.+$):Okay - {}|No match content}", arg);
-// Result: "Okay - Some123Content"
-
-_ = Smart.Format("{theValue:ismatch(^.+999.+$):Okay - {}|No match content}", arg);
-// Result: "No match content"
-```
-
-##### b) Show the matches in the output:
-
-```Csharp
-// List the matching RegEx group values
-_ = Smart.Format("{theValue:ismatch(^.+\\(1\\)\\(2\\)\\(3\\).+$):Matches for '{}'\\: {m:list:| - }|No match}", arg);
-// Result: "Matches for 'Some123Content': Some123Content - 1 - 2 - 3"
-
-// Show specific matching RegEx group values with their index in the list
-_ = Smart.Format("{theValue:ismatch(^.+\\(1\\)\\(2\\)\\(3\\).+$):First 2 matches in '{}'\\: {m[1]} and {m[2]}|No match}", arg);
-// Result: "First 2 matches in 'Some123Content': 1 and 2"
-```
-
-The placeholder `m` is for the collection of matching RegEx group values generated by `IsMatchFormatter`. The collection has at least one entry for a successful match. See more details in the Microsoft docs for the `GroupCollection` class.
-
-The name of the placeholder can be set with `IsMatchFormatter.PlaceholderNameForMatches`. "m" is the default.
-
-
-### 27. Miscellaneous
-
-a) Cyhsarp.Text
-
-Since [#228](https://github.com/axuno/SmartFormat/pull/228) there are no more `Cysharp.Text` classes used in the `SmartFormat` namespace
-    * Created class `ZStringBuilder` as a wrapper around `Utf16ValueStringBuilder`. 
-    * Replaced occurrences of `Utf16ValueStringBuilder` with `ZStringBuilder`.
-
-b) Split character for options and formats ([#243](https://github.com/axuno/SmartFormat/pull/243), [#254](https://github.com/axuno/SmartFormat/pull/254))
-
-The character to split options and formats can be changed. This allows having the default split character `|` as part of the output string.
-Affects `ChooseFormatter`, `ConditionalFormatter`, `IsMatchFormatter`, `ListFormatter`, `PluralLocalizationFormatter`, `SubStringFormatter`. Example:
-```Csharp
-var smart = Smart.CreateDefaultSmartFormat();
-// Change SplitChar from | to ~, so we can use | for the output string
-smart.GetFormatterExtension<ConditionalFormatter>()!.SplitChar = '~';
-_ = smart.Format({0:cond:|No|~|Yes|}", 1);
-// Result: "|Yes|"
-```
-
-c) ChooseFormatter [#253](https://github.com/axuno/SmartFormat/pull/253)
-
-    Modified `ChooseFormatter` case-sensitivity for option strings. This modification is compatible with v2.
-
-    * `bool` and `null` as string: always case-insensitive
-    * using `SmartSettings.CaseSensitivity` unless overridden with `ChooseFormatter.CaseSensitivity`
-    * option strings comparison is culture-aware
-
+---
 
 v2.7.2
 ===
