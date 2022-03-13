@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
@@ -22,15 +22,30 @@
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+        <None Include="../../PkgReadMe.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
       <DefineConstants>TRACE</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <WarningLevel>3</WarningLevel>
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 
     <ItemGroup>
       <!-- repo\src\ZString\ZStringWriter.cs replaced for net461 compatibility -->
