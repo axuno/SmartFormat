@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using FluentAssertions.Formatting;
-using NUnit.Framework;
-using SmartFormat.Core.Extensions;
+﻿using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
-using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
 {
