@@ -22,7 +22,6 @@ for:
       - ps: dotnet --version
       - ps: dotnet restore SmartFormat.sln --verbosity quiet
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
-      - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
       - ps: |
           $version = "3.0.0"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
@@ -31,10 +30,11 @@ for:
               $version = $version + "-PR" + $env:APPVEYOR_PULL_REQUEST_NUMBER
           }
 
+          dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
+
           # Only pack for the main project, exclude forks
           if ($env:APPVEYOR_PROJECT_SLUG -eq 'smartformat')  {
-              dotnet build SmartFormat.Deploy.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
-              dotnet pack  SmartFormat.Deploy.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
+              dotnet pack SmartFormat.Deploy.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
           }
     test_script:
       - cmd: nuget install Appveyor.TestLogger
