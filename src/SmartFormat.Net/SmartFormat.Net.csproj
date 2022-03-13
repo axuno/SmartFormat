@@ -16,8 +16,7 @@ It uses extensions to provide named placeholders, localization, pluralization, g
         <SignAssembly>true</SignAssembly>
         <PackageId>SmartFormat.NET</PackageId>
         <PackageReleaseNotes>See the change log for details of this release:
-            https://github.com/axuno/SmartFormat/blob/version/v3.0/CHANGES.md
-            Give it a try.
+            https://github.com/axuno/SmartFormat/blob/main/CHANGES.md
         </PackageReleaseNotes>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageLicenseFile></PackageLicenseFile>
@@ -35,10 +34,12 @@ It uses extensions to provide named placeholders, localization, pluralization, g
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="\" />
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+        <None Include="../../PkgReadMe.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 
     <ItemGroup>

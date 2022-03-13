@@ -36,7 +36,7 @@ namespace SmartFormat.Tests.Extensions
                 new TimeSpan(0,2,0,2,0),
                 new TimeSpan(3,0,0,3,0),
                 new TimeSpan(0,0,0,0,4),
-                new TimeSpan(5,0,0,0,0),
+                new TimeSpan(5,0,0,0,0)
             };
         }
 

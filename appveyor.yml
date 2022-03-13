@@ -24,7 +24,7 @@ for:
       - ps: dotnet add .\SmartFormat.Tests\SmartFormat.Tests.csproj package AltCover
       - ps: dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
       - ps: |
-          $version = "3.0.0-rc.2"
+          $version = "3.0.0"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
 
           if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
@@ -45,12 +45,12 @@ for:
         type: NuGetPackage
       - path: 'artifacts\*.snupkg'
         type: NuGetPackage
-    deploy:
-      - provider: NuGet
-        api_key:
-          secure: siTK+zMCX6XYTT2G7uhX9XjB6LNhDtZheum/MKIfrnsBITjZ+yEGAPNKVL/LCEPB
-        on:
-          branch: version/v3.0
+    #deploy:
+    #  - provider: NuGet
+    #    api_key:
+    #      secure: siTK+zMCX6XYTT2G7uhX9XjB6LNhDtZheum/MKIfrnsBITjZ+yEGAPNKVL/LCEPB
+    #    on:
+    #      branch: main
   -
     matrix:
       only:
