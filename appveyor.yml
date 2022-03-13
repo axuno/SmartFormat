@@ -33,7 +33,8 @@ for:
 
           # Only pack for the main project, exclude forks
           if ($env:APPVEYOR_PROJECT_SLUG -eq 'smartformat')  {
-              dotnet pack SmartFormat.Deploy.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
+              dotnet build SmartFormat.Deploy.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
+              dotnet pack  SmartFormat.Deploy.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=../../artifacts /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
           }
     test_script:
       - cmd: nuget install Appveyor.TestLogger
