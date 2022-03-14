@@ -802,12 +802,12 @@ namespace SmartFormat.Tests.Core
         [Test]
         public void ParsingErrors_Serialization()
         {
-            // serialize to bytes
             using var stream = new MemoryStream();
-            new BinaryFormatter().Serialize(stream, new ParsingErrors());
+            var fmt = new BinaryFormatter(); //NOSONAR
+            fmt.Serialize(stream, new ParsingErrors());
             stream.Position = 0;
             
-            var exception = new BinaryFormatter().Deserialize(stream) as ParsingErrors;
+            var exception = fmt.Deserialize(stream) as ParsingErrors;
             Assert.That(exception, Is.TypeOf<ParsingErrors>());
         }
     }
