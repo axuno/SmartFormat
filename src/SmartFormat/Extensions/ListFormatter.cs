@@ -85,7 +85,7 @@ namespace SmartFormat.Extensions
             if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
                 itemIndex < currentList.Count)
             {
-                // The current is a List, and the selector is a number;
+                // The current is a List, and the selector is a number
                 // let's return the List item:
                 // Example: {People[2].Name}
                 //           ^List  ^itemIndex

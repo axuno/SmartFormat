@@ -134,7 +134,7 @@ namespace SmartFormat.Tests.Core
             };
             foreach (var format in invalidFormats)
             {
-                _ = parser.ParseFormat(format);
+                Assert.That(del: () => _ = parser.ParseFormat(format), Throws.Nothing);
             }
         }
 

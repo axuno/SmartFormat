@@ -22,20 +22,18 @@ namespace SmartFormat.Extensions
             var selector = selectorInfo.SelectorText;
             var formatDetails = selectorInfo.FormatDetails;
 
-            if (int.TryParse(selector, out var selectorValue))
+            if (int.TryParse(selector, out var selectorValue)
+                && selectorInfo.SelectorIndex == 0
+                && selectorValue < formatDetails.OriginalArgs.Count
+                && selectorInfo.SelectorOperator == string.Empty)
             {
                 // Argument Index:
                 // Just like string.Format, the arg index must be in-range,
                 // must be the first item, and shouldn't have any operator
-                if (selectorInfo.SelectorIndex == 0
-                    && selectorValue < formatDetails.OriginalArgs.Count
-                    && selectorInfo.SelectorOperator == string.Empty)
-                {
-                    // This selector is an argument index.
-                    // Get the value from arguments.
-                    selectorInfo.Result = formatDetails.OriginalArgs[selectorValue];
-                    return true;
-                }
+                // This selector is an argument index.
+                // Get the value from arguments.
+                selectorInfo.Result = formatDetails.OriginalArgs[selectorValue];
+                return true;
             }
 
             return false;

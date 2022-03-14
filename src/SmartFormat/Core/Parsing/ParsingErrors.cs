@@ -16,7 +16,7 @@ namespace SmartFormat.Core.Parsing
     /// This exception only gets thrown when Parser.ErrorAction is set to ThrowError.
     /// </summary>
     [Serializable]
-    public class ParsingErrors : Exception
+    public class ParsingErrors : Exception   //NOSONAR
     {
         private Format _result = InitializationObject.Format;
 
@@ -96,6 +96,13 @@ namespace SmartFormat.Core.Parsing
                 return
                     $"The format string has {Issues.Count} issue{(Issues.Count == 1 ? string.Empty : "s")}:\n{string.Join(", ", Issues.Select(i => i.Issue).ToArray())}\nIn: \"{_result.BaseString}\"\nAt:  {arrows} ";
             }
+        }
+
+        ///<inheritdoc/>
+        protected ParsingErrors(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) : base(info, context)
+        {
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ namespace SmartFormat.Core.Formatting
     /// <summary>
     /// An exception caused while attempting to output the format.
     /// </summary>
+    [Serializable]
     public class FormattingException : Exception
     {
         /// <summary>
@@ -73,5 +74,6 @@ namespace SmartFormat.Core.Formatting
         /// </summary>
         public override string Message =>
             $"Error parsing format string: {Issue} at {Index}\n{Format}\n{new string('-', Index) + "^"}";
+
     }
 }
