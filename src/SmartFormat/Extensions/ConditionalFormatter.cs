@@ -1,48 +1,74 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Net.Utilities;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions
 {
+    /// <summary>
+    /// A class to format primitive types with condition patterns.
+    /// </summary>
     public class ConditionalFormatter : IFormatter
     {
         private static readonly Regex _complexConditionPattern
-            = new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
+            = new(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
                 //   Description:      and/or    comparator     value
                 RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        public string[] Names { get; set; } = {"conditional", "cond", ""};
+        private char _splitChar = '|';
 
+        /// <summary>
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
+        /// </summary>
+        [Obsolete("Use property \"Name\" instead", true)]
+        public string[] Names { get; set; } = {"conditional", "cond", string.Empty};
+
+        ///<inheritdoc/>
+        public string Name { get; set; } = "cond";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the character used to split the option text literals.
+        /// Valid characters are: | (pipe) , (comma)  ~ (tilde)
+        /// </summary>
+        public char SplitChar
+        {
+            get => _splitChar;
+            set => _splitChar = Validation.GetValidSplitCharOrThrow(value);
+        }
+
+        ///<inheritdoc />
         public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
+            
+            // See if the format string contains un-nested splits
+            var parameters = format is not null ? format.Split(SplitChar) : new List<Format>(0);
 
-            if (format == null) return false;
-            // Ignore a leading ":", which is used to bypass the PluralLocalizationExtension
-            if (format.baseString[format.startIndex] == ':') format = format.Substring(1);
+            // Check whether arguments can be handled by this formatter
+            if (format is null || parameters.Count == 1)
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
 
-            // See if the format string contains un-nested "|":
-            var parameters = format.Split('|');
-            if (parameters.Count == 1) return false; // There are no parameters found.
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 format parameters.");
+            }
 
-            // See if the value is a number:
+            // See if the value is a number or an Enum:
             var currentIsNumber =
-                current is byte or short or ushort or int or uint or long or ulong or float or double or decimal
-                    or Enum;
-
-            // An Enum is a number too:
-
-            if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
-                currentIsNumber = true;
+                current is byte or short or ushort or int or uint or long or ulong or float or double or decimal or Enum;
 
             var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
 
@@ -52,11 +78,8 @@ namespace SmartFormat.Extensions
             if (currentIsNumber)
             {
                 paramIndex = -1;
-                while (true)
+                while (paramIndex++ < parameters.Count)
                 {
-                    paramIndex++;
-                    if (paramIndex == parameters.Count) return true;
-
                     if (!TryEvaluateCondition(parameters[paramIndex], currentNumber, out var conditionWasTrue,
                         out var outputItem))
                     {
@@ -72,7 +95,7 @@ namespace SmartFormat.Extensions
                     // If the conditional statement was true, then we can break.
                     if (conditionWasTrue)
                     {
-                        formattingInfo.Write(outputItem, current ?? string.Empty);
+                        formattingInfo.FormatAsChild(outputItem, current);
                         return true;
                     }
                 }
@@ -114,7 +137,7 @@ namespace SmartFormat.Extensions
                 case DateTimeOffset dateTimeOffsetArg when dateTimeOffsetArg.UtcDateTime <= SystemTime.OffsetNow().UtcDateTime:
                     paramIndex = 0;
                     break;
-                case DateTimeOffset dateTimeOffsetArg:
+                case DateTimeOffset:
                     paramIndex = paramCount - 1;
                     break;
                 // TimeSpan: Negative|Zero|Positive  or  Negative/Zero|Positive
@@ -124,7 +147,7 @@ namespace SmartFormat.Extensions
                 case TimeSpan timeSpanArg when timeSpanArg.CompareTo(TimeSpan.Zero) <= 0:
                     paramIndex = 0;
                     break;
-                case TimeSpan timeSpanArg:
+                case TimeSpan:
                     paramIndex = paramCount - 1;
                     break;
                 case string stringArg:
@@ -134,8 +157,7 @@ namespace SmartFormat.Extensions
                 default:
                 {
                     // Object: Something|Nothing
-                    var arg = current;
-                    paramIndex = arg != null ? 0 : 1;
+                    paramIndex = current != null ? 0 : 1;
                     break;
                 }
             }
@@ -144,13 +166,13 @@ namespace SmartFormat.Extensions
             var selectedParameter = parameters[paramIndex];
 
             // Output the selectedParameter:
-            formattingInfo.Write(selectedParameter, current ?? string.Empty);
+            formattingInfo.FormatAsChild(selectedParameter, current);
             return true;
         }
 
         /// <summary>
         /// Evaluates a conditional format.
-        /// Each condition must start with a comparor: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
+        /// Each condition must start with a comparer: "&gt;/&gt;=", "&lt;/&lt;=", "=", "!=".
         /// Conditions must be separated by either "&amp;" (AND) or "/" (OR).
         /// The conditional statement must end with a "?".
         /// Examples:
@@ -161,8 +183,8 @@ namespace SmartFormat.Extensions
         {
             conditionResult = false;
             // Let's evaluate the conditions into a boolean value:
-            var m = _complexConditionPattern.Match(parameter.baseString, parameter.startIndex,
-                parameter.endIndex - parameter.startIndex);
+            var m = _complexConditionPattern.Match(parameter.BaseString, parameter.StartIndex,
+                parameter.EndIndex - parameter.StartIndex);
             if (!m.Success)
             {
                 // Could not parse the "complex condition"
@@ -206,14 +228,14 @@ namespace SmartFormat.Extensions
                 if (i == 0)
                     conditionResult = exp;
                 else if (andOrs[i].Value == "/")
-                    conditionResult = conditionResult | exp;
+                    conditionResult |= exp;
                 else
-                    conditionResult = conditionResult & exp;
+                    conditionResult &= exp;
             }
 
             // Successful
             // Output the substring that doesn't contain the "complex condition"
-            var newStartIndex = m.Index + m.Length - parameter.startIndex;
+            var newStartIndex = m.Index + m.Length - parameter.StartIndex;
             outputItem = parameter.Substring(newStartIndex);
             return true;
         }

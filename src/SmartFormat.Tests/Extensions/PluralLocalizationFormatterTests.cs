@@ -1,6 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using NUnit.Framework;
+using SmartFormat.Core.Formatting;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Utilities;
 using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
@@ -10,13 +13,21 @@ namespace SmartFormat.Tests.Extensions
     [TestFixture]
     public class PluralLocalizationFormatterTests
     {
-        private void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
+        public static SmartFormatter GetFormatter(SmartSettings? smartSettings = null)
+        {
+            var smart = Smart.CreateDefaultSmartFormat(smartSettings ?? new SmartSettings());
+            smart.InsertExtension(1, new PluralLocalizationFormatter());
+            return smart;
+        }
+
+        private static void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
         {
             foreach (var test in expectedValuesAndResults)
             {
+                var smart = GetFormatter();
                 var value = test.Key;
                 var expected = test.Value;
-                var actual = Smart.Format(cultureInfo, format, value);
+                var actual = smart.Format(cultureInfo, format, value);
 
                 Assert.That(actual, Is.EqualTo(expected));
                 Debug.WriteLine(actual);
@@ -24,11 +35,25 @@ namespace SmartFormat.Tests.Extensions
         }
 
         [Test]
+        public void Explicit_Formatter_With_Not_Enough_Parameters_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:plural:One}", 1), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
+        public void Explicit_Formatter_Without_IEnumerable_Arg_Should_Throw()
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            Assert.That(() => smart.Format("{0:plural:One|Two}", new object()), Throws.Exception.TypeOf<FormattingException>());
+        }
+
+        [Test]
         public void Test_Default()
         {
             TestAllResults(
                 new CultureInfo("en-US"),
-                "There {0:is|are} {0} {0:item|items} remaining",
+                "There {0:plural:is|are} {0} {0:plural:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},
                     {   0, "There are 0 items remaining"},
@@ -45,7 +70,7 @@ namespace SmartFormat.Tests.Extensions
         {
             TestAllResults(
                 new CultureInfo("en-US"),
-                "There {0:is|are} {0} {0:item|items} remaining",
+                "There {0:plural:is|are} {0} {0:plural:item|items} remaining",
                 new ExpectedResults {
                     {  -1, "There are -1 items remaining"},
                     {   0, "There are 0 items remaining"},
@@ -60,12 +85,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_English_Unsigned()
         {
-            /**
-             * Different pattern for this test because simply casting ints to u* types
-             * for use in TestCase or ExpectedResults will pass with the old code
-             * but actually declaring them as u* doesn't.
-             */
-
+            var smart = GetFormatter();
             const string format = "There {0:plural(en):is|are} {0} {0:plural(en):item|items} remaining";
 
             var expectedResults = new[]
@@ -77,19 +97,19 @@ namespace SmartFormat.Tests.Extensions
 
             for (ushort i = 0; i < expectedResults.Length; i++)
             {
-                var actualResult = Smart.Format(format, i);
+                var actualResult = smart.Format(format, i);
                 Assert.AreEqual(expectedResults[i], actualResult);
             }
 
             for (uint i = 0; i < expectedResults.Length; i++)
             {
-                var actualResult = Smart.Format(format, i);
+                var actualResult = smart.Format(format, i);
                 Assert.AreEqual(expectedResults[i], actualResult);
             }
 
             for (ulong i = 0; i < (ulong)expectedResults.Length; i++)
             {
-                var actualResult = Smart.Format(format, i);
+                var actualResult = smart.Format(format, i);
                 Assert.AreEqual(expectedResults[i], actualResult);
             }
         }
@@ -108,7 +128,7 @@ namespace SmartFormat.Tests.Extensions
 
             TestAllResults(
                 new CultureInfo("tr"),
-                "Seçili {0:nesneyi|nesneleri} silmek istiyor musunuz?",
+                "Seçili {0:plural:nesneyi|nesneleri} silmek istiyor musunuz?",
                 new ExpectedResults {
                     {  -1, "Seçili nesneleri silmek istiyor musunuz?"},
                     {   0, "Seçili nesneleri silmek istiyor musunuz?"},
@@ -125,7 +145,7 @@ namespace SmartFormat.Tests.Extensions
         {
             TestAllResults(
                 new CultureInfo("ru-RU"),
-                "Я купил {0} {0:банан|банана|бананов}.",
+                "Я купил {0} {0:plural:банан|банана|бананов}.",
                 new ExpectedResults {
                     {   0, "Я купил 0 бананов."},
                     {   1, "Я купил 1 банан."},
@@ -147,7 +167,7 @@ namespace SmartFormat.Tests.Extensions
         {
             TestAllResults(
                 new CultureInfo("pl"),
-                "{0} {0:miesiąc|miesiące|miesięcy} temu",
+                "{0} {0:plural:miesiąc|miesiące|miesięcy} temu",
                 new ExpectedResults {
                     {   0, "0 miesięcy temu"},
                     {   1, "1 miesiąc temu"},
@@ -184,39 +204,97 @@ namespace SmartFormat.Tests.Extensions
                 });
         }
 
-        [Test]
         [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 0, "0 zero miesięcy")]
         [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 1, "1 one miesiąc")]
         [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 2, "2 many miesiące")]
         [TestCase("{0} {0:plural(en):zero|one|many} {0:plural(pl):miesiąc|miesiące|miesięcy}", 5, "5 many miesięcy")]
         public void NamedFormatter_should_use_specific_language(string format, object arg0, string expectedResult)
         {
-            var actualResult = Smart.Format(format, arg0);
+            var smart = GetFormatter();
+            var actualResult = smart.Format(format, arg0);
             Assert.AreEqual(expectedResult, actualResult);
         }
 
-        [Test]
         [TestCase("{0:plural:zero|one|many}", new string[0], "zero")]
         [TestCase("{0:plural:zero|one|many}", new[] { "alice" }, "one")]
         [TestCase("{0:plural:zero|one|many}", new[] { "alice", "bob" }, "many")]
         public void Test_should_allow_ienumerable_parameter(string format, object arg0, string expectedResult)
         {
+            var smart = GetFormatter();
             var culture = new CultureInfo("en-US");
-            var actualResult = Smart.Format(culture, format, arg0);
+            var actualResult = smart.Format(culture, format, arg0);
             Assert.AreEqual(expectedResult, actualResult);
         }
 
         [Test]
         public void Test_With_CustomPluralRuleProvider()
         {
-            var actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")), "{0:plural:Frau|Frauen}", new string[2], "more");
+            var smart = GetFormatter();
+            var actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")), "{0:plural:Frau|Frauen}", new string[2], "more");
             Assert.AreEqual("Frauen", actualResult);
 
-            actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[2], "more");
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[2], "more");
             Assert.AreEqual("people", actualResult);
 
-            actualResult = Smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
             Assert.AreEqual("person", actualResult);
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes}", new string[3], "several");
+            Assert.AreEqual("plusieurs personnes", actualResult);
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes|beaucoup de personnes}", new string[3], "several");
+            Assert.AreEqual("beaucoup de personnes", actualResult);
+        }
+
+        [Test]
+        public void Should_Process_Signed_And_Unsigned_Numbers()
+        {
+            var smart = GetFormatter();
+            foreach (var number in new object[]
+                         { (long)123, (ulong)123, (short)123, (ushort)123, (int)123, (uint)123 })
+            {
+                Assert.That(smart.Format("{0:plural(en):zero|one|many}", number), Is.EqualTo("many"));
+            }
+        }
+
+        [TestCase(1, "There {People.Count:plural:is a person.|are {} people.}", false)]
+        [TestCase(2, "There {People.Count:plural:is a person.|are {} people.}", false)]
+        [TestCase(1, "There {People.Count:is a person.|are {} people.}", true)]
+        [TestCase(2, "There {People.Count:is a person.|are {} people.}", true)]
+        public void Nested_PlaceHolders_Pluralization(int numOfPeople, string format, bool markAsDefault)
+        {
+            var data = numOfPeople == 1
+                ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
+                : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
+            
+            var formatter = new SmartFormatter()
+                .AddExtensions(new ReflectionSource())
+                // Note: If pluralization AND conditional formatters are registered, the formatter
+                //       name MUST be included in the format string, because both could return successful automatic evaluation
+                // Here, we register only pluralization:
+                .AddExtensions(new PluralLocalizationFormatter { CanAutoDetect = markAsDefault },
+                    new DefaultFormatter());
+            var result = formatter.Format(CultureInfo.GetCultureInfo("en"), format, data);
+            
+            Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
+        }
+
+        [TestCase(1, "There {People.Count:plural:|is a person|.~|are {} people|.}", "There |is a person|.")]
+        [TestCase(2, "There {People.Count:plural:|is a person|.~|are {} people|.}", "There |are 2 people|.")]
+        public void Pluralization_With_Changed_SplitChar(int numOfPeople, string format, string expected)
+        {
+            var data = numOfPeople == 1
+                ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
+                : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
+
+            var smart = new SmartFormatter()
+                .AddExtensions(new ReflectionSource())
+                // Set SplitChar from | to ~, so we can use | for the output string
+                .AddExtensions(new PluralLocalizationFormatter { SplitChar = '~'},
+                    new DefaultFormatter());
+            
+            var result = smart.Format(format, data);
+            Assert.That(result, Is.EqualTo(expected));
         }
     }
 }

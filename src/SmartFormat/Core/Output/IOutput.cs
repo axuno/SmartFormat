@@ -1,9 +1,10 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
+using System;
 using SmartFormat.Core.Extensions;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Output
 {
@@ -17,15 +18,20 @@ namespace SmartFormat.Core.Output
         /// </summary>
         /// <param name="text"></param>
         /// <param name="formattingInfo"></param>
-        void Write(string text, IFormattingInfo formattingInfo);
+        void Write(string text, IFormattingInfo? formattingInfo = null);
 
         /// <summary>
-        /// Writes a substring to the output.
+        /// Writes a <see cref="ReadOnlySpan{T}"/> text to the output.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="length"></param>
         /// <param name="formattingInfo"></param>
-        void Write(string text, int startIndex, int length, IFormattingInfo formattingInfo);
+        void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null);
+
+        /// <summary>
+        /// Writes text of a <see cref="ZStringBuilder"/> to the output.
+        /// </summary>
+        /// <param name="stringBuilder"></param>
+        /// <param name="formattingInfo"></param>
+        void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null);
     }
 }

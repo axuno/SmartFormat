@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.TestUtils
 {
     public class Person
     {

@@ -1,16 +1,18 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
+
+using System;
 
 namespace SmartFormat.Core.Settings
 {
     /// <summary>
     /// Determines how format errors are handled.
     /// </summary>
+    [Obsolete("Use 'ParseErrorAction' or 'FormatErrorAction' instead.", true)]
     public enum ErrorAction
     {
-        /// <summary>Throws an exception.  This is only recommended for debugging, so that formatting errors can be easily found.</summary>
+        /// <summary>Throws an exception. This is only recommended for debugging, so that formatting errors can be easily found.</summary>
         ThrowError,
 
         /// <summary>Includes an issue message in the output</summary>

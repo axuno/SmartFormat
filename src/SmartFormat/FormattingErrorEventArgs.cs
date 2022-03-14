@@ -1,7 +1,6 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
 
@@ -22,16 +21,16 @@ namespace SmartFormat
         /// <summary>
         /// Placeholder which caused an error.
         /// </summary>
-        public string Placeholder { get; internal set; }
+        public string Placeholder { get; }
 
         /// <summary>
         /// Location where the error occurred.
         /// </summary>
-        public int ErrorIndex { get; internal set; }
+        public int ErrorIndex { get; }
 
         /// <summary>
         /// Information whether error will throw an exception.
         /// </summary>
-        public bool IgnoreError { get; internal set; }
+        public bool IgnoreError { get; }
     }
 }

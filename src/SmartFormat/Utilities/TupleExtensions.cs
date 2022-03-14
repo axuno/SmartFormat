@@ -1,7 +1,6 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
 using System.Collections.Generic;
@@ -57,13 +56,6 @@ namespace SmartFormat.Utilities
         public static IEnumerable<object?> GetValueTupleItemObjects(this object tuple) => GetValueTupleItemFields(tuple.GetType()).Select(f => f.GetValue(tuple));
 
         /// <summary>
-        /// A list of <see cref="Type"/>s for the fields of a <see cref="ValueTuple"/>.
-        /// </summary>
-        /// <param name="tupleType"></param>
-        /// <returns>Returns of list of <see cref="Type"/>s with the fields of a <see cref="ValueTuple"/>.</returns>
-        public static IEnumerable<Type> GetValueTupleItemTypes(this Type tupleType) => GetValueTupleItemFields(tupleType).Select(f => f.FieldType);
-
-        /// <summary>
         /// A list of <see cref="FieldInfo"/>s with the fields of a <see cref="ValueTuple"/>.
         /// </summary>
         /// <param name="tupleType"></param>
@@ -83,6 +75,11 @@ namespace SmartFormat.Utilities
             return items;
         }
 
+        /// <summary>
+        /// Gets all <see cref="object"/>s of a <see cref="ValueTuple"/> as a flattened list of objects.
+        /// </summary>
+        /// <param name="tuple"></param>
+        /// <returns>All <see cref="object"/>s of a <see cref="ValueTuple"/> as a flattened list of objects.</returns>
         public static IEnumerable<object?> GetValueTupleItemObjectsFlattened(this object tuple)
         {
             foreach (var theTuple in tuple.GetValueTupleItemObjects())

@@ -1,10 +1,10 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions
 {
@@ -14,10 +14,17 @@ namespace SmartFormat.Extensions
     public class DefaultFormatter : IFormatter
     {
         /// <summary>
-        /// Gets or set the names of the <see cref="DefaultFormatter"/>.
+        /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
         /// </summary>
-        public string[] Names { get; set; } = {"default", "d", ""};
+        [Obsolete("Use property \"Name\" instead", true)]
+        public string[] Names { get; set; } = {"default", "d", string.Empty};
 
+        ///<inheritdoc/>
+        public string Name { get; set; } = "d";
+
+        ///<inheritdoc/>
+        public bool CanAutoDetect { get; set; } = true;
+        
         /// <summary>
         /// Checks, if the current value of the <see cref="ISelectorInfo"/> can be processed by the <see cref="DefaultFormatter"/>.
         /// </summary>
@@ -27,61 +34,45 @@ namespace SmartFormat.Extensions
         {
             var format = formattingInfo.Format;
             var current = formattingInfo.CurrentValue;
-
+            
             // If the format has nested placeholders, we process those first
-            // instead of formatting the item:
-            if (format != null && format.HasNested)
+            // instead of formatting the item.
+            if (format is {HasNested: true})
             {
-                formattingInfo.Write(format, current ?? string.Empty);
+                formattingInfo.FormatAsChild(format, current);
                 return true;
             }
-
-            // If the object is null, we shouldn't write anything
-            if (current == null) current = "";
 
             // Use the provider to see if a CustomFormatter is available:
             var provider = formattingInfo.FormatDetails.Provider;
 
-            //  (The following code was adapted from the built-in String.Format code)
-
             //  We will try using IFormatProvider, IFormattable, and if all else fails, ToString.
-            string result;
-            if (provider != null &&
-                provider.GetFormat(typeof(ICustomFormatter)) is ICustomFormatter cFormatter)
+            string? result; 
+            if (provider?.GetFormat(typeof(ICustomFormatter)) is ICustomFormatter cFormatter)
             {
                 var formatText = format?.GetLiteralText();
                 result = cFormatter.Format(formatText, current, provider);
             }
-            // IFormattable:
+            // IFormattable
+            // Note: This is what ValueStringBuilder is implementing in the same way
             else if (current is IFormattable formattable)
             {
                 var formatText = format?.ToString();
                 result = formattable.ToString(formatText, provider);
             }
+            else if (current is string str)
+            {
+                formattingInfo.Write(str.AsSpan());
+                return true;
+            }
             // ToString:
             else
             {
-                result = current.ToString() ?? "null";
-            }
-
-            // Now that we have the result, let's output it (and consider alignment):
-
-            // See if there's a pre-alignment to consider:
-            if (formattingInfo.Alignment > 0)
-            {
-                var spaces = formattingInfo.Alignment - result!.Length;
-                if (spaces > 0) formattingInfo.Write(new string(' ', spaces));
+                result = current?.ToString();
             }
 
             // Output the result:
-            formattingInfo.Write(result);
-
-            // See if there's a post-alignment to consider:
-            if (formattingInfo.Alignment < 0)
-            {
-                var spaces = -formattingInfo.Alignment - result.Length;
-                if (spaces > 0) formattingInfo.Write(new string(' ', spaces));
-            }
+            formattingInfo.Write(result != null ? result.AsSpan() : ReadOnlySpan<char>.Empty);
 
             return true;
         }

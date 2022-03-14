@@ -1,7 +1,6 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
 
@@ -24,7 +23,7 @@ namespace SmartFormat.Core.Parsing
         public ParsingErrors Errors { get; internal set; }
 
         /// <summary>
-        /// If true, the errors will throw an exception.
+        /// If <see langword="true"/>, errors will throw an exception.
         /// </summary>
         public bool ThrowsException { get; internal set; }
     }

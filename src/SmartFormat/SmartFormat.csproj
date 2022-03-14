@@ -1,33 +1,60 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>A string composition library written in C# that can format data into a string with a minimal, intuitive syntax. It uses extensions to provide named placeholders, pluralization, gender conjugation, and time and list formatting.</Description>
+        <Description>This package contains the core SmartFormat assemblies with core extensions built-in.
+
+SmartFormat is a lightweight text templating library written in C#.
+It can format various data sources into a string with a minimal, intuitive syntax similar to string.Format.
+It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
+        </Description>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
-        <Version>2.7.2</Version>
-        <FileVersion>2.7.2</FileVersion>
-        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-        <DefineConstants>TRACE;DEBUG</DefineConstants>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat</AssemblyName>
-        <AssemblyOriginatorKeyFile>SmartFormat.snk</AssemblyOriginatorKeyFile>
-        <SignAssembly>true</SignAssembly>
-        <PackageId>SmartFormat.NET</PackageId>
-        <PackageReleaseNotes>See the change log with for details of this release:
-https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes>
+        <PackageId>SmartFormat</PackageId>
+        <PackageReleaseNotes>See the change log for details of this release:
+https://github.com/axuno/SmartFormat/blob/main/CHANGES.md
+        </PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseFile></PackageLicenseFile>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageTags>string-format string-composition smartformat netstandard netcore netframework</PackageTags>
-        <PackageLicenseFile></PackageLicenseFile>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>string-format stringformat template templating string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Nullable>enable</Nullable>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <!-- EmbedUntrackedSources for deterministic build -->
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <Nullable>enable</Nullable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="" />
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+        <None Include="../../PkgReadMe.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Memory" Version="4.5.4" />
+        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -36,26 +63,38 @@ https://github.com/axuno/SmartFormat/blob/master/CHANGES.md</PackageReleaseNotes
         <Optimize>false</Optimize>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <WarningLevel>3</WarningLevel>
+        <DefineConstants>RELEASE</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>SmartFormat.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100a1cdb8ba81e1a00f0f9509a8f0c896e0de0da6875652fffd44fb867e6b78fd78c31c6fdb07544b2ae53ed4b56daa90333d32ac14387f7f68d39165da8f99b8c294c1cee1bcc4bbcbe2dd73879824b53708837f425e2bf5c7d2cf868de9548c44871888bf9db5cb425064dda4b17134f8e3b52e1f686315a1832043c7b58fb0ac</_Parameter1>
         </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Performance, PublicKey=0024000004800000940000000602000000240000525341310004000001000100a1cdb8ba81e1a00f0f9509a8f0c896e0de0da6875652fffd44fb867e6b78fd78c31c6fdb07544b2ae53ed4b56daa90333d32ac14387f7f68d39165da8f99b8c294c1cee1bcc4bbcbe2dd73879824b53708837f425e2bf5c7d2cf868de9548c44871888bf9db5cb425064dda4b17134f8e3b52e1f686315a1832043c7b58fb0ac</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-        <PackageReference Include="System.Text.Json" Version="4.7.2" />
+        <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj">
+            <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+            <IncludeAssets>SmartFormat.ZString.dll</IncludeAssets>
+        </ProjectReference>
     </ItemGroup>
+
+    <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+    <!-- BuildOnlySettings will add XML-docs to *.nupkg, and PDBs to *.snupkg (if generated) -->
+    <!-- The order of DependsOnTargets arguments is important  -->
+    <Target DependsOnTargets="BuildOnlySettings;ResolveReferences" Name="CopyProjectReferencesToPackage">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+        </ItemGroup>
+    </Target>
 
 </Project>

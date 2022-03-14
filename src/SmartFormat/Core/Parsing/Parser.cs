@@ -1,26 +1,45 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.SmartPools;
 
-namespace SmartFormat.Core.Parsing
+ namespace SmartFormat.Core.Parsing
 {
     /// <summary>
     /// Parses a format string.
     /// </summary>
     public class Parser
     {
+        private const int PositionUndefined = -1;
+        private readonly ParsingErrorText _parsingErrorText = new ();
+
+        #region: Parser.ParseFormat and callees :
+
+        private IndexContainer _index;
+        private string _inputFormat;
+        private Format _resultFormat;
+        
+        #endregion
+
         #region: Settings :
 
         /// <summary>
-        /// Gets or sets the <seealso cref="Core.Settings.SmartSettings" /> for Smart.Format
+        /// Gets or sets the <see cref="SmartSettings" /> for Smart.Format
         /// </summary>
-        public SmartSettings Settings { get; internal set; } = new SmartSettings();
+        public SmartSettings Settings { get; }
+
+        // Cache method results from settings
+        private readonly List<char> _operatorChars;
+        private readonly List<char> _customOperatorChars;
+        private readonly ParserSettings _parserSettings;
+        private readonly List<char> _validSelectorChars;
+        private readonly List<char> _formatOptionsTerminatorChars;
 
         #endregion
 
@@ -35,77 +54,51 @@ namespace SmartFormat.Core.Parsing
 
         #region: Constructor :
 
-        internal Parser(SmartSettings smartSettings)
+        /// <summary>
+        /// Creates a new instance of a <see cref="Parser"/>.
+        /// </summary>
+        /// <param name="smartSettings">
+        /// The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.
+        /// Any changes after passing settings as a parameter may not have effect.
+        /// </param>
+        public Parser(SmartSettings? smartSettings = null)
         {
-            Settings = smartSettings;
+            Settings = smartSettings ?? new SmartSettings();
+            _parserSettings = Settings.Parser;
+            _operatorChars = _parserSettings.OperatorChars();
+            _customOperatorChars = _parserSettings.CustomOperatorChars();
+            _formatOptionsTerminatorChars = _parserSettings.FormatOptionsTerminatorChars();
+
+            _validSelectorChars = new List<char>();
+            _validSelectorChars.AddRange(_parserSettings.SelectorChars());
+            _validSelectorChars.AddRange(_parserSettings.OperatorChars());
+            _validSelectorChars.AddRange(_parserSettings.CustomSelectorChars());
+            
+            _inputFormat = string.Empty;
+            _resultFormat = InitializationObject.Format; // will never be used
         }
 
         #endregion
 
         #region: Special Chars :
 
-        // The following fields are points of extensibility
-
-        /// <summary>
-        /// If false, only digits are allowed as selectors.
-        /// If true, selectors can be alpha-numeric.
-        /// This allows optimized alpha-character detection.
-        /// Specify any additional selector chars in AllowedSelectorChars.
-        /// </summary>
-        private bool _alphanumericSelectors;
-
-        /// <summary>
-        /// A list of allowable selector characters,
-        /// to support additional selector syntaxes such as math.
-        /// Digits are always included, and letters can be included
-        /// with AlphanumericSelectors.
-        /// </summary>
-        private string _allowedSelectorChars = "";
-
-        /// <summary>
-        /// A list of characters that come between selectors.
-        /// This can be "." for dot-notation, "[]" for arrays,
-        /// or even math symbols.
-        /// By default, there are no operators.
-        /// </summary>
-        private string _operators = "";
-
-        /// <summary>
-        /// If false, double-curly braces are escaped.
-        /// If true, the AlternativeEscapeChar is used for escaping braces.
-        /// </summary>
-        private bool _alternativeEscaping;
-
-        /// <summary>
-        /// If AlternativeEscaping is true, then this character is
-        /// used to escape curly braces.
-        /// </summary>
-        private char _alternativeEscapeChar = '\\';
-
-        /// <summary>
-        /// The character literal escape character e.g. for \t (TAB) and others.
-        /// This is kind of overlapping functionality with <see cref="UseAlternativeEscapeChar" />.
-        /// Note: In a future release escape characters for placeholders and character literals should become the same.
-        /// </summary>
-        internal const char CharLiteralEscapeChar = '\\';
-
         /// <summary>
         /// Includes a-z and A-Z in the list of allowed selector chars.
         /// </summary>
+        [Obsolete("Alphanumeric selectors are always enabled", true)]
         public void AddAlphanumericSelectors()
         {
-            _alphanumericSelectors = true;
+            // Do nothing - this is the standard behavior
         }
 
         /// <summary>
         /// Adds specific characters to the allowed selector chars.
         /// </summary>
         /// <param name="chars"></param>
+        [Obsolete("Use 'Settings.Parser.AddCustomSelectorChars' instead.", true)]
         public void AddAdditionalSelectorChars(string chars)
         {
-            foreach (var c in chars)
-                if (_allowedSelectorChars.IndexOf(c) == -1)
-                    _allowedSelectorChars += c;
+            _parserSettings.AddCustomSelectorChars(chars.ToCharArray());
         }
 
         /// <summary>
@@ -114,49 +107,50 @@ namespace SmartFormat.Core.Parsing
         /// that splits the selectors.
         /// </summary>
         /// <param name="chars"></param>
+        [Obsolete("Use 'Settings.Parser.AddCustomOperatorChars' instead.", true)]
         public void AddOperators(string chars)
         {
-            foreach (var c in chars)
-                if (_operators.IndexOf(c) == -1)
-                    _operators += c;
+            _parserSettings.AddCustomOperatorChars(chars.ToCharArray());
         }
 
         /// <summary>
         /// Sets the AlternativeEscaping option to True
         /// so that braces will only be escaped after the
-        /// specified character.
+        /// specified character. The only allowed escape character is the backslash '\'.
         /// </summary>
         /// <param name="alternativeEscapeChar">Defaults to backslash</param>
+        [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
         public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
         {
-            _alternativeEscapeChar = alternativeEscapeChar;
-            _alternativeEscaping = true;
+            if (alternativeEscapeChar != _parserSettings.CharLiteralEscapeChar)
+            {
+                throw new ArgumentException("Cannot set an escape character other than '\\'",
+                    nameof(alternativeEscapeChar));
+            }
+            Settings.StringFormatCompatibility = false;
         }
 
         /// <summary>
-        /// [Default]
-        /// Uses {{ and }} for escaping braces for compatibility with String.Format.
+        /// Uses {{ and }} for escaping braces for compatibility with string.Format.
         /// However, this does not work very well with nested placeholders,
-        /// so it is recommended to use an alternative escape char.
+        /// so it is recommended to use an 'alternative' escape char, which is the
+        /// backslash.
         /// </summary>
+        [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
         public void UseBraceEscaping()
         {
-            _alternativeEscaping = false;
+            throw new NotSupportedException($"Init-only property {nameof(Settings)}.{nameof(Settings.StringFormatCompatibility)} can only be set in an object initializer");
         }
-
-
-        private char _openingBrace = '{';
-        private char _closingBrace = '}';
 
         /// <summary>
         /// Set the closing and opening braces for the parser.
         /// </summary>
         /// <param name="opening"></param>
         /// <param name="closing"></param>
+        [Obsolete("This feature has been removed", true)]
         public void UseAlternativeBraces(char opening, char closing)
         {
-            _openingBrace = opening;
-            _closingBrace = closing;
+            throw new NotSupportedException("This feature has been removed");
         }
 
         #endregion
@@ -164,324 +158,631 @@ namespace SmartFormat.Core.Parsing
         #region: Parsing :
 
         /// <summary>
+        /// The Container for indexes pointing to positions within the input format.
+        /// </summary>
+        private struct IndexContainer
+        {
+            /// <summary>
+            /// The length of the target object, where indexes will be used.
+            /// E.g.: ReadOnlySpan&lt;char&gt;().Length or string.Length
+            /// </summary>
+            public int ObjectLength;
+            
+            /// <summary>
+            /// The current index within the input format
+            /// </summary>
+            public int Current;
+
+            /// <summary>
+            /// The index within the input format after an item (like <see cref="Placeholder"/>, <see cref="Selector"/>, <see cref="LiteralText"/> etc.) was added.
+            /// </summary>
+            public int LastEnd;
+
+            /// <summary>
+            /// The start index of the formatter name within the input format.
+            /// </summary>
+            public int NamedFormatterStart;
+
+            /// <summary>
+            /// The start index of the formatter options within the input format.
+            /// </summary>
+            public int NamedFormatterOptionsStart;
+
+            /// <summary>
+            /// The end index of the formatter options within the input format.
+            /// </summary>
+            public int NamedFormatterOptionsEnd;
+
+            /// <summary>
+            /// The index of the operator within the input format.
+            /// </summary>
+            public int Operator;
+
+            /// <summary>
+            /// The current index of the selector <b>across all</b> <see cref="Placeholder"/>s.
+            /// </summary>
+            public int Selector;
+
+            /// <summary>
+            /// Adds a number to number to the index and returns the sum, but not more than <see cref="ObjectLength"/>.
+            /// </summary>
+            /// <param name="index"></param>
+            /// <param name="add"></param>
+            /// <returns>The sum, but not more than <see cref="ObjectLength"/></returns>
+            public int SafeAdd(int index, int add)
+            {
+                // The design is the way, that an end index
+                // is always 1 above the last position.
+                // Meaning that the maximum of 'FormatItem.EndIndex' equals 'inputFormat.Length'
+                index += add;
+                System.Diagnostics.Debug.Assert(index >= 0);
+                return index < ObjectLength ? index : ObjectLength;
+            }
+        }
+
+        /// <summary>
         /// Parses a format string.
         /// </summary>
-        /// <param name="format"></param>
-        /// <param name="formatterExtensionNames"></param>
-        /// <returns>Returns the <see cref="Format"/> for the parsed string.</returns>
-        public Format ParseFormat(string format, string[] formatterExtensionNames)
+        /// <param name="inputFormat"></param>
+        /// <returns>The <see cref="Format"/> for the parsed string.</returns>
+        public Format ParseFormat(string inputFormat)
         {
-            var result = new Format(Settings, format);
-            var current = result;
+            _inputFormat = inputFormat;
+
+            _index = new IndexContainer {
+                ObjectLength = _inputFormat.Length,
+                Current = PositionUndefined, LastEnd = 0, NamedFormatterStart = PositionUndefined,
+                NamedFormatterOptionsStart = PositionUndefined, NamedFormatterOptionsEnd = PositionUndefined,
+                Operator = PositionUndefined, Selector = PositionUndefined
+            };
+            
+            // Initialize - will be re-assigned with new placeholders
+            _resultFormat = FormatPool.Instance.Get().Initialize(Settings, _inputFormat);
+
+            // Store parsing errors until parsing is finished:
+            var parsingErrors = ParsingErrorsPool.Instance.Get().Initialize(_resultFormat);
+
             Placeholder? currentPlaceholder = null;
-            var namedFormatterStartIndex = -1;
-            var namedFormatterOptionsStartIndex = -1;
-            var namedFormatterOptionsEndIndex = -1;
 
-            // Store parsing errors until the end:
-            var parsingErrors = new ParsingErrors(result);
-            var parsingErrorText = new ParsingErrorText();
-
-            // Cache properties:
-            var openingBrace = _openingBrace;
-            var closingBrace = _closingBrace;
-
-
+            // Used for nested placeholders
             var nestedDepth = 0;
-            var lastI = 0;
-            var operatorIndex = 0;
-            var selectorIndex = 0;
-            for (int i = 0, length = format.Length; i < length; i++)
+
+            for (_index.Current = 0; _index.Current < _inputFormat.Length; _index.Current++)
             {
-                var c = format[i];
+                var inputChar = _inputFormat[_index.Current];
                 if (currentPlaceholder == null)
                 {
-                    if (c == openingBrace)
+                    // We're parsing literal text with an HTML tag
+                    if (_parserSettings.ParseInputAsHtml && inputChar == '<')
                     {
-                        // Finish the last text item:
-                        if (i != lastI) current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
-                        lastI = i + 1;
-
-                        // See if this brace should be escaped:
-                        if (!_alternativeEscaping)
-                        {
-                            var nextI = lastI;
-                            if (nextI < length && format[nextI] == openingBrace)
-                            {
-                                i++;
-                                continue;
-                            }
-                        }
-
-                        // New placeholder:
-                        nestedDepth++;
-                        currentPlaceholder = new Placeholder(Settings, current, i, nestedDepth);
-                        current.Items.Add(currentPlaceholder);
-                        current.HasNested = true;
-                        operatorIndex = i + 1;
-                        selectorIndex = 0;
-                        namedFormatterStartIndex = -1;
+                        ParseHtmlTags();
+                        continue;
                     }
-                    else if (c == closingBrace)
-                    {
-                        // Finish the last text item:
-                        if (i != lastI)
-                            current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
-                        lastI = i + 1;
 
-                        // See if this brace should be escaped:
-                        if (!_alternativeEscaping)
-                        {
-                            var nextI = lastI;
-                            if (nextI < length && format[nextI] == closingBrace)
-                            {
-                                i++;
-                                continue;
-                            }
-                        }
+                    if (inputChar == _parserSettings.PlaceholderBeginChar)
+                    {
+                        AddLiteralCharsParsedBefore();
+
+                        if (EscapeLikeStringFormat(_parserSettings.PlaceholderBeginChar)) continue;
+
+                        CreateNewPlaceholder(ref nestedDepth, out currentPlaceholder);
+                    }
+                    else if (inputChar == _parserSettings.PlaceholderEndChar)
+                    {
+                        AddLiteralCharsParsedBefore();
+
+                        if(EscapeLikeStringFormat(_parserSettings.PlaceholderEndChar)) continue;
 
                         // Make sure that this is a nested placeholder before we un-nest it:
-                        if (current.parent == null)
-                        {
-                            // Don't swallow-up redundant closing braces, but treat them as literals
-                            current.Items.Add(new LiteralText(Settings, current, i) {endIndex = i + 1});
-                            parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i,
-                                i + 1);
-                            continue;
-                        }
+                        if (HasProcessedTooMayClosingBraces(parsingErrors)) continue;
 
-                        // End of the placeholder's Format:
-                        nestedDepth--;
-                        current.endIndex = i;
-                        current.parent.endIndex = i + 1;
-                        current = current.parent.parent;
-                        namedFormatterStartIndex = -1;
+                        // End of the placeholder's Format, _resultFormat will change to parent.parent
+                        FinishPlaceholderFormat(ref nestedDepth);
                     }
-                    else if (c == CharLiteralEscapeChar && Settings.ConvertCharacterStringLiterals ||
-                             _alternativeEscaping && c == _alternativeEscapeChar)
+                    else if (inputChar == _parserSettings.CharLiteralEscapeChar && _parserSettings.ConvertCharacterStringLiterals ||
+                             !Settings.StringFormatCompatibility && inputChar == _parserSettings.CharLiteralEscapeChar)
                     {
-                        namedFormatterStartIndex = -1;
-
-                        // See that is the next character
-                        var nextI = i + 1;
-
-                        // **** Alternative brace escaping with { or } following the escape character ****
-                        if (nextI < length && (format[nextI] == openingBrace || format[nextI] == closingBrace))
-                        {
-                            // Finish the last text item:
-                            if (i != lastI) current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
-                            lastI = i + 1;
-
-                            i++;
-                        }
-                        else
-                        {
-                            // **** Escaping of charater literals like \t, \n, \v etc. ****
-
-                            // Finish the last text item:
-                            if (i != lastI) current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = i});
-                            lastI = i + 2;
-                            if (lastI > length) lastI = length;
-
-                            // Next add the character literal INCLUDING the escape character, which LiteralText will expect
-                            current.Items.Add(new LiteralText(Settings, current, i) {endIndex = lastI});
-
-                            i++;
-                        }
+                        ParseAlternativeEscaping();
                     }
-                    else if (namedFormatterStartIndex != -1)
+                    else if (_index.NamedFormatterStart != PositionUndefined && !ParseNamedFormatter())
                     {
-                        if (c == '(')
-                        {
-                            var emptyName = namedFormatterStartIndex == i;
-                            if (emptyName)
-                            {
-                                namedFormatterStartIndex = -1;
-                                continue;
-                            }
-
-                            namedFormatterOptionsStartIndex = i;
-                        }
-                        else if (c == ')' || c == ':')
-                        {
-                            if (c == ')')
-                            {
-                                var hasOpeningParenthesis = namedFormatterOptionsStartIndex != -1;
-
-                                // ensure no trailing chars past ')'
-                                var nextI = i + 1;
-                                var nextCharIsValid = nextI < format.Length &&
-                                                      (format[nextI] == ':' || format[nextI] == closingBrace);
-
-                                if (!hasOpeningParenthesis || !nextCharIsValid)
-                                {
-                                    namedFormatterStartIndex = -1;
-                                    continue;
-                                }
-
-                                namedFormatterOptionsEndIndex = i;
-
-                                if (format[nextI] == ':') i++; // Consume the ':'
-                            }
-
-                            var nameIsEmpty = namedFormatterStartIndex == i;
-                            var missingClosingParenthesis =
-                                namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex == -1;
-                            if (nameIsEmpty || missingClosingParenthesis)
-                            {
-                                namedFormatterStartIndex = -1;
-                                continue;
-                            }
-
-
-                            lastI = i + 1;
-
-                            var parentPlaceholder = current.parent;
-
-                            if (namedFormatterOptionsStartIndex == -1)
-                            {
-                                var formatterName = format.Substring(namedFormatterStartIndex,
-                                    i - namedFormatterStartIndex);
-
-                                if (FormatterNameExists(formatterName, formatterExtensionNames))
-                                {
-                                    if (parentPlaceholder != null) parentPlaceholder.FormatterName = formatterName;
-                                }
-                                else
-                                    lastI = current.startIndex;
-                            }
-                            else
-                            {
-                                var formatterName = format.Substring(namedFormatterStartIndex,
-                                    namedFormatterOptionsStartIndex - namedFormatterStartIndex);
-
-                                if (FormatterNameExists(formatterName, formatterExtensionNames))
-                                {
-                                    if (parentPlaceholder != null)
-                                    {
-                                        parentPlaceholder.FormatterName = formatterName;
-                                        parentPlaceholder.FormatterOptions = format.Substring(
-                                            namedFormatterOptionsStartIndex + 1,
-                                            namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
-                                    }
-                                }
-                                else
-                                {
-                                    lastI = current.startIndex;
-                                }
-                            }
-
-                            current.startIndex = lastI;
-
-                            namedFormatterStartIndex = -1;
-                        }
+                        // continue the loop
                     }
                 }
                 else
                 {
                     // Placeholder is NOT null, so that means 
                     // we're parsing the selectors:
-                    if (_operators.IndexOf(c) != -1)
-                    {
-                        // Add the selector:
-                        if (i != lastI)
-                        {
-                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
-                                selectorIndex));
-                            selectorIndex++;
-                            operatorIndex = i;
-                        }
-
-                        lastI = i + 1;
-                    }
-                    else if (c == ':')
-                    {
-                        // Add the selector:
-                        if (i != lastI)
-                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
-                                selectorIndex));
-                        else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, $"'0x{Convert.ToUInt32(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
-                                operatorIndex, i);
-                        lastI = i + 1;
-
-                        // Start the format:
-                        currentPlaceholder.Format = new Format(Settings, currentPlaceholder, i + 1);
-                        current = currentPlaceholder.Format;
-                        currentPlaceholder = null;
-                        namedFormatterStartIndex = lastI;
-                        namedFormatterOptionsStartIndex = -1;
-                        namedFormatterOptionsEndIndex = -1;
-                    }
-                    else if (c == closingBrace)
-                    {
-                        // Add the selector:
-                        if (i != lastI)
-                            currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex,
-                                selectorIndex));
-                        else if (operatorIndex != i)
-                            parsingErrors.AddIssue(current, $"'0x{Convert.ToUInt32(c):X}': " + parsingErrorText[ParsingError.TrailingOperatorsInSelector],
-                                operatorIndex, i);
-                        lastI = i + 1;
-
-                        // End the placeholder with no format:
-                        nestedDepth--;
-                        currentPlaceholder.endIndex = i + 1;
-                        current = currentPlaceholder.parent;
-                        currentPlaceholder = null;
-                    }
-                    else
-                    {
-                        // Let's make sure the selector characters are valid:
-                        // Make sure it's alphanumeric:
-                        var isValidSelectorChar =
-                            '0' <= c && c <= '9'
-                            || _alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')
-                            || _allowedSelectorChars.IndexOf(c) != -1;
-                        if (!isValidSelectorChar)
-                            parsingErrors.AddIssue(current, $"'0x{Convert.ToUInt32(c):X}': " +  parsingErrorText[ParsingError.InvalidCharactersInSelector],
-                                i, i + 1);
-                    }
+                    ParseSelector(ref currentPlaceholder, parsingErrors, ref nestedDepth);
                 }
             }
 
             // We're at the end of the input string
             
             // 1. Is the last item a placeholder, that is not finished yet?
-            if (current.parent != null || currentPlaceholder != null)
+            if (_resultFormat.ParentPlaceholder != null || currentPlaceholder != null)
             {
-                parsingErrors.AddIssue(current, parsingErrorText[ParsingError.MissingClosingBrace], format.Length,
-                    format.Length);
-                current.endIndex = format.Length;
+                parsingErrors.AddIssue(_resultFormat, _parsingErrorText[ParsingError.MissingClosingBrace], _inputFormat.Length,
+                    _inputFormat.Length);
+                _resultFormat.EndIndex = _inputFormat.Length;
             }
-            else if (lastI != format.Length)
+            else if (_index.LastEnd != _inputFormat.Length)
             {
                 // 2. The last item must be a literal, so add it
-                current.Items.Add(new LiteralText(Settings, current, lastI) {endIndex = format.Length});
+                _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _inputFormat.Length));
             }
             
-            // Todo v2.7.0: There is no unit test for this condition!
-            while (current.parent != null)
+            // This may happen with a missing closing brace, e.g. "{0:yyyy/MM/dd HH:mm:ss"
+            while (_resultFormat.ParentPlaceholder != null)
             {
-                current = current.parent.parent;
-                current.endIndex = format.Length;
+                _resultFormat = _resultFormat.ParentPlaceholder.Parent;
+                _resultFormat.EndIndex = _inputFormat.Length;
             }
 
             // Check for any parsing errors:
             if (parsingErrors.HasIssues)
             {
                 OnParsingFailure?.Invoke(this,
-                    new ParsingErrorEventArgs(parsingErrors, Settings.ParseErrorAction == ErrorAction.ThrowError));
+                    new ParsingErrorEventArgs(parsingErrors, Settings.Parser.ErrorAction == ParseErrorAction.ThrowError));
 
-                return HandleParsingErrors(parsingErrors, result);
+                return HandleParsingErrors(parsingErrors, _resultFormat);
             }
 
-            return result;
+            ParsingErrorsPool.Instance.Return(parsingErrors);
+            return _resultFormat;
         }
 
-        private static bool FormatterNameExists(string name, string[] formatterExtensionNames)
+        /// <summary>
+        /// Adds a new <see cref="LiteralText"/> item, if there are characters left to process.
+        /// Sets <see cref="IndexContainer.LastEnd"/>.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AddLiteralCharsParsedBefore()
         {
-            return formatterExtensionNames.Any(n => n == name);
+            // Finish the last text item:
+            if (_index.Current != _index.LastEnd)
+            {
+                _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _index.Current));
+            }
+
+            _index.LastEnd = _index.SafeAdd(_index.Current, 1);
+        }
+
+        /// <summary>
+        /// Checks, whether we are on top level and still there was a closing brace.
+        /// In this case we add the redundant brace as literal and create a <see cref="ParsingError"/>.
+        /// </summary>
+        /// <param name="parsingErrors">The list of <see cref="ParsingErrors"/>.</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool HasProcessedTooMayClosingBraces(ParsingErrors parsingErrors)
+        {
+            if (_resultFormat.ParentPlaceholder != null) return false;
+
+            // Don't swallow-up redundant closing braces, but treat them as literals
+            _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.Current, _index.Current + 1));
+            
+            parsingErrors.AddIssue(_resultFormat, _parsingErrorText[ParsingError.TooManyClosingBraces], _index.Current,
+                _index.Current + 1);
+            return true;
+        }
+
+        /// <summary>
+        /// In case of string.Format compatibility, we escape the brace
+        /// and treat it as a literal character.
+        /// </summary>
+        /// <param name="brace">The brace { or } to process.</param>
+        /// <returns><see langword="true">, if escaping was done.</see></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool EscapeLikeStringFormat(char brace)
+        {
+            if (!Settings.StringFormatCompatibility) return false;
+
+            if (_index.LastEnd < _inputFormat.Length && _inputFormat[_index.LastEnd] == brace)
+            {
+                _index.Current = _index.SafeAdd(_index.Current, 1);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Placeholder"/>, adds it to the current format and sets values in <see cref="IndexContainer"/>.
+        /// </summary>
+        /// <param name="nestedDepth">The counter for nesting levels.</param>
+        /// <param name="newPlaceholder"></param>
+        /// <returns>The new <see cref="Placeholder"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void CreateNewPlaceholder(ref int nestedDepth, out Placeholder newPlaceholder)
+        {
+            nestedDepth++;
+            newPlaceholder = PlaceholderPool.Instance.Get().Initialize(_resultFormat, _index.Current, nestedDepth);
+            _resultFormat.Items.Add(newPlaceholder);
+            _resultFormat.HasNested = true;
+            _index.Operator = _index.SafeAdd(_index.Current, 1);
+            _index.Selector = 0;
+            _index.NamedFormatterStart = PositionUndefined;
+        }
+
+        /// <summary>
+        /// Finishes the current placeholder <see cref="Format"/>.
+        /// </summary>
+        /// <param name="nestedDepth">The counter for nesting levels.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void FinishPlaceholderFormat(ref int nestedDepth)
+        {
+            System.Diagnostics.Debug.Assert(_resultFormat.ParentPlaceholder is not null);
+
+            nestedDepth--;
+            _resultFormat.EndIndex = _index.Current;
+            _resultFormat.ParentPlaceholder!.EndIndex = _index.SafeAdd(_index.Current, 1);
+            _resultFormat = _resultFormat.ParentPlaceholder.Parent;
+            _index.NamedFormatterStart = _index.NamedFormatterOptionsStart = _index.NamedFormatterOptionsEnd = PositionUndefined;
+        }
+
+        /// <summary>
+        /// Processes the character if alternative escaping is used.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ParseAlternativeEscaping()
+        {
+            // 2021-05-03/axuno: Removed "index.NamedFormatterStart = PositionUndefined"
+
+            // See what is the next character
+            var indexNextChar = _index.SafeAdd(_index.Current, 1);
+            if (indexNextChar >= _inputFormat.Length)
+                throw new ArgumentException($"Unrecognized escape sequence at the end of the literal");
+
+            // **** Alternative brace escaping with { or } following the escape character ****
+            if (_inputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar || _inputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar)
+            {
+                // Finish the last text item:
+                if (_index.Current != _index.LastEnd) _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _index.Current));
+                _index.LastEnd = _index.SafeAdd(_index.Current, 1);
+
+                _index.Current++;
+            }
+            else
+            {
+                // **** Escaping of character literals like \t, \n, \v etc. ****
+
+                // Finish the last text item:
+                if (_index.Current != _index.LastEnd) _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.LastEnd, _index.Current));
+                                
+                // Is this a unicode escape sequence?
+                if (_inputFormat[indexNextChar] == 'u')
+                {
+                    // The next 4 characters must represent the unicode 
+                    _index.LastEnd = _index.SafeAdd(_index.Current, 6);
+                    _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.Current, _index.LastEnd));
+                }
+                else
+                {
+                    // Next add the character literal INCLUDING the escape character, which LiteralText will expect
+                    _index.LastEnd = _index.SafeAdd(_index.Current, 2);
+                    _resultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, _resultFormat, _inputFormat, _index.Current, _index.LastEnd));
+                }
+
+                _index.Current = _index.SafeAdd(_index.Current, 1);
+            }
+        }
+
+        /// <summary>
+        /// Handles named formatters.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool ParseNamedFormatter()
+        {
+            var inputChar = _inputFormat[_index.Current];
+            if (inputChar == _parserSettings.FormatterOptionsBeginChar)
+            {
+                var emptyName = _index.NamedFormatterStart == _index.Current;
+                if (emptyName)
+                {
+                    _index.NamedFormatterStart = PositionUndefined;
+                    return false;
+                }
+
+                // Note: This short-circuits the Parser.ParseFormat main loop
+                ParseFormatOptions();
+            }
+            else if (inputChar == _parserSettings.FormatterOptionsEndChar || inputChar == _parserSettings.FormatterNameSeparator)
+            {
+                if (inputChar == _parserSettings.FormatterOptionsEndChar)
+                {
+                    var hasOpeningParenthesis = _index.NamedFormatterOptionsStart != PositionUndefined;
+
+                    // ensure no trailing chars past ')'
+                    var nextCharIndex = _index.SafeAdd(_index.Current, 1);
+                    var nextCharIsValid = nextCharIndex < _inputFormat.Length &&
+                                          (_inputFormat[nextCharIndex] == _parserSettings.FormatterNameSeparator || _inputFormat[nextCharIndex] == _parserSettings.PlaceholderEndChar);
+
+                    if (!hasOpeningParenthesis || !nextCharIsValid)
+                    {
+                        _index.NamedFormatterStart = PositionUndefined;
+                        return false;
+                    }
+
+                    _index.NamedFormatterOptionsEnd = _index.Current;
+
+                    if (_inputFormat[nextCharIndex] == _parserSettings.FormatterNameSeparator) _index.Current++; // Consume the ':'
+                }
+
+                var nameIsEmpty = _index.NamedFormatterStart == _index.Current;
+                var missingClosingParenthesis =
+                    _index.NamedFormatterOptionsStart != PositionUndefined &&
+                    _index.NamedFormatterOptionsEnd == PositionUndefined;
+                if (nameIsEmpty || missingClosingParenthesis)
+                {
+                    _index.NamedFormatterStart = PositionUndefined;
+                    return false;
+                }
+                
+                _index.LastEnd = _index.SafeAdd(_index.Current, 1);
+
+                var parentPlaceholder = _resultFormat.ParentPlaceholder;
+
+                if (_index.NamedFormatterOptionsStart == PositionUndefined)
+                {
+                    if (parentPlaceholder != null)
+                    {
+                        parentPlaceholder.FormatterNameStartIndex = _index.NamedFormatterStart;
+                        parentPlaceholder.FormatterNameLength = _index.Current - _index.NamedFormatterStart;
+                    }
+                }
+                else
+                {
+                    if (parentPlaceholder != null)
+                    {
+                        parentPlaceholder.FormatterNameStartIndex = _index.NamedFormatterStart;
+                        parentPlaceholder.FormatterNameLength = _index.NamedFormatterOptionsStart - _index.NamedFormatterStart;
+
+                        // Save the formatter options with CharLiteralEscapeChar removed
+                        parentPlaceholder.FormatterOptionsStartIndex = _index.NamedFormatterOptionsStart + 1;
+                        parentPlaceholder.FormatterOptionsLength = _index.NamedFormatterOptionsEnd - (_index.NamedFormatterOptionsStart + 1);
+                    }
+                }
+
+                // Set start index to start of formatter option arguments,
+                // with {0:default:N2} the start index is on the second colon
+                _resultFormat.StartIndex = _index.LastEnd;
+
+                _index.NamedFormatterStart = PositionUndefined;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Handles the selectors.
+        /// </summary>
+        /// <param name="currentPlaceholder"></param>
+        /// <param name="parsingErrors"></param>
+        /// <param name="nestedDepth"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ParseSelector(ref Placeholder? currentPlaceholder, ParsingErrors parsingErrors, ref int nestedDepth)
+        {
+            if (currentPlaceholder == null)
+            {
+                throw new ArgumentNullException(nameof(currentPlaceholder), $"Unexpected null reference");
+            }
+
+            var inputChar = _inputFormat[_index.Current];
+            if (_operatorChars.Contains(inputChar) || _customOperatorChars.Contains(inputChar))
+            {
+                // Add the selector:
+                if (_index.Current != _index.LastEnd) // if equal, we're already parsing a selector
+                {
+                    currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, _inputFormat, _index.LastEnd, _index.Current, _index.Operator, _index.Selector));
+                    _index.Selector++;
+                    _index.Operator = _index.Current;
+                }
+
+                _index.LastEnd = _index.SafeAdd(_index.Current, 1);
+            }
+            else if (inputChar == _parserSettings.FormatterNameSeparator)
+            {
+                // Add the selector:
+                AddLastSelector(ref currentPlaceholder, parsingErrors);
+                
+                // Start the format:
+                var newFormat = FormatPool.Instance.Get().Initialize(Settings, currentPlaceholder, _index.Current + 1);
+                currentPlaceholder.Format = newFormat;
+                //FormatPool.Instance.Return(_resultFormat); // return to pool before reassigning
+                _resultFormat = newFormat;
+                currentPlaceholder = null;
+                // named formatters will not be parsed with string.Format compatibility switched ON.
+                // But this way we can handle e.g. Smart.Format("{Date:yyyy/MM/dd HH:mm:ss}") like string.Format
+                _index.NamedFormatterStart = Settings.StringFormatCompatibility ? PositionUndefined : _index.LastEnd;
+                _index.NamedFormatterOptionsStart = PositionUndefined;
+                _index.NamedFormatterOptionsEnd = PositionUndefined;
+            }
+            else if (inputChar == _parserSettings.PlaceholderEndChar)
+            {
+                AddLastSelector(ref currentPlaceholder, parsingErrors);
+
+                // End the placeholder with no format:
+                nestedDepth--;
+                currentPlaceholder.EndIndex = _index.SafeAdd(_index.Current, 1);
+                //_resultFormat = currentPlaceholder.Parent;  // removed 2021-08-08: The parent always is the _resultFormat
+                currentPlaceholder = null;
+            }
+            else
+            {
+                // Ensure the selector characters are valid:
+                if (!_validSelectorChars.Contains(inputChar))
+                    parsingErrors.AddIssue(_resultFormat,
+                        $"'0x{Convert.ToUInt32(inputChar):X}': " +
+                        _parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                        _index.Current, _index.SafeAdd(_index.Current, 1));
+            }
+        }
+
+        /// <summary>
+        /// Adds a <see cref="Selector"/> to the current <see cref="Placeholder"/>
+        /// because the current character ':' or '}' indicates the end of a selector.
+        /// </summary>
+        /// <param name="currentPlaceholder"></param>
+        /// <param name="parsingErrors"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AddLastSelector(ref Placeholder currentPlaceholder, ParsingErrors parsingErrors)
+        {
+            if (_index.Current != _index.LastEnd ||
+                currentPlaceholder.Selectors.Count > 0 && currentPlaceholder.Selectors[currentPlaceholder.Selectors.Count - 1].Length > 0 &&
+                _index.Current - _index.Operator == 1 &&
+                (_inputFormat[_index.Operator] == _parserSettings.ListIndexEndChar ||
+                 _inputFormat[_index.Operator] == _parserSettings.NullableOperator))
+                currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, _inputFormat, _index.LastEnd, _index.Current,_index.Operator, _index.Selector));
+            else if (_index.Operator != _index.Current) // the selector only contains illegal ("trailing") operator characters
+                parsingErrors.AddIssue(_resultFormat,
+                    $"'0x{Convert.ToInt32(_inputFormat[_index.Operator]):X}': " +
+                    _parsingErrorText[ParsingError.TrailingOperatorsInSelector],
+                    _index.Operator, _index.Current);
+            _index.LastEnd = _index.SafeAdd(_index.Current, 1);
+        }
+
+        /// <summary>
+        /// Parses all option characters.
+        /// This short-circuits the Parser.ParseFormat main loop.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ParseFormatOptions()
+        {
+            _index.NamedFormatterOptionsStart = _index.Current;
+
+            var nextChar = _inputFormat[_index.SafeAdd(_index.Current, 1)];
+            // Handle empty options()
+            if (_formatOptionsTerminatorChars.Contains(nextChar)) return;
+            
+            while (++_index.Current < _index.ObjectLength)
+            {
+                nextChar = _inputFormat[_index.SafeAdd(_index.Current, 1)];
+                // Skip escaped terminating characters
+                if (_inputFormat[_index.Current] == _parserSettings.CharLiteralEscapeChar &&
+                    (_formatOptionsTerminatorChars.Contains(nextChar) ||
+                     EscapedLiteral.TryGetChar(nextChar, out _, true)))
+                {
+                    _index.Current = _index.SafeAdd(_index.Current, 1);
+                    if (_formatOptionsTerminatorChars.Contains(
+                        _inputFormat[_index.SafeAdd(_index.Current, 1)]))
+                    {
+                        return;
+                    }
+
+                    continue;
+                }
+
+                // End of parsing options, when the NEXT character is terminating,
+                // because this character will be handled in the Parser.ParseFormat main loop.
+                if (_formatOptionsTerminatorChars.Contains(_inputFormat[_index.Current + 1]))
+                {
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 'style' and 'script' tags may contain curly or square braces, which SmartFormat uses to identify <see cref="Placeholder"/>s.
+        /// Also, comments may contain any characters, which could mix up the parser.
+        /// That's why the parser will treat all content inside 'style' and 'script' tags as <see cref="LiteralText"/>,
+        /// if <see cref="ParserSettings.ParseInputAsHtml"/> is <see langword="true"/>.
+        /// </summary>
+        private void ParseHtmlTags()
+        {
+            // The tags we will be parsing with this method
+            var scriptTagName = "script".AsSpan();
+            var styleTagName = "style".AsSpan();
+            
+            // The first position is the start of an HTML tag
+            // Move forward to the tag name
+            _index.Current++;
+
+            // Is it a script tag starting with <script
+            var currentTagName = ReadOnlySpan<char>.Empty;
+            if (_inputFormat.AsSpan(_index.Current).StartsWith(scriptTagName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                currentTagName = scriptTagName;
+                _index.Current += currentTagName.Length; // move behind tag name
+            }
+
+            // Is it a style tag starting with <style
+            if (_inputFormat.AsSpan(_index.Current).StartsWith(styleTagName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                currentTagName = styleTagName;
+                _index.Current += currentTagName.Length; // move behind tag name
+            }
+
+            // Not a tag we should parse, stop processing
+            if (currentTagName == ReadOnlySpan<char>.Empty) return;
+
+            // Initialize quoting variables
+            var isQuoting = false;
+            var endQuoteChar = '\"';
+
+            // Parse characters inside script or style tag
+            while (true)
+            {
+                // done
+                if (_index.Current >= _inputFormat.Length) return;
+
+                #region ** Quoted characters (inside of single quotes or double quotes) **
+
+                // text inside quotes (e.g.: const variable = "</script>"; could mix-up the parser                
+                switch (isQuoting)
+                {
+                    case false when _inputFormat[_index.Current] == '\'' || _inputFormat[_index.Current] == '\"':
+                        isQuoting = !isQuoting;
+                        endQuoteChar = _inputFormat[_index.Current]; // start and end quoting char must be equal
+                        _index.Current++;
+                        continue;
+                    case true when _inputFormat[_index.Current] == endQuoteChar:
+                        isQuoting = !isQuoting;
+                        _index.Current++;
+                        continue;
+                    case true:
+                        _index.Current++;
+                        continue;
+                }
+
+                #endregion
+
+                #region ** Parse script and style tags **
+
+                // Is it a self-closing tag like <script/>
+                if (_inputFormat[_index.Current] == '/' && _inputFormat[_index.Current + 1] == '>' && _inputFormat
+                    .AsSpan(_index.Current - 1 - currentTagName.Length)
+                    .StartsWith(currentTagName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _index.Current++;
+                    return;
+                }
+
+                // Is it the begin of </script> or </style>?
+                if (_inputFormat[_index.Current] == '<' 
+                    && _inputFormat[_index.Current + 1] == '/' 
+                    && currentTagName != ReadOnlySpan<char>.Empty 
+                    && _inputFormat
+                        .AsSpan(_index.Current + 2)
+                        .StartsWith(currentTagName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _index.Current = _index.SafeAdd(_index.Current, 2 + currentTagName.Length); // move behind tag name
+                    if (_index.Current < _inputFormat.Length && _inputFormat[_index.Current] == '>') // closing char
+                        return;
+                }
+
+                if (_inputFormat.Length > _index.Current)
+                {
+                    _index.Current++;
+                    continue;
+                }
+
+                #endregion
+
+                // We get here, when a script or style tag is not closed
+                return;
+            }
         }
 
         #endregion
@@ -516,10 +817,9 @@ namespace SmartFormat.Core.Parsing
         /// </summary>
         public class ParsingErrorText
         {
-            private readonly Dictionary<ParsingError, string> _errors = new Dictionary<ParsingError, string>
-            {
+            private readonly Dictionary<ParsingError, string> _errors = new() {
                 {ParsingError.TooManyClosingBraces, "Format string has too many closing braces"},
-                {ParsingError.TrailingOperatorsInSelector, "There are trailing operators in the selector"},
+                {ParsingError.TrailingOperatorsInSelector, "There are illegal trailing operators in the selector"},
                 {ParsingError.InvalidCharactersInSelector, "Invalid character in the selector"},
                 {ParsingError.MissingClosingBrace, "Format string is missing a closing brace"}
             };
@@ -547,37 +847,36 @@ namespace SmartFormat.Core.Parsing
         /// <returns>The <see cref="Format"/> which will be further processed by the formatter.</returns>
         private Format HandleParsingErrors(ParsingErrors parsingErrors, Format currentResult)
         {
-            switch (Settings.ParseErrorAction)
+            switch (Settings.Parser.ErrorAction)
             {
-                case ErrorAction.ThrowError:
+                case ParseErrorAction.ThrowError:
                     throw parsingErrors;
-                case ErrorAction.MaintainTokens:
+                case ParseErrorAction.MaintainTokens:
                     // Replace erroneous Placeholders with tokens as LiteralText
                     // Placeholder without issues are left unmodified
                     for (var i = 0; i < currentResult.Items.Count; i++)
                     {
-                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex){endIndex = ph.endIndex};
+                            var parent = ph.Format ?? FormatPool.Instance.Get().Initialize(Settings, ph.BaseString);
+                            currentResult.Items[i] = LiteralTextPool.Instance.Get().Initialize(Settings, parent, parent.BaseString, ph.StartIndex, ph.EndIndex);
                         }
                     }
                     return currentResult;
-                case ErrorAction.Ignore:
+                case ParseErrorAction.Ignore:
                     // Replace erroneous Placeholders with an empty LiteralText
                     for (var i = 0; i < currentResult.Items.Count; i++)
                     {
-                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].startIndex && errItem.Index <= currentResult.Items[i].endIndex))
+                        if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                         {
-                            currentResult.Items[i] = new LiteralText(Settings, ph.Format ?? new Format(Settings, ph.baseString), ph.startIndex){endIndex = ph.startIndex};
+                            var parent = ph.Format ?? FormatPool.Instance.Get().Initialize(Settings, ph.BaseString);
+                            currentResult.Items[i] = LiteralTextPool.Instance.Get().Initialize(Settings, parent, parent.BaseString, ph.StartIndex, ph.StartIndex);
                         }
                     }
                     return currentResult;
-                case ErrorAction.OutputErrorInResult:
-                    var fmt = new Format(Settings, parsingErrors.Message) {
-                        startIndex = 0,
-                        endIndex = parsingErrors.Message.Length
-                    };
-                    fmt.Items.Add(new LiteralText(Settings, fmt));
+                case ParseErrorAction.OutputErrorInResult:
+                    var fmt = FormatPool.Instance.Get().Initialize(Settings, parsingErrors.Message, 0, parsingErrors.Message.Length);
+                    fmt.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, fmt, parsingErrors.Message, 0, parsingErrors.Message.Length));
                     return fmt;
                 default:
                     throw new ArgumentException("Illegal type for ParsingErrors", parsingErrors);

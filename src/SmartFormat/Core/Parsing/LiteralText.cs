@@ -1,10 +1,11 @@
-﻿//
-// Copyright (C) axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.
+﻿// 
+// Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
-//
 
 using System;
 using SmartFormat.Core.Settings;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Parsing
 {
@@ -14,75 +15,80 @@ namespace SmartFormat.Core.Parsing
     /// </summary>
     public class LiteralText : FormatItem
     {
-        public LiteralText(SmartSettings smartSettings, Format parent, int startIndex) : base(smartSettings, parent,
-            startIndex)
+        private string? _toStringCache;
+
+        #region: Create, initialize, return to pool :
+
+        /// <summary>
+        /// CTOR for object pooling.
+        /// Immediately after creating the instance, an overload of 'Initialize' must be called.
+        /// </summary>
+        public LiteralText()
         {
+            // Inserted for clarity and documentation
         }
 
-        public LiteralText(SmartSettings smartSettings, Format parent) : base(smartSettings, parent, parent.startIndex)
+        /// <summary>
+        /// Initializes the <see cref="LiteralText"/> instance, representing the literal text that is found in a parsed format string.
+        /// </summary>
+        /// <param name="smartSettings">The <see cref="SmartSettings"/>.</param>
+        /// <param name="parent">The parent <see cref="FormatItem"/></param>
+        /// <param name="baseString">The reference to the parsed format string.</param>
+        /// <param name="startIndex">The start index of the <see cref="LiteralText"/> in the format string.</param>
+        /// <param name="endIndex">The end index of the <see cref="LiteralText"/> in the format string.</param>
+        /// <returns>The <see cref="LiteralText"/> instance, representing the literal text that is found in a parsed format string.</returns>
+        public new LiteralText Initialize(SmartSettings smartSettings, FormatItem parent, string baseString, int startIndex, int endIndex)
         {
+            base.Initialize(smartSettings, parent, baseString, startIndex, endIndex);
+            return this;
         }
 
+        #endregion
+
+        /// <summary>
+        /// Get the string representation of the <see cref="LiteralText"/>, with escaped characters converted.
+        /// Note: The <see cref="Parser"/> puts each escaped character of an input string
+        /// into its own <see cref="LiteralText"/> item.
+        /// </summary>
+        /// <returns>The string representation of the <see cref="LiteralText"/>, with escaped characters converted.</returns>
         public override string ToString()
         {
-            return SmartSettings.ConvertCharacterStringLiterals
-                ? ConvertCharacterLiteralsToUnicode()
-                : baseString.Substring(startIndex, endIndex - startIndex);
+            if (_toStringCache != null) return _toStringCache;
+            if (Length == 0) _toStringCache = string.Empty;
+
+            // The buffer is only 1 character
+            _toStringCache = AsSpan().ToString();
+
+            return _toStringCache;
         }
 
-        private string ConvertCharacterLiteralsToUnicode()
+        /// <summary>
+        /// Get the string representation of the <see cref="LiteralText"/>, with escaped characters converted.
+        /// Note: The <see cref="Parser"/> puts each escaped character of an input string
+        /// into its own <see cref="LiteralText"/> item.
+        /// </summary>
+        /// <returns>The string representation of the <see cref="LiteralText"/>, with escaped characters converted.</returns>
+        public override ReadOnlySpan<char> AsSpan()
         {
-            var source = baseString.Substring(startIndex, endIndex - startIndex);
-            if (source.Length == 0) return source;
+            if (Length == 0) return ReadOnlySpan<char>.Empty;
 
-            // No character literal escaping - nothing to do
-            if (source[0] != Parser.CharLiteralEscapeChar)
-                return source;
+            // The buffer is only for 1 character - each escaped char goes into its own LiteralText
+            return SmartSettings.Parser.ConvertCharacterStringLiterals &&
+                             BaseString.AsSpan(StartIndex)[0] == SmartSettings.Parser.CharLiteralEscapeChar
+                ? EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar,
+                    BaseString.AsSpan(StartIndex, Length),
+                    false, new char[1])
+                : BaseString.AsSpan(StartIndex, Length);
+        }
 
-            // The string length should be 2: espace character \ and literal character
-            if (source.Length < 2) throw new ArgumentException($"Missing escape sequence in literal: \"{source}\"");
-
-            char c;
-            switch (source[1])
-            {
-                case '\'':
-                    c = '\'';
-                    break;
-                case '\"':
-                    c = '\"';
-                    break;
-                case '\\':
-                    c = '\\';
-                    break;
-                case '0':
-                    c = '\0';
-                    break;
-                case 'a':
-                    c = '\a';
-                    break;
-                case 'b':
-                    c = '\b';
-                    break;
-                case 'f':
-                    c = '\f';
-                    break;
-                case 'n':
-                    c = '\n';
-                    break;
-                case 'r':
-                    c = '\r';
-                    break;
-                case 't':
-                    c = '\t';
-                    break;
-                case 'v':
-                    c = '\v';
-                    break;
-                default:
-                    throw new ArgumentException($"Unrecognized escape sequence in literal: \"{source}\"");
-            }
-
-            return c.ToString();
+        /// <summary>
+        /// Clears the <see cref="LiteralText"/> item.
+        /// <para>This method gets called by <see cref="LiteralTextPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
+        /// </summary>
+        public override void Clear()
+        {
+            base.Clear();
+            _toStringCache = null;
         }
     }
 }

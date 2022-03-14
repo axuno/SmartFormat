@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
+        <RootNamespace>SmartFormat.ZString</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1701;1702;1591</NoWarn>
+        <!-- NuGet Packaging -->
+        <IsPackable>false</IsPackable>
+        <Company>Cysharp</Company>
+        <Authors>Cysharp</Authors>
+        <Copyright>© Cysharp, Inc.</Copyright>
+        <PackageTags>string;</PackageTags>
+        <Description>Zero allocation StringBuilder for .NET Core and Unity.</Description>
+        <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/axuno/SmartFormat</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <PackageIcon>SmartFormat_365x365.png</PackageIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+        <None Include="../../PkgReadMe.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
+      <DefineConstants>TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <WarningLevel>3</WarningLevel>
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- repo\src\ZString\ZStringWriter.cs replaced for net461 compatibility -->
+      <Compile Remove="repo\src\ZString\ZStringWriter.cs" />
+      <Compile Remove="repo\docs\**" />
+      <Compile Remove="repo\sandbox\**" />
+      <Compile Remove="repo\src\ZString.Unity\**" />
+      <Compile Remove="repo\src\ZString\Unity\**" />
+      <Compile Remove="repo\tests\**" />
+      <EmbeddedResource Remove="repo\src\ZString\ZStringWriter.cs" />
+      <EmbeddedResource Remove="repo\docs\**" />
+      <EmbeddedResource Remove="repo\sandbox\**" />
+      <EmbeddedResource Remove="repo\src\ZString.Unity\**" />
+      <EmbeddedResource Remove="repo\src\ZString\Unity\**" />
+      <EmbeddedResource Remove="repo\tests\**" />
+      <None Remove="repo\src\ZString\ZStringWriter.cs" />
+      <None Remove="repo\docs\**" />
+      <None Remove="repo\sandbox\**" />
+      <None Remove="repo\src\ZString.Unity\**" />
+      <None Remove="repo\src\ZString\Unity\**" />
+      <None Remove="repo\tests\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Memory" Version="4.5.4" />
+    </ItemGroup>
+
+</Project>

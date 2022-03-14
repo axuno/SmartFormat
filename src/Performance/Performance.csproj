@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartFormat.Extensions.Newtonsoft.Json\SmartFormat.Extensions.Newtonsoft.Json.csproj" />
+    <ProjectReference Include="..\SmartFormat.Extensions.System.Text.Json\SmartFormat.Extensions.System.Text.Json.csproj" />
+    <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
+    <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+  </ItemGroup>
+
+</Project>

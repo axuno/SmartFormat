@@ -2,12 +2,15 @@
 
     <PropertyGroup>
         <Product>SmartFormat</Product>
-        <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <Company>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Company>
-        <Copyright>Copyright 2011-2022 axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Copyright>
+        <Company>SmartFormat</Company>
+        <Authors>axuno gGmbH, Scott Rippey, SmartFormat Project maintainers and contributors.</Authors>
+        <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+        <Copyright>Copyright 2011-$(CurrentYear) SmartFormat Project</Copyright>
         <RepositoryUrl>https://github.com/axuno/SmartFormat.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <AssemblyVersion>2.7.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
+        <Version>3.0.0</Version>
+        <FileVersion>3.0.0</FileVersion>
+        <AssemblyVersion>3.0.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
         <LangVersion>latest</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisLevel>latest</AnalysisLevel>

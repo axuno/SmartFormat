@@ -1,9 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.TestUtils
 {
     /// <summary>
     /// Generic class that can be used for United States addresses
@@ -56,10 +55,10 @@ namespace SmartFormat.Tests
             result = new Address(match.Groups["streetaddress"].Value, match.Groups["city"].Value, match.Groups["state"].Value, match.Groups["zip"].Value);
             return true;
         }
-        static Regex static_TryParse_AddressPattern = new Regex("(?<streetaddress>.*?)\\s*[\\n,]\\s*(?<city>.*?),\\s*(?<state>\\S\\S)\\s*(?<zip>\\S*)");
+        static Regex static_TryParse_AddressPattern = new("(?<streetaddress>.*?)\\s*[\\n,]\\s*(?<city>.*?),\\s*(?<state>\\S\\S)\\s*(?<zip>\\S*)");
         public static Address Parse(string addressString)
         {
-            Address result = new Address("","","","");
+            Address result = new("","","","");
             if (!TryParse(addressString, ref result))
                 throw new Exception("The Address String could not be properly parsed.");
             return result;

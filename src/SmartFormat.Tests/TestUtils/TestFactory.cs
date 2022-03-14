@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmartFormat.Tests
+namespace SmartFormat.Tests.TestUtils
 {
     public abstract class TestFactory
     {
@@ -28,8 +28,8 @@ namespace SmartFormat.Tests
 
         public static List<object> GetItems()
         {
-            return new List<object>
-                       {
+            return new()
+            {
                            new
                                {
                                    Name = "Table",

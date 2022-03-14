@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 
@@ -12,59 +14,96 @@ namespace SmartFormat.Tests.Core
     [TestFixture]
     public class FormatterTests
     {
-        private object[] errorArgs = new object[]{ new FormatDelegate(format => { throw new Exception("ERROR!"); } ) };
+        private readonly object[] _errorArgs = { new FormatDelegate(format => throw new Exception("ERROR!")) };
+
+        private static SmartFormatter GetSimpleFormatter()
+        {
+            var formatter = new SmartFormatter()
+                .AddExtensions(new DefaultFormatter())
+                .AddExtensions(new ReflectionSource(), new DefaultSource());
+            return formatter;
+        }
+
+        [Test]
+        public void Formatter_With_Numeric_Params_Objects()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("ABC{0}{1}DEF", 0, 1), Is.EqualTo("ABC01DEF"));
+        }
+
+        [Test]
+        public void Formatter_With_String_Params_Objects()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("Name: {0}", "Joe"), Is.EqualTo("Name: Joe"));
+        }
+
+        [Test]
+        public void Formatter_Pure_Literal_No_Args()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            var parsed = formatter.Parser.ParseFormat("ABC");
+            Assert.That(formatter.Format(parsed), Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void Formatter_With_Null_Args()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("a{0}b{1}c", null, null), Is.EqualTo("abc"));
+        }
+        
+        [Test]
+        public void Formatter_With_IList_Objects()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("{0}{1}", new List<object?>{0,1}), Is.EqualTo("01"));
+        }
+
+        [Test]
+        public void Formatter_With_IList_Null()
+        {
+            var formatter = Smart.CreateDefaultSmartFormat();
+            Assert.That(formatter.Format("a{0}{1}b", new List<object?>{null, null}), Is.EqualTo("ab"));
+        }
 
         [Test]
         public void Formatter_Throws_Exceptions()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.ThrowError;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings{Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.ThrowError}});
 
-            Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", errorArgs, "--ERROR!--ERROR!--"));
+            Assert.Throws<FormattingException>(() => formatter.Test("--{0}--", _errorArgs, "--ERROR!--ERROR!--"));
         }
 
         [Test]
         public void Formatter_Outputs_Exceptions()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings{Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.OutputErrorInResult}});
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--ERROR!--ERROR!--");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "--ERROR!--ERROR!--");
         }
 
         [Test]
         public void Formatter_Ignores_Exceptions()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings{Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.Ignore}});
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "------");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "------");
         }
 
         [Test]
         public void Formatter_Maintains_Tokens()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.MaintainTokens;
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings{Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.MaintainTokens}});
 
-            formatter.Test("--{0}--{0:ZZZZ}--", errorArgs, "--{0}--{0:ZZZZ}--");
+            formatter.Test("--{0}--{0:ZZZZ}--", _errorArgs, "--{0}--{0:ZZZZ}--");
         }
 
         [Test]
         public void Formatter_Maintains_Object_Tokens()
         {
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.MaintainTokens;
-            formatter.Test("--{Object.Thing}--", errorArgs, "--{Object.Thing}--");
-        }
-
-        [Test]
-        public void Formatter_AlignNull()
-        {
-            string? name = null;
-            var obj = new { name = name };
-            var str2 = Smart.Format("Name: {name,-10}| Column 2", obj);
-            Assert.That(str2, Is.EqualTo("Name:           | Column 2"));
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.MaintainTokens}});
+            formatter.Test("--{Object.Thing}--", _errorArgs, "--{Object.Thing}--");
         }
 
         [Test]
@@ -73,59 +112,48 @@ namespace SmartFormat.Tests.Core
             var data = new {Person = new {FirstName = "John", LastName = "Long"}, Address = new {City = "London"}};
             var formatter = Smart.CreateDefaultSmartFormat();
             
-            // This is necessary to avoid undesired trailing blanks:
-            // }}} are now considered as 3 different closing braces
-            formatter.Parser.UseAlternativeEscapeChar('\\');
-            
             // This allows a nested template to access outer scopes.
             // Here, {City} will come from Address, but {FirstName} will come from Person:
-            var result = formatter.Format("{Person:{Address:City: {City}, Name: {FirstName}}}", data);
+            var result = formatter.Format("{Person:{Address:City\\: {City}, Name\\: {FirstName}}}", data);
             
             Assert.That(result, Is.EqualTo("City: London, Name: John"));
         }
 
-        [TestCase(1)]
-        [TestCase(2)]
-        public void Nested_PlaceHolders_Conditional(int numOfPeople)
+        [TestCase("({.Joe.})", ":{Joe}:")]
+        [TestCase("Kate", ":{(.Not:Joe.)}:")]
+        public void Any_Character_Anywhere_If_Escaped(string name, string expected)
         {
-
-            var data = numOfPeople == 1
-                ? new {People = new List<object> {new {Name = "Name 1", Age = 20}}}
-                : new {People = new List<object> {new {Name = "Name 1", Age = 20}, new {Name = "Name 2", Age = 30}}};
-            var formatter = Smart.CreateDefaultSmartFormat();
-            
-            var result = formatter.Format("There {People.Count:is a person.|are {} people.}", data);
-            
-            Assert.That(result, numOfPeople == 1 ? Is.EqualTo("There is a person.") : Is.EqualTo("There are 2 people."));
+            var smart = Smart.CreateDefaultSmartFormat();
+            var arg = new {Name = name};
+            // {} and () must and can only be escaped inside options
+            var format = @":\{{Name:choose(\(\{.Joe.\}\)):Joe|(.Not\:Joe.)}\}:";
+            Assert.That(smart.Format(format, arg), Is.EqualTo(expected));
         }
 
         [Test]
         public void Formatter_NotifyFormattingError()
         {
             var obj = new { Name = "some name" };
-            var badPlaceholder = new List<string>();
+            var badPlaceholder = new List<FormattingErrorEventArgs>();
 
-            var formatter = Smart.CreateDefaultSmartFormat();
-            formatter.Settings.FormatErrorAction = ErrorAction.Ignore;
-            formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args.Placeholder);
+            var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.Ignore}});
+            formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args);
             var res = formatter.Format("{NoName} {Name} {OtherMissing}", obj);
-            Assert.That(badPlaceholder.Count == 2 && badPlaceholder[0] == "{NoName}" && badPlaceholder[1] == "{OtherMissing}");
+            Assert.That(badPlaceholder.Count, Is.EqualTo(2));
+            Assert.That(badPlaceholder[0].Placeholder == "{NoName}");
+            Assert.That(badPlaceholder[1].Placeholder == "{OtherMissing}");
+            Assert.That(badPlaceholder[0].ErrorIndex, Is.EqualTo(7));
+            Assert.That(badPlaceholder[0].IgnoreError, Is.EqualTo(true));
         }
 
-        [Test]
-        public void LeadingBackslashMustNotEscapeBraces()
+        [TestCase("\\{Test}", "\\Hello", false)]
+        [TestCase(@"\\{Test}",@"\Hello",  true)]
+        public void LeadingBackslashMustNotEscapeBraces(string format, string expected, bool convertCharacterStringLiterals)
         {
-            var smart = Smart.CreateDefaultSmartFormat();
-            smart.Settings.ConvertCharacterStringLiterals = false;
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
+                {StringFormatCompatibility = true, Parser = new ParserSettings {ConvertCharacterStringLiterals = convertCharacterStringLiterals}});
 
-            var expected = "\\Hello";
-            var actual = smart.Format("\\{Test}", new { Test = "Hello" });
-            Assert.AreEqual(expected, actual);
-
-            smart.Settings.ConvertCharacterStringLiterals = true;
-
-            expected = @"\Hello";
-            actual = smart.Format(@"\\{Test}", new { Test = "Hello" }); // double backslash means escaping the backslash
+            var actual = smart.Format(format, new { Test = "Hello" });
             Assert.AreEqual(expected, actual);
         }
 
@@ -144,19 +172,111 @@ namespace SmartFormat.Tests.Core
             var args = new object[] {new Dictionary<string, string> {{"Greeting", "Hello"}} };
             var format = "{Greeting}";
             var output = new StringOutput();
-            var formatter = new SmartFormatter();
-            formatter.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-            formatter.Settings.ConvertCharacterStringLiterals = true;
-            formatter.Settings.FormatErrorAction = ErrorAction.OutputErrorInResult;
-            formatter.Settings.ParseErrorAction = ErrorAction.OutputErrorInResult;
-            formatter.Parser.AddAlphanumericSelectors(); // required for this test
-            var formatParsed = formatter.Parser.ParseFormat(format, new []{string.Empty});
-            var formatDetails = new FormatDetails(formatter, formatParsed, args, null, null, output);
+            var formatter = new SmartFormatter(new SmartSettings
+            {
+                CaseSensitivity = CaseSensitivityType.CaseInsensitive,
+                Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.OutputErrorInResult},
+                Parser = new ParserSettings {ErrorAction = ParseErrorAction.OutputErrorInResult}
+            });
+            var formatParsed = formatter.Parser.ParseFormat(format);
+            var formatDetails = new FormatDetails().Initialize(formatter, formatParsed, args, null, output);
             
             Assert.AreEqual(args, formatDetails.OriginalArgs);
             Assert.AreEqual(format, formatDetails.OriginalFormat.RawText);
             Assert.AreEqual(formatter.Settings, formatDetails.Settings);
-            Assert.IsTrue(formatDetails.FormatCache == null);
+        }
+
+        [Test]
+        public void Missing_FormatExtensions_Should_Throw()
+        {
+            var formatter = new SmartFormatter();
+            // make sure we test against missing format extensions
+            formatter.AddExtensions(new DefaultSource());
+
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+            Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
+        }
+
+        [Test]
+        public void Missing_SourceExtensions_Should_Throw()
+        {
+            var formatter = new SmartFormatter();
+            // make sure we test against missing source extensions
+            formatter.AddExtensions(new DefaultFormatter());
+
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+            Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
+        }
+
+        [Test]
+        public void Adding_FormatExtension_With_Existing_Name_Should_Throw()
+        {
+            var formatter = new SmartFormatter();
+            var firstExtension = new DefaultFormatter();
+            formatter.AddExtensions(firstExtension);
+            var dupeExtension = new NullFormatter {Name = firstExtension.Name};
+            Assert.That(() => formatter.AddExtensions(dupeExtension), Throws.TypeOf(typeof(ArgumentException)));
+        }
+
+        [Test]
+        public void Remove_None_Existing_Source()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+            Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void Remove_Existing_Source()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+            formatter.AddExtensions(new StringSource());
+            Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(true));
+        }
+
+        [Test]
+        public void Remove_None_Existing_Formatter()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+            Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void Remove_Existing_Formatter()
+        {
+            var formatter = new SmartFormatter();
+            
+            Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+            formatter.AddExtensions(new DefaultFormatter());
+            Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(true));
+        }
+
+        [Test]
+        public void Formatter_GetSourceExtension()
+        {
+            var formatter = GetSimpleFormatter();
+            Assert.That(formatter.GetSourceExtensions().Count, Is.EqualTo(formatter.SourceExtensions.Count));
+            Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));  ;
+        }
+
+        [Test]
+        public void Formatter_GetFormatterExtension()
+        {
+            var formatter = GetSimpleFormatter();
+            Assert.That(formatter.GetFormatterExtensions().Count, Is.EqualTo(formatter.FormatterExtensions.Count));
+            Assert.That(formatter.GetFormatterExtension<DefaultFormatter>(), Is.InstanceOf(typeof(DefaultFormatter)));  ;
+        }
+
+        [Test]
+        public void Not_Existing_Formatter_Name_Should_Throw()
+        {
+            var smart = GetSimpleFormatter();
+            Assert.That(() => smart.Format("{0:not_existing_formatter_name:}", new object()), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("not_existing_formatter_name"));
         }
     }
 }

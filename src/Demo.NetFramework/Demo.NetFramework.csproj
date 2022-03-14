@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net462</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ApplicationIcon>SmartFormat.Demo.ico</ApplicationIcon>
+        <LangVersion>8.0</LangVersion>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove="ThirdParty\RTFLib\Readme.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="ThirdParty\RTFLib\Readme.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartFormat.Tests\SmartFormat.Tests.csproj" />
+        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="SmartFormatDemo.cs" />
+        <Compile Update="SmartFormatDemo.Designer.cs">
+            <DependentUpon>SmartFormatDemo.cs</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="SmartFormatDemo.resx">
+            <SubType>Designer</SubType>
+            <DependentUpon>SmartFormatDemo.cs</DependentUpon>
+        </EmbeddedResource>
+    </ItemGroup>
+
+</Project>

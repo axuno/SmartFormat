@@ -1,23 +1,52 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
-using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Parsing;
+﻿using NUnit.Framework;
+using SmartFormat.Core.Output;
+using SmartFormat.Extensions;
 
 namespace SmartFormat.Tests.Core
 {
     [TestFixture]
     class FormatCacheTests
     {
-        [Test]
-        public void Create_Cache()
+        private static SmartFormatter GetSimpleFormatter()
         {
-            var sf = new SmartFormatter();
-            var format = new Format(sf.Settings, "the base string");
-            var fc = new FormatCache(format);
-            Assert.AreEqual(format, fc.Format);
-            Assert.IsAssignableFrom<Dictionary<string,object>>(fc.CachedObjects);
-            fc.CachedObjects.Add("key", "value");
-            Assert.IsTrue(fc.CachedObjects["key"].ToString() == "value");
+            var formatter = new SmartFormatter()
+                .AddExtensions(new DefaultFormatter())
+                .AddExtensions(new ReflectionSource(), new DefaultSource());
+            return formatter;
+        }
+
+        [Test]
+        public void Format_WithCache()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString);
+            Assert.That(formatter.Format(format, data), Is.EqualTo($"{data.Name}, {data.City}"));
+        }
+
+        [Test]
+        public void Format_WithCache_Into_StringOutput()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString);
+            var output = new StringOutput();
+            formatter.FormatInto(output, null, format, data);
+            Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
+        }
+
+        [Test]
+        public void Format_WithCache_Into_ZStringOutput()
+        {
+            var data = new {Name = "Joe", City = "Melbourne"};
+            var formatter = GetSimpleFormatter();
+            var formatString = "{Name}, {City}";
+            var format = formatter.Parser.ParseFormat(formatString);
+            using var output = new ZStringOutput();
+            formatter.FormatInto(output, null, format, data);
+            Assert.That(output.ToString(), Is.EqualTo($"{data.Name}, {data.City}"));
         }
     }
 }
