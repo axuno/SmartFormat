@@ -803,11 +803,11 @@ namespace SmartFormat.Tests.Core
         public void ParsingErrors_Serialization()
         {
             using var stream = new MemoryStream();
-            var fmt = new BinaryFormatter(); //NOSONAR
-            fmt.Serialize(stream, new ParsingErrors());
+            var ser = new System.Runtime.Serialization.DataContractSerializer(typeof(ParsingErrors));
+            ser.WriteObject(stream, new ParsingErrors());
             stream.Position = 0;
-            
-            var exception = fmt.Deserialize(stream) as ParsingErrors;
+
+            var exception = ser.ReadObject(stream) as ParsingErrors;
             Assert.That(exception, Is.TypeOf<ParsingErrors>());
         }
     }
