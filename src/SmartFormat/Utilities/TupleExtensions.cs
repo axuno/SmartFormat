@@ -91,10 +91,11 @@ namespace SmartFormat.Utilities
                         yield return innerTuple;
                     }
                 }
-                else
+                else if (theTuple is null)
                 {
-                    yield return theTuple;
+                    yield return null;
                 }
+                else yield return theTuple;
             }
         }
     }

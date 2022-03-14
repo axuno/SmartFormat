@@ -3,7 +3,9 @@ using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Tests.TestUtils;
 using System;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 
 namespace SmartFormat.Tests.Core
@@ -134,7 +136,7 @@ namespace SmartFormat.Tests.Core
             };
             foreach (var format in invalidFormats)
             {
-                _ = parser.ParseFormat(format);
+                Assert.That(del: () => _ = parser.ParseFormat(format), Throws.Nothing);
             }
         }
 
@@ -795,6 +797,18 @@ namespace SmartFormat.Tests.Core
                 Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
                     Is.EqualTo("{TheVariable}"));
             }
+        }
+
+        [Test]
+        public void ParsingErrors_Serialization()
+        {
+            using var stream = new MemoryStream();
+            var fmt = new BinaryFormatter(); //NOSONAR
+            fmt.Serialize(stream, new ParsingErrors());
+            stream.Position = 0;
+            
+            var exception = fmt.Deserialize(stream) as ParsingErrors;
+            Assert.That(exception, Is.TypeOf<ParsingErrors>());
         }
     }
 }

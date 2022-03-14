@@ -17,7 +17,7 @@ namespace SmartFormat.Utilities
         /// <summary>
         /// Normally this is a pass-through to DateTime.Now, but it can be overridden with SetDateTime( .. ) for unit testing and debugging.
         /// </summary>
-        public static Func<DateTime> Now = () => DateTime.Now;
+        public static Func<DateTime> Now { get; private set; } = () => DateTime.Now;
 
         /// <summary>
         /// Set time to return when SystemTime.Now() is called.
@@ -34,7 +34,7 @@ namespace SmartFormat.Utilities
         /// <summary>
         /// Normally this is a pass-through to DateTimeOffset.Now, but it can be overridden with SetDateTime( .. ) for unit testing and debugging.
         /// </summary>
-        public static Func<DateTimeOffset> OffsetNow = () => DateTimeOffset.Now;
+        public static Func<DateTimeOffset> OffsetNow { get; private set; } = () => DateTimeOffset.Now;
 
         /// <summary>
         /// Set time to return when SystemTime.OffsetNow() is called.

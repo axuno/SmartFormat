@@ -91,9 +91,9 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void Test_Nested_Tuples()
         {
-            var child = (Child: "The child", ChildName: "Child name");
+            var child = (Child: "The child", ChildName: "Child name", JustNull: default(string));
             var mainWithChild = (Main: "Main", child);
-            var expected = new List<object?> { mainWithChild.Item1, child.Child, child.ChildName};
+            var expected = new List<object?> { mainWithChild.Item1, child.Child, child.ChildName, default(string)};
 
             Assert.That(mainWithChild.GetValueTupleItemObjectsFlattened().ToList(), Is.EqualTo(expected));
         }
