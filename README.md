@@ -35,3 +35,14 @@
 Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.Net/wiki)
 
 See the [changelog](CHANGES.md) for changes.
+
+### License
+
+*SmartFormat* is licensed under [The MIT License (MIT)](LICENSE.md)
+
+The bundled project *SmartFormat.ZString* is Copyright © Cysharp, Inc. [Their software](https://github.com/Cysharp/ZString) 
+is licensed under [The MIT License (MIT)](src/SmartFormat.ZString/repo/LICENSE). 
+Their conversion methods under the `ZString/Number` directory 
+is Copyright © .NET Foundation and Contributors und is licensed
+under [The MIT License (MIT)](https://github.com/dotnet/runtime/blob/master/LICENSE.TXT).
+
