@@ -1,6 +1,9 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
+using SmartFormat.Core.Settings;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.Localization;
 using SmartFormat.Utilities;
 
@@ -110,5 +113,58 @@ namespace SmartFormat.Tests.Extensions
             var result = provider.GetString("does-not-exist", CultureInfo.InvariantCulture);
             Assert.That(result, Is.Null);
         }
+
+        #region * Custom ILocalizationProvider Implementation *
+
+        [Test]
+        public void CustomLocalizationProvider()
+        {
+            // Important: Register the ILocalizationProvider in SmartSettings
+            // before creating the LocalizationFormatter
+            var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
+                { Localization = { LocalizationProvider = new DictLocalizationProvider() } });
+            smart.AddExtensions(new LocalizationFormatter());
+
+            // Only the word "COUNTRY" is translated into 3 languages
+            var result = smart.Format("{:L(en):COUNTRY} * {:L(fr):COUNTRY} * {:L(es):COUNTRY}");
+            Assert.That(result, Is.EqualTo("country * pays * país"));
+        }
+
+        private class DictLocalizationProvider : ILocalizationProvider
+        {
+            private readonly Dictionary<string, Dictionary<string, string>> _translations;
+
+            public DictLocalizationProvider()
+            {
+                _translations = new Dictionary<string, Dictionary<string, string>> {
+                    { "en", new Dictionary<string, string> { { "COUNTRY", "country" } } },
+                    { "fr", new Dictionary<string, string> { { "COUNTRY", "pays" } } },
+                    { "es", new Dictionary<string, string> { { "COUNTRY", "país" } } }
+                };
+            }
+
+            public string? GetString(string name)
+            {
+                return GetTranslation(name, CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+            }
+
+            public string? GetString(string name, string cultureName)
+            {
+                return GetTranslation(name, cultureName);
+            }
+
+            public string? GetString(string name, CultureInfo cultureInfo)
+            {
+                return GetTranslation(name, cultureInfo.TwoLetterISOLanguageName);
+            }
+
+            private string? GetTranslation(string name, string cultureName)
+            {
+                if (!_translations.TryGetValue(cultureName, out var entry)) return null;
+                return entry.TryGetValue(name, out var localized) ? localized : null;
+            }
+        }
+
+        #endregion
     }
 }
