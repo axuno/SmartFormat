@@ -27,12 +27,13 @@
 * .Net Standard 2.1 and later for best optimizations
  
 ### Get started
-[![NuGet](https://img.shields.io/nuget/v/SmartFormat.Net.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the **full** NuGet package *-or-*
+[![NuGet](https://img.shields.io/nuget/v/SmartFormat.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the **full** NuGet package *-or-*
 
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.svg)](https://www.nuget.org/packages/SmartFormat/) Install the **core** NuGet package
 
-[![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/wiki)
-Have a look at the [SmartFormat.Net Wiki](https://github.com/axuno/SmartFormat.Net/wiki)
+[![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/SmartFormat/wiki)
+Have a look at the [SmartFormat Wiki](https://github.com/axuno/SmartFormat/wiki)<br/>
+**Using `async` / multithreading? [Follow this](https://github.com/axuno/SmartFormat/wiki/Async-and-Thread-Safety).**
 
 See the [changelog](CHANGES.md) for changes.
 
