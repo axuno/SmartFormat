@@ -3,9 +3,10 @@
 // Licensed under the MIT license.
 
 /*
-   Credits to Needle (https://github.com/needle-tools)
+   Credits to Unity Technologies (https://unity.com/)
    and their PersistentVariablesSource extension to Smart.Format
-   at https://github.com/needle-mirror/com.unity.localization/blob/master/Runtime/Smart%20Format/Extensions/PersistentVariablesSource.cs
+   at https://docs.unity3d.com/Packages/com.unity.localization@latest
+   and https://docs.unity3d.com/Packages/com.unity.localization@1.3/manual/Smart/SmartStrings.html
 */
 using System;
 
