@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.SmartPools;
@@ -189,9 +190,9 @@ namespace SmartFormat.Extensions
             // itemFormat|spacer|lastSpacer
             // itemFormat|spacer|lastSpacer|twoSpacer
             var itemFormat = parameters[0];
-            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : string.Empty;
-            var lastSpacer = parameters.Count >= 3 ? parameters[2].GetLiteralText() : spacer;
-            var twoSpacer = parameters.Count >= 4 ? parameters[3].GetLiteralText() : lastSpacer;
+            var spacer = parameters.Count >= 2 ? parameters[1] : null;
+            var lastSpacer = parameters.Count >= 3 ? parameters[2] : spacer;
+            var twoSpacer = parameters.Count >= 4 ? parameters[3] : lastSpacer;
             
             if (!itemFormat.HasNested)
             {
@@ -241,15 +242,15 @@ namespace SmartFormat.Extensions
                 }
                 else if (CollectionIndex < items.Count - 1)
                 {
-                    spacerFormattingInfo.Write(spacer);
+                    WriteSpacer(spacerFormattingInfo, spacer, item);
                 }
                 else if (CollectionIndex == 1)
                 {
-                    spacerFormattingInfo.Write(twoSpacer);
+                    WriteSpacer(spacerFormattingInfo, twoSpacer, item);
                 }
                 else
                 {
-                    spacerFormattingInfo.Write(lastSpacer);
+                    WriteSpacer(spacerFormattingInfo, lastSpacer, item);
                 }
 
                 // Output the nested format for this item:
@@ -266,6 +267,14 @@ namespace SmartFormat.Extensions
             parameters.Clear();
 
             return true;
+        }
+
+        static void WriteSpacer(FormattingInfo formattingInfo, Format? spacer, object item)
+        {
+            if (spacer == null)
+                formattingInfo.Write(string.Empty);
+            else
+                formattingInfo.FormatAsChild(spacer, item);
         }
 
         /// <summary>
