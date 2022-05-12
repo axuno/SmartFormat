@@ -190,7 +190,7 @@ namespace SmartFormat.Extensions
             // itemFormat|spacer|lastSpacer
             // itemFormat|spacer|lastSpacer|twoSpacer
             var itemFormat = parameters[0];
-            var spacer = parameters.Count >= 2 ? parameters[1] : null;
+            var spacer = parameters[1];
             var lastSpacer = parameters.Count >= 3 ? parameters[2] : spacer;
             var twoSpacer = parameters.Count >= 4 ? parameters[3] : lastSpacer;
             
@@ -242,15 +242,15 @@ namespace SmartFormat.Extensions
                 }
                 else if (CollectionIndex < items.Count - 1)
                 {
-                    WriteSpacer(spacerFormattingInfo, spacer, item);
+                    spacerFormattingInfo.FormatAsChild(spacer, item);
                 }
                 else if (CollectionIndex == 1)
                 {
-                    WriteSpacer(spacerFormattingInfo, twoSpacer, item);
+                    spacerFormattingInfo.FormatAsChild(twoSpacer, item);
                 }
                 else
                 {
-                    WriteSpacer(spacerFormattingInfo, lastSpacer, item);
+                    spacerFormattingInfo.FormatAsChild(lastSpacer, item);
                 }
 
                 // Output the nested format for this item:
@@ -267,14 +267,6 @@ namespace SmartFormat.Extensions
             parameters.Clear();
 
             return true;
-        }
-
-        static void WriteSpacer(FormattingInfo formattingInfo, Format? spacer, object item)
-        {
-            if (spacer == null)
-                formattingInfo.Write(string.Empty);
-            else
-                formattingInfo.FormatAsChild(spacer, item);
         }
 
         /// <summary>
