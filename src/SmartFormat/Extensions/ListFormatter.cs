@@ -189,9 +189,9 @@ namespace SmartFormat.Extensions
             // itemFormat|spacer|lastSpacer
             // itemFormat|spacer|lastSpacer|twoSpacer
             var itemFormat = parameters[0];
-            var spacer = parameters.Count >= 2 ? parameters[1].GetLiteralText() : string.Empty;
-            var lastSpacer = parameters.Count >= 3 ? parameters[2].GetLiteralText() : spacer;
-            var twoSpacer = parameters.Count >= 4 ? parameters[3].GetLiteralText() : lastSpacer;
+            var spacer = parameters[1];
+            var lastSpacer = parameters.Count >= 3 ? parameters[2] : spacer;
+            var twoSpacer = parameters.Count >= 4 ? parameters[3] : lastSpacer;
             
             if (!itemFormat.HasNested)
             {
@@ -230,6 +230,18 @@ namespace SmartFormat.Extensions
                 .Initialize(null, formattingInfo.FormatDetails, format, null);
             spacerFormattingInfo.Alignment = 0;
 
+            // Note:
+            // Give spacers the data context of the root parent.
+            // formattingInfo.CurrentValue from the argument to
+            // TryEvaluateFormat(IFormattingInfo formattingInfo) only contains the list elements.
+            var rootParent = (formattingInfo as Core.Formatting.FormattingInfo);
+            do
+            {
+                rootParent = rootParent?.Parent;
+            } while (rootParent?.Parent != null);
+
+            var rootParentValue = rootParent?.CurrentValue;
+
             foreach (var item in items)
             {
                 CollectionIndex += 1; // Keep track of the index
@@ -241,15 +253,15 @@ namespace SmartFormat.Extensions
                 }
                 else if (CollectionIndex < items.Count - 1)
                 {
-                    spacerFormattingInfo.Write(spacer);
+                    WriteSpacer(spacerFormattingInfo, spacer, rootParentValue);
                 }
                 else if (CollectionIndex == 1)
                 {
-                    spacerFormattingInfo.Write(twoSpacer);
+                    WriteSpacer(spacerFormattingInfo, twoSpacer, rootParentValue);
                 }
                 else
                 {
-                    spacerFormattingInfo.Write(lastSpacer);
+                    WriteSpacer(spacerFormattingInfo, lastSpacer, rootParentValue);
                 }
 
                 // Output the nested format for this item:
@@ -266,6 +278,14 @@ namespace SmartFormat.Extensions
             parameters.Clear();
 
             return true;
+        }
+
+        private static void WriteSpacer(IFormattingInfo formattingInfo, Format spacer, object? value)
+        {
+            if (spacer.HasNested)
+                formattingInfo.FormatAsChild(spacer, value);
+            else
+                formattingInfo.Write(spacer.GetLiteralText());
         }
 
         /// <summary>
