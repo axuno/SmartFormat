@@ -98,6 +98,22 @@ namespace SmartFormat.Tests.Extensions
             Assert.AreEqual(expectedResult, smart.Format(format, arg0));
         }
 
+        [TestCase(null, "Must be a word like 'good', 'bad'")]
+        [TestCase("", "'' is not a word")]
+        [TestCase("good", "good")]
+        [TestCase("bad", "bad")]
+        public void Choose_Result_May_Contain_Placeholders(string? input, string expected)
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            var arg = new {
+                Input = input,
+                Examples = new[] { "good", "bad" }
+            };
+
+            var result = smart.Format("{Input:choose(null|):Must be a word like {Examples:list:'{}'|, }|'' is not a word|{}}", arg);
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
         [TestCase("{0:choose(1|2):1|2}", 99)]
         [TestCase("{0:choose(1):1}", 99)]
         public void Choose_throws_when_choice_is_invalid(string format, object arg0)
