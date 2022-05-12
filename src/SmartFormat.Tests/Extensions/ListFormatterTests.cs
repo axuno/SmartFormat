@@ -120,7 +120,7 @@ namespace SmartFormat.Tests.Extensions
             var names = new[] { "John", "Mary", "Amy" };
 
             Assert.AreEqual("John, Mary and Amy", smart.Format("{0:list:{}|{1} | {2} }", names, ",", "and"));
-            Assert.AreEqual("John, Mary nor Amy", smart.Format("{0.Names:list:{}|, | {0.Not:nor|or} }", new { Names = names, Not = true }));
+            Assert.AreEqual("John, Mary nor Amy", smart.Format("{Names:list:{}|, | {Not:nor|or} }", new { Names = names, Not = true }));
         }
 
         [TestCase("{0:list:{}-|}", "A-B-C-D-E-")]
