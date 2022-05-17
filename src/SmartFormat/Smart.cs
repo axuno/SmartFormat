@@ -18,6 +18,9 @@ namespace SmartFormat
     /// </summary>
     public static class Smart
     {
+        [ThreadStatic] // creates isolated versions of the formatter in each thread
+        private static SmartFormatter? _formatter;
+
         #region: Smart.Format :
 
         /// <summary>
@@ -95,9 +98,25 @@ namespace SmartFormat
         /// <summary>
         /// Gets or sets the default <see cref="SmartFormatter"/>.
         /// If not set, the <see cref="CreateDefaultSmartFormat"/> will be used.
-        /// It is recommended to set the <see langword="static"/> <see cref="Default"/> <see cref="SmartFormatter"/> with the extensions that are actually needed.
+        /// <para>
+        /// Using the <see cref="ThreadStaticAttribute"/>, <see cref="Default"/> returns isolated instances of the <see cref="SmartFormatter"/> in each thread.
+        /// </para>
+        /// <para>
+        /// It is recommended to set the thread-<see langword="static"/>
+        /// <see cref="Default"/> <see cref="SmartFormatter"/> with the extensions that are actually needed.
+        /// As <see cref="Default"/> is thread-static, this must be done on each thread.
+        /// </para>
         /// </summary>
-        public static SmartFormatter Default { get; set; } = CreateDefaultSmartFormat();
+        public static SmartFormatter Default
+        {
+            get
+            {
+                // formatter was not yet in use on current thread
+                _formatter ??= CreateDefaultSmartFormat();
+                return _formatter;
+            }
+            set => _formatter = value;
+        }
 
         /// <summary>
         /// Creates a new <see cref="SmartFormatter"/> instance with core extensions registered.
@@ -126,28 +145,28 @@ namespace SmartFormat
         {
             // Register all default extensions here:
             var smart = new SmartFormatter(settings)
-            // Extension are sorted automatically
-            .AddExtensions(
-                new StringSource(),
-                // will automatically be added to the IFormatter list, too
-                new ListFormatter(),
-                new DictionarySource(),
-                new ValueTupleSource(),
-                new ReflectionSource(),
-                // for string.Format behavior
-                new DefaultSource(),
-                new KeyValuePairSource()
-            )
-            .AddExtensions(
-                new PluralLocalizationFormatter(),
-                new ConditionalFormatter(),
-                new IsMatchFormatter(),
-                new NullFormatter(),
-                new ChooseFormatter(),
-                new SubStringFormatter(),
-                // for string.Format behavior
-                new DefaultFormatter()
-            );
+                // Extension are sorted automatically
+                .AddExtensions(
+                    new StringSource(),
+                    // will automatically be added to the IFormatter list, too
+                    new ListFormatter(),
+                    new DictionarySource(),
+                    new ValueTupleSource(),
+                    new ReflectionSource(),
+                    // for string.Format behavior
+                    new DefaultSource(),
+                    new KeyValuePairSource()
+                )
+                .AddExtensions(
+                    new PluralLocalizationFormatter(),
+                    new ConditionalFormatter(),
+                    new IsMatchFormatter(),
+                    new NullFormatter(),
+                    new ChooseFormatter(),
+                    new SubStringFormatter(),
+                    // for string.Format behavior
+                    new DefaultFormatter()
+                );
 
             return smart;
         }

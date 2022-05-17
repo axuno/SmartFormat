@@ -113,14 +113,19 @@ namespace SmartFormat.Tests.Extensions
 
         }
 
-        [Test]
-        public void NestedFormatSpacers()
+        [TestCase(true, ", ", "John, Mary and Amy")]
+        [TestCase(false, ", ", "John, Mary nor Amy")]
+        public void NestedFormatSpacers(bool isAnd, string split, string expected)
         {
             var smart = Smart.CreateDefaultSmartFormat();
-            var names = new[] { "John", "Mary", "Amy" };
+            var args = new {
+                Names = new[] { "John", "Mary", "Amy" },
+                IsAnd = isAnd, // true or false
+                Split = split // comma as list separator
+            };
 
-            Assert.AreEqual("John, Mary and Amy", smart.Format("{0:list:{}|{1} | {2} }", names, ",", "and"));
-            Assert.AreEqual("John, Mary nor Amy", smart.Format("{Names:list:{}|, | {Not:nor|or} }", new { Names = names, Not = true }));
+            Assert.AreEqual(expected, smart.Format("{0:list:{}|{1}| {2} }", args.Names, args.Split, args.IsAnd ? "and" : "nor"));
+            Assert.AreEqual(expected, smart.Format("{Names:list:{}|{Split}| {IsAnd:and|nor} }", args));
         }
 
         [TestCase("{0:list:{}-|}", "A-B-C-D-E-")]
