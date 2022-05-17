@@ -32,8 +32,7 @@
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.svg)](https://www.nuget.org/packages/SmartFormat/) Install the **core** NuGet package
 
 [![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/SmartFormat/wiki)
-Have a look at the [SmartFormat Wiki](https://github.com/axuno/SmartFormat/wiki)<br/>
-**Using `async` / multithreading? [Follow this](https://github.com/axuno/SmartFormat/wiki/Async-and-Thread-Safety).**
+Have a look at the [SmartFormat Wiki](https://github.com/axuno/SmartFormat/wiki)
 
 See the [changelog](CHANGES.md) for changes.
 

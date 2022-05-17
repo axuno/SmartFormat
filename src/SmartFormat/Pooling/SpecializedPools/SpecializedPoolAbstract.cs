@@ -35,6 +35,11 @@ namespace SmartFormat.Pooling.SpecializedPools
         }
 
         /// <summary>
+        /// Gets whether the pool is running in thread-safe mode.
+        /// </summary>
+        public bool IsThreadSafeMode => _isThreadSafeMode;
+
+        /// <summary>
         /// Disposes the current instance of the <see cref="ObjectPool{T}"/> and
         /// creates a new one, applying the current <see cref="PoolSettings"/> and <see cref="PoolPolicy{T}"/>.
         /// </summary>
