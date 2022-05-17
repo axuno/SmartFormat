@@ -7,6 +7,7 @@
 
 [![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/SmartFormat.svg)](https://ci.appveyor.com/project/axuno/SmartFormat/branch/main/tests)
 [![codecov](https://codecov.io/gh/axuno/SmartFormat/branch/main/graph/badge.svg)](https://codecov.io/gh/axuno/SmartFormat)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=axuno_SmartFormat&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=axuno_SmartFormat)
 
 [![Paypal-Donations](https://img.shields.io/badge/Donate-PayPal-important.svg?style=flat-square)](https://www.paypal.com/donate?hosted_button_id=KSC3LRAR26AHN)
 
@@ -40,9 +41,9 @@ See the [changelog](CHANGES.md) for changes.
 
 *SmartFormat* is licensed under [The MIT License (MIT)](LICENSE.md)
 
-The bundled project *SmartFormat.ZString* is Copyright © Cysharp, Inc. [Their software](https://github.com/Cysharp/ZString) 
+The bundled project *SmartFormat.ZString* is Copyright Â© Cysharp, Inc. [Their software](https://github.com/Cysharp/ZString) 
 is licensed under [The MIT License (MIT)](src/SmartFormat.ZString/repo/LICENSE). 
 Their conversion methods under the `ZString/Number` directory 
-is Copyright © .NET Foundation and Contributors und is licensed
+is Copyright Â© .NET Foundation and Contributors und is licensed
 under [The MIT License (MIT)](https://github.com/dotnet/runtime/blob/master/LICENSE.TXT).
 
