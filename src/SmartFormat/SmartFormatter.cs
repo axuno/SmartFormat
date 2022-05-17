@@ -454,7 +454,7 @@ namespace SmartFormat
         public void FormatInto(IOutput output, IFormatProvider? provider, string format, IList<object?> args)
         {
             var formatParsed = Parser.ParseFormat(format);
-            FormatInto(output, null, formatParsed, args);
+            FormatInto(output, provider, formatParsed, args);
             FormatPool.Instance.Return(formatParsed); // The parser gets the Format from the pool
         }
 

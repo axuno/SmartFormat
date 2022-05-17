@@ -28,9 +28,9 @@ namespace SmartFormat.Core.Settings
         /// Thread safety is relevant for global caching, lists and object pools,
         /// which can be filled from different threads concurrently.
         /// <para><see langword="true"/> does <b>not</b> guarantee thread safety of all classes.</para>
-        /// Default is <see langword="false"/>.
+        /// Default is <see langword="true"/>.
         /// </summary>
-        public static bool IsThreadSafeMode { get; set; } = false;
+        public static bool IsThreadSafeMode { get; set; } = true;
 
         /// <summary>
         /// Uses <c>string.Format</c>-compatible escaping of curly braces, {{ and }},

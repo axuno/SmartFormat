@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using SmartFormat.Pooling;
 using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 
@@ -277,6 +281,55 @@ namespace SmartFormat.Tests.Core
         {
             var smart = GetSimpleFormatter();
             Assert.That(() => smart.Format("{0:not_existing_formatter_name:}", new object()), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("not_existing_formatter_name"));
+        }
+
+        [Test]
+        public void Parallel_Smart_Format()
+        {
+            // Switch to thread safety - otherwise the test would throw an InvalidOperationException
+            const bool currentThreadSafeMode = true;
+            var savedIsThreadSafeMode = SmartSettings.IsThreadSafeMode;
+            SmartSettings.IsThreadSafeMode = currentThreadSafeMode;
+
+            // Thread pools might not be created in thread-safe mode,
+            // so we have to reset them
+            foreach (dynamic p in PoolRegistry.Items.Values)
+            {
+                if (!p.IsThreadSafeMode) p.Reset(SmartSettings.IsThreadSafeMode);
+            }
+            
+            var results = new ConcurrentDictionary<long, string>();
+            var threadIds = new ConcurrentDictionary<int, int>();
+            var options = new ParallelOptions { MaxDegreeOfParallelism = 100 };
+            long resultCounter = 0;
+            long formatterInstancesCounter = 0;
+
+            Assert.That(code: () =>
+                Parallel.For(0L, 1000, options, (i, loopState) =>
+                {
+                    // If the ChooseFormatter extension does not exist,
+                    // we re-use an existing SmartFormatter instance
+                    if (Smart.Default.GetFormatterExtension<ChooseFormatter>() is not null)
+                    {
+                        // Remove an extension we don't need for the test
+                        if (Smart.Default.RemoveFormatterExtension<ChooseFormatter>())
+                            Interlocked.Increment(ref formatterInstancesCounter);
+                    }
+
+                    // register unique thread ids
+                    threadIds.TryAdd(Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.ManagedThreadId);
+                    // Smart.Default is a thread-static instance of the SmartFormatter,
+                    // which is used here
+                    results.TryAdd(i, Smart.Format("{0}", i));
+                    Interlocked.Increment(ref resultCounter);
+                }), Throws.Nothing);
+            Assert.That(threadIds.Count, Is.AtLeast(4)); // otherwise the test is not significant
+            Assert.That(Smart.CreateDefaultSmartFormat().GetFormatterExtension<ChooseFormatter>(), Is.Not.Null);
+            Assert.That(threadIds.Count, Is.EqualTo(formatterInstancesCounter));
+            Assert.That(results.Count, Is.EqualTo(resultCounter));
+
+            // Restore to saved value
+            SmartSettings.IsThreadSafeMode = savedIsThreadSafeMode;
         }
     }
 }

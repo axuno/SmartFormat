@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using SmartFormat.Pooling.SpecializedPools;
 
 namespace SmartFormat.Pooling
 {

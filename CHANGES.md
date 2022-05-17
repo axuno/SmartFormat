@@ -1,6 +1,45 @@
 Latest Changes
 ====
 
+v3.1.0
+===
+
+This is a feature update, that is released upon feedback from the community.
+
+### Thread-safe Mode
+
+Thread-safe mode is now enabled by default:
+`SmartSettings.IsThreadSafeMode == true`.<br/>
+This has no impact on the API.
+
+In case *SmartFormat* is *exclusively* utilized in a single-threaded context, `SmartSettings.IsThreadSafeMode=false` should be considered for enhanced performance.
+
+### Static `Smart` Methods for Formatting
+
+Static `Smart` methods like Smart.Format(*format*, *args*) can now be called in an `async` / multi-threaded context.
+
+The `SmartFormatter` instance returned by `Smart.Default` is flagged with the `ThreadStatic` attribute.
+
+### `ListFormatter` may have Placeholders in "spacers"
+
+Thanks to **[karljj1](https://github.com/axuno/SmartFormat/commits?author=karljj1)** for the PR.
+
+Before *v3.1.0* the format options for `ListFormatter` could only contain literal text. Now `Placeholder`s are allowed.
+
+#### Example:
+
+```CSharp
+var args = new {
+    Names = new[] { "John", "Mary", "Amy" },
+    IsAnd = true, // true or false
+    Split = ", "  // comma and space as list separator
+};
+_ = Smart.Format("{Names:list:{}|{Split}| {IsAnd:and|nor} }", args);
+// Output for "IsAnd=true":  "John, Mary and Amy"
+// Output for "IsAnd=false": "John, Mary nor Amy"
+```
+<br/>
+
 v3.0.0
 ===
 
