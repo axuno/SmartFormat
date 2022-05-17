@@ -317,7 +317,7 @@ namespace SmartFormat.Tests.Core
                     }
 
                     // register unique thread ids
-                    threadIds.TryAdd(Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.ManagedThreadId);
+                    threadIds.TryAdd(Environment.CurrentManagedThreadId, Environment.CurrentManagedThreadId);
                     // Smart.Default is a thread-static instance of the SmartFormatter,
                     // which is used here
                     results.TryAdd(i, Smart.Format("{0}", i));
