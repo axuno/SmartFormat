@@ -323,7 +323,7 @@ namespace SmartFormat.Tests.Core
                     results.TryAdd(i, Smart.Format("{0}", i));
                     Interlocked.Increment(ref resultCounter);
                 }), Throws.Nothing);
-            Assert.That(threadIds.Count, Is.AtLeast(4)); // otherwise the test is not significant
+            Assert.That(threadIds.Count, Is.AtLeast(2)); // otherwise the test is not significant
             Assert.That(Smart.CreateDefaultSmartFormat().GetFormatterExtension<ChooseFormatter>(), Is.Not.Null);
             Assert.That(threadIds.Count, Is.EqualTo(formatterInstancesCounter));
             Assert.That(results.Count, Is.EqualTo(resultCounter));
