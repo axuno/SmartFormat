@@ -131,17 +131,12 @@ namespace SmartFormat.Extensions.Time.Utilities
         /// </para>
         /// </summary>
         RangeWeeks = 0x2000,
-
-        /// <summary>(for internal use only)</summary>
-        _Abbreviate = Abbreviate | AbbreviateOff,
-
-        /// <summary>(for internal use only)</summary>
-        _LessThan = LessThan | LessThanOff,
-
-        /// <summary>(for internal use only)</summary>
-        _Truncate = TruncateShortest | TruncateAuto | TruncateFill | TruncateFull,
-
-        /// <summary>(for internal use only)</summary>
-        _Range = RangeMilliSeconds | RangeSeconds | RangeMinutes | RangeHours | RangeDays | RangeWeeks
     }
-}
+
+    internal static class TimeSpanFormatOptionsPresets
+    {
+        public const TimeSpanFormatOptions Abbreviate = TimeSpanFormatOptions.Abbreviate | TimeSpanFormatOptions.AbbreviateOff;
+        public const TimeSpanFormatOptions LessThan = TimeSpanFormatOptions.LessThan | TimeSpanFormatOptions.LessThanOff;
+        public const TimeSpanFormatOptions Truncate = TimeSpanFormatOptions.TruncateShortest | TimeSpanFormatOptions.TruncateAuto | TimeSpanFormatOptions.TruncateFill | TimeSpanFormatOptions.TruncateFull;
+        public const TimeSpanFormatOptions Range = TimeSpanFormatOptions.RangeMilliSeconds | TimeSpanFormatOptions.RangeSeconds | TimeSpanFormatOptions.RangeMinutes | TimeSpanFormatOptions.RangeHours | TimeSpanFormatOptions.RangeDays | TimeSpanFormatOptions.RangeWeeks;
+    }

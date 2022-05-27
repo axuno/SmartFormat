@@ -55,11 +55,11 @@ namespace SmartFormat.Extensions.Time.Utilities
             options = options.Merge(DefaultFormatOptions).Merge(AbsoluteDefaults);
             
             // Extract the individual options:
-            var rangeMax = options.Mask(TimeSpanFormatOptions._Range).AllFlags().Last();
-            _rangeMin = options.Mask(TimeSpanFormatOptions._Range).AllFlags().First();
-            _truncate = options.Mask(TimeSpanFormatOptions._Truncate).AllFlags().First();
-            _lessThan = options.Mask(TimeSpanFormatOptions._LessThan) != TimeSpanFormatOptions.LessThanOff;
-            _abbreviate = options.Mask(TimeSpanFormatOptions._Abbreviate) != TimeSpanFormatOptions.AbbreviateOff;
+            var rangeMax = options.Mask(TimeSpanFormatOptionsPresets.Range).AllFlags().Last();
+            _rangeMin = options.Mask(TimeSpanFormatOptionsPresets.Range).AllFlags().First();
+            _truncate = options.Mask(TimeSpanFormatOptionsPresets.Truncate).AllFlags().First();
+            _lessThan = options.Mask(TimeSpanFormatOptionsPresets.LessThan) != TimeSpanFormatOptions.LessThanOff;
+            _abbreviate = options.Mask(TimeSpanFormatOptionsPresets.Abbreviate) != TimeSpanFormatOptions.AbbreviateOff;
             _round = _lessThan ? (Func<double, double>) Math.Floor : Math.Ceiling;
             _timeTextInfo = timeTextInfo;
 

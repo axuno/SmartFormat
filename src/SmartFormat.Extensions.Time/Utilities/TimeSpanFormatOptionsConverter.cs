@@ -18,10 +18,10 @@ namespace SmartFormat.Extensions.Time.Utilities
         {
             var masks = new[]
             {
-                TimeSpanFormatOptions._Abbreviate,
-                TimeSpanFormatOptions._LessThan,
-                TimeSpanFormatOptions._Range,
-                TimeSpanFormatOptions._Truncate
+                TimeSpanFormatOptionsPresets.Abbreviate,
+                TimeSpanFormatOptionsPresets.LessThan,
+                TimeSpanFormatOptionsPresets.Range,
+                TimeSpanFormatOptionsPresets.Truncate
             };
             foreach (var mask in masks)
                 if ((left & mask) == 0)
