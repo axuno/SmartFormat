@@ -7,18 +7,15 @@ using System;
 
 namespace SmartFormat.Utilities
 {
-    internal class Validation
+    internal static class Validation
     {
-        protected Validation()
-        {
-            // Nothing to do here
-        }
+        private static readonly char[] Valid = new[] { '|', ',', '~' };
+
         public static char GetValidSplitCharOrThrow(char toCheck)
         {
-            var valid = new[] { '|', ',', '~' };
-            return toCheck == valid[0] || toCheck == valid[1] || toCheck == valid[2]
+            return toCheck == Valid[0] || toCheck == Valid[1] || toCheck == Valid[2]
                 ? toCheck
-                : throw new ArgumentException($"Only '{valid[0]}', '{valid[1]}' and '{valid[2]}' are valid split chars.");
+                : throw new ArgumentException($"Only '{Valid[0]}', '{Valid[1]}' and '{Valid[2]}' are valid split chars.");
         }
     }
 }
