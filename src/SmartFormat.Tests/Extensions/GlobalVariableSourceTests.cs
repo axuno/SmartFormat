@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Extensions.PersistentVariables;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -53,9 +54,7 @@ namespace SmartFormat.Tests.Extensions
         public void Parallel_Load_By_Adding_Variables_To_Instance()
         {
             // Switch to thread safety - otherwise the test would throw an InvalidOperationException
-            const bool currentThreadSafeMode = true;
-            var savedIsThreadSafeMode = SmartSettings.IsThreadSafeMode;
-            SmartSettings.IsThreadSafeMode = currentThreadSafeMode;
+            var savedMode = ThreadSafeMode.SwitchOn();
 
             GlobalVariablesSource.Instance.Add("global", new VariablesGroup());
 
@@ -69,7 +68,7 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(GlobalVariablesSource.Instance["global"].Count, Is.EqualTo(1000));
 
             // Restore to saved value
-            SmartSettings.IsThreadSafeMode = savedIsThreadSafeMode;
+            ThreadSafeMode.SwitchTo(savedMode);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace SmartFormat.Extensions
         /// Note: For reading, <see cref="Dictionary{TKey, TValue}"/> and <see cref="ConcurrentDictionary{TKey, TValue}"/> perform equally.
         /// For writing, <see cref="ConcurrentDictionary{TKey, TValue}"/> is slower with more garbage (tested under net5.0).
         /// </remarks>
-        protected readonly IDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> TypeCache =
+        protected internal readonly IDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> TypeCache =
             SmartSettings.IsThreadSafeMode
                 ? new ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>()
                 : new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>();
