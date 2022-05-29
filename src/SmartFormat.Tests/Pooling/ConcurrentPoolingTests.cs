@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Parsing;
@@ -10,21 +9,13 @@ using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Pooling;
 using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Pooling
 {
     [TestFixture]
     public class ConcurrentPoolingTests
     {
-        private static void ResetAllPools(bool goThreadSafe)
-        {
-            // get specialized pools (includes smart pools)
-            foreach (dynamic p in PoolRegistry.Items.Values)
-            {
-                p.Reset(goThreadSafe);
-            }
-        }
-
         private static List<(Type? Type, IPoolCounters? Counters)> GetAllPoolCounters()
         {
             var l = new List<(Type? Type, IPoolCounters? Counters)>();
@@ -68,10 +59,7 @@ namespace SmartFormat.Tests.Pooling
         public void Parallel_Load_On_Specialized_Pools()
         {
             // Switch to thread safety
-            const bool currentThreadSafeMode = true;
-            var savedIsThreadSafeMode = SmartSettings.IsThreadSafeMode;
-            SmartSettings.IsThreadSafeMode = currentThreadSafeMode;
-            ResetAllPools(currentThreadSafeMode);
+            var savedMode = ThreadSafeMode.SwitchOn();
 
             const int maxLoops = 100;
             var options = new ParallelOptions { MaxDegreeOfParallelism = 10 };
@@ -108,10 +96,7 @@ namespace SmartFormat.Tests.Pooling
             }
 
             // Restore thread safety
-            SmartSettings.IsThreadSafeMode = savedIsThreadSafeMode;
-            ResetAllPools(savedIsThreadSafeMode);
-
-            Assert.That(PoolRegistry.Items.Count, Is.EqualTo(0), "PoolRegistry.Items");
+            ThreadSafeMode.SwitchTo(savedMode);
         }
     }
 }

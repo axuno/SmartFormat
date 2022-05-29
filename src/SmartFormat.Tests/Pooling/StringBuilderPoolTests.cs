@@ -68,7 +68,7 @@ namespace SmartFormat.Tests.Pooling
             var savedObjectPoolType = sbp.Pool.GetType();
             
             // Change the current setting
-            sbp.Reset(!savedIsThreadSafeMode);
+            sbp.Reset(!sbp.Pool.IsThreadSafeMode);
             
             var newThreadSafety = !savedIsThreadSafeMode;
             var newObjectPoolType = sbp.Pool.GetType();

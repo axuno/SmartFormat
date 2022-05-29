@@ -8,6 +8,7 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Extensions.PersistentVariables;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Extensions
 {
@@ -284,9 +285,7 @@ namespace SmartFormat.Tests.Extensions
         public void Parallel_Load_By_Adding_Variables_To_Source()
         {
             // Switch to thread safety - otherwise the test would throw an InvalidOperationException
-            const bool currentThreadSafeMode = true;
-            var savedIsThreadSafeMode = SmartSettings.IsThreadSafeMode;
-            SmartSettings.IsThreadSafeMode = currentThreadSafeMode;
+            var savedMode = ThreadSafeMode.SwitchOn();
 
             var pvs = new PersistentVariablesSource { { "global", new VariablesGroup() } };
             var options = new ParallelOptions { MaxDegreeOfParallelism = 10 };
@@ -299,7 +298,7 @@ namespace SmartFormat.Tests.Extensions
             Assert.That(pvs["global"].Count, Is.EqualTo(1000));
 
             // Restore to saved value
-            SmartSettings.IsThreadSafeMode = savedIsThreadSafeMode;
+            ThreadSafeMode.SwitchTo(savedMode);
         }
     }
 }

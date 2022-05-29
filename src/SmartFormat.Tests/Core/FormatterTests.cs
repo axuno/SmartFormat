@@ -287,16 +287,7 @@ namespace SmartFormat.Tests.Core
         public void Parallel_Smart_Format()
         {
             // Switch to thread safety - otherwise the test would throw an InvalidOperationException
-            const bool currentThreadSafeMode = true;
-            var savedIsThreadSafeMode = SmartSettings.IsThreadSafeMode;
-            SmartSettings.IsThreadSafeMode = currentThreadSafeMode;
-
-            // Thread pools might not be created in thread-safe mode,
-            // so we have to reset them
-            foreach (dynamic p in PoolRegistry.Items.Values)
-            {
-                if (!p.IsThreadSafeMode) p.Reset(SmartSettings.IsThreadSafeMode);
-            }
+            var savedMode = ThreadSafeMode.SwitchOn();
             
             var results = new ConcurrentDictionary<long, string>();
             var threadIds = new ConcurrentDictionary<int, int>();
@@ -329,7 +320,7 @@ namespace SmartFormat.Tests.Core
             Assert.That(results.Count, Is.EqualTo(resultCounter));
 
             // Restore to saved value
-            SmartSettings.IsThreadSafeMode = savedIsThreadSafeMode;
+            ThreadSafeMode.SwitchTo(savedMode);
         }
     }
 }

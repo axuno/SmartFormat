@@ -173,20 +173,7 @@ namespace SmartFormat.Tests.Extensions
         [Test]
         public void WithThreadPool_ShouldNotMixUpCollectionIndex()
         {
-            void ResetAllPools(bool goThreadSafe)
-            {
-                // get specialized pools (includes smart pools)
-                foreach (dynamic p in PoolRegistry.Items.Values)
-                {
-                    p.Reset(goThreadSafe);
-                }
-            }
-
-            // Switch to thread safety
-            const bool currentThreadSafeMode = true;
-            var savedIsThreadSafeMode = SmartSettings.IsThreadSafeMode;
-            SmartSettings.IsThreadSafeMode = ListFormatter.IsThreadSafeMode = currentThreadSafeMode;
-            ResetAllPools(currentThreadSafeMode);
+            var savedMode = ThreadSafeMode.SwitchOn();
             
             const string format = "wheres-Index={Index} - List: {0:{}| and }";
             const string expected = "wheres-Index=-1 - List: test1 and test2";
@@ -220,8 +207,7 @@ namespace SmartFormat.Tests.Extensions
             }
 
             // Restore thread safety
-            SmartSettings.IsThreadSafeMode = ListFormatter.IsThreadSafeMode = savedIsThreadSafeMode;
-            ResetAllPools(savedIsThreadSafeMode);
+            ThreadSafeMode.SwitchTo(savedMode);
         }
 
         [TestCase("{0:list:{} = {Index}|, }", "A = 0, B = 1, C = 2, D = 3, E = 4")] // Index holds the current index of the iteration

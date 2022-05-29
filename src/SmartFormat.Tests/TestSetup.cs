@@ -2,6 +2,7 @@
 using System.IO;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests
 {
@@ -14,7 +15,7 @@ namespace SmartFormat.Tests
             // Disable console output from test methods
             Console.SetOut(TextWriter.Null);
 
-            SmartSettings.IsThreadSafeMode = false;
+            SmartSettings.IsThreadSafeMode = ThreadSafeMode.SwitchOff();
             PoolSettings.IsPoolingEnabled = true;
             PoolSettings.CheckReturnedObjectsExistInPool = true;
 

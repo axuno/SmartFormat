@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
@@ -174,20 +172,8 @@ namespace SmartFormat.Tests.Extensions
 
             var formatter = Smart.CreateDefaultSmartFormat();
             var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
-
-            IDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
-                method)>? typeCache;
-
-            if(SmartSettings.IsThreadSafeMode)
-                typeCache =
-                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
-                        System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
-                            method)>;
-            else
-                typeCache =
-                GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
-                    System.Collections.Generic.Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
             
+            var typeCache = reflectionSource.TypeCache;
             var obj = new {Obj = new MiscObject { MethodReturnValue = "The Method Value"}};
             
             // Invoke formatter 1st time
@@ -207,19 +193,7 @@ namespace SmartFormat.Tests.Extensions
         {
             var formatter = Smart.CreateDefaultSmartFormat();
             var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
-            IDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
-                method)>? typeCache;
-
-            if(SmartSettings.IsThreadSafeMode)
-                typeCache =
-                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
-                        System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
-                            method)>;
-            else
-                typeCache =
-                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
-                        System.Collections.Generic.Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
-            var obj = new {Obj = new MiscObject { Field = "The Field Value"}};
+            var typeCache = reflectionSource.TypeCache;            var obj = new {Obj = new MiscObject { Field = "The Field Value"}};
             
             // Invoke formatter 1st time
             Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
@@ -239,18 +213,7 @@ namespace SmartFormat.Tests.Extensions
             var formatter = Smart.CreateDefaultSmartFormat();
             var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
             reflectionSource.IsTypeCacheEnabled = false;
-            IDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
-                method)>? typeCache;
-
-            if(SmartSettings.IsThreadSafeMode)
-                typeCache =
-                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
-                        System.Collections.Concurrent.ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo?
-                            method)>;
-            else
-                typeCache =
-                    GetInstanceField(typeof(ReflectionSource), reflectionSource, TestReflectionSource.TypeCacheFieldName) as
-                        System.Collections.Generic.Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>;
+            var typeCache = reflectionSource.TypeCache;
             var obj = new {Obj = new MiscObject { Field = "The Field Value", MethodReturnValue = "The Method Value"}};
             
             // Invoke formatter, expecting results, but empty cache
@@ -298,21 +261,6 @@ namespace SmartFormat.Tests.Extensions
 
         public class DerivedMiscObject : MiscObject
         {
-        }
-
-        /// <summary>
-        /// Uses reflection to get the field value from an object.
-        /// </summary>
-        /// <param name="type">The instance type.</param>
-        /// <param name="instance">The instance object.</param>
-        /// <param name="fieldName">The field's name which is to be fetched.</param>
-        /// <returns>The field value from the object.</returns>
-        internal static object? GetInstanceField(Type type, object instance, string fieldName)
-        {
-            const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-                                              | BindingFlags.Static;
-            var field = type.GetField(fieldName, bindingFlags);
-            return field?.GetValue(instance);
         }
 
         internal class Address
