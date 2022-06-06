@@ -1,6 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 
 namespace SmartFormat.Performance
 {

@@ -7,96 +7,95 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SmartFormat.Utilities
+namespace SmartFormat.Utilities;
+
+/// <summary>
+/// Extensions for <see cref="ValueTuple"/>s.
+/// </summary>
+/// <remarks>
+/// Credits to James Esh for the code posted on
+/// https://stackoverflow.com/questions/46707556/detect-if-an-object-is-a-valuetuple
+/// </remarks>
+public static class TupleExtensions
 {
-    /// <summary>
-    /// Extensions for <see cref="ValueTuple"/>s.
-    /// </summary>
-    /// <remarks>
-    /// Credits to James Esh for the code posted on
-    /// https://stackoverflow.com/questions/46707556/detect-if-an-object-is-a-valuetuple
-    /// </remarks>
-    public static class TupleExtensions
+    // value tuples can have a maximum of 7 elements
+    private static readonly HashSet<Type> ValueTupleTypes = new HashSet<Type>(new Type[]
     {
-        // value tuples can have a maximum of 7 elements
-        private static readonly HashSet<Type> ValueTupleTypes = new HashSet<Type>(new Type[]
-        {
-            typeof(ValueTuple<>),
-            typeof(ValueTuple<,>),
-            typeof(ValueTuple<,,>),
-            typeof(ValueTuple<,,,>),
-            typeof(ValueTuple<,,,,>),
-            typeof(ValueTuple<,,,,,>),
-            typeof(ValueTuple<,,,,,,>),
-            typeof(ValueTuple<,,,,,,,>)
-        });
+        typeof(ValueTuple<>),
+        typeof(ValueTuple<,>),
+        typeof(ValueTuple<,,>),
+        typeof(ValueTuple<,,,>),
+        typeof(ValueTuple<,,,,>),
+        typeof(ValueTuple<,,,,,>),
+        typeof(ValueTuple<,,,,,,>),
+        typeof(ValueTuple<,,,,,,,>)
+    });
 
-        /// <summary>
-        /// Extension method to check whether an object is of type <see cref="ValueTuple"/>
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns>Returns <c>true</c>, if the object is of type <see cref="ValueTuple"/>.</returns>
-        public static bool IsValueTuple(this object obj) => IsValueTupleType(obj.GetType());
+    /// <summary>
+    /// Extension method to check whether an object is of type <see cref="ValueTuple"/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns>Returns <c>true</c>, if the object is of type <see cref="ValueTuple"/>.</returns>
+    public static bool IsValueTuple(this object obj) => IsValueTupleType(obj.GetType());
 
-        /// <summary>
-        /// Extension method to check whether the given type is a <see cref="ValueTuple"/>
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns>Returns <c>true</c>, if the type is a <see cref="ValueTuple"/>.</returns>
-        public static bool IsValueTupleType(this Type type)
+    /// <summary>
+    /// Extension method to check whether the given type is a <see cref="ValueTuple"/>
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns>Returns <c>true</c>, if the type is a <see cref="ValueTuple"/>.</returns>
+    public static bool IsValueTupleType(this Type type)
+    {
+        return type.GetTypeInfo().IsGenericType && ValueTupleTypes.Contains(type.GetGenericTypeDefinition());
+    }
+
+    /// <summary>
+    /// A list of <see cref="object"/>s with the values for each <see cref="ValueTuple"/> field.
+    /// </summary>
+    /// <param name="tuple"></param>
+    /// <returns>Returns a list of <see cref="object"/>s with the values for each <see cref="ValueTuple"/> field.</returns>
+    public static IEnumerable<object?> GetValueTupleItemObjects(this object tuple) => GetValueTupleItemFields(tuple.GetType()).Select(f => f.GetValue(tuple));
+
+    /// <summary>
+    /// A list of <see cref="FieldInfo"/>s with the fields of a <see cref="ValueTuple"/>.
+    /// </summary>
+    /// <param name="tupleType"></param>
+    /// <returns>Returns of list of <see cref="FieldInfo"/>s with the fields of a <see cref="ValueTuple"/>.</returns>
+    public static List<FieldInfo> GetValueTupleItemFields(this Type tupleType)
+    {
+        var items = new List<FieldInfo>();
+
+        FieldInfo? field;
+        var nth = 1;
+        while ((field = tupleType.GetRuntimeField($"Item{nth}")) != null)
         {
-            return type.GetTypeInfo().IsGenericType && ValueTupleTypes.Contains(type.GetGenericTypeDefinition());
+            nth++;
+            items.Add(field);
         }
 
-        /// <summary>
-        /// A list of <see cref="object"/>s with the values for each <see cref="ValueTuple"/> field.
-        /// </summary>
-        /// <param name="tuple"></param>
-        /// <returns>Returns a list of <see cref="object"/>s with the values for each <see cref="ValueTuple"/> field.</returns>
-        public static IEnumerable<object?> GetValueTupleItemObjects(this object tuple) => GetValueTupleItemFields(tuple.GetType()).Select(f => f.GetValue(tuple));
+        return items;
+    }
 
-        /// <summary>
-        /// A list of <see cref="FieldInfo"/>s with the fields of a <see cref="ValueTuple"/>.
-        /// </summary>
-        /// <param name="tupleType"></param>
-        /// <returns>Returns of list of <see cref="FieldInfo"/>s with the fields of a <see cref="ValueTuple"/>.</returns>
-        public static List<FieldInfo> GetValueTupleItemFields(this Type tupleType)
+    /// <summary>
+    /// Gets all <see cref="object"/>s of a <see cref="ValueTuple"/> as a flattened list of objects.
+    /// </summary>
+    /// <param name="tuple"></param>
+    /// <returns>All <see cref="object"/>s of a <see cref="ValueTuple"/> as a flattened list of objects.</returns>
+    public static IEnumerable<object?> GetValueTupleItemObjectsFlattened(this object tuple)
+    {
+        foreach (var theTuple in tuple.GetValueTupleItemObjects())
         {
-            var items = new List<FieldInfo>();
-
-            FieldInfo? field;
-            var nth = 1;
-            while ((field = tupleType.GetRuntimeField($"Item{nth}")) != null)
+            if (theTuple != null && theTuple.IsValueTuple())
             {
-                nth++;
-                items.Add(field);
+                foreach (var innerTuple in theTuple.GetValueTupleItemObjectsFlattened())
+                {
+                    yield return innerTuple;
+                }
             }
-
-            return items;
-        }
-
-        /// <summary>
-        /// Gets all <see cref="object"/>s of a <see cref="ValueTuple"/> as a flattened list of objects.
-        /// </summary>
-        /// <param name="tuple"></param>
-        /// <returns>All <see cref="object"/>s of a <see cref="ValueTuple"/> as a flattened list of objects.</returns>
-        public static IEnumerable<object?> GetValueTupleItemObjectsFlattened(this object tuple)
-        {
-            foreach (var theTuple in tuple.GetValueTupleItemObjects())
+            else if (theTuple is null)
             {
-                if (theTuple != null && theTuple.IsValueTuple())
-                {
-                    foreach (var innerTuple in theTuple.GetValueTupleItemObjectsFlattened())
-                    {
-                        yield return innerTuple;
-                    }
-                }
-                else if (theTuple is null)
-                {
-                    yield return null;
-                }
-                else yield return theTuple;
+                yield return null;
             }
+            else yield return theTuple;
         }
     }
 }
