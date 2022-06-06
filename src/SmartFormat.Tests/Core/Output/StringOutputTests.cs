@@ -2,35 +2,34 @@
 using NUnit.Framework;
 using SmartFormat.Core.Output;
 
-namespace SmartFormat.Tests.Core.Output
+namespace SmartFormat.Tests.Core.Output;
+
+[TestFixture]
+public class StringOutputTests
 {
-    [TestFixture]
-    public class StringOutputTests
+    [Test]
+    public void Output_Of_Span()
     {
-        [Test]
-        public void Output_Of_Span()
-        {
-            var so = new StringOutput();
-            so.Write("text".AsSpan(), null!);
-            Assert.AreEqual("text", so.ToString());
-        }
+        var so = new StringOutput();
+        so.Write("text".AsSpan(), null!);
+        Assert.AreEqual("text", so.ToString());
+    }
 
-        [Test]
-        public void Output_Of_String()
-        {
-            var so = new StringOutput(16);
-            so.Write("text", null!);
-            Assert.AreEqual("text", so.ToString());
-        }
+    [Test]
+    public void Output_Of_String()
+    {
+        var so = new StringOutput(16);
+        so.Write("text", null!);
+        Assert.AreEqual("text", so.ToString());
+    }
 
-        [Test]
-        public void Output_Of_ValueStringBuilder()
-        {
-            var so = new StringOutput();
-            using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
-            sb.Append("text");
-            so.Write(sb, null!);
-            Assert.AreEqual("text", so.ToString());
-        }
+    [Test]
+    public void Output_Of_ValueStringBuilder()
+    {
+        var so = new StringOutput();
+        using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
+        sb.Append("text");
+        so.Write(sb, null!);
+        Assert.AreEqual("text", so.ToString());
     }
 }
