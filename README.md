@@ -47,3 +47,8 @@ Their conversion methods under the `ZString/Number` directory
 is Copyright © .NET Foundation and Contributors und is licensed
 under [The MIT License (MIT)](https://github.com/dotnet/runtime/blob/master/LICENSE.TXT).
 
+## Thanks!
+
+We would like to thank [JetBrains](https://www.jetbrains.com/?from=SmartFormat) for supporting the project with free licenses of their fantastic tools.
+
+<img src="https://raw.githubusercontent.com/axuno/SmartFormat/main/jetbrains.svg" alt="JetBrains" width="100" />
