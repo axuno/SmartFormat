@@ -274,6 +274,12 @@ This package is a SmartFormat extension for formatting `System.DateTime`, `Syste
 
 ---
 
+v2.7.3
+===
+* **Hot fix**: Newtonsoft.Json prior to version 13.0.1 is vulnerable. The minimum version of the package reference is now 13.0.1
+Newtonsoft.Json prior to version 13.0.1 is vulnerable to Insecure Defaults due to improper handling of expressions with high nesting level that lead to StackOverFlow exception or high CPU and RAM usage. Exploiting this vulnerability results in Denial Of Service (DoS).
+
+
 v2.7.2
 ===
 * **Fixed**: `ConditionalFormatter` processes unsigned numbers in arguments correctly.
