@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/scottrippey/SmartFormat.NET/main/SmartFormat_64x64.png" width="64" alt="Logo">
 
-[![GitHub release](https://img.shields.io/github/release/axuno/smartformat.net.svg)](https://github.com/axuno/SmartFormat.Net/releases/latest)
+[![GitHub release](https://img.shields.io/github/release/axuno/smartformat.net.svg?sort=semver)](https://github.com/axuno/SmartFormat.Net/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/SmartFormat.Net/blob/main/License.txt)
 [![AppVeyor build status windows](https://img.shields.io/appveyor/job/build/axuno/smartformat/windows/version/v3.0?label=windows%20build)](https://ci.appveyor.com/project/axuno/smartformat/branch/version/v3.0)
 [![AppVeyor build status linux](https://img.shields.io/appveyor/job/build/axuno/smartformat/linux/version/v3.0?label=linux%20build)](https://ci.appveyor.com/project/axuno/smartformat/branch/version/v3.0)
