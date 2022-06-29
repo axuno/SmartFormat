@@ -3,7 +3,6 @@
 // Licensed under the MIT license.
 //
 
-using System.Text;
 using SmartFormat.Core.Extensions;
 #nullable enable
 
