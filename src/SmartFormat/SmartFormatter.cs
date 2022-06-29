@@ -617,7 +617,7 @@ namespace SmartFormat
             if (Settings.StringFormatCompatibility)
             {
                 return 
-                    _formatterExtensions.First(fe => fe.GetType() == typeof(DefaultFormatter) || fe.GetType().BaseType == typeof(DefaultFormatter))
+                    _formatterExtensions.First(fe => fe is DefaultFormatter)
                     .TryEvaluateFormat(formattingInfo);
             }
 
