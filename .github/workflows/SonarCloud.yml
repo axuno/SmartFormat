@@ -1,14 +1,17 @@
 name: SonarCloud
 on:
   push:
-    branches: [ main, 'version/**', 'pr-**' ]
+    branches: [ main, 'version/**', 'pr/**', 'pr-**' ]
   pull_request:
-    branches: [ main, 'version/**', 'pr-**' ]
+    branches: [ main, 'version/**', 'pr/**', 'pr-**' ]
     types: [opened, synchronize, reopened]
 jobs:
   build:
     name: Build
     runs-on: windows-latest
+    # SonarCloud do not support analysis of forked PRs, even when those PRs come from members of the organization
+    # (PRs from forks can't access secrets other than secrets.GITHUB_TOKEN for security reasons)
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     env:
       version: '3.1.0'
       versionFile: '3.1.0'
@@ -40,7 +43,6 @@ jobs:
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
       - name: Build, test and analyze
-        if: github.event_name != 'pull_request'    # PRs won't get any secrets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
