@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
@@ -300,9 +299,15 @@ public class ListFormatter : IFormatter, ISource, IInitializer
     /// </remarks>
     private bool HasNullableOperator(IFormattingInfo formattingInfo)
     {
-        return formattingInfo.Placeholder != null &&
-               formattingInfo.Placeholder.Selectors.Any(s =>
-                   s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
+        if (formattingInfo.Placeholder != null)
+        {
+            foreach (var s in formattingInfo.Placeholder.Selectors)
+            {
+                if (s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator)
+                    return true;
+            }
+        }
+        return false;
     }
 
     ///<inheritdoc />
