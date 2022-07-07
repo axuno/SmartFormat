@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
@@ -106,11 +105,12 @@ public sealed class Format : FormatItem, IDisposable
 
         ParentPlaceholder = null;
         HasNested = false;
-            
+
         // Return and clear FormatItems we own
-        foreach (var item in Items.Where(i => ReferenceEquals(this, i.ParentFormatItem)))
+        foreach (var item in Items)
         {
-            ReturnFormatItemToPool(item);
+            if (ReferenceEquals(this, item.ParentFormatItem))
+                ReturnFormatItemToPool(item);
         }
         Items.Clear();
 
@@ -237,9 +237,9 @@ public sealed class Format : FormatItem, IDisposable
     public int IndexOf(char search, int start)
     {
         start = StartIndex + start;
-        foreach (var item in Items.Where(item => item.EndIndex >= start))
+        foreach (var item in Items)
         {
-            if (item is not LiteralText literalItem) continue;
+            if (item.EndIndex < start || item is not LiteralText literalItem) continue;
 
             if (start < literalItem.StartIndex) start = literalItem.StartIndex;
             var literalIndex =

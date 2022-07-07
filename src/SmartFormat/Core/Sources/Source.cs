@@ -2,7 +2,6 @@
 // Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
 
-using System.Linq;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 
@@ -24,10 +23,7 @@ public abstract class Source : ISource, IInitializer
     protected SmartSettings? _smartSettings;
 
     /// <inheritdoc />
-    public virtual bool TryEvaluateSelector(ISelectorInfo selectorInfo)
-    {
-        return false;
-    }
+    public abstract bool TryEvaluateSelector(ISelectorInfo selectorInfo);
 
     /// <inheritdoc />
     public virtual void Initialize(SmartFormatter smartFormatter)
@@ -48,9 +44,15 @@ public abstract class Source : ISource, IInitializer
     /// </remarks>
     private bool HasNullableOperator(ISelectorInfo selectorInfo)
     {
-        return _smartSettings != null && selectorInfo.Placeholder != null &&
-               selectorInfo.Placeholder.Selectors.Any(s =>
-                   s.OperatorLength > 1 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator);
+        if (_smartSettings != null && selectorInfo.Placeholder != null)
+        {
+            foreach (var s in selectorInfo.Placeholder.Selectors)
+            {
+                if (s.OperatorLength > 1 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator)
+                    return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>
