@@ -67,15 +67,15 @@ public class ConditionalFormatter : IFormatter
         }
 
         // See if the value is a number or an Enum:
-        var currentIsNumber =
-            current is byte or short or ushort or int or uint or long or ulong or float or double or decimal or Enum;
+        var currentIsConvertible = current is IConvertible &&
+                (current is not (DateTime or string or bool)); // We have special handling for these types
 
-        var currentNumber = currentIsNumber ? Convert.ToDecimal(current) : 0;
+        var currentNumber = currentIsConvertible ? Convert.ToDecimal(current) : 0;
 
         int paramIndex; // Determines which parameter to use for output
 
         // First, we'll see if we are using "complex conditions":
-        if (currentIsNumber)
+        if (currentIsConvertible)
         {
             paramIndex = -1;
             while (paramIndex++ < parameters.Count)
@@ -107,7 +107,7 @@ public class ConditionalFormatter : IFormatter
         var paramCount = parameters.Count;
 
         // Determine the Current item's Type:
-        if (currentIsNumber)
+        if (currentIsConvertible)
         {
             if (currentNumber < 0)
                 paramIndex = paramCount - 1;
