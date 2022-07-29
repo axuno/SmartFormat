@@ -4,8 +4,8 @@ namespace SmartFormat.Tests.TestUtils;
 
 class ConvertibleDecimal : IConvertible
 {
-    public decimal _value;
-
+    private readonly decimal _value;
+    
     public TypeCode GetTypeCode() => TypeCode.Decimal;
     public decimal ToDecimal(IFormatProvider provider) => _value;
 
