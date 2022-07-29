@@ -4,10 +4,10 @@ namespace SmartFormat.Tests.TestUtils;
 
 class ConvertibleDecimal : IConvertible
 {
-    public decimal value;
+    public decimal _value;
 
     public TypeCode GetTypeCode() => TypeCode.Decimal;
-    public decimal ToDecimal(IFormatProvider provider) => value;
+    public decimal ToDecimal(IFormatProvider provider) => _value;
 
     public bool ToBoolean(IFormatProvider provider) => throw new NotImplementedException();
     public byte ToByte(IFormatProvider provider) => throw new NotImplementedException();
@@ -25,7 +25,7 @@ class ConvertibleDecimal : IConvertible
     public uint ToUInt32(IFormatProvider provider) => throw new NotImplementedException();
     public ulong ToUInt64(IFormatProvider provider) => throw new NotImplementedException();
 
-    public override string ToString() => $"Convertible({value})";
+    public override string ToString() => $"Convertible({_value})";
 
-    public ConvertibleDecimal(decimal v) => value = v;
+    public ConvertibleDecimal(decimal v) => _value = v;
 }
