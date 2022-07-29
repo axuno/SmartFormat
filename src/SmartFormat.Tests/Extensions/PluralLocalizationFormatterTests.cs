@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
+using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 using ExpectedResults = System.Collections.Generic.Dictionary<decimal, string>;
 
@@ -244,6 +245,18 @@ public class PluralLocalizationFormatterTests
 
         actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes|beaucoup de personnes}", new string[3], "several");
         Assert.AreEqual("beaucoup de personnes", actualResult);
+    }
+
+    [TestCase("{0:plural:one|many} {1:plural:one|many} {2:plural:one|many}", "many one many")]
+    [TestCase("There {0:plural:is|are} {0} {0:plural:item|items} remaining", "There are Convertible(0) items remaining")]
+    [TestCase("There {1:plural:is|are} {1} {1:plural:item|items} remaining", "There is Convertible(1) item remaining")]
+    public void Test_With_IConvertible(string format, string expectedResult)
+    {
+        var smart = GetFormatter();
+        var culture = new CultureInfo("en-US");
+        var args = new object[] { new ConvertibleDecimal(0), new ConvertibleDecimal(1), new ConvertibleDecimal(2) };
+        var actualResult = smart.Format(culture, format, args);
+        Assert.AreEqual(expectedResult, actualResult);
     }
 
     [Test]

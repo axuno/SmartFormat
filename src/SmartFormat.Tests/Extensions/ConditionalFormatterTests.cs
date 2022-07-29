@@ -106,6 +106,17 @@ public class ConditionalFormatterTests
         smart.Test(format, args, expected);
     }
 
+    [TestCase("{0:cond:Zero|Other} {1:cond:Zero|Other} {2:cond:Zero|Other}", "Zero Other Other")]
+    [TestCase("{0:cond:Zero|One|Other} {1:cond:Zero|One|Other} {2:cond:Zero|One|Other}", "Zero One Other")]
+    [TestCase("{0:cond:Zero|One|Two|Other} {1:cond:Zero|One|Two|Other} {2:cond:Zero|One|Two|Other}", "Zero One Two")]
+    [TestCase("{0:cond:>0?Positive|<0?Negative|=0?Zero}, {1:cond:>0?Positive|<0?Negative|=0?Zero}, {2:cond:>0?Positive|<0?Negative|=0?Zero}", "Zero, Positive, Positive")]
+    public void Test_IConvertible(string format, string expected)
+    {
+        var args = new object[] { new ConvertibleDecimal(0), new ConvertibleDecimal(1), new ConvertibleDecimal(2) };
+        var smart = Smart.CreateDefaultSmartFormat();
+        smart.Test(format, args, expected);
+    }
+
     [TestCase("{0:cond:>0?Positive|<0?Negative|=0?Zero}, {1:cond:>0?Positive|<0?Negative|=0?Zero}, {2:cond:>0?Positive|<0?Negative|=0?Zero}", "Negative, Zero, Positive")]
     [TestCase("{1:cond:<1?Baby|>=1&<4?Toddler|>=4&<=9?Child|=10/=11/=12?Pre-Teen|<18?Teenager|<20?Young Adult|<20/<=24&<25?Early Twenties|>55&<100?Senior Citizen|>100?Crazy Old|Adult}", "Baby")]
     [TestCase("{2:cond:<1?Baby|>=1&<4?Toddler|>=4&<=9?Child|=10/=11/=12?Pre-Teen|<18?Teenager|<20?Young Adult|<20/<=24&<25?Early Twenties|>55&<100?Senior Citizen|>100?Crazy Old|Adult}", "Baby")]
