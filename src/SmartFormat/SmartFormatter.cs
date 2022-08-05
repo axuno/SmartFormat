@@ -385,8 +385,6 @@ public class SmartFormatter
             var childFormattingInfo = formattingInfo.CreateChild(placeholder);
             try
             {
-                // Note: If there is no selector (like {:0.00}),
-                // FormattingInfo.CurrentValue is left unchanged
                 EvaluateSelectors(childFormattingInfo);
             }
             catch (Exception ex)
@@ -529,6 +527,16 @@ public class SmartFormatter
                 "No formatter extensions are available. Please add at least one formatter extension, such as the DefaultFormatter.");
     }
 
+    /// <summary>
+    /// Evaluates all <see cref="Selector"/>s of a <see cref="Placeholder"/>.
+    /// </summary>
+    /// <remarks>
+    /// Note: If there is no selector (like {:0.00}), <see cref="FormattingInfo.CurrentValue"/> is left unchanged.
+    /// <br/>
+    /// Child formats <b>inside <see cref="Placeholder"/>s</b> are evaluated in <see cref="DefaultFormatter"/>.
+    /// Example: "{ChildOne.ChildTwo.ChildThree: {Four}}" where "{Four}" is a child placeholder.
+    /// </remarks>
+    /// <param name="formattingInfo"></param>
     private void EvaluateSelectors(FormattingInfo formattingInfo)
     {
         if (formattingInfo.Placeholder is null) return;
@@ -553,7 +561,8 @@ public class SmartFormatter
             if (firstSelector)
             {
                 firstSelector = false;
-                // Handle "nested scopes" by traversing the stack:
+                // Handle "nested scopes" like "{ChildOne.ChildTwo.ChildThree: {Four}}
+                // by traversing the stack:
                 var parentFormattingInfo = formattingInfo;
                 while (!handled && parentFormattingInfo.Parent != null)
                 {

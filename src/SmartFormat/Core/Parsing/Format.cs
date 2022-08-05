@@ -106,12 +106,15 @@ public sealed class Format : FormatItem, IDisposable
         ParentPlaceholder = null;
         HasNested = false;
 
+#pragma warning disable S3267 // Don't use LINQ in favor of less GC
         // Return and clear FormatItems we own
         foreach (var item in Items)
         {
             if (ReferenceEquals(this, item.ParentFormatItem))
                 ReturnFormatItemToPool(item);
         }
+#pragma warning restore S3267 // Restore: Loops should be simplified with "LINQ" expressions
+
         Items.Clear();
 
         // Return and clear the list of SplitLists
@@ -237,6 +240,7 @@ public sealed class Format : FormatItem, IDisposable
     public int IndexOf(char search, int start)
     {
         start = StartIndex + start;
+#pragma warning disable S3267 // Don't use LINQ in favor of less GC
         foreach (var item in Items)
         {
             if (item.EndIndex < start || item is not LiteralText literalItem) continue;
@@ -246,6 +250,7 @@ public sealed class Format : FormatItem, IDisposable
                 literalItem.BaseString.IndexOf(search, start, literalItem.EndIndex - start);
             if (literalIndex != -1) return literalIndex - StartIndex;
         }
+#pragma warning restore S3267 // Restore: Loops should be simplified with "LINQ" expressions
 
         return -1;
     }

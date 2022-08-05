@@ -104,6 +104,6 @@ public abstract class FormatItem
     /// </summary>
     /// <returns>The <see cref="ReadOnlySpan{T}"/> representation of this <see cref="FormatItem"/></returns>
     public virtual ReadOnlySpan<char> AsSpan() => EndIndex <= StartIndex
-        ? BaseString.AsSpan(StartIndex)
+        ? ReadOnlySpan<char>.Empty
         : BaseString.AsSpan(StartIndex, Length);
 }
