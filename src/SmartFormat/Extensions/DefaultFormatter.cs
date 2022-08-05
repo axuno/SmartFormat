@@ -35,7 +35,7 @@ public class DefaultFormatter : IFormatter
         var current = formattingInfo.CurrentValue;
             
         // If the format has nested placeholders, we process those first
-        // instead of formatting the item.
+        // instead of formatting the item. Like with "{2:list:{:{FirstName}}|, }"
         if (format is {HasNested: true})
         {
             formattingInfo.FormatAsChild(format, current);
