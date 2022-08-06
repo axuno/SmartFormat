@@ -1,10 +1,9 @@
-﻿// 
+// 
 // Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
@@ -188,9 +187,6 @@ public class ListFormatter : IFormatter, ISource, IInitializer
         // itemFormat|spacer|lastSpacer
         // itemFormat|spacer|lastSpacer|twoSpacer
         var itemFormat = parameters[0];
-        var spacer = parameters[1];
-        var lastSpacer = parameters.Count >= 3 ? parameters[2] : spacer;
-        var twoSpacer = parameters.Count >= 4 ? parameters[3] : lastSpacer;
             
         if (!itemFormat.HasNested)
         {
@@ -198,6 +194,7 @@ public class ListFormatter : IFormatter, ISource, IInitializer
             // so we will treat it as an ItemFormat:
             var newItemFormat = FormatPool.Instance.Get().Initialize(_smartSettings, itemFormat.BaseString,
                 itemFormat.StartIndex, itemFormat.EndIndex, true);
+            itemFormat.ParentPlaceholder = formattingInfo.Placeholder;
 
             var newPlaceholder = PlaceholderPool.Instance.Get().Initialize(newItemFormat, itemFormat.StartIndex, 0);
             newPlaceholder.Format = itemFormat;
@@ -210,7 +207,7 @@ public class ListFormatter : IFormatter, ISource, IInitializer
         }
 
         // Let's buffer all items from the enumerable (to ensure the Count without double-enumeration):
-        List<object>? itemsAsList = null;
+        using var objectListPooledObject = ListPool<object>.Instance.Get(out var itemsAsList);
         if (currentAsEnumerable is not ICollection items)
         {
             itemsAsList = ListPool<object>.Instance.Get();
@@ -224,10 +221,29 @@ public class ListFormatter : IFormatter, ISource, IInitializer
         var savedCollectionIndex = CollectionIndex; 
         CollectionIndex = -1;
 
+        FormatItems(items, parameters, itemFormat, formattingInfo);
+
+        CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
+
+        parameters.Clear();
+
+        return true;
+    }
+
+    private static void FormatItems(ICollection items, SplitList parameters, Format itemFormat,
+        IFormattingInfo formattingInfo)
+    {
+        var format = formattingInfo.Format!; // can't be null
+
         // Do not inherit alignment for the spacers - use new FormattingInfo
-        var spacerFormattingInfo = FormattingInfoPool.Instance.Get()
-            .Initialize(null, formattingInfo.FormatDetails, format, null);
+        using var fmtInfoPooledObject = FormattingInfoPool.Instance.Get(out var spacerFormattingInfo);
+        spacerFormattingInfo.Initialize((Core.Formatting.FormattingInfo)formattingInfo, formattingInfo.FormatDetails,
+            format, null);
         spacerFormattingInfo.Alignment = 0;
+
+        var spacer = parameters[1];
+        var lastSpacer = parameters.Count >= 3 ? parameters[2] : spacer;
+        var twoSpacer = parameters.Count >= 4 ? parameters[3] : lastSpacer;
 
         // Note:
         // Give spacers the data context of the root parent.
@@ -244,7 +260,7 @@ public class ListFormatter : IFormatter, ISource, IInitializer
         foreach (var item in items)
         {
             CollectionIndex += 1; // Keep track of the index
-                
+
             // Determine which spacer to write:
             if (spacer == null || CollectionIndex == 0)
             {
@@ -266,17 +282,6 @@ public class ListFormatter : IFormatter, ISource, IInitializer
             // Output the nested format for this item:
             formattingInfo.FormatAsChild(itemFormat, item);
         }
-
-        CollectionIndex = savedCollectionIndex; // Restore the CollectionIndex
-
-        FormattingInfoPool.Instance.Return(spacerFormattingInfo);
-
-        if (itemsAsList != null)
-            ListPool<object>.Instance.Return(itemsAsList);
-
-        parameters.Clear();
-
-        return true;
     }
 
     private static void WriteSpacer(IFormattingInfo formattingInfo, Format spacer, object? value)
