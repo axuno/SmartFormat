@@ -24,7 +24,7 @@ public class Parser
     private IndexContainer _index;
     private string _inputFormat;
     private Format _resultFormat;
-        
+
     #endregion
 
     #region: Settings :

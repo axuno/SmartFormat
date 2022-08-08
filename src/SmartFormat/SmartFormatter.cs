@@ -1,4 +1,4 @@
-﻿// 
+﻿//
 // Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
 
@@ -255,7 +255,7 @@ public class SmartFormatter
     {
         return Format(null, format, (IList<object?>) args);
     }
-        
+
     /// <summary>
     /// Replaces one or more format items in as specified string with the string representation of a specific object.
     /// </summary>
@@ -289,18 +289,18 @@ public class SmartFormatter
     public string Format(IFormatProvider? provider, string format, IList<object?> args)
     {
         var formatParsed = Parser.ParseFormat(format); // The parser gets the Format from the pool
-            
+
         // Note: Making ZStringOutput a class instance variable has no advantage for speed,
         // but brings 10% less Gen 0 GC. Then, SmartFormatter would have to be IDisposable (dispose ZStringOutput)
         using var zsOutput = new ZStringOutput(ZStringBuilderExtensions.CalcCapacity(formatParsed));
-            
+
         var current = args.Count > 0 ? args[0] : args; // The first item is the default.
 
         var formatDetails = FormatDetailsPool.Instance.Get().Initialize(this, formatParsed, args, provider, zsOutput);
         Format(formatDetails, formatParsed, current);
 
         FormatDetailsPool.Instance.Return(formatDetails);
-        FormatPool.Instance.Return(formatParsed); 
+        FormatPool.Instance.Return(formatParsed);
 
         return zsOutput.ToString();
     }
@@ -361,7 +361,7 @@ public class SmartFormatter
     }
 
     #endregion
-        
+
     /// <summary>
     /// Format the <see cref="FormattingInfo" /> argument.
     /// </summary>
@@ -407,7 +407,7 @@ public class SmartFormatter
             }
         }
     }
-        
+
     private void Format(FormatDetails formatDetails, Format format, object? current)
     {
         var formattingInfo = FormattingInfoPool.Instance.Get().Initialize(formatDetails, format, current);
@@ -488,10 +488,10 @@ public class SmartFormatter
     #endregion
 
     #endregion
-        
+
     #region: Private methods :
 
-    private void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
+    internal void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
         IFormattingInfo formattingInfo)
     {
         OnFormattingFailure?.Invoke(this,
@@ -537,24 +537,24 @@ public class SmartFormatter
     /// Example: "{ChildOne.ChildTwo.ChildThree: {Four}}" where "{Four}" is a child placeholder.
     /// </remarks>
     /// <param name="formattingInfo"></param>
-    private void EvaluateSelectors(FormattingInfo formattingInfo)
+    internal void EvaluateSelectors(FormattingInfo formattingInfo)
     {
         if (formattingInfo.Placeholder is null) return;
-           
+
         var firstSelector = true;
         foreach (var selector in formattingInfo.Placeholder.Selectors)
         {
             // Don't evaluate empty selectors
             // (used e.g. for Settings.Parser.NullableOperator and Settings.Parser.ListIndexEndChar final operators)
             if(selector.Length == 0) continue;
-                
+
             formattingInfo.Selector = selector;
             // Do not evaluate alignment-only selectors
             if (formattingInfo.SelectorOperator.Length > 0 &&
                 formattingInfo.SelectorOperator[0] == Settings.Parser.AlignmentOperator) continue;
-                
+
             formattingInfo.Result = null;
-                
+
             var handled = InvokeSourceExtensions(formattingInfo);
             if (handled) formattingInfo.CurrentValue = formattingInfo.Result;
 
@@ -597,7 +597,7 @@ public class SmartFormatter
     /// </summary>
     /// <param name="formattingInfo"></param>
     /// <exception cref="FormattingException"></exception>
-    private void EvaluateFormatters(FormattingInfo formattingInfo)
+    internal void EvaluateFormatters(FormattingInfo formattingInfo)
     {
         var handled = InvokeFormatterExtensions(formattingInfo);
         if (!handled)
@@ -624,7 +624,7 @@ public class SmartFormatter
         // Compatibility mode does not support formatter extensions except this one:
         if (Settings.StringFormatCompatibility)
         {
-            return 
+            return
                 _formatterExtensions.First(fe => fe is DefaultFormatter)
                     .TryEvaluateFormat(formattingInfo);
         }
@@ -637,18 +637,18 @@ public class SmartFormatter
             foreach (var fe in _formatterExtensions)
             {
                 if (!fe.Name.Equals(formatterName, comparison)) continue;
-                    
+
                 formatterExtension = fe;
                 break;
             }
-                
+
             if (formatterExtension is null)
                 throw formattingInfo.FormattingException($"No formatter with name '{formatterName}' found",
                     formattingInfo.Format, formattingInfo.Selector?.SelectorIndex ?? -1);
 
             return formatterExtension.TryEvaluateFormat(formattingInfo);
         }
-            
+
         // Go through all (implicit) formatters which contain an empty name
         // much higher performance and less GC than using Linq
         foreach (var fe in _formatterExtensions)
