@@ -309,4 +309,17 @@ public class PluralLocalizationFormatterTests
         var result = smart.Format(format, data);
         Assert.That(result, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void DoesNotHandle_Bool_WhenCanAutoDetect_IsTrue()
+    {
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource())
+            .AddExtensions(new PluralLocalizationFormatter { CanAutoDetect = true }, // Should not handle the bool
+            new ConditionalFormatter { CanAutoDetect = true }, // Should handle the bool
+            new DefaultFormatter());
+
+        var result = smart.Format(new CultureInfo("ar"), "{0:yes|no}", true);
+        Assert.That(result, Is.EqualTo("yes"));
+    }
 }
