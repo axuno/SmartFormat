@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace Cysharp.Text
 {
-    public partial struct Utf8ValueStringBuilder
+    internal partial struct Utf8ValueStringBuilder
     {
         /// <summary>Appends the string returned by processing a composite format string, each format item is replaced by the string representation of arguments.</summary>
         public void AppendFormat<T1>(string format, T1 arg1)

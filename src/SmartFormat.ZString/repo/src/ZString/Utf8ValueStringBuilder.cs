@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Cysharp.Text
 {
-    public partial struct Utf8ValueStringBuilder : IDisposable, IBufferWriter<byte>, IResettableBufferWriter<byte>
+    internal partial struct Utf8ValueStringBuilder : IDisposable, IBufferWriter<byte>, IResettableBufferWriter<byte>
     {
         public delegate bool TryFormat<T>(T value, Span<byte> destination, out int written, StandardFormat format);
 
@@ -513,7 +513,7 @@ namespace Cysharp.Text
             RegisterTryFormat<T?>(CreateNullableFormatter<T>());
         }
 
-        public static class FormatterCache<T>
+        internal static class FormatterCache<T>
         {
             public static TryFormat<T> TryFormatDelegate;
             static FormatterCache()

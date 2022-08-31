@@ -8,13 +8,14 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Text;
 
 /*
  *  The ZStringWriter class from the repo is excluded from the project
  *  and replaced with this modified version, so we can compile for TFM net461 
  */
 
-namespace Cysharp.Text;
+namespace SmartFormat.ZString;
 
 /// <summary>
 /// A <see cref="TextWriter"/> implementation that is backed with <see cref="Utf16ValueStringBuilder"/>.
@@ -40,7 +41,7 @@ public sealed class ZStringWriter : TextWriter
     /// </summary>
     public ZStringWriter(IFormatProvider formatProvider) : base(formatProvider)
     {
-        sb = ZString.CreateStringBuilder();
+        sb = Cysharp.Text.ZString.CreateStringBuilder();
         isOpen = true;
     }
 

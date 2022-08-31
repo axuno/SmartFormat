@@ -2,7 +2,7 @@
 
 namespace Cysharp.Text
 {
-    public static partial class ZString
+    internal static partial class ZString
     {
         /// <summary>Prepare string format to avoid parse template in each operation.</summary>
         public static Utf16PreparedFormat<T1> PrepareUtf16<T1>(string format)
