@@ -4,7 +4,7 @@ using System.Buffers.Text;
 
 namespace Cysharp.Text
 {
-    public partial struct Utf8ValueStringBuilder
+    internal partial struct Utf8ValueStringBuilder
     {
         static object CreateFormatter(Type type)
         {

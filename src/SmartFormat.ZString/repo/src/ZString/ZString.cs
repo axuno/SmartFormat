@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Cysharp.Text
 {
-    public static partial class ZString
+    internal static partial class ZString
     {
         static Encoding UTF8NoBom = new UTF8Encoding(false);
 

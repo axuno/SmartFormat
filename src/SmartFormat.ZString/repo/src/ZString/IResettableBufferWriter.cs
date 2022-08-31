@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cysharp.Text
 {
-    public interface IResettableBufferWriter<T> : IBufferWriter<T>
+    internal interface IResettableBufferWriter<T> : IBufferWriter<T>
     {
         void Reset();
     }

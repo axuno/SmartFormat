@@ -2,7 +2,7 @@
 
 namespace Cysharp.Text
 {
-    public static partial class ZString
+    internal static partial class ZString
     {
         /// <summary>Concatenates the string representation of some specified objects.</summary>
         public static string Concat<T1>(T1 arg1)

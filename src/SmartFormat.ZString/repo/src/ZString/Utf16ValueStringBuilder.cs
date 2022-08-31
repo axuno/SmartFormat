@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Cysharp.Text
 {
-    public partial struct Utf16ValueStringBuilder : IDisposable, IBufferWriter<char>, IResettableBufferWriter<char>
+    internal partial struct Utf16ValueStringBuilder : IDisposable, IBufferWriter<char>, IResettableBufferWriter<char>
     {
         public delegate bool TryFormat<T>(T value, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format);
 
@@ -727,7 +727,7 @@ namespace Cysharp.Text
             RegisterTryFormat<T?>(CreateNullableFormatter<T>());
         }
 
-        public static class FormatterCache<T>
+        internal static class FormatterCache<T>
         {
             public static TryFormat<T> TryFormatDelegate;
             static FormatterCache()
