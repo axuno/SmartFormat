@@ -1,6 +1,22 @@
 Latest Changes
 ====
 
+v3.2.0
+===
+### Enhancements
+
+* Remove usage of Linq for less GC
+* Add `IConvertable` support for `PluralLocalizationFormatter` and `ConditionalFormatter`
+* `ListFormatter`
+  * ListFormatter handles selector name "Index" in `IEnumerable`s and `IList`s: In `v1.6.1` a Selector was tested for having the name **"index"**, even if data was not an `IList`, and returned the `CollectionIndex`. This is now implemented again in the `ListFormatter.TryEvaluateSelector(...)`
+  * Set the `ParentPlaceholder` property for item `Format`s
+  * Use `PooledObject<T>` where possible, so objects will be returned to `ObjectPool` also in case of exceptions
+
+### Fixes
+* `FormatItem.AsSpan()` returns the correct name
+* Remove potential namespace collisions: All public types in namespace `Cysharp.Text` are now internal
+
+
 v3.1.0
 ===
 
