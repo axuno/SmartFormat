@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Threading;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.SmartPools;
@@ -76,8 +77,16 @@ public class ListFormatter : IFormatter, ISource, IInitializer
         var current = selectorInfo.CurrentValue;
         var selector = selectorInfo.SelectorText;
 
-        if (current is not IList currentList) return false;
+        // Check whether the selector is named "Index"
+        var selectorIsIndex = current is IEnumerable && selector.Equals("index", StringComparison.OrdinalIgnoreCase);
+        if (selectorIsIndex && selectorInfo.SelectorIndex == 0)
+        {
+            selectorInfo.Result = CollectionIndex;
+            return true;
+        }
 
+        if (current is not IList currentList) return false;
+        
         // See if we're trying to access a specific index:
         var isAbsolute = selectorInfo.SelectorIndex == 0 && selectorInfo.SelectorOperator.Length == 0;
         if (!isAbsolute && int.TryParse(selector, out var itemIndex) &&
@@ -91,22 +100,11 @@ public class ListFormatter : IFormatter, ISource, IInitializer
             return true;
         }
 
-        // We want to see if there is an "Index" property that was supplied.
-        if (selector.Equals("index", StringComparison.OrdinalIgnoreCase))
+        // Looking for 2 lists to sync: "{List1: {List2[Index]}}"
+        if (selectorIsIndex && 0 <= CollectionIndex && CollectionIndex < currentList.Count)
         {
-            // Looking for "{Index}"
-            if (selectorInfo.SelectorIndex == 0)
-            {
-                selectorInfo.Result = CollectionIndex;
-                return true;
-            }
-
-            // Looking for 2 lists to sync: "{List1: {List2[Index]} }"
-            if (0 <= CollectionIndex && CollectionIndex < currentList.Count)
-            {
-                selectorInfo.Result = currentList[CollectionIndex];
-                return true;
-            }
+            selectorInfo.Result = currentList[CollectionIndex];
+            return true;
         }
 
         return false;
