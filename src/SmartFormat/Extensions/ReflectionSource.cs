@@ -44,7 +44,6 @@ public class ReflectionSource : Source
     /// <inheritdoc />
     public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
     {
-            
         var current = selectorInfo.CurrentValue;
             
         if (TrySetResultForNullableOperator(selectorInfo)) return true;
@@ -95,7 +94,7 @@ public class ReflectionSource : Source
             switch (member.MemberType)
             {
                 case MemberTypes.Field:
-                    //  Selector is a Field; retrieve the value:
+                    // Selector is a Field; retrieve the value:
                     var field = member as FieldInfo;
                     selectorInfo.Result = field?.GetValue(current);
                     if (IsTypeCacheEnabled) TypeCache[(sourceType, selector)] = (field, null);
@@ -104,17 +103,17 @@ public class ReflectionSource : Source
                 case MemberTypes.Method:
                     if (!TryGetMethodInfo(member, out var method)) continue;
  
-                    //  Check that this method is valid -- it needs to return a value and has to be parameter-less:
-                    //  We are only looking for a parameter-less Function/Property:
+                    // Check that this method is valid -- it needs to return a value and has to be parameter-less:
+                    // We are only looking for a parameter-less Function/Property:
                     if (method?.GetParameters().Length > 0) continue;
 
-                    //  Make sure that this method is not void! It has to be a Function!
+                    // Make sure that this method is not void! It has to be a Function!
                     if (method?.ReturnType == typeof(void)) continue;
 
                     // Add to cache
                     if (IsTypeCacheEnabled) TypeCache[(sourceType, selector)] = (null, method);
 
-                    //  Retrieve the Selectors/ParseFormat value:
+                    // Retrieve the Selectors/ParseFormat value:
                     selectorInfo.Result = method?.Invoke(current, Array.Empty<object>());
                     return true;
             }

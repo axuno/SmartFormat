@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -64,6 +65,22 @@ public class ListFormatterTests
         var smart = Smart.CreateDefaultSmartFormat();
         var result = smart.Format("{TheList?:list:{}|, |, and }", new { TheList = default(object)});
         Assert.AreEqual(string.Empty, result);
+    }
+
+    [Test]
+    public void Enumerable_With_SelectorName_Index_Is_Recognized()
+    {
+        var smart = Smart.CreateDefaultSmartFormat();
+        var objects = new object[]
+        {
+            new { Content = "Content A" },
+            new { Content = "Content B" }
+        };
+
+        // Linq Select returns an IEnumerable.
+        // "Index" selector should be recognized even when the argument is not an IList
+        var result = smart.Format("{0:{Content} with Index {Index}|, }", objects.Select(x => x));
+        Assert.That(result, Is.EqualTo("Content A with Index 0, Content B with Index 1"));
     }
 
     [Test]
