@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
+        <!-- Current Cysharp.ZString release version is 2.5.0 -->
         <RootNamespace>SmartFormat.ZString</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -20,6 +21,7 @@
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -32,12 +34,16 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <WarningLevel>3</WarningLevel>
+        <WarningLevel>0</WarningLevel>
         <!-- EmbedUntrackedSources for deterministic build -->
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
+      <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 
     <ItemGroup>
