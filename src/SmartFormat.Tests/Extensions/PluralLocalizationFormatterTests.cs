@@ -49,6 +49,18 @@ public class PluralLocalizationFormatterTests
         Assert.That(() => smart.Format("{0:plural:One|Two}", new object()), Throws.Exception.TypeOf<FormattingException>());
     }
 
+    [TestCase(0)]
+    [TestCase(1)]
+    [TestCase(100)]
+    public void Explicit_Should_Process_Singular_PluralRule(int count)
+    {
+        var smart = Smart.CreateDefaultSmartFormat();
+        // Japanese does not have plural definitions (is a Singular language)
+        // "リンゴを2個持っています。" => "I have 2 apple(s)"
+        var result = smart.Format("リンゴを{0:plural(ja):{}個持っています。}", count);
+        Assert.That(result, Is.EqualTo($"リンゴを{count}個持っています。"));
+    }
+
     [Test]
     public void Test_Default()
     {

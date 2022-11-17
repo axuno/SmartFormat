@@ -70,7 +70,21 @@ public class PluralLocalizationFormatter : IFormatter
     ///<inheritdoc/>
     public string Name { get; set; } = "plural";
 
-    ///<inheritdoc/>
+    /// <summary>
+    /// Any extensions marked as <see cref="CanAutoDetect"/> will be called implicitly
+    /// (when no formatter name is specified in the input format string).
+    /// For example, "{0:N2}" will implicitly call extensions marked as <see cref="CanAutoDetect"/>.
+    /// Implicit formatter invocations should not throw exceptions.
+    /// With <see cref="CanAutoDetect"/> == <see langword="false"/>, the formatter can only be
+    /// called by its name in the input format string.
+    /// <para/>
+    /// <b>Auto detection only works with more than 1 format argument.
+    /// Is recommended to set <see cref="CanAutoDetect"/> to <see langword="false"/>. This will be the default in a future version.
+    /// </b>
+    /// </summary>
+    /// <remarks>
+    /// If more than one registered <see cref="IFormatter"/> can auto-detect, the first one in the formatter list will win.
+    /// </remarks>
     public bool CanAutoDetect { get; set; } = true;
 
     /// <summary>
@@ -93,17 +107,13 @@ public class PluralLocalizationFormatter : IFormatter
 
         // Extract the plural words from the format string:
         var pluralWords = format.Split(SplitChar);
-        // This extension requires at least two plural words:
-        if (pluralWords.Count == 1)
+
+        // This extension requires at least two plural words for auto detection
+        // For locales
+        if (pluralWords.Count <= 1 && string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
         {
             // Auto detection calls just return a failure to evaluate
-            if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
-                return false;
-
-            // throw, if the formatter has been called explicitly
-            throw new FormatException(
-                $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 plural words.");
-
+            return false;
         }
 
         decimal value;
