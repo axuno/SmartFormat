@@ -21,31 +21,33 @@ namespace SmartFormat.Extensions;
 /// result: 35.00
 /// </example>
 /// <remarks>
-/// The <see cref="LogicCalcFormatter"/> will use un-nested <see cref="Placeholder"/>s as NCalc parameters.
+/// The <see cref="LogiCalcFormatter"/> will use un-nested <see cref="Placeholder"/>s as NCalc parameters.
 /// NCalc parameters are useful when a value is unknown at compile time,
 /// or when performance is important and repetitive parsing and compilation of the expression tree
 /// can be saved for further calculations.
 /// </remarks>
-public class LogicCalcFormatter : IFormatter
+public class LogiCalcFormatter : IFormatter
 {
     private readonly Dictionary<string, object?> _parameters = new(50);
     private Format? _nCalcFormat;
+    [ThreadStatic] // creates isolated versions of the Expression in each thread
     private static NCalc.Expression? _nCalcExpression;
-    private static readonly StringBuilder _sb = new();
+    [ThreadStatic] // creates isolated versions of the StringBuilder in each thread
+    private static StringBuilder? _sb;
     ///<inheritdoc/>
-    public string Name { get; set; } = "M";
+    public string Name { get; set; } = "calc";
 
     /// <summary>
     /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
     /// </summary>
     [Obsolete("Use property \"Name\" instead", true)]
-    public string[] Names { get; set; } = { "M" };
+    public string[] Names { get; set; } = { "calc" };
 
     ///<inheritdoc/>
     public bool CanAutoDetect { get; set; } = false;
 
     /// <summary>
-    /// The parameters that were used when the <see cref="LogicCalcFormatter"/> was invoked last.
+    /// The parameters that were used when the <see cref="LogiCalcFormatter"/> was invoked last.
     /// Can be helpful to make sure <see cref="Placeholder"/>s actually become <see cref="NCalc"/> parameters.
     /// </summary>
     public IReadOnlyDictionary<string, object?> LastNCalcParameters => _parameters;
@@ -111,6 +113,7 @@ public class LogicCalcFormatter : IFormatter
 
     private static string CreateNCalcExpression(FormattingInfo fi, IDictionary<string, object?> parameters)
     {
+        _sb ??= new StringBuilder(fi.Format!.Length);
         _sb.Clear();
         _sb.Capacity = fi.Format!.Length; // default sb.Capacity is only 16
         

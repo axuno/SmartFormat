@@ -18,7 +18,7 @@ namespace SmartFormat.Performance
             //BenchmarkRunner.Run<NullFormatterChooseFormatterTests>();
             //BenchmarkRunner.Run<ReflectionVsStringSourceTests>();
 
-            BenchmarkRunner.Run<LogicCalcTests>();
+            BenchmarkRunner.Run<LogiCalcTests>();
         }
     }
 }

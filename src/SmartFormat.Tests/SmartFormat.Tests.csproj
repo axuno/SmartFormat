@@ -17,7 +17,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Brutal.Dev.StrongNameSigner" Version="3.1.0" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
 		<PackageReference Include="NUnit" Version="3.13.3" />
@@ -36,7 +35,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SmartFormat.Extensions.LogicCalc\SmartFormat.Extensions.LogicCalc.csproj" />
+        <ProjectReference Include="..\SmartFormat.Extensions.LogiCalc\SmartFormat.Extensions.LogiCalc.csproj" />
         <ProjectReference Include="..\SmartFormat.Net\SmartFormat.Net.csproj" />
         <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
     </ItemGroup>

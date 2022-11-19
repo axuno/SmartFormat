@@ -10,7 +10,7 @@ namespace SmartFormat.Performance;
 [SimpleJob(RuntimeMoniker.Net60)]
 [MemoryDiagnoser]
 // [RPlotExporter]
-public class LogicCalcTests
+public class LogiCalcTests
 {
     private const string CondFmtString = "{0:cond:Zero|Two}";
     private const string ChooseFmtString = "{0:choose(0|2):Zero|Two}";
@@ -89,7 +89,7 @@ Outliers
   Allocated : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
   1 us      : 1 Microsecond (0.000001 sec)
 */
-    public LogicCalcTests()
+    public LogiCalcTests()
     {
         _condFormat = _parser.ParseFormat(CondFmtString);
         _chooseFormat = _parser.ParseFormat(ChooseFmtString);
@@ -159,7 +159,7 @@ Outliers
                 //new IsMatchFormatter(),
                 //new NullFormatter(),
                 //new ChooseFormatter(),
-                new LogicCalcFormatter(),
+                new LogiCalcFormatter(),
                 //new SubStringFormatter(),
                 // for string.Format behavior
                 new DefaultFormatter()
@@ -201,6 +201,23 @@ Outliers
         }
     }
 
+/*
+Using: DynamicExpresso with l.Invoke(parameter);
+|          Method |   N |       Mean |     Error |    StdDev |     Median |   Gen 0 |  Gen 1 | Gen 2 | Allocated |
+|---------------- |---- |-----------:|----------:|----------:|-----------:|--------:|-------:|------:|----------:|
+|       PureNCalc |  10 |   3.962 us | 0.0781 us | 0.1095 us |   3.899 us |  0.7706 |      - |     - |      6 KB |
+| PureDynExpresso |  10 | 191.074 us | 3.7918 us | 8.8633 us | 185.416 us |  7.8125 | 2.6855 |     - |     65 KB |
+|       PureNCalc | 100 |  40.729 us | 0.7110 us | 0.6651 us |  40.425 us |  7.6904 |      - |     - |     63 KB |
+| PureDynExpresso | 100 | 266.201 us | 2.2993 us | 1.9200 us | 265.286 us | 14.1602 | 3.9063 |     - |    119 KB |
+
+Using: DynamicExpresso with t.Eval<string>(parameter);
+|          Method |   N |          Mean |       Error |      StdDev |        Median |    Gen 0 |    Gen 1 | Gen 2 | Allocated |
+|---------------- |---- |--------------:|------------:|------------:|--------------:|---------:|---------:|------:|----------:|
+|       PureNCalc |  10 |      4.022 us |   0.0753 us |   0.0668 us |      4.001 us |   0.7706 |        - |     - |      6 KB |
+| PureDynExpresso |  10 |  1,594.676 us |  31.7938 us |  70.4529 us |  1,556.132 us |  48.8281 |  23.4375 |     - |    414 KB |
+|       PureNCalc | 100 |     40.669 us |   0.8008 us |   1.2467 us |     40.340 us |   7.6904 |        - |     - |     63 KB |
+| PureDynExpresso | 100 | 16,066.776 us | 320.0519 us | 760.6373 us | 15,878.786 us | 468.7500 | 234.3750 |     - |  3,947 KB |
+ */
     [Benchmark]
     public void PureNCalc()
     {

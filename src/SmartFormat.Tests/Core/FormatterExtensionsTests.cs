@@ -112,7 +112,6 @@ public class FormatterExtensionsTests
 
     #region: Custom Extensions :
 
-    [Test]
     [TestCase("{0}", 5, "TestExtension1 Options: , Format: ")]
     [TestCase("{0:N2}", 5, "TestExtension1 Options: , Format: N2")]
     public void Without_NamedFormatter_extensions_are_invoked_in_order(string format, object arg0, string expectedResult)
@@ -122,7 +121,6 @@ public class FormatterExtensionsTests
         Assert.AreEqual(expectedResult, actualResult);
     }
 
-    [Test]
     [TestCase("{0:test1:}", 5, "TestExtension1 Options: , Format: ")]
     [TestCase("{0:test1():}", 5, "TestExtension1 Options: , Format: ")]
     [TestCase("{0:test1:N2}", 5, "TestExtension1 Options: , Format: N2")]

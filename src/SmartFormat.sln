@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Net", "SmartFor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Extensions.Time", "SmartFormat.Extensions.Time\SmartFormat.Extensions.Time.csproj", "{62553041-4606-47FC-B44E-8D6D51F23E22}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Extensions.LogicCalc", "SmartFormat.Extensions.LogicCalc\SmartFormat.Extensions.LogicCalc.csproj", "{1FF6FC88-038E-43CD-8B32-A748AC8AD26E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Extensions.LogiCalc", "SmartFormat.Extensions.LogiCalc\SmartFormat.Extensions.LogiCalc.csproj", "{1FF6FC88-038E-43CD-8B32-A748AC8AD26E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
