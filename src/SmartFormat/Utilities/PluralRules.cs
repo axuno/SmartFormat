@@ -267,9 +267,13 @@ public static class PluralRules
             _ => 5  // other
         }; 
     private static PluralRuleDelegate Czech => (value, pluralWordsCount) =>
-        value == 1 ? 0 : // one
-        value.Between(2, 4) ? 1 : // few
-        2;
+        value switch
+        {
+            0 => 0, // zero
+            1 => 1, // one
+            > 1 and < 5 => 2, // few
+            _ => 3  // other
+        };
     private static PluralRuleDelegate Welsh => (value, pluralWordsCount) =>
         value switch
         {
