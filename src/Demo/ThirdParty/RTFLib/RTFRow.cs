@@ -78,19 +78,19 @@ namespace RTF
                 {
                     throw new ArgumentNullException("cellDefinitions.Length");
                 }
-                this._definitionBuilder = new StringBuilder();
+                _definitionBuilder = new StringBuilder();
 
 
-                this._rowDefinition = rowDefinition;
-                this._cellDefinitions = cellDefinitions;
-                this._builder = builder;
+                _rowDefinition = rowDefinition;
+                _cellDefinitions = cellDefinitions;
+                _builder = builder;
 
-                StringBuilder sb = this._definitionBuilder;
+                StringBuilder sb = _definitionBuilder;
 
                 sb.Append("\\trowd\\trgaph115\\trleft-115");
                 sb.AppendLine("\\trautofit1"); //AutoFit: ON
-                this.TableCellBorderSide();
-                this.BorderDef();
+                TableCellBorderSide();
+                BorderDef();
                 //Pad();
 
 
@@ -119,15 +119,15 @@ namespace RTF
                 //3    Twips.
 
 
-                this._cells = new List <RTFCellDefinitionBuilder>();
+                _cells = new List <RTFCellDefinitionBuilder>();
                 int x = 0;
-                foreach (RTFCellDefinition item in this._cellDefinitions)
+                foreach (RTFCellDefinition item in _cellDefinitions)
                 {
                     item.SetX(x);
                     x += (int) (item.CellWidthRaw * TWIPSA4);
-                    this._cells.Add(new RTFCellDefinitionBuilder(this._builder, this._definitionBuilder, item));
+                    _cells.Add(new RTFCellDefinitionBuilder(_builder, _definitionBuilder, item));
                 }
-                this._builder._sb.Append(this._definitionBuilder.ToString());
+                _builder._sb.Append(_definitionBuilder.ToString());
             }
 
             #endregion
@@ -136,7 +136,7 @@ namespace RTF
 
             ~RTFRow()
             {
-                this.Dispose(false);
+                Dispose(false);
             }
 
             #endregion
@@ -146,7 +146,7 @@ namespace RTF
             private string BorderDef()
             {
                 StringBuilder sb = new StringBuilder();
-                RTFBorderSide _rTFBorderSide = this._rowDefinition.RTFBorderSide;
+                RTFBorderSide _rTFBorderSide = _rowDefinition.RTFBorderSide;
                 if ((_rTFBorderSide & RTFBorderSide.DoubleThickness) == RTFBorderSide.DoubleThickness)
                 {
                     sb.Append("\\brdrth");
@@ -160,9 +160,9 @@ namespace RTF
                     sb.Append("\\brdrdb");
                 }
                 sb.Append("\\brdrw");
-                sb.Append(this._rowDefinition.BorderWidth);
+                sb.Append(_rowDefinition.BorderWidth);
 
-                sb.AppendFormat("\\brdrc{0}", this._builder.IndexOf(this._rowDefinition.BorderColor));
+                sb.AppendFormat("\\brdrc{0}", _builder.IndexOf(_rowDefinition.BorderColor));
                 sb.AppendLine();
 
                 return sb.ToString();
@@ -170,16 +170,16 @@ namespace RTF
 
             protected void Dispose(bool disposing)
             {
-                if (this._builder != null)
+                if (_builder != null)
                 {
-                    this._builder._sb.AppendLine("\\row");
+                    _builder._sb.AppendLine("\\row");
                     //_builder._sb.AppendLine();
-                    this._builder._sb.AppendLine("{");
-                    this._builder._sb.Append(this._definitionBuilder.ToString());
+                    _builder._sb.AppendLine("{");
+                    _builder._sb.Append(_definitionBuilder.ToString());
 
-                    this._builder._sb.AppendLine("}");
+                    _builder._sb.AppendLine("}");
                 }
-                this._builder = null;
+                _builder = null;
                 if (disposing)
                 {
                     GC.SuppressFinalize(this);
@@ -188,24 +188,24 @@ namespace RTF
 
             private void Pad()
             {
-                if (this._rowDefinition.Padding != Padding.Empty)
+                if (_rowDefinition.Padding != Padding.Empty)
                 {
-                    StringBuilder sb = this._definitionBuilder;
-                    sb.AppendFormat("\\trpaddfl3\\trpaddl{0}", this._rowDefinition.Padding.Left);
-                    sb.AppendFormat("\\trpaddfr3\\trpaddr{0}", this._rowDefinition.Padding.Right);
-                    sb.AppendFormat("\\trpaddft3\\trpaddt{0}", this._rowDefinition.Padding.Top);
-                    sb.AppendFormat("\\trpaddfb3\\trpaddb{0}", this._rowDefinition.Padding.Bottom);
+                    StringBuilder sb = _definitionBuilder;
+                    sb.AppendFormat("\\trpaddfl3\\trpaddl{0}", _rowDefinition.Padding.Left);
+                    sb.AppendFormat("\\trpaddfr3\\trpaddr{0}", _rowDefinition.Padding.Right);
+                    sb.AppendFormat("\\trpaddft3\\trpaddt{0}", _rowDefinition.Padding.Top);
+                    sb.AppendFormat("\\trpaddfb3\\trpaddb{0}", _rowDefinition.Padding.Bottom);
                 }
             }
 
             private void TableCellBorderSide()
             {
-                RTFBorderSide _rTFBorderSide = this._rowDefinition.RTFBorderSide;
+                RTFBorderSide _rTFBorderSide = _rowDefinition.RTFBorderSide;
 
                 if (_rTFBorderSide != RTFBorderSide.None)
                 {
-                    StringBuilder sb = this._definitionBuilder;
-                    string bd = this.BorderDef();
+                    StringBuilder sb = _definitionBuilder;
+                    string bd = BorderDef();
 
                     if ((_rTFBorderSide & RTFBorderSide.Left) == RTFBorderSide.Left)
                     {
@@ -236,21 +236,21 @@ namespace RTF
 
             public IEnumerator <IBuilderContent> GetEnumerator()
             {
-                this._builder._sb.AppendLine("\\pard\\intbl\\f0");
-                foreach (RTFCellDefinitionBuilder item in this._cells)
+                _builder._sb.AppendLine("\\pard\\intbl\\f0");
+                foreach (RTFCellDefinitionBuilder item in _cells)
                 {
-                    yield return new RTFCell(this._builder, item.CellDefinition);
+                    yield return new RTFCell(_builder, item.CellDefinition);
                 }
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return this.GetEnumerator();
+                return GetEnumerator();
             }
 
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
             }
 
             #endregion

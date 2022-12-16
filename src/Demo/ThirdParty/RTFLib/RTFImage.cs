@@ -52,8 +52,8 @@ namespace RTF
 
             public RTFImage(RTFBuilder builder)
             {
-                this._builder = builder;
-                this.sb = new StringBuilder();
+                _builder = builder;
+                sb = new StringBuilder();
             }
 
             #endregion
@@ -102,16 +102,16 @@ namespace RTF
 
 
                 // Create the image control string and append it to the RTF string
-                this.WriteImagePrefix(image, xDpi, yDpi);
+                WriteImagePrefix(image, xDpi, yDpi);
 
 
                 // Create the Windows Metafile and append its bytes in HEX format
-                this.WriteRtfImage(image);
+                WriteRtfImage(image);
 
                 // Close the RTF image control string
-                this.sb.Append(this.RTF_IMAGE_POST);
+                sb.Append(RTF_IMAGE_POST);
 
-                this._builder._sb.Append(this.sb.ToString());
+                _builder._sb.Append(sb.ToString());
             }
 
             #endregion
@@ -191,16 +191,16 @@ namespace RTF
                 int pichgoal = (int) Math.Round((_image.Height / yDpi) * TWIPS_PER_INCH);
 
                 // Append values to RTF string
-                this.sb.Append(@"{\pict\wmetafile8");
-                this.sb.Append(@"\picw");
-                this.sb.Append(picw);
-                this.sb.Append(@"\pich");
-                this.sb.Append(pich);
-                this.sb.Append(@"\picwgoal");
-                this.sb.Append(picwgoal);
-                this.sb.Append(@"\pichgoal");
-                this.sb.Append(pichgoal);
-                this.sb.Append(" ");
+                sb.Append(@"{\pict\wmetafile8");
+                sb.Append(@"\picw");
+                sb.Append(picw);
+                sb.Append(@"\pich");
+                sb.Append(pich);
+                sb.Append(@"\picwgoal");
+                sb.Append(picwgoal);
+                sb.Append(@"\pichgoal");
+                sb.Append(pichgoal);
+                sb.Append(" ");
             }
 
             /// <summary>
@@ -271,7 +271,7 @@ namespace RTF
                         // Append the bits to the RTF string
                         for (int i = 0; i < _buffer.Length; ++i)
                         {
-                            this.sb.Append(String.Format("{0:X2}", _buffer[i]));
+                            sb.Append(String.Format("{0:X2}", _buffer[i]));
                         }
                         if (_stream != null)
                         {

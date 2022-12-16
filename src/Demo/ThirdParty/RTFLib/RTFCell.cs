@@ -38,9 +38,9 @@ namespace RTF
 
             public RTFCell(RTFBuilder builder, RTFCellDefinition cellDefinition)
             {
-                this._builder = builder;
-                this._cellDefinition = cellDefinition;
-                this._firstAccessContent = true;
+                _builder = builder;
+                _cellDefinition = cellDefinition;
+                _firstAccessContent = true;
             }
 
             #endregion
@@ -49,7 +49,7 @@ namespace RTF
 
             ~RTFCell()
             {
-                this.Dispose(false);
+                Dispose(false);
             }
 
             #endregion
@@ -58,11 +58,11 @@ namespace RTF
 
             protected void Dispose(bool disposing)
             {
-                if (disposing && this._builder != null)
+                if (disposing && _builder != null)
                 {
-                    this._builder._sb.AppendLine("\\cell ");
+                    _builder._sb.AppendLine("\\cell ");
                 }
-                this._builder = null;
+                _builder = null;
                 if (disposing)
                 {
                     GC.SuppressFinalize(this);
@@ -75,37 +75,37 @@ namespace RTF
 
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
             }
 
             public RTFBuilderbase Content
             {
                 get
                 {
-                    if (this._firstAccessContent)
+                    if (_firstAccessContent)
                     {
                         //par in table
-                        switch (this._cellDefinition.Alignment)
+                        switch (_cellDefinition.Alignment)
                         {
                             case RTFAlignment.TopCenter:
                             case RTFAlignment.BottomCenter:
                             case RTFAlignment.MiddleCenter:
-                                this._builder._sb.Append("\\qc ");
+                                _builder._sb.Append("\\qc ");
                                 break;
                             case RTFAlignment.TopLeft:
                             case RTFAlignment.MiddleLeft:
                             case RTFAlignment.BottomLeft:
-                                this._builder._sb.Append("\\ql ");
+                                _builder._sb.Append("\\ql ");
                                 break;
                             case RTFAlignment.TopRight:
                             case RTFAlignment.BottomRight:
                             case RTFAlignment.MiddleRight:
-                                this._builder._sb.Append("\\qr ");
+                                _builder._sb.Append("\\qr ");
                                 break;
                         }
-                        this._firstAccessContent = false;
+                        _firstAccessContent = false;
                     }
-                    return this._builder;
+                    return _builder;
                 }
             }
 

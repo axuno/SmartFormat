@@ -38,9 +38,9 @@ namespace RTF
 
             public RTFBuilderUnWrapped(RTFBuilder builder)
             {
-                this.wrapped = new RTFFormatWrap(builder);
-                this._builder = builder;
-                this._builder._unwrapped = true;
+                wrapped = new RTFFormatWrap(builder);
+                _builder = builder;
+                _builder._unwrapped = true;
             }
 
             #endregion
@@ -49,7 +49,7 @@ namespace RTF
 
             ~RTFBuilderUnWrapped()
             {
-                this.Dispose(false);
+                Dispose(false);
             }
 
             #endregion
@@ -58,10 +58,10 @@ namespace RTF
 
             public void Dispose(bool disposing)
             {
-                if (this._builder != null)
+                if (_builder != null)
                 {
-                    this.wrapped.Dispose();
-                    this._builder._unwrapped = false;
+                    wrapped.Dispose();
+                    _builder._unwrapped = false;
                 }
                 if (disposing)
                 {
@@ -75,7 +75,7 @@ namespace RTF
 
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
             }
 
             #endregion

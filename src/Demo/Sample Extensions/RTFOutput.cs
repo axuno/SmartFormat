@@ -52,7 +52,7 @@ namespace SmartFormat.Demo.Sample_Extensions
             else
             {
                 var nestedDepth = formattingInfo.Placeholder.NestedDepth;
-                var backcolor = this.nestedColors[nestedDepth % nestedColors.Length];
+                var backcolor = nestedColors[nestedDepth % nestedColors.Length];
                 output.BackColor(backcolor).Append(text, startIndex, length);
             }
         }

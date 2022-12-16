@@ -43,13 +43,13 @@ namespace RTF
 
         public RTFCellDefinition(int cellwidth, RTFAlignment alignment, RTFBorderSide rTFBorderSide, int borderWidth, Color borderColor, Padding padding)
         {
-            this._x = 0;
-            this._padding = padding;
-            this._alignment = alignment;
-            this._rTFBorderSide = rTFBorderSide;
-            this._borderWidth = borderWidth;
-            this._borderColor = borderColor;
-            this._cellWidth = (float) cellwidth / 100;
+            _x = 0;
+            _padding = padding;
+            _alignment = alignment;
+            _rTFBorderSide = rTFBorderSide;
+            _borderWidth = borderWidth;
+            _borderColor = borderColor;
+            _cellWidth = (float) cellwidth / 100;
         }
 
         #endregion
@@ -63,9 +63,9 @@ namespace RTF
         public RTFAlignment Alignment
         {
             [DebuggerStepThrough]
-            get { return this._alignment; }
+            get { return _alignment; }
             [DebuggerStepThrough]
-            set { this._alignment = value; }
+            set { _alignment = value; }
         }
 
         /// <summary>
@@ -75,9 +75,9 @@ namespace RTF
         public RTFBorderSide RTFBorderSide
         {
             [DebuggerStepThrough]
-            get { return this._rTFBorderSide; }
+            get { return _rTFBorderSide; }
             [DebuggerStepThrough]
-            set { this._rTFBorderSide = value; }
+            set { _rTFBorderSide = value; }
         }
 
         /// <summary>
@@ -87,9 +87,9 @@ namespace RTF
         public int BorderWidth
         {
             [DebuggerStepThrough]
-            get { return this._borderWidth; }
+            get { return _borderWidth; }
             [DebuggerStepThrough]
-            set { this._borderWidth = value; }
+            set { _borderWidth = value; }
         }
 
         /// <summary>
@@ -99,9 +99,9 @@ namespace RTF
         public Color BorderColor
         {
             [DebuggerStepThrough]
-            get { return this._borderColor; }
+            get { return _borderColor; }
             [DebuggerStepThrough]
-            set { this._borderColor = value; }
+            set { _borderColor = value; }
         }
 
         /// <summary>
@@ -111,9 +111,9 @@ namespace RTF
         public float CellWidthRaw
         {
             [DebuggerStepThrough]
-            get { return this._cellWidth; }
+            get { return _cellWidth; }
             [DebuggerStepThrough]
-            set { this._cellWidth = value; }
+            set { _cellWidth = value; }
         }
 
         /// <summary>
@@ -123,15 +123,15 @@ namespace RTF
         public int X
         {
             [DebuggerStepThrough]
-            get { return this._x; }
+            get { return _x; }
         }
 
         public Padding Padding
         {
             [DebuggerStepThrough]
-            get { return this._padding; }
+            get { return _padding; }
             [DebuggerStepThrough]
-            set { this._padding = value; }
+            set { _padding = value; }
         }
 
         #endregion
@@ -141,7 +141,7 @@ namespace RTF
         [DebuggerStepThrough]
         public void SetX(int value)
         {
-            this._x = value;
+            _x = value;
         }
 
         #endregion

@@ -5,18 +5,21 @@ namespace SmartFormat.Tests.TestUtils;
 
 public class Person
 {
+    private Random _random = new();
+
     public Person()
     {
         Friends = new List<Person>();
+        Random = _random.Next(1, 10);
     }
-    public Person(string newName, Gender gender, DateTime newBirthday, string newAddress, params Person[] newFriends)
+    public Person(string newName, Gender gender, DateTime newBirthday, string newAddress, params Person[] newFriends) : this()
     {
         FullName = newName;
         Gender = gender;
         Birthday = newBirthday;
         if (!string.IsNullOrEmpty(newAddress))
             Address = Address.Parse(newAddress);
-        Friends = new List<Person>(newFriends);
+        Friends.AddRange(newFriends);
     }
 
     public string FirstName { get; set; } = string.Empty;
@@ -74,6 +77,8 @@ public class Person
     public Person? Spouse { get; set; }
 
     public Gender Gender { get; set; }
+
+    public int Random { get; set; }
 }
 
 public enum Gender
