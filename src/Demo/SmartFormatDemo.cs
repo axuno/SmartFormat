@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Demo.Sample_Extensions;
+using SmartFormat.Extensions;
 using SmartFormat.Tests.Extensions;
 using SmartFormat.Tests.TestUtils;
 
@@ -20,14 +21,14 @@ namespace SmartFormat.Demo
             InitializeComponent();
         }
 
-        private RTFOutput rtfOutput;
+        private RTFOutput _rtfOutput;
 
-        private PropertyGridObject args;
+        private PropertyGridObject _args;
 
         private void SmartFormatDemo_Load(object sender, EventArgs e)
         {
-            this.args = new PropertyGridObject();
-            var nestedColors = new Color[] {
+            _args = new PropertyGridObject();
+            var nestedColors = new[] {
                 Color.Orange,
                 Color.LightYellow,
                 Color.LightGreen,
@@ -35,26 +36,29 @@ namespace SmartFormat.Demo
                 Color.LightSkyBlue,
                 Color.Lavender,
             };
-            rtfOutput = new RTFOutput(nestedColors, Color.LightPink);
+            _rtfOutput = new RTFOutput(nestedColors, Color.LightPink);
 
-            args.Person = TestFactory.GetPerson();
-            args.Date = DateTime.Now;
-            args.DateTimeOffset = DateTimeOffset.Now - new TimeSpan(1, 0,0,0);
-            args.Inventory = TestFactory.GetItems();
-            args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
-            propertyGrid1.SelectedObject = args;
+            _args.Person = TestFactory.GetPerson();
+            _args.Date = DateTime.Now;
+            _args.DateTimeOffset = DateTimeOffset.Now - new TimeSpan(1, 0,0,0);
+            _args.Inventory = TestFactory.GetItems();
+            _args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
+            propertyGrid1.SelectedObject = _args;
 
             Smart.Default = Smart.CreateDefaultSmartFormat(new SmartSettings
             {
                 Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.OutputErrorInResult},
                 Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}
             });
+            Smart.Default.AddExtensions(new TimeFormatter());
+            Smart.Default.AddExtensions(new XmlSource());
+            Smart.Default.AddExtensions(new XElementFormatter());
 
             LoadExamples();
         }
         private void LoadExamples()
         {
-            this.lstExamples.DisplayMember = "Key";
+            lstExamples.DisplayMember = "Key";
             //this.lstExamples.ValueMember = "Value";
             var examples = new Dictionary<string, string> {
 {"Basics of SmartFormat",
@@ -113,14 +117,14 @@ There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remainin
 @"It is possible to format Xml as input argument
 Example:
   There are {Xml.Person.Count} people: {Xml.Person: {FirstName}|,|, and}
-  #1:  {Xml.Person.0: {FirstName}'s phone number is {Phone}}
-  #2:  {Xml.Person.1: {FirstName}'s phone number is {Phone}}
+  #1:  {Xml.Person[0]: {FirstName}'s phone number is {Phone}}
+  #2:  {Xml.Person[1]: {FirstName}'s phone number is {Phone}}
 "},
             };
 
             var listObjects = examples.Cast<object>().ToArray();
-            this.lstExamples.Items.AddRange(listObjects);
-            this.lstExamples.SelectedIndex = 0;
+            lstExamples.Items.AddRange(listObjects);
+            lstExamples.SelectedIndex = 0;
         }
 
         public class PropertyGridObject
@@ -140,28 +144,28 @@ Example:
             public object Xml { get; set; }
         }
 
-        private void txtInput_TextChanged(object sender, EventArgs e)
+        private void TxtInput_TextChanged(object sender, EventArgs e)
         {
             groupBox1.ResetForeColor();
             groupBox1.Text = "Format";
             var format = txtInput.Text;
 
-            rtfOutput.Clear();
+            _rtfOutput.Clear();
             // Save selection:
             var s = txtInput.SelectionStart;
             var l = txtInput.SelectionLength;
             try
             {
-                Smart.Default.FormatInto(rtfOutput, format, args);
+                Smart.Default.FormatInto(_rtfOutput, format, _args);
 
                 txtInput.SelectAll();
                 txtInput.SelectionBackColor = txtInput.BackColor;
             }
             catch (ParsingErrors ex)
             {
-                var errorBG = Color.LightPink;
-                var errorFG = Color.DarkRed;
-                groupBox1.ForeColor = errorFG;
+                var errorBg = Color.LightPink;
+                var errorFg = Color.DarkRed;
+                groupBox1.ForeColor = errorFg;
 
                 groupBox1.Text = string.Format("Format has {0} issue{1}: {2}",
                                                ex.Issues.Count,
@@ -172,20 +176,20 @@ Example:
                 foreach (var issue in ex.Issues)
                 {
                     txtInput.Select(issue.Index, issue.Length);
-                    txtInput.SelectionBackColor = errorBG;
+                    txtInput.SelectionBackColor = errorBg;
                 }
             }
             txtInput.SelectionStart = s;
             txtInput.SelectionLength = l;
 
-            txtOutput.Rtf = rtfOutput.ToString();
+            txtOutput.Rtf = _rtfOutput.ToString();
         }
 
-        private void lstExamples_SelectedIndexChanged(object sender, EventArgs e)
+        private void LstExamples_SelectedIndexChanged(object sender, EventArgs e)
         {
             var example = (KeyValuePair<string, string>) lstExamples.SelectedItem;
             if (example.Value == null) return;
-            this.txtInput.Text = example.Value;
+            txtInput.Text = example.Value;
         }
     }
 }

@@ -42,22 +42,22 @@ namespace RTF
         public RTFBuilder()
             : base(RTFFont.Arial , 20F)
         {
-            this._sb = new StringBuilder();
+            _sb = new StringBuilder();
         }
 
         public RTFBuilder(RTFFont defaultFont) : base(defaultFont, 20F)
         {
-            this._sb = new StringBuilder();
+            _sb = new StringBuilder();
         }
 
         public RTFBuilder(float defaultFontSize) : base(RTFFont.Arial, defaultFontSize)
         {
-            this._sb = new StringBuilder();
+            _sb = new StringBuilder();
         }
 
         public RTFBuilder(RTFFont defaultFont, float defaultFontSize) : base(defaultFont, defaultFontSize)
         {
-            this._sb = new StringBuilder();
+            _sb = new StringBuilder();
         }
 
         #endregion
@@ -70,19 +70,19 @@ namespace RTF
             {
                 using (new RTFFormatWrap(this))
                 {
-                    value = this.CheckChar(value);
+                    value = CheckChar(value);
                     if (value.Contains("\n"))
                     {
                         string[] lines = value.Split(new[] {"\r\n","\n"}, StringSplitOptions.None);
                         for (int i = 0; i < lines.Length; i++)
                         {
-                            if (i > 0) this._sb.Append("\\line ");
-                            this._sb.Append(lines[i]);
+                            if (i > 0) _sb.Append("\\line ");
+                            _sb.Append(lines[i]);
                         }
                     }
                     else
                     {
-                        this._sb.Append(value);
+                        _sb.Append(value);
                     }
                 }
             }
@@ -90,7 +90,7 @@ namespace RTF
 
         protected override void AppendLevelInternal(int level)
         {
-            this._sb.AppendFormat("\\level{0} ", level);
+            _sb.AppendFormat("\\level{0} ", level);
         }
 
         protected override void AppendLineInternal(string value)
@@ -98,20 +98,20 @@ namespace RTF
             using (new RTFParaWrap(this))
             {
                 Append(value);
-                this._sb.AppendLine("\\line");
+                _sb.AppendLine("\\line");
             }
         }
 
         protected override void AppendLineInternal()
         {
-            this._sb.AppendLine("\\line");
+            _sb.AppendLine("\\line");
         }
 
         protected override void AppendPageInternal()
         {
             using (new RTFParaWrap(this))
             {
-                this._sb.AppendLine("\\page");
+                _sb.AppendLine("\\page");
             }
         }
 
@@ -119,7 +119,7 @@ namespace RTF
         {
             using (new RTFParaWrap(this))
             {
-                this._sb.AppendLine("\\par ");
+                _sb.AppendLine("\\par ");
             }
         }
 
@@ -127,13 +127,13 @@ namespace RTF
         {
             if (!string.IsNullOrEmpty(rtf))
             {
-                this._sb.Append(rtf);
+                _sb.Append(rtf);
             }
         }
 
         protected override IEnumerable <RTFBuilderbase> EnumerateCellsInternal(RTFRowDefinition rowDefinition, RTFCellDefinition[] cellDefinitions)
         {
-            using (IRTFRow ie = this.CreateRow(rowDefinition, cellDefinitions))
+            using (IRTFRow ie = CreateRow(rowDefinition, cellDefinitions))
             {
                 IEnumerator <IBuilderContent> ie2 = ie.GetEnumerator();
                 while (ie2.MoveNext())
@@ -160,7 +160,7 @@ namespace RTF
             }
             catch
             {
-                this._sb.AppendLine("[Insert image error]");
+                _sb.AppendLine("[Insert image error]");
             }
         }
 
@@ -171,7 +171,7 @@ namespace RTF
 
         protected override void ResetInternal()
         {
-            this._sb.AppendLine("\\pard");
+            _sb.AppendLine("\\pard");
         }
 
         public override string ToString()
@@ -213,7 +213,7 @@ namespace RTF
             sb.AppendFormat("\\fs{0} ", DefaultFontSize);
             sb.AppendLine();
 
-            sb.Append(this._sb.ToString());
+            sb.Append(_sb.ToString());
             sb.Append("}");
 
 

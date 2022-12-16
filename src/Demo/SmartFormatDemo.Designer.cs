@@ -64,7 +64,7 @@
             this.txtInput.Size = new System.Drawing.Size(691, 123);
             this.txtInput.TabIndex = 0;
             this.txtInput.Text = "";
-            this.txtInput.TextChanged += new System.EventHandler(this.txtInput_TextChanged);
+            this.txtInput.TextChanged += new System.EventHandler(this.TxtInput_TextChanged);
             // 
             // txtOutput
             // 
@@ -150,7 +150,7 @@
             this.lstExamples.Name = "lstExamples";
             this.lstExamples.Size = new System.Drawing.Size(583, 23);
             this.lstExamples.TabIndex = 2;
-            this.lstExamples.SelectedIndexChanged += new System.EventHandler(this.lstExamples_SelectedIndexChanged);
+            this.lstExamples.SelectedIndexChanged += new System.EventHandler(this.LstExamples_SelectedIndexChanged);
             // 
             // groupBox2
             // 

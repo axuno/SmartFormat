@@ -40,56 +40,56 @@ namespace RTF
 
             public RTFFormatWrap(RTFBuilder builder)
             {
-                this._builder = builder;
-                if (this._builder._unwrapped)
+                _builder = builder;
+                if (_builder._unwrapped)
                 {
                     return;
                 }
 
-                StringBuilder sb = this._builder._sb;
+                StringBuilder sb = _builder._sb;
 
-                int len = this._builder._sb.Length;
+                int len = _builder._sb.Length;
 
-                if (this._builder._sf.Alignment == StringAlignment.Center)
+                if (_builder._sf.Alignment == StringAlignment.Center)
                 {
                     sb.Append("\\qc");
                 }
-                else if (this._builder._sf.Alignment == StringAlignment.Far)
+                else if (_builder._sf.Alignment == StringAlignment.Far)
                 {
                     sb.Append("\\qr");
                 }
-                if ((this._builder._fontStyle & System.Drawing.FontStyle.Bold) == System.Drawing.FontStyle.Bold)
+                if ((_builder._fontStyle & System.Drawing.FontStyle.Bold) == System.Drawing.FontStyle.Bold)
                 {
                     sb.Append("\\b");
                 }
-                if ((this._builder._fontStyle & System.Drawing.FontStyle.Italic) == System.Drawing.FontStyle.Italic)
+                if ((_builder._fontStyle & System.Drawing.FontStyle.Italic) == System.Drawing.FontStyle.Italic)
                 {
                     sb.Append("\\i");
                 }
-                if ((this._builder._fontStyle & System.Drawing.FontStyle.Underline) == System.Drawing.FontStyle.Underline)
+                if ((_builder._fontStyle & System.Drawing.FontStyle.Underline) == System.Drawing.FontStyle.Underline)
                 {
                     sb.Append("\\ul");
                 }
-                if ((this._builder._fontStyle & System.Drawing.FontStyle.Strikeout) == System.Drawing.FontStyle.Strikeout)
+                if ((_builder._fontStyle & System.Drawing.FontStyle.Strikeout) == System.Drawing.FontStyle.Strikeout)
                 {
                     sb.Append("\\strike");
                 }
 
-                if (this._builder._fontSize != this._builder.DefaultFontSize)
+                if (_builder._fontSize != _builder.DefaultFontSize)
                 {
-                    sb.AppendFormat("\\fs{0}", this._builder._fontSize);
+                    sb.AppendFormat("\\fs{0}", _builder._fontSize);
                 }
-                if (this._builder._font != 0)
+                if (_builder._font != 0)
                 {
-                    sb.AppendFormat("\\f{0}", this._builder._font);
+                    sb.AppendFormat("\\f{0}", _builder._font);
                 }
-                if (this._builder._forecolor != this._builder.Defaultforecolor)
+                if (_builder._forecolor != _builder.Defaultforecolor)
                 {
-                    sb.AppendFormat("\\cf{0}", this._builder.IndexOf(this._builder._forecolor));
+                    sb.AppendFormat("\\cf{0}", _builder.IndexOf(_builder._forecolor));
                 }
-                if (this._builder._backcolor != this._builder.DefaultBackColor)
+                if (_builder._backcolor != _builder.DefaultBackColor)
                 {
-                    sb.AppendFormat("\\highlight{0}", this._builder.IndexOf(this._builder._backcolor));
+                    sb.AppendFormat("\\highlight{0}", _builder.IndexOf(_builder._backcolor));
                 }
 
 
@@ -105,7 +105,7 @@ namespace RTF
 
             ~RTFFormatWrap()
             {
-                this.Dispose(false);
+                Dispose(false);
             }
 
             #endregion
@@ -114,50 +114,50 @@ namespace RTF
 
             protected void Dispose(bool disposing)
             {
-                if (this._builder != null && !this._builder._unwrapped)
+                if (_builder != null && !_builder._unwrapped)
                 {
         
-                    StringBuilder sb = this._builder._sb;
+                    StringBuilder sb = _builder._sb;
 
                     int len = sb.Length;
-                    if ((this._builder._fontStyle & System.Drawing.FontStyle.Bold) == System.Drawing.FontStyle.Bold)
+                    if ((_builder._fontStyle & System.Drawing.FontStyle.Bold) == System.Drawing.FontStyle.Bold)
                     {
                         sb.Append("\\b0");
                     }
-                    if ((this._builder._fontStyle & System.Drawing.FontStyle.Italic) == System.Drawing.FontStyle.Italic)
+                    if ((_builder._fontStyle & System.Drawing.FontStyle.Italic) == System.Drawing.FontStyle.Italic)
                     {
                         sb.Append("\\i0");
                     }
-                    if ((this._builder._fontStyle & System.Drawing.FontStyle.Underline) == System.Drawing.FontStyle.Underline)
+                    if ((_builder._fontStyle & System.Drawing.FontStyle.Underline) == System.Drawing.FontStyle.Underline)
                     {
                         sb.Append("\\ulnone");
                     }
-                    if ((this._builder._fontStyle & System.Drawing.FontStyle.Strikeout) == System.Drawing.FontStyle.Strikeout)
+                    if ((_builder._fontStyle & System.Drawing.FontStyle.Strikeout) == System.Drawing.FontStyle.Strikeout)
                     {
                         sb.Append("\\strike0");
                     }
 
-                    this._builder._fontStyle = System.Drawing.FontStyle.Regular;
+                    _builder._fontStyle = System.Drawing.FontStyle.Regular;
 
-                    if (this._builder._fontSize != this._builder.DefaultFontSize)
+                    if (_builder._fontSize != _builder.DefaultFontSize)
                     {
-                        this._builder._fontSize = this._builder.DefaultFontSize;
-                        sb.AppendFormat("\\fs{0} ", this._builder.DefaultFontSize);
+                        _builder._fontSize = _builder.DefaultFontSize;
+                        sb.AppendFormat("\\fs{0} ", _builder.DefaultFontSize);
                     }
-                    if (this._builder._font != 0)
+                    if (_builder._font != 0)
                     {
                         sb.Append("\\f0");
-                        this._builder._font = 0;
+                        _builder._font = 0;
                     }
 
-                    if (this._builder._forecolor != this._builder.Defaultforecolor)
+                    if (_builder._forecolor != _builder.Defaultforecolor)
                     {
-                        this._builder._forecolor = this._builder.Defaultforecolor;
+                        _builder._forecolor = _builder.Defaultforecolor;
                         sb.Append("\\cf0");
                     }
-                    if (this._builder._backcolor != this._builder.DefaultBackColor)
+                    if (_builder._backcolor != _builder.DefaultBackColor)
                     {
-                        this._builder._backcolor = this._builder.DefaultBackColor;
+                        _builder._backcolor = _builder.DefaultBackColor;
                         sb.Append("\\highlight0");
                     }
                     //if (_builder._alignment != StringAlignment.Near )
@@ -182,7 +182,7 @@ namespace RTF
 
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
             }
 
             #endregion

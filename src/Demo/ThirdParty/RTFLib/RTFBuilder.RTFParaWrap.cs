@@ -39,29 +39,29 @@ namespace RTF
 
             public RTFParaWrap(RTFBuilder builder)
             {
-                this._builder = builder;
-                int len = this._builder._sb.Length;
-                if (this._builder._sf.Alignment == StringAlignment.Center)
+                _builder = builder;
+                int len = _builder._sb.Length;
+                if (_builder._sf.Alignment == StringAlignment.Center)
                 {
-                    this._builder._sb.Append("\\qc");
+                    _builder._sb.Append("\\qc");
                 }
-                else if (this._builder._sf.Alignment == StringAlignment.Far)
+                else if (_builder._sf.Alignment == StringAlignment.Far)
                 {
-                    this._builder._sb.Append("\\qr");
+                    _builder._sb.Append("\\qr");
                 }
-                if (this._builder._firstLineIndent > 0)
+                if (_builder._firstLineIndent > 0)
                 {
-                    this._builder._sb.Append("\\fi" + this._builder._firstLineIndent);
+                    _builder._sb.Append("\\fi" + _builder._firstLineIndent);
                 }
-                if (this._builder._lineIndent > 0)
+                if (_builder._lineIndent > 0)
                 {
-                    this._builder._sb.Append("\\li" + this._builder._lineIndent);
+                    _builder._sb.Append("\\li" + _builder._lineIndent);
                 }
 
 
-                if (this._builder._sb.Length > len)
+                if (_builder._sb.Length > len)
                 {
-                    this._builder._sb.Append(" ");
+                    _builder._sb.Append(" ");
                 }
             }
 
@@ -71,7 +71,7 @@ namespace RTF
 
             ~RTFParaWrap()
             {
-                this.Dispose(false);
+                Dispose(false);
             }
 
             #endregion
@@ -80,14 +80,14 @@ namespace RTF
 
             protected void Dispose(bool disposing)
             {
-                if ( this._builder != null && !this._builder._unwrapped)
+                if ( _builder != null && !_builder._unwrapped)
                 {
-                    if (this._builder._sf.Alignment != StringAlignment.Near || this._builder._lineIndent > 0 || this._builder._firstLineIndent > 0)
+                    if (_builder._sf.Alignment != StringAlignment.Near || _builder._lineIndent > 0 || _builder._firstLineIndent > 0)
                     {
-                        this._builder._firstLineIndent = 0;
-                        this._builder._lineIndent = 0;
-                        this._builder._sf.Alignment = StringAlignment.Near;
-                        this._builder._sb.Append("\\pard ");
+                        _builder._firstLineIndent = 0;
+                        _builder._lineIndent = 0;
+                        _builder._sf.Alignment = StringAlignment.Near;
+                        _builder._sb.Append("\\pard ");
                     }
                 }
                 if (disposing)
@@ -102,7 +102,7 @@ namespace RTF
 
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
             }
 
             #endregion

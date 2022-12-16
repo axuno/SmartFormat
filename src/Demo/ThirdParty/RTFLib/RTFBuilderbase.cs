@@ -54,36 +54,36 @@ namespace RTF
         {
 
             _rawFonts = new StringCollection();
-            this._font = IndexOfFont(defaultFont);
-            this._defaultFontSize = defaultFontSize;
-            this._fontSize = this._defaultFontSize;
-            this._defaultforecolor = SystemColors.WindowText;
-            this._defaultbackcolor = SystemColors.Window;
-            this._colortbl = new List <Color>();
-            this._colortbl.Add(this._defaultforecolor);
-            this._colortbl.Add(this._defaultbackcolor);
-            this._fontStyle = System.Drawing.FontStyle.Regular;
-            this._backcolor = this._defaultbackcolor;
-            this._forecolor = this._defaultforecolor;
-            this._sf = (StringFormat) StringFormat.GenericDefault.Clone();
-            this._sf.FormatFlags = StringFormatFlags.NoWrap;
-            this._sf.Trimming = StringTrimming.Word;
+            _font = IndexOfFont(defaultFont);
+            _defaultFontSize = defaultFontSize;
+            _fontSize = _defaultFontSize;
+            _defaultforecolor = SystemColors.WindowText;
+            _defaultbackcolor = SystemColors.Window;
+            _colortbl = new List <Color>();
+            _colortbl.Add(_defaultforecolor);
+            _colortbl.Add(_defaultbackcolor);
+            _fontStyle = System.Drawing.FontStyle.Regular;
+            _backcolor = _defaultbackcolor;
+            _forecolor = _defaultforecolor;
+            _sf = (StringFormat) StringFormat.GenericDefault.Clone();
+            _sf.FormatFlags = StringFormatFlags.NoWrap;
+            _sf.Trimming = StringTrimming.Word;
         }
         #endregion
         #region Public Properties
         public int Length
         {
-            get { return this.LengthInternal(); }
+            get { return LengthInternal(); }
         }
         public float DefaultFontSize
         {
             [DebuggerStepThrough]
-            get { return this._defaultFontSize; }
+            get { return _defaultFontSize; }
         }
         public Color Defaultforecolor
         {
             [DebuggerStepThrough]
-            get { return this._defaultforecolor; }
+            get { return _defaultforecolor; }
         }
         public List <RTFFont> Fonts
         {
@@ -93,7 +93,7 @@ namespace RTF
         public Color DefaultBackColor
         {
             [DebuggerStepThrough]
-            get { return this._defaultbackcolor; }
+            get { return _defaultbackcolor; }
         }
         #endregion
         #region Virtual Methods
@@ -111,7 +111,7 @@ namespace RTF
 
         ~RTFBuilderbase()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         #endregion
@@ -134,12 +134,12 @@ namespace RTF
         #region Public Methods
         public RTFBuilderbase Alignment(StringAlignment alignment)
         {
-            this._sf.Alignment = alignment;
+            _sf.Alignment = alignment;
             return this;
         }
         public RTFBuilderbase Append(string value)
         {
-            this.AppendInternal(value);
+            AppendInternal(value);
             return this;
         }
         public RTFBuilderbase Append(char[] value)
@@ -225,50 +225,50 @@ namespace RTF
         }
         public RTFBuilderbase AppendLevel(int level)
         {
-            this.AppendLevelInternal(level);
+            AppendLevelInternal(level);
             return this;
         }
         public RTFBuilderbase AppendLine(string value)
         {
-            this.AppendLineInternal(value);
+            AppendLineInternal(value);
             return this;
         }
         public RTFBuilderbase AppendLine()
         {
-            this.AppendLineInternal();
+            AppendLineInternal();
             return this;
         }
         [DebuggerStepThrough]
         public RTFBuilderbase AppendLineFormat(string format, object arg0)
         {
             string formated = string.Format(format, arg0);
-            return this.AppendLine(formated);
+            return AppendLine(formated);
         }
         [DebuggerStepThrough]
         public RTFBuilderbase AppendLineFormat(string format, params object[] args)
         {
             string formated = string.Format(format, args);
-            return this.AppendLine(formated);
+            return AppendLine(formated);
         }
         [DebuggerStepThrough]
         public RTFBuilderbase AppendLineFormat(string format, object arg0, object arg1, object arg2)
         {
             string formated = string.Format(format, arg0, arg1, arg2);
-            return this.AppendLine(formated);
+            return AppendLine(formated);
         }
         public RTFBuilderbase AppendPage()
         {
-            this.AppendPageInternal();
+            AppendPageInternal();
             return this;
         }
         public RTFBuilderbase AppendPara()
         {
-            this.AppendParaInternal();
+            AppendParaInternal();
             return this;
         }
         public RTFBuilderbase AppendRTF(string rtf)
         {
-            this.AppendRTFInternal(rtf);
+            AppendRTFInternal(rtf);
             return this;
         }
         /// <summary>
@@ -284,15 +284,15 @@ namespace RTF
                 {
                     try
                     {
-                        string rtfc = this.GetColoursFromRtf(rtf);
+                        string rtfc = GetColoursFromRtf(rtf);
                         string rtff = GetFontsFromRtf(rtfc);
                         string texttoadd = GetConcentratedText(rtff);
-                        this.AppendRTF(texttoadd);
+                        AppendRTF(texttoadd);
                     }
                     catch (ArgumentException ex)
                     {
-                        this.AppendLine("RTF Document ERROR:");
-                        this.AppendLine(ex.Message);
+                        AppendLine("RTF Document ERROR:");
+                        AppendLine(ex.Message);
                     }
                 }
             }
@@ -330,8 +330,8 @@ namespace RTF
                             int.TryParse(MatchResults.Groups["blue"].Captures[i].Value, out blueval))
                         {
                             Color c = Color.FromArgb(redval, greenval, blueval);
-                            int count = this._colortbl.Count;
-                            int index = this.IndexOf(c);
+                            int count = _colortbl.Count;
+                            int index = IndexOf(c);
                             if ((i + 1) == index)
                             {
                                 continue;
@@ -445,7 +445,7 @@ namespace RTF
                 int index = _rawFonts.IndexOf(font);
                 if (index < 0)
                 {
-                    return this._rawFonts.Add(font);
+                    return _rawFonts.Add(font);
                 }
                 return index;
             }
@@ -455,12 +455,12 @@ namespace RTF
         [DebuggerStepThrough]
         public RTFBuilderbase BackColor(KnownColor color)
         {
-            return this.BackColor(Color.FromKnownColor(color));
+            return BackColor(Color.FromKnownColor(color));
         }
         [DebuggerStepThrough]
         public RTFBuilderbase BackColor(Color color)
         {
-            this._backcolor = color;
+            _backcolor = color;
             return this;
         }
         public void Clear()
@@ -473,51 +473,51 @@ namespace RTF
         }
         public IEnumerable <RTFBuilderbase> EnumerateCells(RTFRowDefinition rowDefinition, RTFCellDefinition[] cellDefinitions)
         {
-            return this.EnumerateCellsInternal(rowDefinition, cellDefinitions);
+            return EnumerateCellsInternal(rowDefinition, cellDefinitions);
         }
         [DebuggerStepThrough]
         public RTFBuilderbase Font(RTFFont font)
         {
-           this._font = IndexOfFont(font);
+           _font = IndexOfFont(font);
            return this;
         }
         [DebuggerStepThrough]
         public RTFBuilderbase Font(int index)
         {
-            if (index >= 0 && index < this._rawFonts.Count)
+            if (index >= 0 && index < _rawFonts.Count)
             {
-                this._font = index;
+                _font = index;
             }
             return this;
         }
         [DebuggerStepThrough]
         public RTFBuilderbase FontSize(float fontSize)
         {
-            this._fontSize = fontSize;
+            _fontSize = fontSize;
             return this;
         }
         [DebuggerStepThrough]
         public RTFBuilderbase ForeColor(KnownColor color)
         {
-            this._forecolor = Color.FromKnownColor(color);
+            _forecolor = Color.FromKnownColor(color);
             return this;
         }
         [DebuggerStepThrough]
         public RTFBuilderbase ForeColor(Color color)
         {
-            this._forecolor = color;
+            _forecolor = color;
             return this;
         }
         public RTFBuilderbase ForeColor(int index)
         {
             index--;
-            if (index >= 0 && index < this._colortbl.Count)
+            if (index >= 0 && index < _colortbl.Count)
             {
-                this._forecolor = this._colortbl[index];
+                _forecolor = _colortbl[index];
             }
             else if (index < 0)
             {
-                this._forecolor = this._colortbl[0];
+                _forecolor = _colortbl[0];
             }
             return this;
         }
@@ -529,23 +529,23 @@ namespace RTF
         [DebuggerStepThrough]
         public RTFBuilderbase FontStyle(FontStyle fontStyle)
         {
-            this._fontStyle = fontStyle;
+            _fontStyle = fontStyle;
             return this;
         }
         [DebuggerStepThrough]
 
         public RTFBuilderbase FontStyleNOT(FontStyle fontStyle)
         {
-            if ((this._fontStyle & fontStyle) == fontStyle)
+            if ((_fontStyle & fontStyle) == fontStyle)
             {
-                this._fontStyle &= ~fontStyle;
+                _fontStyle &= ~fontStyle;
             }
             return this;
         }
         [DebuggerStepThrough]
         public RTFBuilderbase FontStyleOR(FontStyle fontStyle)
         {
-            this._fontStyle |= fontStyle;
+            _fontStyle |= fontStyle;
             return this;
         }
         /// <summary>
@@ -557,11 +557,11 @@ namespace RTF
         [DebuggerStepThrough]
         public int IndexOf(Color color)
         {
-            if (!this._colortbl.Contains(color))
+            if (!_colortbl.Contains(color))
             {
-                this._colortbl.Add(color);
+                _colortbl.Add(color);
             }
-            int index = this._colortbl.IndexOf(color) + 1;
+            int index = _colortbl.IndexOf(color) + 1;
             return index;
         }
         /// <summary>
@@ -572,43 +572,43 @@ namespace RTF
         [DebuggerStepThrough]
         public RTFBuilderbase InsertImage(Image image)
         {
-            this.InsertImageInternal(image);
+            InsertImageInternal(image);
             return this;
         }
         public RTFBuilderbase LineIndent(int indent)
         {
-            this._lineIndent = indent;
+            _lineIndent = indent;
             return this;
         }
         public RTFBuilderbase LineIndentFirst(int indent)
         {
-            this._firstLineIndent = indent;
+            _firstLineIndent = indent;
             return this;
         }
         [DebuggerStepThrough]
         public RTFBuilderbase PrependLineFormatIf(string format, ref bool appended, object arg0)
         {
             string formated = string.Format(format, arg0);
-            return this.PrependLineIf(formated, ref appended);
+            return PrependLineIf(formated, ref appended);
         }
         [DebuggerStepThrough]
         public RTFBuilderbase PrependLineFormatIf(string format, ref bool appended, params object[] args)
         {
             string formated = string.Format(format, args);
-            return this.PrependLineIf(formated, ref appended);
+            return PrependLineIf(formated, ref appended);
         }
         [DebuggerStepThrough]
         public RTFBuilderbase PrependLineFormatIf(string format, ref bool appended, object arg0, object arg1, object arg2)
         {
             string formated = string.Format(format, arg0, arg1, arg2);
-            return this.PrependLineIf(formated, ref appended);
+            return PrependLineIf(formated, ref appended);
         }
         [DebuggerStepThrough]
         public RTFBuilderbase PrependLineIf(ref bool appended)
         {
             if (appended)
             {
-                this.AppendLine();
+                AppendLine();
             }
             appended = true;
             return this;
@@ -618,7 +618,7 @@ namespace RTF
         {
             if (appended)
             {
-                this.AppendLine();
+                AppendLine();
                 Append(value);
             }
             else
@@ -630,7 +630,7 @@ namespace RTF
         }
         public RTFBuilderbase Reset()
         {
-            this.ResetInternal();
+            ResetInternal();
             return this;
         }
         #endregion
@@ -638,7 +638,7 @@ namespace RTF
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
         }
 
         #endregion
