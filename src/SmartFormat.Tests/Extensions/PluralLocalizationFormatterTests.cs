@@ -176,6 +176,22 @@ public class PluralLocalizationFormatterTests
     }
 
     [Test]
+    public void Test_Czech()
+    {
+        TestAllResults(
+            new CultureInfo("cs"),
+            "{0:plural:Nemáte zprávu|Máte {} zprávu|Přišly Vám {} zprávy|Přišlo Vám {} zpráv}!",
+            new ExpectedResults {
+                {   0, "Nemáte zprávu!"},
+                {   1, "Máte 1 zprávu!"},
+                {   2, "Přišly Vám 2 zprávy!"},
+                {   4, "Přišly Vám 4 zprávy!"},
+                {   5, "Přišlo Vám 5 zpráv!"},
+                {   6, "Přišlo Vám 6 zpráv!"},
+            });
+    }
+
+    [Test]
     public void Test_Polish()
     {
         TestAllResults(
