@@ -13,14 +13,14 @@ jobs:
     # (PRs from forks can't access secrets other than secrets.GITHUB_TOKEN for security reasons)
     if: ${{ !github.event.pull_request.head.repo.fork }}
     env:
-      version: '3.1.0'
-      versionFile: '3.1.0'
+      version: '3.2.1'
+      versionFile: '3.2.1'
     steps:
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0   # Shallow clones should be disabled for a better relevancy of analysis
       - name: Cache SonarCloud packages
@@ -60,7 +60,7 @@ jobs:
           echo "Packing Version: ${{ env.version }}, File Version: ${{ env.versionFile }}"
           dotnet pack ./src/SmartFormat.Deploy.sln /verbosity:minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:ContinuousIntegrationBuild=true /p:PackageOutputPath=${{ github.workspace }}/artifacts /p:Version=${{ env.version }} /p:FileVersion=${{ env.versionFile }}
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Packages_${{ env.version }}
           path: ${{ github.workspace }}/artifacts/

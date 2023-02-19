@@ -123,19 +123,24 @@ public class PluralLocalizationFormatter : IFormatter
         // We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
         // in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
         // 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
-        if (current is IConvertible convertible && current is not bool)
-            value = convertible.ToDecimal(null);
-        else if (current is IEnumerable<object> objects)
-            value = objects.Count();
-        else
-        {
-            // Auto detection calls just return a failure to evaluate
-            if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
-                return false;
 
-            // throw, if the formatter has been called explicitly
-            throw new FormatException(
-                $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' can format numbers and IEnumerables, but the argument was of type '{current?.GetType().ToString() ?? "null"}'");
+        switch (current)
+        {
+            case IConvertible convertible when current is not bool && TryGetDecimalValue(convertible, null, out value):
+                break;
+            case IEnumerable<object> objects:
+                value = objects.Count();
+                break;
+            default:
+            {
+                // Auto detection calls just return a failure to evaluate
+                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+                    return false;
+
+                // throw, if the formatter has been called explicitly
+                throw new FormatException(
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' can format numbers and IEnumerables, but the argument was of type '{current?.GetType().ToString() ?? "null"}'");
+            }
         }
 
         // Get the specific plural rule, or the default rule:
@@ -152,6 +157,20 @@ public class PluralLocalizationFormatter : IFormatter
         var pluralForm = pluralWords[pluralIndex];
         formattingInfo.FormatAsChild(pluralForm, current);
         return true;
+    }
+
+    private bool TryGetDecimalValue(IConvertible convertible, IFormatProvider? provider,  out decimal value)
+    {
+        try
+        {
+            value = convertible.ToDecimal(provider);
+            return true;
+        }
+        catch
+        {
+            value = default;
+            return false;
+        }
     }
 
     private static PluralRules.PluralRuleDelegate GetPluralRule(IFormattingInfo formattingInfo)
