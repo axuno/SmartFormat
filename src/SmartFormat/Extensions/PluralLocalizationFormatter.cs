@@ -159,7 +159,7 @@ public class PluralLocalizationFormatter : IFormatter
         return true;
     }
 
-    private bool TryGetDecimalValue(IConvertible convertible, IFormatProvider? provider,  out decimal value)
+    private static bool TryGetDecimalValue(IConvertible convertible, IFormatProvider? provider,  out decimal value)
     {
         try
         {
