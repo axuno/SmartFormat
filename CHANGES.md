@@ -1,6 +1,30 @@
 Latest Changes
 ====
 
+v3.2.1
+===
+
+### PluralLocalizationFormatter
+
+* Fix: Auto-detection of PluralLocalizationFormatter does not throw for values not convertible to decimal by @axunonb in https://github.com/axuno/SmartFormat/pull/330  Resolves #329 (Thanks to @BtbN)
+
+    * Current behavior, introduced in v3.2.0:
+    When `PluralLocalizationFormatter.CanAutoDetect == true`, values that are not convertible to `decimal` will throw then trying to `IConvertible.ToDecimal(...)`
+
+    * New behavior, equivalent to v3.1.0:
+    When `PluralLocalizationFormatter.CanAutoDetect == true`, for values that are not convertible to `decimal`, `IFormatter.TryEvaluateFormat(...)` will return `false`
+
+* Fix processing for Singular languages by @axunonb in https://github.com/axuno/SmartFormat/pull/322
+
+### Other Changes
+
+* EditorConfig and appveyor.yml by @axunonb in https://github.com/axuno/SmartFormat/pull/319
+* Integrate Cysharp.ZString release v2.5.0 (26 Oct 2022) by @axunonb in https://github.com/axuno/SmartFormat/pull/323
+* Fix: PluralRules for Czech locale by @alexheb in https://github.com/axuno/SmartFormat/pull/325
+* Fixes for Demo App and NUnit TestAdapter by @axunonb in https://github.com/axuno/SmartFormat/pull/328
+
+**Full Changelog**: https://github.com/axuno/SmartFormat/compare/v3.2.0...v3.2.1
+
 v3.2.0
 ===
 ### Enhancements
