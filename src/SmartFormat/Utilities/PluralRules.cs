@@ -355,7 +355,7 @@ public static class PluralRules
     /// <param name="twoLetterIsoLanguageName">The language code in two-letter ISO-639 format.</param>
     /// <remarks>
     /// The pluralization rules are taken from
-    /// http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/language_plural_rules.html
+    /// http://www.unicode.org/cldr/cldr-aux/charts/22/supplemental/language_plural_rules.html
     /// </remarks>
     public static PluralRuleDelegate GetPluralRule(string? twoLetterIsoLanguageName)
     {
