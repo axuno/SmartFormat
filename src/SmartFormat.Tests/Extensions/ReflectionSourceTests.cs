@@ -21,6 +21,19 @@ public class ReflectionSourceTests
         };
     }
 
+#if NET
+    [Test]
+    public void DateOnly_TimeOnly()
+    {
+        var date = new DateOnly(2023, 12, 31);
+        var time = new TimeOnly(23, 45, 56);
+
+        var result = Smart.Format("{0:dd.MM.yyyy} - {1:HH\\:mm\\:ss}", date, time);
+
+        Assert.That(result, Is.EqualTo("31.12.2023 - 23:45:56"));
+    }
+#endif
+
     [Test]
     public void Test_Properties()
     {
