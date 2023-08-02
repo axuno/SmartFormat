@@ -25,14 +25,14 @@ jobs:
         with:
           fetch-depth: 0   # Shallow clones should be disabled for a better relevancy of analysis
       - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
@@ -49,13 +49,13 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ github.event.repository.owner.login }}_SmartFormat" /o:"${{ github.event.repository.owner.login }}" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="**/SmartFormat.ZString/**/*" /d:sonar.cs.opencover.reportsPaths="./src/SmartFormat.Tests/**/coverage*.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ github.event.repository.owner.login }}_SmartFormat" /o:"${{ github.event.repository.owner.login }}" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="**/SmartFormat.ZString/**/*" /d:sonar.cs.opencover.reportsPaths="./src/SmartFormat.Tests/**/coverage*.xml"
           dotnet sln ./src/SmartFormat.sln remove ./src/Demo/Demo.csproj ./src/Demo.NetFramework/Demo.NetFramework.csproj ./src/Performance/Performance.csproj ./src/Performance_v27/Performance_v27.csproj 
           dotnet add ./src/SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
           dotnet restore ./src/SmartFormat.sln
           dotnet build ./src/SmartFormat.sln --no-restore /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:ContinuousIntegrationBuild=true /p:Version=${{ env.version }} /p:FileVersion=${{ env.versionFile }}
           dotnet test ./src/SmartFormat.sln --no-build --verbosity normal /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../SmartFormat/SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|SmartFormat.ZString|NUnit3.TestAdapter"
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: Pack
         run: |
           echo "Packing Version: ${{ env.version }}, File Version: ${{ env.versionFile }}"
