@@ -50,6 +50,7 @@ public class PluralLocalizationFormatterTests
     }
 
     [TestCase("")] // no string
+    [TestCase("1234")] // don't convert numeric string to decimal, see https://github.com/axuno/SmartFormat/issues/345
     [TestCase(false)] // no boolean
     [TestCase(3.40282347E+38f)] // float.MaxValue exceeds decimal.MaxValue
     public void Explicit_Formatter_Without_Valid_Argument_Should_Throw(object arg)

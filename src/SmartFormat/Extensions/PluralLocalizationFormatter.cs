@@ -126,7 +126,7 @@ public class PluralLocalizationFormatter : IFormatter
         */
         switch (current)
         {
-            case IConvertible convertible when convertible is not bool or string && TryGetDecimalValue(convertible, null, out value):
+            case IConvertible convertible when convertible is not (bool or string) && TryGetDecimalValue(convertible, null, out value):
                 break;
             case IEnumerable<object> objects:
                 value = objects.Count();
