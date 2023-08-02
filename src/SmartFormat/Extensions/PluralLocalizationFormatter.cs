@@ -14,6 +14,7 @@ namespace SmartFormat.Extensions;
 
 /// <summary>
 /// A class to format following culture specific pluralization rules.
+/// The maximum value the formatter can process is <see cref="decimal.MaxValue"/>.
 /// </summary>
 public class PluralLocalizationFormatter : IFormatter
 {
@@ -79,7 +80,7 @@ public class PluralLocalizationFormatter : IFormatter
     /// called by its name in the input format string.
     /// <para/>
     /// <b>Auto detection only works with more than 1 format argument.
-    /// Is recommended to set <see cref="CanAutoDetect"/> to <see langword="false"/>. This will be the default in a future version.
+    /// It is recommended to set <see cref="CanAutoDetect"/> to <see langword="false"/>. This will be the default in a future version.
     /// </b>
     /// </summary>
     /// <remarks>
@@ -102,31 +103,30 @@ public class PluralLocalizationFormatter : IFormatter
     {
         var format = formattingInfo.Format;
         var current = formattingInfo.CurrentValue;
-            
-        if (format == null) return false;
 
-        // Extract the plural words from the format string:
+        if (format == null) return false;
+            
+        // Extract the plural words from the format string
         var pluralWords = format.Split(SplitChar);
 
+        var useAutoDetection = string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName);
+
         // This extension requires at least two plural words for auto detection
-        // For locales
-        if (pluralWords.Count <= 1 && string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
-        {
-            // Auto detection calls just return a failure to evaluate
-            return false;
-        }
+        // Valid types for auto detection are checked later
+        if (useAutoDetection && pluralWords.Count <= 1) return false;
 
         decimal value;
 
-        // Check whether arguments can be handled by this formatter
-            
-        // We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
-        // in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
-        // 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
+        /*
+         Check whether arguments can be handled by this formatter:
 
+         We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
+         in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
+         'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
+        */
         switch (current)
         {
-            case IConvertible convertible when current is not bool && TryGetDecimalValue(convertible, null, out value):
+            case IConvertible convertible when convertible is not bool or string && TryGetDecimalValue(convertible, null, out value):
                 break;
             case IEnumerable<object> objects:
                 value = objects.Count();
@@ -134,12 +134,11 @@ public class PluralLocalizationFormatter : IFormatter
             default:
             {
                 // Auto detection calls just return a failure to evaluate
-                if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
-                    return false;
+                if (useAutoDetection) return false;
 
                 // throw, if the formatter has been called explicitly
-                throw new FormatException(
-                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' can format numbers and IEnumerables, but the argument was of type '{current?.GetType().ToString() ?? "null"}'");
+                throw new FormattingException(format,
+                    $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' can format numbers and IEnumerables, but the argument was of type '{current?.GetType().ToString() ?? "null"}'", 0);
             }
         }
 

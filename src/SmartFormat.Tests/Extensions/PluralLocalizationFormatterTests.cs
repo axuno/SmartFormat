@@ -49,6 +49,31 @@ public class PluralLocalizationFormatterTests
         Assert.That(() => smart.Format("{0:plural:One|Two}", new object()), Throws.Exception.TypeOf<FormattingException>());
     }
 
+    [TestCase("")] // no string
+    [TestCase(false)] // no boolean
+    [TestCase(3.40282347E+38f)] // float.MaxValue exceeds decimal.MaxValue
+    public void Explicit_Formatter_Without_Valid_Argument_Should_Throw(object arg)
+    {
+        var smart = Smart.CreateDefaultSmartFormat();
+        Assert.That(() => smart.Format("{0:plural:One|Two}", arg), Throws.Exception.TypeOf<FormattingException>(), "Invalid argument type or value");
+    }
+
+    [TestCase("String", "String")]
+    [TestCase(false, "other")]
+    [TestCase(default(string?), "other")]
+    public void AutoDetect_Formatter_Should_Not_Handle_bool_string_null(object arg, string expected)
+    {
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource())
+            .AddExtensions(new PluralLocalizationFormatter { CanAutoDetect = true },
+                new ConditionalFormatter { CanAutoDetect = true },
+                new DefaultFormatter());
+
+        // Result comes from ConditionalFormatter!
+        var result = smart.Format("{0:{}|other}", arg);
+        Assert.That(result, Is.EqualTo(expected));
+    }
+
     [TestCase(0)]
     [TestCase(1)]
     [TestCase(100)]
@@ -335,36 +360,6 @@ public class PluralLocalizationFormatterTests
                 new DefaultFormatter());
             
         var result = smart.Format(format, data);
-        Assert.That(result, Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void DoesNotHandle_Bool_WhenCanAutoDetect_IsTrue()
-    {
-        var smart = new SmartFormatter()
-            .AddExtensions(new DefaultSource())
-            .AddExtensions(new PluralLocalizationFormatter { CanAutoDetect = true }, // Should not handle the bool
-            new ConditionalFormatter { CanAutoDetect = true }, // Should handle the bool
-            new DefaultFormatter());
-
-        var result = smart.Format(new CultureInfo("ar"), "{0:yes|no}", true);
-        Assert.That(result, Is.EqualTo("yes"));
-    }
-
-    [TestCase("A", "[A]")]
-    [TestCase(default(string?), "null")]
-    public void DoesNotHandle_NonDecimalValues_WhenCanAutoDetect_IsTrue(string? category, string expected)
-    {
-        var smart = new SmartFormatter()
-            .AddExtensions(new DefaultSource())
-            .AddExtensions(new ReflectionSource())
-            // Should not handle because "Category" value cannot convert to decimal
-            .AddExtensions(new PluralLocalizationFormatter { CanAutoDetect = true },
-                // Should detect and handle the format
-                new ConditionalFormatter { CanAutoDetect = true },
-                new DefaultFormatter());
-
-        var result = smart.Format(new CultureInfo("en"), "{Category:[{}]|null}", new { Category = category });
         Assert.That(result, Is.EqualTo(expected));
     }
 }
