@@ -1,6 +1,11 @@
 Latest Changes
 ====
 
+v3.2.2
+===
+
+See https://github.com/axuno/SmartFormat/releases/tag/v3.2.2
+
 v3.2.1
 ===
 
