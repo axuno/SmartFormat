@@ -14,7 +14,7 @@ namespace SmartFormat.Extensions;
 
 /// <summary>
 /// A class to format following culture specific pluralization rules.
-/// The maximum value the formatter can process is <see cref="decimal.MaxValue"/>.
+/// The range of values the formatter can process is from <see cref="decimal.MinValue"/> to <see cref="decimal.MaxValue"/>.
 /// </summary>
 public class PluralLocalizationFormatter : IFormatter
 {
