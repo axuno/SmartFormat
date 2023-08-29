@@ -204,4 +204,17 @@ public class LocalizationFormatterTests
         var actual = smart.Format(CultureInfo.GetCultureInfo(cultureName), format, count);
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [TestCase("{:L:{ProductType}}", "en", "paper", "Paper")]
+    [TestCase("{:L:{ProductType}}", "de", "paper", "das Papier")]
+    [TestCase("{:L:{ProductType}}", "fr", "paper", "Papier")]
+    [TestCase("{:L:{ProductType}}", "en", "pen", "Pen")]
+    [TestCase("{:L:{ProductType}}", "de", "pen", "der Kugelschreiber")]
+    [TestCase("{:L:{ProductType}}", "fr", "pen", "Bic")]
+    public void Combine_With_Nesting(string format, string cultureName, string productType, string expected)
+    {
+        var smart = GetFormatterWithRegisteredResource();
+        var actual = smart.Format(CultureInfo.GetCultureInfo(cultureName), format, new { ProductType = productType });
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }

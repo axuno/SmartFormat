@@ -132,4 +132,10 @@
   <data name="{} items" xml:space="preserve">
     <value>{} Elemente</value>
   </data>
+  <data name="paper" xml:space="preserve">
+    <value>das Papier</value>
+  </data>
+  <data name="pen" xml:space="preserve">
+    <value>der Kugelschreiber</value>
+  </data>
 </root>

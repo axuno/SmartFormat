@@ -68,6 +68,14 @@ public class LocalizationFormatter : IFormatter, IInitializer
         // Get the localized string
         var localized = LocalizationProvider!.GetString(formattingInfo.Format!.RawText, cultureInfo);
 
+        // Try formatting if localized string was not found, but a format has nested items
+        if (localized is null && formattingInfo.Format!.HasNested)
+        {
+            var formatted = _formatter!.Format(formattingInfo.Format!.RawText, formattingInfo.CurrentValue);
+
+            localized = LocalizationProvider!.GetString(formatted, cultureInfo);
+        }
+
         if (localized is null) throw new LocalizationFormattingException(formattingInfo.Format, $"No localized string found for '{formattingInfo.Format!.RawText}'", formattingInfo.Format.StartIndex);
             
         // Use an existing Format from the cache
