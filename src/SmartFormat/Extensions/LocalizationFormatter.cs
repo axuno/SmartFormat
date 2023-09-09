@@ -6,7 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
+using SmartFormat.Pooling.SmartPools;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions;
@@ -67,6 +69,21 @@ public class LocalizationFormatter : IFormatter, IInitializer
 
         // Get the localized string
         var localized = LocalizationProvider!.GetString(formattingInfo.Format!.RawText, cultureInfo);
+
+        // Try formatting if localized string was not found, but a format has nested items
+        if (localized is null && formattingInfo.Format!.HasNested)
+        {
+            using var zsOutput = new ZStringOutput(ZStringBuilderExtensions.CalcCapacity(formattingInfo.Format));
+
+            var localizableFormatDetails = FormatDetailsPool.Instance.Get().Initialize(_formatter!,
+                formattingInfo.Format, InitializationObject.ObjectList, null, zsOutput);
+            var localizableFormattingInfo = FormattingInfoPool.Instance.Get().Initialize(localizableFormatDetails,
+                formattingInfo.Format, formattingInfo.CurrentValue);
+
+            _formatter!.Format(localizableFormattingInfo);
+
+            localized = LocalizationProvider!.GetString(zsOutput.ToString(), cultureInfo);
+        }
 
         if (localized is null) throw new LocalizationFormattingException(formattingInfo.Format, $"No localized string found for '{formattingInfo.Format!.RawText}'", formattingInfo.Format.StartIndex);
             
