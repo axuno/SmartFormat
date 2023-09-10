@@ -5,7 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using SmartFormat.Utilities;
 using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions;
@@ -53,40 +53,14 @@ public class DictionarySource : Source
             return true;
         }
 
-        // This is for IReadOnlyDictionary<,>
-        var currentType = current.GetType();
-        if (IsDictionary(currentType))
+        // This is for IReadOnlyDictionary<,> using Reflection
+        if (ReflectionUtils.TryGetDictionaryValue(current.GetType(), current, selector,
+                selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison(), out var value))
         {
-            if (currentType.GetProperty("Keys")?.GetValue(current) is not IEnumerable keys)
-                return false;
-
-            foreach (var key in keys)
-            {
-                if (!key.ToString()
-                        .Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
-                    continue;
-
-                selectorInfo.Result = currentType.GetProperty("Item")?.GetValue(current, new [] { key });
-                return true;
-            }
+            selectorInfo.Result = value;
+            return true;
         }
         
         return false;
-    }
-
-    private static readonly List<Type> DictionaryInterfaces = new() {
-        typeof(IDictionary<,>), // 1
-        typeof(IDictionary), // 2
-        typeof(IReadOnlyDictionary<,>) // 3
-    };
-    private static bool IsDictionary(Type type)
-    {
-        return DictionaryInterfaces
-            .Exists(dictInterface =>
-                dictInterface == type || // 1
-                (type.IsGenericType && dictInterface == type.GetGenericTypeDefinition()) || // 2
-                type.GetInterfaces().ToList().Exists(typeInterface => // 3
-                    typeInterface == dictInterface ||
-                    (typeInterface.IsGenericType && dictInterface == typeInterface.GetGenericTypeDefinition())));
     }
 }

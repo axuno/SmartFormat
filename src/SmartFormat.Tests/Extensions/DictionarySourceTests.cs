@@ -6,6 +6,7 @@ using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions;
 
@@ -159,11 +160,25 @@ public class DictionarySourceTests
     }
 
     [Test]
+    public void Generic_Dictionary_String_String()
+    {
+        var dict = new Dictionary<string, string> { { "Name", "Joe" } };
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), new DictionarySource())
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{Name}", dict);
+
+        Assert.That(result, Is.EqualTo("Joe"));
+    }
+
+    [Test]
     public void IReadOnlyDictionary_With_IConvertible_Key()
     {
         var roDict = new CustomReadOnlyDictionary<IConvertible, object?>(new Dictionary<IConvertible, object?> { { 1, 1 }, { "Two", 2 }, { "Three", "three" }, });
-        var formatter = Smart.CreateDefaultSmartFormat();
-        var result = formatter.Format("{1}{Two}{Three}", roDict);
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), new DictionarySource())
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{1}{Two}{Three}", roDict);
 
         Assert.That(result, Is.EqualTo("12three"));
     }
@@ -172,10 +187,23 @@ public class DictionarySourceTests
     public void IReadOnlyDictionary_With_String_Key()
     {
         var roDict = new CustomReadOnlyDictionary<string, object?>(new Dictionary<string, object?> { { "One", 1 }, { "Two", 2 }, { "Three", "three" }, });
-        var formatter = Smart.CreateDefaultSmartFormat();
-        var result = formatter.Format("{One}{Two}{Three}", roDict);
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), new DictionarySource())
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{One}{Two}{Three}", roDict);
 
         Assert.That(result, Is.EqualTo("12three"));
+    }
+
+    [TestCase("key", "value")]
+    [TestCase("nokey", null)]
+    public void Get_GenericDictionary_Value(string key, string? expected)
+    {
+        var dict = new Dictionary<string, object> { { "key", "value" } };
+        var success = ReflectionUtils.TryGetDictionaryValue(dict.GetType(), dict, key, StringComparison.Ordinal, out var value);
+
+        Assert.That(success, Is.EqualTo(expected != null));
+        Assert.That(value, Is.EqualTo(expected));
     }
 
     public class CustomReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue?>
