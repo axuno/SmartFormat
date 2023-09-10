@@ -74,7 +74,7 @@ public class DictionarySource : Source
         return false;
     }
 
-    private static readonly Type[] DictionaryInterfaces = {
+    private static readonly List<Type> DictionaryInterfaces = new() {
         typeof(IDictionary<,>), // 1
         typeof(IDictionary), // 2
         typeof(IReadOnlyDictionary<,>) // 3
@@ -82,10 +82,10 @@ public class DictionarySource : Source
     private static bool IsDictionary(Type type)
     {
         return DictionaryInterfaces
-            .Any(dictInterface =>
+            .Exists(dictInterface =>
                 dictInterface == type || // 1
                 (type.IsGenericType && dictInterface == type.GetGenericTypeDefinition()) || // 2
-                type.GetInterfaces().Any(typeInterface => // 3
+                type.GetInterfaces().ToList().Exists(typeInterface => // 3
                     typeInterface == dictInterface ||
                     (typeInterface.IsGenericType && dictInterface == typeInterface.GetGenericTypeDefinition())));
     }
