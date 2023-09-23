@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
@@ -176,7 +177,7 @@ public class DictionarySourceTests
     {
         var roDict = new CustomReadOnlyDictionary<IConvertible, object?>(new Dictionary<IConvertible, object?> { { 1, 1 }, { "Two", 2 }, { "Three", "three" }, });
         var smart = new SmartFormatter()
-            .AddExtensions(new DefaultSource(), new DictionarySource())
+            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionaryEnabled = true })
             .AddExtensions(new DefaultFormatter());
         var result = smart.Format("{1}{Two}{Three}", roDict);
 
@@ -188,22 +189,27 @@ public class DictionarySourceTests
     {
         var roDict = new CustomReadOnlyDictionary<string, object?>(new Dictionary<string, object?> { { "One", 1 }, { "Two", 2 }, { "Three", "three" }, });
         var smart = new SmartFormatter()
-            .AddExtensions(new DefaultSource(), new DictionarySource())
+            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionaryEnabled = true })
             .AddExtensions(new DefaultFormatter());
         var result = smart.Format("{One}{Two}{Three}", roDict);
 
         Assert.That(result, Is.EqualTo("12three"));
     }
 
-    [TestCase("key", "value")]
-    [TestCase("nokey", null)]
-    public void Get_GenericDictionary_Value(string key, string? expected)
+    [Test]
+    public void IReadOnlyDictionary_Cache_Should_Store_Types_It_Cannot_Handle()
     {
-        var dict = new Dictionary<string, object> { { "key", "value" } };
-        var success = ReflectionUtils.TryGetDictionaryValue(dict.GetType(), dict, key, StringComparison.Ordinal, out var value);
+        var dictSource = new DictionarySource { IsIReadOnlyDictionaryEnabled = true };
+        var kvp = new KeyValuePair<string, object?>("One", 1);
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), dictSource, new KeyValuePairSource())
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{One}", kvp);
 
-        Assert.That(success, Is.EqualTo(expected != null));
-        Assert.That(value, Is.EqualTo(expected));
+        Assert.That(result, Is.EqualTo("1"));
+        Assert.That(dictSource.RoDictionaryTypeCache.Keys.Count, Is.EqualTo(1));
+        Assert.That(dictSource.RoDictionaryTypeCache.Keys.First(), Is.EqualTo(typeof(KeyValuePair<string, object?>)));
+        Assert.That(dictSource.RoDictionaryTypeCache.Values.First(), Is.Null);
     }
 
     public class CustomReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue?>
