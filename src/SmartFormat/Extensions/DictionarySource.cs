@@ -18,7 +18,7 @@ namespace SmartFormat.Extensions;
 /// and <see cref="IReadOnlyDictionary{TKey,TValue}"/>.
 /// Include this source, if any of these types shall be used.
 /// <para/>
-/// For support of <see cref="IReadOnlyDictionary{TKey,TValue}"/> <see cref="IsIReadOnlyDictionaryEnabled"/> must be set to <see langword="true"/>.
+/// For support of <see cref="IReadOnlyDictionary{TKey,TValue}"/> <see cref="IsIReadOnlyDictionarySupported"/> must be set to <see langword="true"/>.
 /// This uses Reflection and is slower than the other types despite caching.
 /// </summary>
 public class DictionarySource : Source
@@ -59,7 +59,7 @@ public class DictionarySource : Source
         }
         
         // This is for IReadOnlyDictionary<,> using Reflection
-        if (IsIReadOnlyDictionaryEnabled && TryGetDictionaryValue(current, selector,
+        if (IsIReadOnlyDictionarySupported && TryGetDictionaryValue(current, selector,
                 selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison(), out var value))
         {
             selectorInfo.Result = value;
@@ -89,7 +89,7 @@ public class DictionarySource : Source
     /// Although caching is used, this is still slower than the other types.
     /// Default is <see langword="false"/>.
     /// </summary>
-    public bool IsIReadOnlyDictionaryEnabled { get; set; } = false;
+    public bool IsIReadOnlyDictionarySupported { get; set; } = false;
     
     private bool TryGetDictionaryValue(object obj, string key, StringComparison comparison, out object? value)
     {

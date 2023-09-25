@@ -177,7 +177,7 @@ public class DictionarySourceTests
     {
         var roDict = new CustomReadOnlyDictionary<IConvertible, object?>(new Dictionary<IConvertible, object?> { { 1, 1 }, { "Two", 2 }, { "Three", "three" }, });
         var smart = new SmartFormatter()
-            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionaryEnabled = true })
+            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionarySupported = true })
             .AddExtensions(new DefaultFormatter());
         var result = smart.Format("{1}{Two}{Three}", roDict);
 
@@ -189,7 +189,7 @@ public class DictionarySourceTests
     {
         var roDict = new CustomReadOnlyDictionary<string, object?>(new Dictionary<string, object?> { { "One", 1 }, { "Two", 2 }, { "Three", "three" }, });
         var smart = new SmartFormatter()
-            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionaryEnabled = true })
+            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionarySupported = true })
             .AddExtensions(new DefaultFormatter());
         var result = smart.Format("{One}{Two}{Three}", roDict);
 
@@ -199,7 +199,7 @@ public class DictionarySourceTests
     [Test]
     public void IReadOnlyDictionary_Cache_Should_Store_Types_It_Cannot_Handle()
     {
-        var dictSource = new DictionarySource { IsIReadOnlyDictionaryEnabled = true };
+        var dictSource = new DictionarySource { IsIReadOnlyDictionarySupported = true };
         var kvp = new KeyValuePair<string, object?>("One", 1);
         var smart = new SmartFormatter()
             .AddExtensions(new DefaultSource(), dictSource, new KeyValuePairSource())
