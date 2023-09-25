@@ -1,89 +1,10 @@
 Latest Changes
 ====
 
-v3.2.2
+Changes after v3.0.0
 ===
 
-See https://github.com/axuno/SmartFormat/releases/tag/v3.2.2
-
-v3.2.1
-===
-
-### PluralLocalizationFormatter
-
-* Fix: Auto-detection of PluralLocalizationFormatter does not throw for values not convertible to decimal by @axunonb in https://github.com/axuno/SmartFormat/pull/330  Resolves #329 (Thanks to @BtbN)
-
-    * Current behavior, introduced in v3.2.0:
-    When `PluralLocalizationFormatter.CanAutoDetect == true`, values that are not convertible to `decimal` will throw then trying to `IConvertible.ToDecimal(...)`
-
-    * New behavior, equivalent to v3.1.0:
-    When `PluralLocalizationFormatter.CanAutoDetect == true`, for values that are not convertible to `decimal`, `IFormatter.TryEvaluateFormat(...)` will return `false`
-
-* Fix processing for Singular languages by @axunonb in https://github.com/axuno/SmartFormat/pull/322
-
-### Other Changes
-
-* EditorConfig and appveyor.yml by @axunonb in https://github.com/axuno/SmartFormat/pull/319
-* Integrate Cysharp.ZString release v2.5.0 (26 Oct 2022) by @axunonb in https://github.com/axuno/SmartFormat/pull/323
-* Fix: PluralRules for Czech locale by @alexheb in https://github.com/axuno/SmartFormat/pull/325
-* Fixes for Demo App and NUnit TestAdapter by @axunonb in https://github.com/axuno/SmartFormat/pull/328
-
-**Full Changelog**: https://github.com/axuno/SmartFormat/compare/v3.2.0...v3.2.1
-
-v3.2.0
-===
-### Enhancements
-
-* Remove usage of Linq for less GC
-* Add `IConvertable` support for `PluralLocalizationFormatter` and `ConditionalFormatter`
-* `ListFormatter`
-  * ListFormatter handles selector name "Index" in `IEnumerable`s and `IList`s: In `v1.6.1` a Selector was tested for having the name **"index"**, even if data was not an `IList`, and returned the `CollectionIndex`. This is now implemented again in the `ListFormatter.TryEvaluateSelector(...)`
-  * Set the `ParentPlaceholder` property for item `Format`s
-  * Use `PooledObject<T>` where possible, so objects will be returned to `ObjectPool` also in case of exceptions
-
-### Fixes
-* `FormatItem.AsSpan()` returns the correct name
-* Remove potential namespace collisions: All public types in namespace `Cysharp.Text` are now internal
-
-
-v3.1.0
-===
-
-This is a feature update, that is released upon feedback from the community.
-
-### Thread-safe Mode
-
-Thread-safe mode is now enabled by default:
-`SmartSettings.IsThreadSafeMode == true`.<br/>
-This has no impact on the API.
-
-In case *SmartFormat* is *exclusively* utilized in a single-threaded context, `SmartSettings.IsThreadSafeMode=false` should be considered for enhanced performance.
-
-### Static `Smart` Methods for Formatting
-
-Static `Smart` methods like Smart.Format(*format*, *args*) can now be called in an `async` / multi-threaded context.
-
-The `SmartFormatter` instance returned by `Smart.Default` is flagged with the `ThreadStatic` attribute.
-
-### `ListFormatter` may have Placeholders in "spacers"
-
-Thanks to **[karljj1](https://github.com/axuno/SmartFormat/commits?author=karljj1)** for the PR.
-
-Before *v3.1.0* the format options for `ListFormatter` could only contain literal text. Now `Placeholder`s are allowed.
-
-#### Example:
-
-```CSharp
-var args = new {
-    Names = new[] { "John", "Mary", "Amy" },
-    IsAnd = true, // true or false
-    Split = ", "  // comma and space as list separator
-};
-_ = Smart.Format("{Names:list:{}|{Split}| {IsAnd:and|nor} }", args);
-// Output for "IsAnd=true":  "John, Mary and Amy"
-// Output for "IsAnd=false": "John, Mary nor Amy"
-```
-<br/>
+Please see release notes for all versions after v3.0.0 on https://github.com/axuno/SmartFormat/releases/
 
 v3.0.0
 ===
