@@ -10,8 +10,8 @@ It uses extensions to provide named placeholders, localization, pluralization, g
         <AssemblyTitle>SmartFormat.Extensions.Xml</AssemblyTitle>
         <AssemblyName>SmartFormat.Extensions.Xml</AssemblyName>
         <PackageId>SmartFormat.Extensions.Xml</PackageId>
-        <PackageReleaseNotes>See the change log for the main project at
-            https://github.com/axuno/SmartFormat/blob/main/CHANGES.md
+        <PackageReleaseNotes>Please see release notes on 
+https://github.com/axuno/SmartFormat/releases/
         </PackageReleaseNotes>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageLicenseFile></PackageLicenseFile>
