@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
+using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions;
 
@@ -154,6 +158,96 @@ public class DictionarySourceTests
         var result = smart.Format(format, addrDict);
 
         Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Generic_Dictionary_String_String()
+    {
+        var dict = new Dictionary<string, string> { { "Name", "Joe" } };
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), new DictionarySource())
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{Name}", dict);
+
+        Assert.That(result, Is.EqualTo("Joe"));
+    }
+
+    [Test]
+    public void IReadOnlyDictionary_With_IConvertible_Key()
+    {
+        var roDict = new CustomReadOnlyDictionary<IConvertible, object?>(new Dictionary<IConvertible, object?> { { 1, 1 }, { "Two", 2 }, { "Three", "three" }, });
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionarySupported = true })
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{1}{Two}{Three}", roDict);
+
+        Assert.That(result, Is.EqualTo("12three"));
+    }
+
+    [Test]
+    public void IReadOnlyDictionary_With_String_Key()
+    {
+        var roDict = new CustomReadOnlyDictionary<string, object?>(new Dictionary<string, object?> { { "One", 1 }, { "Two", 2 }, { "Three", "three" }, });
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), new DictionarySource { IsIReadOnlyDictionarySupported = true })
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{One}{Two}{Three}", roDict);
+
+        Assert.That(result, Is.EqualTo("12three"));
+    }
+
+    [Test]
+    public void IReadOnlyDictionary_Cache_Should_Store_Types_It_Cannot_Handle()
+    {
+        var dictSource = new DictionarySource { IsIReadOnlyDictionarySupported = true };
+        var kvp = new KeyValuePair<string, object?>("One", 1);
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), dictSource, new KeyValuePairSource())
+            .AddExtensions(new DefaultFormatter());
+        var result = smart.Format("{One}", kvp);
+
+        Assert.That(result, Is.EqualTo("1"));
+        Assert.That(dictSource.RoDictionaryTypeCache.Keys.Count, Is.EqualTo(1));
+        Assert.That(dictSource.RoDictionaryTypeCache.Keys.First(), Is.EqualTo(typeof(KeyValuePair<string, object?>)));
+        Assert.That(dictSource.RoDictionaryTypeCache.Values.First(), Is.Null);
+    }
+
+    public class CustomReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue?>
+    {
+        private readonly IDictionary<TKey, TValue?> _dictionary;
+
+        public CustomReadOnlyDictionary(IDictionary<TKey, TValue?> dictionary)
+        {
+            _dictionary = dictionary;
+        }
+
+        public IEnumerator<KeyValuePair<TKey, TValue?>> GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public int Count => _dictionary.Count;
+
+        public bool ContainsKey(TKey key)
+        {
+            return _dictionary.ContainsKey(key);
+        }
+
+        public bool TryGetValue(TKey key, out TValue? value)
+        {
+            return _dictionary.TryGetValue(key, out value);
+        }
+
+        public TValue? this[TKey key] => _dictionary[key];
+
+        public IEnumerable<TKey> Keys => _dictionary.Keys;
+
+        public IEnumerable<TValue?> Values => _dictionary.Values;
     }
 
     public class Address
