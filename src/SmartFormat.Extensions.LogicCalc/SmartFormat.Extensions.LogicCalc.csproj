@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>This package is a SmartFormat extension to evaluate for mathematical expressions.
+
+SmartFormat is a lightweight text templating library written in C#.
+It can format various data sources into a string with a minimal, intuitive syntax similar to string.Format.
+It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
+        </Description>
+        <AssemblyTitle>SmartFormat.Extensions.LogicCalc</AssemblyTitle>
+        <AssemblyName>SmartFormat.Extensions.LogicCalc</AssemblyName>
+        <PackageId>SmartFormat.Extensions.LogicCalc</PackageId>
+        <PackageReleaseNotes>See the change log for the main project at
+            https://github.com/axuno/SmartFormat/blob/main/CHANGES.md
+        </PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseFile></PackageLicenseFile>
+        <PackageLicenseUrl></PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
+        <PackageIcon>SmartFormat_365x365.png</PackageIcon>
+        <PackageTags>string-format stringformat template templating string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net60</TargetFrameworks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Nullable>enable</Nullable>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
+        <DelaySign>False</DelaySign>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+        <None Include="../../PkgReadMe.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <!-- Added to include SmartFormat.ZString.dll into the nuget package -->
+    <!-- BuildOnlySettings will add XML-docs to *.nupkg, and PDBs to *.snupkg (if generated) -->
+    <!-- The order of DependsOnTargets arguments is important  -->
+    <Target DependsOnTargets="BuildOnlySettings;ResolveReferences" Name="CopyProjectReferencesToPackage">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+        </ItemGroup>
+    </Target>
+
+    <ItemGroup>
+        <PackageReference Include="Brutal.Dev.StrongNameSigner" Version="3.1.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NCalcSync" Version="3.5.0" GeneratePathProperty="true" />
+    </ItemGroup>
+
+</Project>
