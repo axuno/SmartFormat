@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SmartFormat.Extensions.LogiCalc\SmartFormat.Extensions.LogiCalc.csproj" />
     <ProjectReference Include="..\SmartFormat.Net\SmartFormat.Net.csproj" />
     <ProjectReference Include="..\SmartFormat.Tests\SmartFormat.Tests.csproj" />
   </ItemGroup>

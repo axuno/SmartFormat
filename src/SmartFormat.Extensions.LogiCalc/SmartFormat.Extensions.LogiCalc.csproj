@@ -58,12 +58,12 @@ It uses extensions to provide named placeholders, localization, pluralization, g
     </Target>
 
     <ItemGroup>
-        <PackageReference Include="Brutal.Dev.StrongNameSigner" Version="3.1.1" />
+        <PackageReference Include="Brutal.Dev.StrongNameSigner" Version="3.4.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="NCalcSync" Version="3.5.0" GeneratePathProperty="true" />
+        <PackageReference Include="NCalcSync" Version="3.8.0" GeneratePathProperty="true" />
         <PackageReference Include="System.Memory" Version="4.5.5" />
     </ItemGroup>
 
