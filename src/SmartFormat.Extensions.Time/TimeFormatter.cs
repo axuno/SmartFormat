@@ -203,7 +203,7 @@ public class TimeFormatter : IFormatter
 
         if (timeTextInfoFromCulture != null) return timeTextInfoFromCulture;
 
-        if(timeTextInfoFromCulture is null && FallbackLanguage == string.Empty)
+        if(FallbackLanguage == string.Empty)
             throw new FormattingException(formattingInfo.Placeholder, $"{nameof(TimeTextInfo)} could not be found for the given culture argument '{formattingInfo.FormatterOptions}'.", 0);
 
         if(FallbackLanguage != string.Empty)

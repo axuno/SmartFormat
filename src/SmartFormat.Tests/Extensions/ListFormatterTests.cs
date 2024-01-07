@@ -170,13 +170,11 @@ public class ListFormatterTests
     [Test, Description("Format a list of lists")]
     public void List_Of_Lists_With_Element_Format()
     {
-#pragma warning disable CA1861 // Not called repeatedly, but called with different arguments
         var data = new List<int[]> {
             new[] { 1, 2, 3 },
             new[] { 4, 5, 6 },
             new[] { 7, 8, 9 }
         };
-#pragma warning restore CA1861
 
         var formatter = new SmartFormatter()
             .AddExtensions(new ListFormatter(), new DefaultSource())

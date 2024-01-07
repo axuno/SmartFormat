@@ -19,7 +19,7 @@ public class ConditionalFormatter : IFormatter
     private static readonly Regex _complexConditionPattern
         = new(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
             //   Description:      and/or    comparator     value
-            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
 
     private char _splitChar = '|';
 
@@ -127,7 +127,7 @@ public class ConditionalFormatter : IFormatter
             case DateTime dateTimeArg when dateTimeArg.ToUniversalTime() <= SystemTime.Now().ToUniversalTime():
                 paramIndex = 0;
                 break;
-            case DateTime dateTimeArg:
+            case DateTime:
                 paramIndex = paramCount - 1;
                 break;
             // Date: Past|Present|Future   or   Past/Present|Future

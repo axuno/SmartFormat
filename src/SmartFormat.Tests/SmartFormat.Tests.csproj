@@ -29,12 +29,14 @@
 	</ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <NoWarn>$(NoWarn);CA1861</NoWarn>
         <WarningLevel>4</WarningLevel>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <WarningLevel>3</WarningLevel>
+        <NoWarn>$(NoWarn);CA1861</NoWarn>
+        <WarningLevel>4</WarningLevel>
         <DefineConstants>RELEASE</DefineConstants>
     </PropertyGroup>
 

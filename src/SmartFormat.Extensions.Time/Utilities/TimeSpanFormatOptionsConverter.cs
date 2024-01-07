@@ -2,6 +2,7 @@
 // Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -10,9 +11,8 @@ namespace SmartFormat.Extensions.Time.Utilities;
 internal static class TimeSpanFormatOptionsConverter
 {
     private static readonly Regex parser =
-        new Regex(
-            @"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        new(@"\b(w|week|weeks|d|day|days|h|hour|hours|m|minute|minutes|s|second|seconds|ms|millisecond|milliseconds|auto|short|fill|full|abbr|noabbr|less|noless)\b",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(500));
 
     public static TimeSpanFormatOptions Merge(this TimeSpanFormatOptions left, TimeSpanFormatOptions right)
     {

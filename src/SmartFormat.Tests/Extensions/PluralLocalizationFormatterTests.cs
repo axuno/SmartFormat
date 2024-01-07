@@ -270,7 +270,6 @@ public class PluralLocalizationFormatterTests
         Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
 
-#pragma warning disable CA1861 // Not called repeatedly, but called with different arguments
     [TestCase("{0:plural:zero|one|many}", new string[0], "zero")]
     [TestCase("{0:plural:zero|one|many}", new[] { "alice" }, "one")]
     [TestCase("{0:plural:zero|one|many}", new[] { "alice", "bob" }, "many")]
@@ -281,7 +280,6 @@ public class PluralLocalizationFormatterTests
         var actualResult = smart.Format(culture, format, arg0);
         Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
-#pragma warning restore CA1861
 
     [Test]
     public void Test_With_CustomPluralRuleProvider()
