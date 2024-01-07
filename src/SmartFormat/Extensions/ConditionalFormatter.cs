@@ -19,7 +19,7 @@ public class ConditionalFormatter : IFormatter
     private static readonly Regex _complexConditionPattern
         = new(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
             //   Description:      and/or    comparator     value
-            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
 
     private char _splitChar = '|';
 

@@ -77,7 +77,7 @@ public class IsMatchFormatter : IFormatter, IInitializer
                 $"Formatter named '{formattingInfo.Placeholder?.FormatterName}' requires at least 2 format options.");
         }
 
-        var regEx = new Regex(expression, RegexOptions);
+        var regEx = new Regex(expression, RegexOptions, TimeSpan.FromMilliseconds(500));
         var match = regEx.Match(formattingInfo.CurrentValue.ToString());
 
         if (!match.Success)
