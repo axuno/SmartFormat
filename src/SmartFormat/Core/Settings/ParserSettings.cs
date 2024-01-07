@@ -82,7 +82,7 @@ public class ParserSettings
     {
         foreach (var c in characters)
         {
-            if(DisallowedSelectorChars().Where(_ => OperatorChars().All(ch => ch != c)).Contains(c) ||
+            if(DisallowedSelectorChars().Where(_ => OperatorChars().TrueForAll(ch => ch != c)).Contains(c) ||
                SelectorChars().Contains(c) || CustomSelectorChars().Contains(c))
                 throw new ArgumentException($"Cannot add '{c}' as a custom operator character. It is disallowed or in use as a selector.");
 

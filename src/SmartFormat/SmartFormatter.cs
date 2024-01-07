@@ -95,7 +95,7 @@ public class SmartFormatter
             _ = InsertExtension(index, source);
 
             // Also add the class as a formatter, if possible
-            if (source is IFormatter formatter && FormatterExtensions.All(fx => fx.GetType() != formatter.GetType())) AddExtensions(formatter);
+            if (source is IFormatter formatter && FormatterExtensions.TrueForAll(fx => fx.GetType() != formatter.GetType())) AddExtensions(formatter);
         }
 
         return this;
@@ -123,7 +123,7 @@ public class SmartFormatter
             _ = InsertExtension(index, formatter);
 
             // Also add the class as a source, if possible
-            if (formatter is ISource source && SourceExtensions.All(sx => sx.GetType() != source.GetType())) AddExtensions(source);
+            if (formatter is ISource source && SourceExtensions.TrueForAll(sx => sx.GetType() != source.GetType())) AddExtensions(source);
         }
 
         return this;
@@ -144,7 +144,7 @@ public class SmartFormatter
     /// </exception>
     public SmartFormatter InsertExtension(int position, ISource sourceExtension)
     {
-        if (_sourceExtensions.Any(sx => sx.GetType() == sourceExtension.GetType())) return this;
+        if (_sourceExtensions.Exists(sx => sx.GetType() == sourceExtension.GetType())) return this;
 
         if (sourceExtension is IInitializer sourceToInitialize)
             sourceToInitialize.Initialize(this);
@@ -169,10 +169,10 @@ public class SmartFormatter
     /// </exception>
     public SmartFormatter InsertExtension(int position, IFormatter formatterExtension)
     {
-        if (_formatterExtensions.Any(sx => sx.GetType() == formatterExtension.GetType())) return this;
+        if (_formatterExtensions.Exists(sx => sx.GetType() == formatterExtension.GetType())) return this;
 
         // Extension name is in use by a different type
-        if(_formatterExtensions.Any(fx => fx.Name.Equals(formatterExtension.Name)))
+        if(_formatterExtensions.Exists(fx => fx.Name.Equals(formatterExtension.Name)))
             throw new ArgumentException($"Formatter '{formatterExtension.GetType().Name}' uses existing name.", nameof(formatterExtension));
 
         if (formatterExtension is IInitializer formatterToInitialize)
