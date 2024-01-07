@@ -63,8 +63,11 @@ public class NullFormatterTests
     public void FormatOption_Should_Only_Be_Output_If_Argument_Is_Null(object? value, string formats, string expected)
     {
         var smart = GetFormatter();
-        Assert.That(smart.Format("{TheValue:isnull:" + formats + "}", new {TheValue = value}), Is.EqualTo(expected));
-        Assert.That(smart.Format("{0:isnull:" + formats + "}", value), Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(smart.Format("{TheValue:isnull:" + formats + "}", new { TheValue = value }), Is.EqualTo(expected));
+            Assert.That(smart.Format("{0:isnull:" + formats + "}", value), Is.EqualTo(expected));
+        });
     }
 
     [TestCase(null, 0, "Was null")] // first choose formatter

@@ -29,7 +29,7 @@ public class NestingTests
     {
         var smart = Smart.CreateDefaultSmartFormat();
         var actual = smart.Format(format, _data);
-        Assert.AreEqual(expectedOutput, actual);
+        Assert.That(actual, Is.EqualTo(expectedOutput));
     }
 
     [Test]
@@ -43,11 +43,14 @@ public class NestingTests
             Child = new {IdenticalName = "Name from Child", ChildValue = "Child value"}
         };
 
-        // Access to outer scope, if no current scope variable is found
-        Assert.AreEqual(string.Format($"{nestedObject.ParentValue} - {nestedObject.Child.ChildValue}"), smart.Format("{Child:{ParentValue} - {Child.ChildValue}|}", nestedObject));
+        Assert.Multiple(() =>
+        {
+            // Access to outer scope, if no current scope variable is found
+            Assert.That(smart.Format("{Child:{ParentValue} - {Child.ChildValue}|}", nestedObject), Is.EqualTo(string.Format($"{nestedObject.ParentValue} - {nestedObject.Child.ChildValue}")));
 
-        // Access to current scope, although outer scope variable with same name exists
-        Assert.AreNotEqual(string.Format($"{nestedObject.IdenticalName} - {nestedObject.Child.IdenticalName}"), smart.Format("{Child:{IdenticalName} - {Child.IdenticalName}|}", nestedObject));
+            // Access to current scope, although outer scope variable with same name exists
+            Assert.That(smart.Format("{Child:{IdenticalName} - {Child.IdenticalName}|}", nestedObject), Is.Not.EqualTo(string.Format($"{nestedObject.IdenticalName} - {nestedObject.Child.IdenticalName}")));
+        });
     }
 
     [Test]
@@ -60,6 +63,6 @@ public class NestingTests
         // Removing the spaces from Nesting_can_access_outer_scopes requires alternative escaping of { and }!
         var sf = Smart.CreateDefaultSmartFormat();
         var actual = sf.Format(format, _data);
-        Assert.AreEqual(expectedOutput, actual);
+        Assert.That(actual, Is.EqualTo(expectedOutput));
     }
 }

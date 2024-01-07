@@ -44,9 +44,11 @@ public class GlobalVariableSourceTests
         var ref1 = GlobalVariablesSource.Instance;
         GlobalVariablesSource.Reset();
         var ref2 = GlobalVariablesSource.Instance;
-            
-        Assert.That(!ReferenceEquals(ref1, ref2), "Different references after ResetInstance()");
-        Assert.That(ref2.Count, Is.EqualTo(0));
+        Assert.Multiple(() =>
+        {
+            Assert.That(!ReferenceEquals(ref1, ref2), "Different references after ResetInstance()");
+            Assert.That(ref2, Is.Empty);
+        });
     }
 
     [Test]
@@ -64,7 +66,7 @@ public class GlobalVariableSourceTests
             {
                 GlobalVariablesSource.Instance["global"].Add($"{i:0000}", new IntVariable((int)i));
             }), Throws.Nothing);
-        Assert.That(GlobalVariablesSource.Instance["global"].Count, Is.EqualTo(1000));
+        Assert.That(GlobalVariablesSource.Instance["global"], Has.Count.EqualTo(1000));
 
         // Restore to saved value
         ThreadSafeMode.SwitchTo(savedMode);

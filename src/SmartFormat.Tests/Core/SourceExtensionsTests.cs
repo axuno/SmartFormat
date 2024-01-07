@@ -49,7 +49,7 @@ public class SourceExtensionsTests
         var orderedSources = allSources.OrderBy(f => WellKnownExtensionTypes.Sources[f.GetType().FullName!])
             .ToList().AsReadOnly();
 
-        CollectionAssert.AreEqual(orderedSources, sf.GetSourceExtensions());
+        Assert.That(sf.GetSourceExtensions(), Is.EqualTo(orderedSources).AsCollection);
     }
 
     #region: Custom Extensions :
@@ -61,7 +61,7 @@ public class SourceExtensionsTests
     {
         var smart = GetFormatterWithTestExtensions();
         var actualResult = smart.Format(format, arg0);
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -87,7 +87,7 @@ public class SourceExtensionsTests
     {
         var smart = GetFormatterWithTestExtensions();
         var actualResult = smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -100,7 +100,7 @@ public class SourceExtensionsTests
         formatter.GetFormatterExtension<TestExtension1>()!.CanAutoDetect = false;
         formatter.GetFormatterExtension<TestExtension2>()!.CanAutoDetect = true;
         var actual = formatter.Format(format, arg0);
-        Assert.AreEqual(expectedOutput, actual);
+        Assert.That(actual, Is.EqualTo(expectedOutput));
     }
 
     private static SmartFormatter GetFormatterWithTestExtensions()

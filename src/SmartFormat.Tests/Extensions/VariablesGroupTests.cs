@@ -31,18 +31,23 @@ public class VariablesGroupTests
             new KeyValuePair<string, IVariable>(var2Name, var2)
         };
         vg[var3Name] = var3;
-            
-        Assert.That(vg.Count, Is.EqualTo(3));
-        Assert.That((int) vg[var1Name].GetValue()!, Is.EqualTo(1234));
-        Assert.That((string) vg[var2Name].GetValue()!, Is.EqualTo("theValue"));
-        Assert.That(vg.Keys.Count, Is.EqualTo(3));
-        Assert.That(vg.ContainsKey(var1Name));
-        Assert.That(vg.Values.Count, Is.EqualTo(3));
-        Assert.That(vg.Values.Contains(var1));
-        Assert.That(vg.Values.Contains(var2));
-        Assert.That(vg.Values.Contains(var3));
-        Assert.That(vg.ContainsKey(var2Name));
-        Assert.That(vg.TryGetValue(var1Name + "False", out _), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(vg, Has.Count.EqualTo(3));
+            Assert.That((int) vg[var1Name].GetValue()!, Is.EqualTo(1234));
+            Assert.That((string) vg[var2Name].GetValue()!, Is.EqualTo("theValue"));
+            Assert.That(vg.Keys, Has.Count.EqualTo(3));
+            Assert.That(vg.ContainsKey(var1Name));
+            Assert.That(vg.Values, Has.Count.EqualTo(3));
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(vg.Values.Contains(var1));
+            Assert.That(vg.Values.Contains(var2));
+            Assert.That(vg.Values.Contains(var3));
+            Assert.That(vg.ContainsKey(var2Name));
+            Assert.That(vg.TryGetValue(var1Name + "False", out _), Is.False);
+        });
     }
 
     [Test]
@@ -52,7 +57,7 @@ public class VariablesGroupTests
         var kvp = new KeyValuePair<string, IVariable>("theKey", new IntVariable(9876));
         vg.Add(kvp);
 
-        Assert.That(vg.Contains(new KeyValuePair<string, IVariable>(kvp.Key, kvp.Value)));
+        Assert.That(vg, Does.Contain(new KeyValuePair<string, IVariable>(kvp.Key, kvp.Value)));
     }
 
     [Test]
@@ -90,7 +95,7 @@ public class VariablesGroupTests
         vg.Add(kvp);
         vg.Remove(kvp);
 
-        Assert.That(vg.Count, Is.EqualTo(0));
+        Assert.That(vg, Is.Empty);
         Assert.That(vg.Remove("non-existent"), Is.EqualTo(false));
     }
 
@@ -100,7 +105,7 @@ public class VariablesGroupTests
         var vg = new VariablesGroup { { "theKey", new IntVariable(12) } };
         vg.Remove("theKey");
 
-        Assert.That(vg.Count, Is.EqualTo(0));
+        Assert.That(vg, Is.Empty);
         Assert.That(vg.Remove("non-existent"), Is.EqualTo(false));
     }
 
@@ -112,7 +117,7 @@ public class VariablesGroupTests
         vg.Add(kvp);
         vg.Clear();
 
-        Assert.That(vg.Count, Is.EqualTo(0));
+        Assert.That(vg, Is.Empty);
     }
 
     [Test]
@@ -127,7 +132,7 @@ public class VariablesGroupTests
         var array = new KeyValuePair<string, IVariable>[vg.Count];
         vg.CopyTo(array, 0);
 
-        Assert.That(vg.Count, Is.EqualTo(array.Length));
+        Assert.That(vg, Has.Count.EqualTo(array.Length));
         for (var i = 0; i < array.Length; i++)
         {
             Assert.That(vg.ContainsKey(array[i].Key));
@@ -144,9 +149,12 @@ public class VariablesGroupTests
         vg.Add(kvp2);
         var vgCopy = vg.Clone();
 
-        Assert.That(vgCopy.Count, Is.EqualTo(vg.Count));
-        Assert.That(vgCopy.Values, Is.EquivalentTo(vg.Values));
-        Assert.That(vgCopy.Keys, Is.EquivalentTo(vg.Keys));
+        Assert.That(vgCopy, Has.Count.EqualTo(vg.Count));
+        Assert.Multiple(() =>
+        {
+            Assert.That(vgCopy.Values, Is.EquivalentTo(vg.Values));
+            Assert.That(vgCopy.Keys, Is.EquivalentTo(vg.Keys));
+        });
     }
 
     [Test]
@@ -154,8 +162,11 @@ public class VariablesGroupTests
     {
         var nv = new NameVariablePair("theName", new IntVariable(1234));
 
-        Assert.That(nv.Name, Is.EqualTo("theName"));
-        Assert.That((int) nv.Variable.GetValue()!, Is.EqualTo(1234));
-        Assert.That(nv.ToString(), Is.EqualTo("'theName' - 'System.Int32' - '1234'"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(nv.Name, Is.EqualTo("theName"));
+            Assert.That((int) nv.Variable.GetValue()!, Is.EqualTo(1234));
+            Assert.That(nv.ToString(), Is.EqualTo("'theName' - 'System.Int32' - '1234'"));
+        });
     }
 }

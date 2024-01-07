@@ -95,9 +95,8 @@ public class IsMatchFormatterTests
     {
         var smart = GetFormatter();
         var myList = new List<int> {100, 200, 300};
-        Assert.AreEqual("100.00, 200.00 and no match for '300'",
-            smart.Format(CultureInfo.InvariantCulture,
-                "{0:list:{:ismatch(^100|200|999$):{:0.00}|no match for '{}'}|, | and }", myList));
+        Assert.That(smart.Format(CultureInfo.InvariantCulture,
+                "{0:list:{:ismatch(^100|200|999$):{:0.00}|no match for '{}'}|, | and }", myList), Is.EqualTo("100.00, 200.00 and no match for '300'"));
     }
 
     [TestCase("€ Euro", "Currency: €")]
@@ -139,8 +138,11 @@ public class IsMatchFormatterTests
         // To be escaped with backslash for PCRE RegEx:  ".^$*+?()[]{}\|"
         var regEx = new Regex(regExEscaped);
 
-        Assert.That(EscapedLiteral.EscapeCharLiterals('\\', regExEscaped, 0, regExEscaped.Length, true), Is.EqualTo(optionsEscaped));
-        Assert.IsTrue(regEx.Match(search).Success);
+        Assert.Multiple(() =>
+        {
+            Assert.That(EscapedLiteral.EscapeCharLiterals('\\', regExEscaped, 0, regExEscaped.Length, true), Is.EqualTo(optionsEscaped));
+            Assert.That(regEx.Match(search).Success, Is.True);
+        });
 
         var result = smart.Format("{0:ismatch(" + optionsEscaped + "):found {}|}", search);
         Assert.That(result, Is.EqualTo("found " + search));
@@ -167,7 +169,10 @@ public class IsMatchFormatterTests
         var optionsEscaped = new string(EscapedLiteral.EscapeCharLiterals('\\', pattern, 0, pattern.Length, true).ToArray());
         var result = smart.Format("{0:ismatch(" + optionsEscaped + "):found {}|}", input);
 
-        Assert.That(regEx.Match(input).Success, Is.EqualTo(shouldMatch), "RegEx pattern match");
-        Assert.That(result, shouldMatch ? Is.EqualTo("found " + input) : Is.EqualTo(string.Empty), "IsMatchFormatter pattern match");
+        Assert.Multiple(() =>
+        {
+            Assert.That(regEx.Match(input).Success, Is.EqualTo(shouldMatch), "RegEx pattern match");
+            Assert.That(result, shouldMatch ? Is.EqualTo("found " + input) : Is.EqualTo(string.Empty), "IsMatchFormatter pattern match");
+        });
     }
 }

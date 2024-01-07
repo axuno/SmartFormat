@@ -12,7 +12,7 @@ public class StringOutputTests
     {
         var so = new StringOutput();
         so.Write("text".AsSpan(), null!);
-        Assert.AreEqual("text", so.ToString());
+        Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 
     [Test]
@@ -20,7 +20,7 @@ public class StringOutputTests
     {
         var so = new StringOutput(16);
         so.Write("text", null!);
-        Assert.AreEqual("text", so.ToString());
+        Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 
     [Test]
@@ -30,6 +30,6 @@ public class StringOutputTests
         using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
         sb.Append("text");
         so.Write(sb, null!);
-        Assert.AreEqual("text", so.ToString());
+        Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 }

@@ -146,7 +146,7 @@ public class ConditionalFormatterTests
     {
         var smart = Smart.CreateDefaultSmartFormat();
         var actualOutput = smart.Format(format, arg0);
-        Assert.AreEqual(expectedOutput, actualOutput);
+        Assert.That(actualOutput, Is.EqualTo(expectedOutput));
     }
 
     [Test]

@@ -24,7 +24,7 @@ public class LocalizationProviderTests
         provider.AddResource(LocTest1.ResourceManager);
         // only one of the same resource should be added
         provider.AddResource(LocTest1.ResourceManager);
-        Assert.That(provider.Resources.Count, Is.EqualTo(1));
+        Assert.That(provider.Resources, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -35,9 +35,12 @@ public class LocalizationProviderTests
         var success1 = provider.Remove("does-not-exist");
         var success2 = provider.Remove(provider.Resources.First().Value.BaseName);
 
-        Assert.That(success1, Is.False);
-        Assert.That(success2, Is.True);
-        Assert.That(provider.Resources.Count, Is.EqualTo(0));
+        Assert.Multiple(() =>
+        {
+            Assert.That(success1, Is.False);
+            Assert.That(success2, Is.True);
+            Assert.That(provider.Resources, Is.Empty);
+        });
     }
 
     [Test]
@@ -47,7 +50,7 @@ public class LocalizationProviderTests
             
         provider.Clear();
 
-        Assert.That(provider.Resources.Count, Is.EqualTo(0));
+        Assert.That(provider.Resources, Is.Empty);
     }
 
     [Test]
@@ -69,10 +72,13 @@ public class LocalizationProviderTests
             
         var result = provider.GetString(nameof(LocTest1.WeTranslateText), CultureInfo.GetCultureInfo("es"));
         LocTest1.Culture = CultureInfo.GetCultureInfo("es");
-        Assert.That(result, Is.EqualTo(LocTest1.WeTranslateText));
-        Assert.That(
-            provider.Resources.First().Value
-                .GetString(nameof(LocTest1.WeTranslateText), CultureInfo.GetCultureInfo("es")), Is.EqualTo("Traducimos el texto"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(LocTest1.WeTranslateText));
+            Assert.That(
+                provider.Resources.First().Value
+                    .GetString(nameof(LocTest1.WeTranslateText), CultureInfo.GetCultureInfo("es")), Is.EqualTo("Traducimos el texto"));
+        });
         Assert.That(result, Is.EqualTo("Traducimos el texto"));
     }
 
@@ -100,8 +106,11 @@ public class LocalizationProviderTests
             
         var result = provider.GetString(input, cultureName);
         LocTest2.Culture = CultureInfo.GetCultureInfo(cultureName);
-        Assert.That(provider.Resources.Count, Is.EqualTo(2));
-        Assert.That(result, Is.EqualTo(LocTest2.Jack));
+        Assert.Multiple(() =>
+        {
+            Assert.That(provider.Resources, Has.Count.EqualTo(2));
+            Assert.That(result, Is.EqualTo(LocTest2.Jack));
+        });
         Assert.That(result, Is.EqualTo(expected));
     }
 

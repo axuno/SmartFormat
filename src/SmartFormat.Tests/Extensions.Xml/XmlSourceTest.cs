@@ -56,7 +56,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("Mr. {FirstName:xml} {LastName:xml}", xmlEl);
         // assert
-        Assert.AreEqual("Mr. Joe Doe", res);
+        Assert.That(res, Is.EqualTo("Mr. Joe Doe"));
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("Mr. {FirstName.0:xml}", xmlEl);
         // assert
-        Assert.AreEqual("Mr. Joe", res);
+        Assert.That(res, Is.EqualTo("Mr. Joe"));
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("Mr. {FirstName:xml} {LastName:xml}", xmlEl);
         // assert
-        Assert.AreEqual("Mr. Joe Doe", res);
+        Assert.That(res, Is.EqualTo("Mr. Joe Doe"));
     }
 
     [Test]
@@ -92,7 +92,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("Mr. \\{{LastName:xml}\\}", xmlEl);
         // assert
-        Assert.AreEqual("Mr. {Doe}", res);
+        Assert.That(res, Is.EqualTo("Mr. {Doe}"));
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("Mr. {FirstName.1:xml} {LastName:xml}", xmlEl);
         // assert
-        Assert.AreEqual("Mr. Jack Doe", res);
+        Assert.That(res, Is.EqualTo("Mr. Jack Doe"));
     }
 
     [Test]
@@ -116,7 +116,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("Mr. {FirstName:xml}", xmlEl);
         // assert
-        Assert.AreEqual("Mr. Joe", res);
+        Assert.That(res, Is.EqualTo("Mr. Joe"));
     }
 
     [Test]
@@ -128,7 +128,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("There {FirstName.Count:cond:is {} Doe |are {} Does}", xmlEl);
         // assert
-        Assert.AreEqual("There are 3 Does", res);
+        Assert.That(res, Is.EqualTo("There are 3 Does"));
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class XmlSourceTest
         // act
         var res = smart.Format("There are{FirstName:list: {}|,|, and} Doe", xmlEl);
         // assert
-        Assert.AreEqual("There are Joe, Jack, and Jim Doe", res);
+        Assert.That(res, Is.EqualTo("There are Joe, Jack, and Jim Doe"));
     }
 
     [Test]

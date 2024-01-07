@@ -20,8 +20,11 @@ public class DictionaryPoolTests
         var dictPool = GetDictionaryPool();
             
         Assert.That(() => dictPool.Get(), Throws.Nothing);
-        Assert.That(dictPool.Pool.CountActive, Is.EqualTo(1));
-        Assert.That(dictPool.Pool.CountInactive, Is.EqualTo(0));
-        Assert.That(dictPool.Pool.CountAll, Is.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dictPool.Pool.CountActive, Is.EqualTo(1));
+            Assert.That(dictPool.Pool.CountInactive, Is.EqualTo(0));
+            Assert.That(dictPool.Pool.CountAll, Is.EqualTo(1));
+        });
     }
 }

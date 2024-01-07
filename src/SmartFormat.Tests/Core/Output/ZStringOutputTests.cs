@@ -12,8 +12,11 @@ public class ZStringOutputTests
     public void Create_With_Capacity()
     {
         using var zStringOutput = new ZStringOutput(SmartFormat.Utilities.ZStringBuilderExtensions.DefaultBufferSize + 10000);
-        Assert.That(zStringOutput.Output, Is.InstanceOf<ZStringBuilder>());
-        Assert.That(zStringOutput, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(zStringOutput.Output, Is.InstanceOf<ZStringBuilder>());
+            Assert.That(zStringOutput, Is.Not.Null);
+        });
     }
 
     [Test]
@@ -31,7 +34,7 @@ public class ZStringOutputTests
     {
         var so = new ZStringOutput();
         so.Write("text".AsSpan(), null);
-        Assert.AreEqual("text", so.ToString());
+        Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 
     [Test]
@@ -39,7 +42,7 @@ public class ZStringOutputTests
     {
         var so = new ZStringOutput();
         so.Write("text", null);
-        Assert.AreEqual("text", so.ToString());
+        Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 
     [Test]
@@ -49,6 +52,6 @@ public class ZStringOutputTests
         using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
         sb.Append("text");
         so.Write(sb, null);
-        Assert.AreEqual("text", so.ToString());
+        Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 }

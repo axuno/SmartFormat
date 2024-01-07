@@ -41,7 +41,7 @@ public class TemplateFormatterTests
         };
 
         var actual = smart.Format(format, person);
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class TemplateFormatterTests
         };
 
         var actual = smart.Format(format, person);
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -98,7 +98,7 @@ public class TemplateFormatterTests
         };
 
         var actual = smart.Format(format, person);
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class TemplateFormatterTests
         };
 
         var actual = smart.Format(format, person);
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [TestCase(true, "Dear Mr Doe:")]
@@ -161,7 +161,7 @@ public class TemplateFormatterTests
         };
             
         var actual = smart.Format(format, (object) people);
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
         
     [Test]
@@ -209,6 +209,6 @@ public class TemplateFormatterTests
         };
 
         var actual = smart.Format(format, person);
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }

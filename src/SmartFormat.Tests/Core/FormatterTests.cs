@@ -141,11 +141,14 @@ public class FormatterTests
         var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.Ignore}});
         formatter.OnFormattingFailure += (o, args) => badPlaceholder.Add(args);
         var res = formatter.Format("{NoName} {Name} {OtherMissing}", obj);
-        Assert.That(badPlaceholder.Count, Is.EqualTo(2));
-        Assert.That(badPlaceholder[0].Placeholder == "{NoName}");
-        Assert.That(badPlaceholder[1].Placeholder == "{OtherMissing}");
-        Assert.That(badPlaceholder[0].ErrorIndex, Is.EqualTo(7));
-        Assert.That(badPlaceholder[0].IgnoreError, Is.EqualTo(true));
+        Assert.That(badPlaceholder, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(badPlaceholder[0].Placeholder, Is.EqualTo("{NoName}"));
+            Assert.That(badPlaceholder[1].Placeholder, Is.EqualTo("{OtherMissing}"));
+            Assert.That(badPlaceholder[0].ErrorIndex, Is.EqualTo(7));
+            Assert.That(badPlaceholder[0].IgnoreError, Is.EqualTo(true));
+        });
     }
 
     [TestCase("\\{Test}", "\\Hello", false)]
@@ -156,7 +159,7 @@ public class FormatterTests
             {StringFormatCompatibility = true, Parser = new ParserSettings {ConvertCharacterStringLiterals = convertCharacterStringLiterals}});
 
         var actual = smart.Format(format, new { Test = "Hello" });
-        Assert.AreEqual(expected, actual);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -165,7 +168,7 @@ public class FormatterTests
         // see issue https://github.com/scottrippey/SmartFormat.NET/issues/101
         var smart = Smart.CreateDefaultSmartFormat();
         object? boxedNull = null;
-        Assert.AreEqual(smart.Format("{0}", default(object)!), smart.Format("{0}", boxedNull!));
+        Assert.That(smart.Format("{0}", boxedNull!), Is.EqualTo(smart.Format("{0}", default(object)!)));
     }
 
     [Test]
@@ -182,10 +185,13 @@ public class FormatterTests
         });
         var formatParsed = formatter.Parser.ParseFormat(format);
         var formatDetails = new FormatDetails().Initialize(formatter, formatParsed, args, null, output);
-            
-        Assert.AreEqual(args, formatDetails.OriginalArgs);
-        Assert.AreEqual(format, formatDetails.OriginalFormat.RawText);
-        Assert.AreEqual(formatter.Settings, formatDetails.Settings);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatDetails.OriginalArgs, Is.EqualTo(args));
+            Assert.That(formatDetails.OriginalFormat.RawText, Is.EqualTo(format));
+            Assert.That(formatDetails.Settings, Is.EqualTo(formatter.Settings));
+        });
     }
 
     [Test]
@@ -195,7 +201,7 @@ public class FormatterTests
         // make sure we test against missing format extensions
         formatter.AddExtensions(new DefaultSource());
 
-        Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+        Assert.That(formatter.FormatterExtensions, Is.Empty);
         Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
     }
 
@@ -206,7 +212,7 @@ public class FormatterTests
         // make sure we test against missing source extensions
         formatter.AddExtensions(new DefaultFormatter());
 
-        Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+        Assert.That(formatter.SourceExtensions, Is.Empty);
         Assert.Throws<InvalidOperationException>(() => formatter.Format("", Array.Empty<object>()));
     }
 
@@ -224,9 +230,11 @@ public class FormatterTests
     public void Remove_None_Existing_Source()
     {
         var formatter = new SmartFormatter();
-            
-        Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
-        Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(false));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.SourceExtensions, Is.Empty);
+            Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(false));
+        });
     }
 
     [Test]
@@ -234,7 +242,7 @@ public class FormatterTests
     {
         var formatter = new SmartFormatter();
             
-        Assert.That(formatter.SourceExtensions.Count, Is.EqualTo(0));
+        Assert.That(formatter.SourceExtensions, Is.Empty);
         formatter.AddExtensions(new StringSource());
         Assert.That(formatter.RemoveSourceExtension<StringSource>(), Is.EqualTo(true));
     }
@@ -243,9 +251,11 @@ public class FormatterTests
     public void Remove_None_Existing_Formatter()
     {
         var formatter = new SmartFormatter();
-            
-        Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
-        Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(false));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.FormatterExtensions, Is.Empty);
+            Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(false));
+        });
     }
 
     [Test]
@@ -253,7 +263,7 @@ public class FormatterTests
     {
         var formatter = new SmartFormatter();
             
-        Assert.That(formatter.FormatterExtensions.Count, Is.EqualTo(0));
+        Assert.That(formatter.FormatterExtensions, Is.Empty);
         formatter.AddExtensions(new DefaultFormatter());
         Assert.That(formatter.RemoveFormatterExtension<DefaultFormatter>(), Is.EqualTo(true));
     }
@@ -262,16 +272,24 @@ public class FormatterTests
     public void Formatter_GetSourceExtension()
     {
         var formatter = GetSimpleFormatter();
-        Assert.That(formatter.GetSourceExtensions().Count, Is.EqualTo(formatter.SourceExtensions.Count));
-        Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));  ;
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.GetSourceExtensions(), Has.Count.EqualTo(formatter.SourceExtensions.Count));
+            Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));
+        });
+        ;
     }
 
     [Test]
     public void Formatter_GetFormatterExtension()
     {
         var formatter = GetSimpleFormatter();
-        Assert.That(formatter.GetFormatterExtensions().Count, Is.EqualTo(formatter.FormatterExtensions.Count));
-        Assert.That(formatter.GetFormatterExtension<DefaultFormatter>(), Is.InstanceOf(typeof(DefaultFormatter)));  ;
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.GetFormatterExtensions(), Has.Count.EqualTo(formatter.FormatterExtensions.Count));
+            Assert.That(formatter.GetFormatterExtension<DefaultFormatter>(), Is.InstanceOf(typeof(DefaultFormatter)));
+        });
+        ;
     }
 
     [Test]
@@ -312,10 +330,16 @@ public class FormatterTests
                 results.TryAdd(i, Smart.Format("{0}", i));
                 Interlocked.Increment(ref resultCounter);
             }), Throws.Nothing);
-        Assert.That(threadIds.Count, Is.AtLeast(2)); // otherwise the test is not significant
-        Assert.That(Smart.CreateDefaultSmartFormat().GetFormatterExtension<ChooseFormatter>(), Is.Not.Null);
-        Assert.That(threadIds.Count, Is.EqualTo(formatterInstancesCounter));
-        Assert.That(results.Count, Is.EqualTo(resultCounter));
+        Assert.Multiple(() =>
+        {
+            Assert.That(threadIds, Has.Count.AtLeast(2)); // otherwise the test is not significant
+            Assert.That(Smart.CreateDefaultSmartFormat().GetFormatterExtension<ChooseFormatter>(), Is.Not.Null);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(threadIds, Has.Count.EqualTo(formatterInstancesCounter));
+            Assert.That(results, Has.Count.EqualTo(resultCounter));
+        });
 
         // Restore to saved value
         ThreadSafeMode.SwitchTo(savedMode);

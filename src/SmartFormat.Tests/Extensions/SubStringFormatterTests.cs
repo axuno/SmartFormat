@@ -33,7 +33,7 @@ public class SubStringFormatterTests
     public void NoParentheses_Should_Work()
     {
         var smart = GetFormatter();
-        Assert.AreEqual("No parentheses: Long John", smart.Format("No parentheses: {Name:substr}", _person));
+        Assert.That(smart.Format("No parentheses: {Name:substr}", _person), Is.EqualTo("No parentheses: Long John"));
     }
 
     [Test]
@@ -54,14 +54,14 @@ public class SubStringFormatterTests
     public void StartPositionLongerThanString()
     {
         var smart = GetFormatter();
-        Assert.AreEqual(string.Empty, smart.Format("{Name:substr(999)}", _person));
+        Assert.That(smart.Format("{Name:substr(999)}", _person), Is.EqualTo(string.Empty));
     }
 
     [Test]
     public void StartPositionAndLengthLongerThanString()
     {
         var smart = GetFormatter();
-        Assert.AreEqual(string.Empty, smart.Format("{Name:substr(999,1)}", _person));
+        Assert.That(smart.Format("{Name:substr(999,1)}", _person), Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -72,7 +72,7 @@ public class SubStringFormatterTests
         var behavior = formatter.OutOfRangeBehavior;
             
         formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ReturnEmptyString;
-        Assert.AreEqual(string.Empty, smart.Format("{Name:substr(0,999)}", _person));
+        Assert.That(smart.Format("{Name:substr(0,999)}", _person), Is.EqualTo(string.Empty));
 
         formatter.OutOfRangeBehavior = behavior;
     }
@@ -85,7 +85,7 @@ public class SubStringFormatterTests
         var behavior = formatter.OutOfRangeBehavior;
 
         formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ReturnStartIndexToEndOfString;
-        Assert.AreEqual("Long John", smart.Format("{Name:substr(0,999)}", _person));
+        Assert.That(smart.Format("{Name:substr(0,999)}", _person), Is.EqualTo("Long John"));
 
         formatter.OutOfRangeBehavior = behavior;
     }
@@ -104,35 +104,35 @@ public class SubStringFormatterTests
     public void OnlyPositiveStartPosition()
     {
         var smart = GetFormatter();
-        Assert.AreEqual("John", smart.Format("{Name:substr(5)}", _person));
+        Assert.That(smart.Format("{Name:substr(5)}", _person), Is.EqualTo("John"));
     }
 
     [Test]
     public void StartPositionAndPositiveLength()
     {
         var smart = GetFormatter();
-        Assert.AreEqual("New", smart.Format("{City:substr(0,3)}", _person));
+        Assert.That(smart.Format("{City:substr(0,3)}", _person), Is.EqualTo("New"));
     }
 
     [Test]
     public void OnlyNegativeStartPosition()
     {
         var smart = GetFormatter();
-        Assert.AreEqual("John", smart.Format("{Name:substr(-4)}", _person));
+        Assert.That(smart.Format("{Name:substr(-4)}", _person), Is.EqualTo("John"));
     }
 
     [Test]
     public void NegativeStartPositionAndPositiveLength()
     {
         var smart = GetFormatter();
-        Assert.AreEqual("Jo", smart.Format("{Name:substr(-4, 2)}", _person));
+        Assert.That(smart.Format("{Name:substr(-4, 2)}", _person), Is.EqualTo("Jo"));
     }
 
     [Test]
     public void NegativeStartPositionAndNegativeLength()
     {
         var smart = GetFormatter();
-        Assert.AreEqual("Joh", smart.Format("{Name:substr(-4, -1)}", _person));
+        Assert.That(smart.Format("{Name:substr(-4, -1)}", _person), Is.EqualTo("Joh"));
     }
 
     [Test]
@@ -163,8 +163,11 @@ public class SubStringFormatterTests
         var currentSplitChar = smart.GetFormatterExtension<SubStringFormatter>()!.SplitChar;
         // Change SplitChar from default ',' to '|'
         smart.GetFormatterExtension<SubStringFormatter>()!.SplitChar = '|';
-        Assert.AreEqual("Joh", smart.Format("{Name:substr(-4|-1)}", _person));
-        Assert.That(currentSplitChar, Is.EqualTo(',')); // make sure there was a change
+        Assert.Multiple(() =>
+        {
+            Assert.That(smart.Format("{Name:substr(-4|-1)}", _person), Is.EqualTo("Joh"));
+            Assert.That(currentSplitChar, Is.EqualTo(',')); // make sure there was a change
+        });
     }
 
     [Test]

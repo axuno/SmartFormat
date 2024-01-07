@@ -23,9 +23,12 @@ public class StringBuilderPoolTests
         var sbp = GetStringBuilderPool();
             
         Assert.That(() => sbp.Get(), Throws.Nothing);
-        Assert.That(sbp.Pool.CountActive, Is.EqualTo(1));
-        Assert.That(sbp.Pool.CountInactive, Is.EqualTo(0));
-        Assert.That(sbp.Pool.CountAll, Is.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(sbp.Pool.CountActive, Is.EqualTo(1));
+            Assert.That(sbp.Pool.CountInactive, Is.EqualTo(0));
+            Assert.That(sbp.Pool.CountAll, Is.EqualTo(1));
+        });
     }
 
     [Test]
@@ -37,16 +40,22 @@ public class StringBuilderPoolTests
         var sb = sbp.Get();
         sb.Append("something");
 
-        Assert.That(sbp.Pool.CountActive, Is.EqualTo(1));
-        Assert.That(sb.Capacity, Is.EqualTo(sbp.DefaultStringBuilderCapacity));
-            
-        // Returning an item should clear the StringBuilder
-        Assert.That(() => sbp.Return(sb), Throws.Nothing);
-        Assert.That(sb.Length, Is.EqualTo(0));
-            
-        Assert.That(sbp.Pool.CountActive, Is.EqualTo(0));
-        Assert.That(sbp.Pool.CountInactive, Is.EqualTo(1));
-        Assert.That(sbp.Pool.CountAll, Is.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(sbp.Pool.CountActive, Is.EqualTo(1));
+            Assert.That(sb.Capacity, Is.EqualTo(sbp.DefaultStringBuilderCapacity));
+
+            // Returning an item should clear the StringBuilder
+            Assert.That(() => sbp.Return(sb), Throws.Nothing);
+            Assert.That(sb.Length, Is.EqualTo(0));
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sbp.Pool.CountActive, Is.EqualTo(0));
+            Assert.That(sbp.Pool.CountInactive, Is.EqualTo(1));
+            Assert.That(sbp.Pool.CountAll, Is.EqualTo(1));
+        });
     }
 
     [Test]
@@ -56,7 +65,7 @@ public class StringBuilderPoolTests
         var sb = sbp.Get();
         sbp.Return(sb);
         sbp.Get(out var sb2);
-        Assert.AreSame(sb, sb2);
+        Assert.That(sb2, Is.SameAs(sb));
     }
 
     [Test]
@@ -73,16 +82,19 @@ public class StringBuilderPoolTests
         var newThreadSafety = !savedIsThreadSafeMode;
         var newObjectPoolType = sbp.Pool.GetType();
 
-        Assert.That(savedObjectPoolType,
-            savedIsThreadSafeMode
-                ? Is.EqualTo(typeof(ObjectPoolConcurrent<StringBuilder>))
-                : Is.EqualTo(typeof(ObjectPoolSingleThread<StringBuilder>)));
-            
-        Assert.That(newObjectPoolType,
-            newThreadSafety
-                ? Is.EqualTo(typeof(ObjectPoolConcurrent<StringBuilder>))
-                : Is.EqualTo(typeof(ObjectPoolSingleThread<StringBuilder>)));
-        Assert.That(newThreadSafety, Is.EqualTo(sbp.Pool.IsThreadSafeMode));
+        Assert.Multiple(() =>
+        {
+            Assert.That(savedObjectPoolType,
+                    savedIsThreadSafeMode
+                        ? Is.EqualTo(typeof(ObjectPoolConcurrent<StringBuilder>))
+                        : Is.EqualTo(typeof(ObjectPoolSingleThread<StringBuilder>)));
+
+            Assert.That(newObjectPoolType,
+                newThreadSafety
+                    ? Is.EqualTo(typeof(ObjectPoolConcurrent<StringBuilder>))
+                    : Is.EqualTo(typeof(ObjectPoolSingleThread<StringBuilder>)));
+            Assert.That(newThreadSafety, Is.EqualTo(sbp.Pool.IsThreadSafeMode));
+        });
 
         // Clean up
         sbp.Reset(savedIsThreadSafeMode);
@@ -96,7 +108,10 @@ public class StringBuilderPoolTests
         var stringBuilder = sbp?.Get();
         sbp?.Dispose();
 
-        Assert.That(stringBuilder, Is.Not.Null, "StringBuilder instance");
-        Assert.That(sbp?.Pool.CountAll ?? -1, Is.EqualTo(0), "CountAll");
+        Assert.Multiple(() =>
+        {
+            Assert.That(stringBuilder, Is.Not.Null, "StringBuilder instance");
+            Assert.That(sbp?.Pool.CountAll ?? -1, Is.EqualTo(0), "CountAll");
+        });
     }
 }

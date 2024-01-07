@@ -15,7 +15,7 @@ public static class TestHelpers
         try
         {
             actual = formatter.Format(format, args);
-            Assert.AreEqual(expected, actual);
+            Assert.That(actual, Is.EqualTo(expected));
             Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
         }
         catch (Exception ex)
@@ -39,7 +39,7 @@ public static class TestHelpers
             try
             {
                 actual = formatter.Format(format, args);
-                Assert.AreEqual(expected, actual);
+                Assert.That(actual, Is.EqualTo(expected));
                 Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
             }
             catch (Exception ex)
@@ -67,7 +67,7 @@ public static class TestHelpers
             {
                 var specificCulture = new CultureInfo("en-us");
                 actual = formatter.Format(specificCulture, format, args);
-                Assert.AreEqual(expected, actual);
+                Assert.That(actual, Is.EqualTo(expected));
                 Console.WriteLine("Success: \"{0}\" => \"{1}\"", format, actual);
             }
             catch (Exception ex)

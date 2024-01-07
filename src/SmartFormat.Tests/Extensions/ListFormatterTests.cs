@@ -16,7 +16,7 @@ namespace SmartFormat.Tests.Extensions;
 [TestFixture]
 public class ListFormatterTests
 {
-    public static object[] GetArgs()
+    private static object[] GetArgs()
     {
         var args = new object[] {
             "ABCDE".ToCharArray(),
@@ -36,7 +36,7 @@ public class ListFormatterTests
         // Important: You cannot use "items" as an indexed parameter directly,
         // as it would be used as arg0="one", arg1="two", arg2="three"
         var result = smart.Format("{0:list:{}|, |, and }", (System.Collections.IList) items);
-        Assert.AreEqual("one, two, and three", result);
+        Assert.That(result, Is.EqualTo("one, two, and three"));
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class ListFormatterTests
         smart.GetFormatterExtension<ListFormatter>()!.SplitChar = '~';
         var items = new[] { "one", "two", "three" };
         var result = smart.Format("{0:list:{}~|~|}", (System.Collections.IList) items);
-        Assert.AreEqual("one|two|three", result);
+        Assert.That(result, Is.EqualTo("one|two|three"));
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class ListFormatterTests
         var smart = Smart.CreateDefaultSmartFormat();
         var items = Array.Empty<string>();
         var result = smart.Format("{0:list:{}|, |, and }", new object[] { items });
-        Assert.AreEqual(string.Empty, result);
+        Assert.That(result, Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class ListFormatterTests
     {
         var smart = Smart.CreateDefaultSmartFormat();
         var result = smart.Format("{TheList?:list:{}|, |, and }", new { TheList = default(object)});
-        Assert.AreEqual(string.Empty, result);
+        Assert.That(result, Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -106,13 +106,13 @@ public class ListFormatterTests
         });
 
         var result = smart.Format("{0:list:{Name}|, |, and }", new object[] { data }); // Person A, Person B, and Person C
-        Assert.AreEqual("Person A, Person B, and Person C", result);
+        Assert.That(result, Is.EqualTo("Person A, Person B, and Person C"));
         result = smart.Format("{0:list:{Name}|, |, and }", model.Persons);  // Person A, and Person C
-        Assert.AreEqual("Person A, and Person C", result);
+        Assert.That(result, Is.EqualTo("Person A, and Person C"));
         result = smart.Format("{0:list:{Name}|, |, and }", data.Where(p => p.Gender == "F"));  // Person B
-        Assert.AreEqual("Person B", result);
+        Assert.That(result, Is.EqualTo("Person B"));
         result = smart.Format("{0:{Persons:list:{Name}|, }}", model); // Person A, and Person C
-        Assert.AreEqual("Person A, Person C", result);
+        Assert.That(result, Is.EqualTo("Person A, Person C"));
     }
 
     [TestCase("{4:list}", "System.Int32[]")]
@@ -140,8 +140,11 @@ public class ListFormatterTests
             Split = split // comma as list separator
         };
 
-        Assert.AreEqual(expected, smart.Format("{0:list:{}|{1}| {2} }", args.Names, args.Split, args.IsAnd ? "and" : "nor"));
-        Assert.AreEqual(expected, smart.Format("{Names:list:{}|{Split}| {IsAnd:and|nor} }", args));
+        Assert.Multiple(() =>
+        {
+            Assert.That(smart.Format("{0:list:{}|{1}| {2} }", args.Names, args.Split, args.IsAnd ? "and" : "nor"), Is.EqualTo(expected));
+            Assert.That(smart.Format("{Names:list:{}|{Split}| {IsAnd:and|nor} }", args), Is.EqualTo(expected));
+        });
     }
 
     [TestCase("{0:list:{}-|}", "A-B-C-D-E-")]
@@ -167,11 +170,13 @@ public class ListFormatterTests
     [Test, Description("Format a list of lists")]
     public void List_Of_Lists_With_Element_Format()
     {
+#pragma warning disable CA1861 // Not called repeatedly, but called with different arguments
         var data = new List<int[]> {
             new[] { 1, 2, 3 },
             new[] { 4, 5, 6 },
             new[] { 7, 8, 9 }
         };
+#pragma warning restore CA1861
 
         var formatter = new SmartFormatter()
             .AddExtensions(new ListFormatter(), new DefaultSource())
@@ -202,13 +207,13 @@ public class ListFormatterTests
         {
             tasks.Add(Task.Factory.StartNew(val =>
             {
-                Thread.Sleep(5 * (int)(val ?? 100));
+                Task.Delay(5 * (int) (val ?? 100)).Wait();
                 var smart = new SmartFormatter()
                     .AddExtensions(new StringSource(), new ListFormatter(), new DefaultSource())
                     .AddExtensions(new DefaultFormatter());
                 var ret = smart.Format(format, wheres);
-                    
-                Thread.Sleep(5 * (int)(val ?? 100)); /* add some delay to force ThreadPool swapping */
+
+                Task.Delay(5 * (int) (val ?? 100)).Wait();
                 return ret;
             }, i));
         }
@@ -246,7 +251,7 @@ public class ListFormatterTests
             .AddExtensions(new ListFormatter(), new DefaultSource())
             .AddExtensions(new DefaultFormatter());
 
-        Assert.AreEqual("one, two, and three", formatter.Format("{0:list:{}|, |, and }", new object[] { items }));
+        Assert.That(formatter.Format("{0:list:{}|, |, and }", new object[] { items }), Is.EqualTo("one, two, and three"));
     }
 
     [Test]
@@ -271,9 +276,11 @@ public class ListFormatterTests
         var data = new {Numbers = numbers};
         var indexResult1 = smart.Format(">{Numbers.1}<", data); // index method 1
         var indexResult2 = smart.Format(">{Numbers[1]}<", data); // index method 2
-            
-        Assert.That(indexResult1, Is.EqualTo($">{expected}<"));
-        Assert.That(indexResult2, Is.EqualTo($">{expected}<"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(indexResult1, Is.EqualTo($">{expected}<"));
+            Assert.That(indexResult2, Is.EqualTo($">{expected}<"));
+        });
     }
 
     [Test]
@@ -288,8 +295,11 @@ public class ListFormatterTests
         var indexResult1 = smart.Format(">{Numbers?.0}<", data); // index method 1
         var indexResult2 = smart.Format(">{Numbers?[0]}<", data); // index method 2
 
-        Assert.That(indexResult1, Is.EqualTo("><"));
-        Assert.That(indexResult2, Is.EqualTo("><"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(indexResult1, Is.EqualTo("><"));
+            Assert.That(indexResult2, Is.EqualTo("><"));
+        });
     }
 
     [Test]

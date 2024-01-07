@@ -16,7 +16,7 @@ public class TextWriterOOutputTests
         var two = new TextWriterOutput(sw);
         two.Write("text".AsSpan(), null);
         sw.Flush();
-        Assert.AreEqual("text", sw.ToString());
+        Assert.That(sw.ToString(), Is.EqualTo("text"));
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class TextWriterOOutputTests
         var two = new TextWriterOutput(sw);
         two.Write("text", null);
         sw.Flush();
-        Assert.AreEqual("text", sw.ToString());
+        Assert.That(sw.ToString(), Is.EqualTo("text"));
     }
 
     [Test]
@@ -38,6 +38,6 @@ public class TextWriterOOutputTests
         var two = new TextWriterOutput(sw);
         two.Write(sb, null);
         sw.Flush();
-        Assert.AreEqual("text", sw.ToString());
+        Assert.That(sw.ToString(), Is.EqualTo("text"));
     }
 }

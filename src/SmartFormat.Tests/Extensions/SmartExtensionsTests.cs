@@ -10,7 +10,7 @@ public class SmartExtensionsTests
 {
     #region : StringBuilderTests :
 
-    public static object[] GetArgs()
+    private static object[] GetArgs()
     {
         return new object[] {
             TimeSpan.Zero,
@@ -58,7 +58,7 @@ public class SmartExtensionsTests
         sw.WriteSmart("{0}", text);
         sw.Flush();
         sw.Close();
-        Assert.AreEqual(string.Format(fmt, text), sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo(string.Format(fmt, text)));
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class SmartExtensionsTests
         sw.WriteLineSmart("{0}", text);
         sw.Flush();
         sw.Close();
-        Assert.AreEqual(string.Format(fmt, text) + Environment.NewLine, sb.ToString());
+        Assert.That(sb.ToString(), Is.EqualTo(string.Format(fmt, text) + Environment.NewLine));
     }
 
     #endregion
@@ -85,7 +85,7 @@ public class SmartExtensionsTests
         var fmt = "{0}";
         var result = fmt.FormatSmart(text);
 
-        Assert.AreEqual(string.Format(fmt, text), result);
+        Assert.That(result, Is.EqualTo(string.Format(fmt, text)));
     }
 
     #endregion

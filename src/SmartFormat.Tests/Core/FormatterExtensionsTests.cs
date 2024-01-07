@@ -35,10 +35,12 @@ public class FormatterExtensionsTests
             var negatedAutoDetection = formatter.CanAutoDetect;
             formatter.Name = guid;
             formatter.GetType().GetProperty("Names")?.SetValue(formatter, new[] {guid}); // "Names" property is obsolete
-                
-            Assert.That(formatter.GetType().GetProperty("Names")?.GetValue(formatter), Is.EqualTo(new[]{guid}));  // "Names" property is obsolete
-            Assert.That(formatter.Name, Is.EqualTo(guid));
-                
+            Assert.Multiple(() =>
+            {
+                Assert.That(formatter.GetType().GetProperty("Names")?.GetValue(formatter), Is.EqualTo(new[] { guid }));  // "Names" property is obsolete
+                Assert.That(formatter.Name, Is.EqualTo(guid));
+            });
+
             if (formatter is not TemplateFormatter)
             {
                 formatter.CanAutoDetect = negatedAutoDetection;
@@ -76,25 +78,26 @@ public class FormatterExtensionsTests
         var orderedFormatters = allFormatters.OrderBy(f => WellKnownExtensionTypes.Formatters[f.GetType().FullName!])
             .ToList().AsReadOnly();
 
-        CollectionAssert.AreEqual(orderedFormatters, sf.GetFormatterExtensions());
+        Assert.That(sf.GetFormatterExtensions(), Is.EqualTo(orderedFormatters).AsCollection);
     }
 
     #region: Default Extensions :
 
-    [Test]
+#pragma warning disable CA1861 // Not called repeatedly, but called with different arguments
     [TestCase("{0:cond:zero|one|two}", 0, "zero")]
     [TestCase("{0:cond:zero|one|two}", 1, "one")]
     [TestCase("{0:cond:zero|one|two}", 2, "two")]
-    [TestCase("{0:list:+{}|, |, and }", new []{ 1, 2, 3 }, "+1, +2, and +3")]
-    [TestCase("{0:list:+{}|, |, and }", new []{ 1, 2, 3 }, "+1, +2, and +3")]
+    [TestCase("{0:list:+{}|, |, and }", new[] { 1, 2, 3 }, "+1, +2, and +3")]
+    [TestCase("{0:list:+{}|, |, and }", new[] { 2, 3, 4 }, "+2, +3, and +4")]
     [TestCase("{0:d()}", 5, "5")]
     [TestCase("{0:d:N2}", 5, "5.00")]
     public void Invoke_extensions_by_name(string format, object arg0, string expectedResult)
     {
         var smart = Smart.CreateDefaultSmartFormat();
         var actualResult = smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
+#pragma warning restore CA1861
 
     #endregion
 
@@ -104,10 +107,13 @@ public class FormatterExtensionsTests
     public void Conditional_Formatter_With_Parenthesis(bool value, string expected)
     {
         var smart = Smart.CreateDefaultSmartFormat();
-        // explicit conditional formatter
-        Assert.AreEqual(expected, smart.Format("{value:cond:yes (probably)|no (possibly)}", new { value }));
-        // implicit
-        Assert.AreEqual(expected, smart.Format("{value:yes (probably)|no (possibly)}", new { value }));
+        Assert.Multiple(() =>
+        {
+            // explicit conditional formatter
+            Assert.That(smart.Format("{value:cond:yes (probably)|no (possibly)}", new { value }), Is.EqualTo(expected));
+            // implicit
+            Assert.That(smart.Format("{value:yes (probably)|no (possibly)}", new { value }), Is.EqualTo(expected));
+        });
     }
 
     #region: Custom Extensions :
@@ -119,7 +125,7 @@ public class FormatterExtensionsTests
     {
         var smart = GetFormatterWithTestExtensions();
         var actualResult = smart.Format(format, arg0);
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -145,7 +151,7 @@ public class FormatterExtensionsTests
     {
         var smart = GetFormatterWithTestExtensions();
         var actualResult = smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -158,7 +164,7 @@ public class FormatterExtensionsTests
         formatter.GetFormatterExtension<TestExtension1>()!.CanAutoDetect = false;
         formatter.GetFormatterExtension<TestExtension2>()!.CanAutoDetect = true;
         var actual = formatter.Format(format, arg0);
-        Assert.AreEqual(expectedOutput, actual);
+        Assert.That(actual, Is.EqualTo(expectedOutput));
     }
 
     private static SmartFormatter GetFormatterWithTestExtensions()

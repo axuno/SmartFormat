@@ -12,7 +12,7 @@ namespace SmartFormat.Tests.Pooling;
 [TestFixture]
 public class ObjectPoolClassesTests
 {
-    public class SomePoolObject
+    internal class SomePoolObject
     {
         public string Value { get; set; } = string.Empty;
     }
@@ -20,7 +20,7 @@ public class ObjectPoolClassesTests
     private const int MaximumPoolSize = 5;
 
     // Used as TestCaseSource
-    internal static IEnumerable<ObjectPool<SomePoolObject>> GetObjectPoolBasedPools(bool withValidPolicy)
+    private static IEnumerable<ObjectPool<SomePoolObject>> GetObjectPoolBasedPools(bool withValidPolicy)
     {
         var policy = withValidPolicy
             ? new PoolPolicy<SomePoolObject>
@@ -37,7 +37,7 @@ public class ObjectPoolClassesTests
         var types = ReflectionTools.GetSubclassesOf(typeof(ObjectPool<>).Assembly, typeof(ObjectPool<>));
         foreach (var type in types)
         {
-            Type constructedType = type.MakeGenericType(typeof(SomePoolObject));
+            var constructedType = type.MakeGenericType(typeof(SomePoolObject));
             var instance = (ObjectPool<SomePoolObject>)Activator.CreateInstance(constructedType, policy)!;
                 
             instance.IsPoolingEnabled = true;
@@ -68,11 +68,13 @@ public class ObjectPoolClassesTests
         pool.Return(obj);
         pool.Clear(); // 'Clear' calls ActionOnDestroy
         var destroyed = obj.Value.ToLower();
-            
-        Assert.That(created, Is.EqualTo(nameof(created)), poolAsObj.GetType().Name);
-        Assert.That(returned,Is.EqualTo(nameof(returned)), poolAsObj.GetType().Name);
-        Assert.That(get, Is.EqualTo(nameof(get)), poolAsObj.GetType().Name);
-        Assert.That(destroyed, Is.EqualTo(nameof(destroyed)), poolAsObj.GetType().Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(created, Is.EqualTo(nameof(created)), poolAsObj.GetType().Name);
+            Assert.That(returned, Is.EqualTo(nameof(returned)), poolAsObj.GetType().Name);
+            Assert.That(get, Is.EqualTo(nameof(get)), poolAsObj.GetType().Name);
+            Assert.That(destroyed, Is.EqualTo(nameof(destroyed)), poolAsObj.GetType().Name);
+        });
     }
 
     [TestCaseSource(nameof(GetObjectPoolBasedPools), new object?[] { true })]
@@ -97,11 +99,13 @@ public class ObjectPoolClassesTests
         var itemInPool = pool.PoolItems[0]; // reference the first and only item
         pool.Clear(); // 'Clear' calls ActionOnDestroy
         var destroyed = itemInPool.Value;
-            
-        Assert.That(created, Is.EqualTo(nameof(created)), poolAsObj.GetType().Name);
-        Assert.That(returned, Is.EqualTo(nameof(returned)), poolAsObj.GetType().Name);
-        Assert.That(get, Is.EqualTo(nameof(get)), poolAsObj.GetType().Name);
-        Assert.That(destroyed, Is.EqualTo(nameof(destroyed)), poolAsObj.GetType().Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(created, Is.EqualTo(nameof(created)), poolAsObj.GetType().Name);
+            Assert.That(returned, Is.EqualTo(nameof(returned)), poolAsObj.GetType().Name);
+            Assert.That(get, Is.EqualTo(nameof(get)), poolAsObj.GetType().Name);
+            Assert.That(destroyed, Is.EqualTo(nameof(destroyed)), poolAsObj.GetType().Name);
+        });
     }
 
     [TestCaseSource(nameof(GetObjectPoolBasedPools), new object?[] { true })]
@@ -155,20 +159,23 @@ public class ObjectPoolClassesTests
 
         pool.Clear();
 
-        // Got 3 elements from the pool
-        Assert.That(activeCount1, Is.EqualTo(3), poolAsObj.GetType().Name);
-        Assert.That(allCount1, Is.EqualTo(3), poolAsObj.GetType().Name);
-        Assert.That(inactiveCount1, Is.EqualTo(0), poolAsObj.GetType().Name);
+        Assert.Multiple(() =>
+        {
+            // Got 3 elements from the pool
+            Assert.That(activeCount1, Is.EqualTo(3), poolAsObj.GetType().Name);
+            Assert.That(allCount1, Is.EqualTo(3), poolAsObj.GetType().Name);
+            Assert.That(inactiveCount1, Is.EqualTo(0), poolAsObj.GetType().Name);
 
-        // Returned 3 elements back to the pool
-        Assert.That(activeCount2, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(allCount2, Is.EqualTo(3), poolAsObj.GetType().Name);
-        Assert.That(inactiveCount2, Is.EqualTo(3), poolAsObj.GetType().Name);
+            // Returned 3 elements back to the pool
+            Assert.That(activeCount2, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(allCount2, Is.EqualTo(3), poolAsObj.GetType().Name);
+            Assert.That(inactiveCount2, Is.EqualTo(3), poolAsObj.GetType().Name);
 
-        // After 'Clear'
-        Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            // After 'Clear'
+            Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
+        });
     }
 
     [TestCaseSource(nameof(GetObjectPoolBasedPools), new object?[] { true })]
@@ -199,20 +206,23 @@ public class ObjectPoolClassesTests
 
         pool.Clear();
 
-        // Got 'numOfCreated' elements from the pool
-        Assert.That(activeCount1, Is.EqualTo(numOfCreated), poolAsObj.GetType().Name);
-        Assert.That(allCount1, Is.EqualTo(numOfCreated), poolAsObj.GetType().Name);
-        Assert.That(inactiveCount1, Is.EqualTo(0), poolAsObj.GetType().Name);
+        Assert.Multiple(() =>
+        {
+            // Got 'numOfCreated' elements from the pool
+            Assert.That(activeCount1, Is.EqualTo(numOfCreated), poolAsObj.GetType().Name);
+            Assert.That(allCount1, Is.EqualTo(numOfCreated), poolAsObj.GetType().Name);
+            Assert.That(inactiveCount1, Is.EqualTo(0), poolAsObj.GetType().Name);
 
-        // Tried to return all 'numOfCreated' elements back to the pool
-        Assert.That(activeCount2, Is.EqualTo(MaximumPoolSize), poolAsObj.GetType().Name);
-        Assert.That(allCount2, Is.EqualTo(numOfCreated), poolAsObj.GetType().Name);
-        Assert.That(inactiveCount2, Is.EqualTo(MaximumPoolSize), poolAsObj.GetType().Name);
+            // Tried to return all 'numOfCreated' elements back to the pool
+            Assert.That(activeCount2, Is.EqualTo(MaximumPoolSize), poolAsObj.GetType().Name);
+            Assert.That(allCount2, Is.EqualTo(numOfCreated), poolAsObj.GetType().Name);
+            Assert.That(inactiveCount2, Is.EqualTo(MaximumPoolSize), poolAsObj.GetType().Name);
 
-        // After 'Clear'
-        Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            // After 'Clear'
+            Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
+        });
     }
 
     [TestCaseSource(nameof(GetObjectPoolBasedPools), new object?[] { true })]
@@ -231,11 +241,14 @@ public class ObjectPoolClassesTests
 
         pool.Dispose();
 
-        Assert.That(actualCreated, Is.EqualTo(shouldBeCreated), poolAsObj.GetType().Name);
-        Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.PoolItems.Any(), Is.EqualTo(false), poolAsObj.GetType().Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(actualCreated, Is.EqualTo(shouldBeCreated), poolAsObj.GetType().Name);
+            Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.PoolItems.Any(), Is.EqualTo(false), poolAsObj.GetType().Name);
+        });
     }
 
     [TestCaseSource(nameof(GetObjectPoolBasedPools), new object?[] { true })]
@@ -255,9 +268,12 @@ public class ObjectPoolClassesTests
             pool.Return(a);
         }
 
-        Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
-        Assert.That(pool.PoolItems.Any(), Is.EqualTo(false), poolAsObj.GetType().Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(pool.CountAll, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountActive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.CountInactive, Is.EqualTo(0), poolAsObj.GetType().Name);
+            Assert.That(pool.PoolItems.Any(), Is.EqualTo(false), poolAsObj.GetType().Name);
+        });
     }
 }

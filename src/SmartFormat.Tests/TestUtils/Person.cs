@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace SmartFormat.Tests.TestUtils;
 
 public class Person
 {
-    private Random _random = new();
-
     public Person()
     {
         Friends = new List<Person>();
-        Random = _random.Next(1, 10);
+        Random = GetRandomNumber(1, 10);
     }
     public Person(string newName, Gender gender, DateTime newBirthday, string newAddress, params Person[] newFriends) : this()
     {
@@ -20,6 +19,18 @@ public class Person
         if (!string.IsNullOrEmpty(newAddress))
             Address = Address.Parse(newAddress);
         Friends.AddRange(newFriends);
+    }
+
+    private static int GetRandomNumber(int min, int max)
+    {
+#if !NET6_0_OR_GREATER
+        var randomNumber = new byte[4];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Math.Abs(BitConverter.ToInt32(randomNumber, 0) % 10) + 1;
+#else
+        return RandomNumberGenerator.GetInt32(min, max);
+#endif
     }
 
     public string FirstName { get; set; } = string.Empty;
@@ -34,7 +45,7 @@ public class Person
             }
         }
         set {
-            string[] names = value.Split(' ');
+            var names = value.Split(' ');
             FirstName = names[0];
             if (names.Length == 2) {
                 LastName = names[1];

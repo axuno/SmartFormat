@@ -51,8 +51,11 @@ public class ConcurrentPoolingTests
                 var someObject = pool.Get();
                 pool.Return(someObject);
             }), Throws.Nothing);
-        Assert.That(pool.CountActive, Is.EqualTo(0));
-        Assert.That(pool.CountInactive, Is.GreaterThan(0));
+        Assert.Multiple(() =>
+        {
+            Assert.That(pool.CountActive, Is.EqualTo(0));
+            Assert.That(pool.CountInactive, Is.GreaterThan(0));
+        });
     }
 
     [Test]
@@ -78,9 +81,11 @@ public class ConcurrentPoolingTests
 
         var result = list.OrderBy(e => e);
         long compareCounter = 1;
-            
-        Assert.That(list.Count, Is.EqualTo(maxLoops - 1));
-        Assert.That(result.All(r => r == $"Number: {compareCounter++:00000}"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(list, Has.Count.EqualTo(maxLoops - 1));
+            Assert.That(result.All(r => r == $"Number: {compareCounter++:00000}"));
+        });
 
         foreach (var p in GetAllPoolCounters())
         {
@@ -91,8 +96,11 @@ public class ConcurrentPoolingTests
             Console.WriteLine(@"{0}: {1}", nameof(IPoolCounters.CountInactive), p.Counters?.CountInactive);
 
             Console.WriteLine();
-            Assert.That(p.Counters!.CountActive, Is.EqualTo(0), string.Join(" ", nameof(IPoolCounters.CountActive), p.Type?.ToString()));
-            Assert.That(p.Counters.CountInactive, Is.GreaterThan(0), string.Join(" ", nameof(IPoolCounters.CountInactive), p.Type?.ToString()));
+            Assert.Multiple(() =>
+            {
+                Assert.That(p.Counters!.CountActive, Is.EqualTo(0), string.Join(" ", nameof(IPoolCounters.CountActive), p.Type?.ToString()));
+                Assert.That(p.Counters.CountInactive, Is.GreaterThan(0), string.Join(" ", nameof(IPoolCounters.CountInactive), p.Type?.ToString()));
+            });
         }
 
         // Restore thread safety

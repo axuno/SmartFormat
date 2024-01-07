@@ -26,8 +26,11 @@ public class StringFormatCompatibilityTests
         var cultureDE = new CultureInfo("de-DE");
         var fmt = "Today's temperature is {0}°C.";
         var temp = 20.45m;
-        Assert.That(formatter.Format(cultureUS, fmt, temp), Is.EqualTo(string.Format(cultureUS, fmt, temp)));
-        Assert.That(formatter.Format(cultureDE, fmt, temp), Is.EqualTo(string.Format(cultureDE, fmt, temp)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.Format(cultureUS, fmt, temp), Is.EqualTo(string.Format(cultureUS, fmt, temp)));
+            Assert.That(formatter.Format(cultureDE, fmt, temp), Is.EqualTo(string.Format(cultureDE, fmt, temp)));
+        });
     }
 
     [Test]
@@ -38,8 +41,11 @@ public class StringFormatCompatibilityTests
         var cultureDE = new CultureInfo("de-DE");
         var fmt = "It is now {0:d} at {0:t}";
         var now = DateTime.Now;
-        Assert.That(formatter.Format(cultureUS, fmt, now), Is.EqualTo(string.Format(cultureUS, fmt, now)));
-        Assert.That(formatter.Format(cultureDE, fmt, now), Is.EqualTo(string.Format(cultureDE, fmt, now)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.Format(cultureUS, fmt, now), Is.EqualTo(string.Format(cultureUS, fmt, now)));
+            Assert.That(formatter.Format(cultureDE, fmt, now), Is.EqualTo(string.Format(cultureDE, fmt, now)));
+        });
     }
 
     [Test]
@@ -90,8 +96,11 @@ public class StringFormatCompatibilityTests
         var cultureDE = new CultureInfo("de-DE");
         var fmt = "Today's temperature is {0}°C.";
         var temp = 20.45m;
-        Assert.That(formatter.Format(cultureUS, fmt, temp), Is.EqualTo(string.Format(cultureUS, fmt, temp)));
-        Assert.That(formatter.Format(cultureDE, fmt, temp), Is.EqualTo(string.Format(cultureDE, fmt, temp)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.Format(cultureUS, fmt, temp), Is.EqualTo(string.Format(cultureUS, fmt, temp)));
+            Assert.That(formatter.Format(cultureDE, fmt, temp), Is.EqualTo(string.Format(cultureDE, fmt, temp)));
+        });
     }
 
     [Test]
