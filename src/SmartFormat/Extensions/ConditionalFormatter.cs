@@ -127,7 +127,7 @@ public class ConditionalFormatter : IFormatter
             case DateTime dateTimeArg when dateTimeArg.ToUniversalTime() <= SystemTime.Now().ToUniversalTime():
                 paramIndex = 0;
                 break;
-            case DateTime dateTimeArg:
+            case DateTime:
                 paramIndex = paramCount - 1;
                 break;
             // Date: Past|Present|Future   or   Past/Present|Future
