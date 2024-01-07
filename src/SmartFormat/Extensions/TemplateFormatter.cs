@@ -15,7 +15,7 @@ namespace SmartFormat.Extensions;
 public class TemplateFormatter : IFormatter, IInitializer
 {
     private SmartFormatter? _formatter;
-    private IDictionary<string, Format>? _templates;
+    private Dictionary<string, Format>? _templates;
     private readonly bool _canHandleAutoDetection = false;
 
     /// <summary>

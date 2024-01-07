@@ -83,7 +83,6 @@ public class FormatterExtensionsTests
 
     #region: Default Extensions :
 
-#pragma warning disable CA1861 // Not called repeatedly, but called with different arguments
     [TestCase("{0:cond:zero|one|two}", 0, "zero")]
     [TestCase("{0:cond:zero|one|two}", 1, "one")]
     [TestCase("{0:cond:zero|one|two}", 2, "two")]
@@ -97,7 +96,6 @@ public class FormatterExtensionsTests
         var actualResult = smart.Format(new CultureInfo("en-US"), format, arg0); // must be culture with decimal point
         Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
-#pragma warning restore CA1861
 
     #endregion
 

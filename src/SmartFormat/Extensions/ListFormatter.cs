@@ -282,7 +282,7 @@ public class ListFormatter : IFormatter, ISource, IInitializer
         }
     }
 
-    private static void WriteSpacer(IFormattingInfo formattingInfo, Format spacer, object? value)
+    private static void WriteSpacer(FormattingInfo formattingInfo, Format spacer, object? value)
     {
         if (spacer.HasNested)
             formattingInfo.FormatAsChild(spacer, value);

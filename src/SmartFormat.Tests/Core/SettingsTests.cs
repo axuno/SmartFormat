@@ -19,10 +19,8 @@ public class SettingsTests
     public void ExistingSelectorCharacter_Should_Not_Be_Added()
     {
         var settings = new SmartSettings();
-#pragma warning disable CA1861 // Not called repeatedly
         settings.Parser.AddCustomSelectorChars(new[] {'A', ' '});
         settings.Parser.AddCustomSelectorChars(new[] {' '});
-#pragma warning restore CA1861
         Assert.Multiple(() =>
         {
             Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == 'A'), Is.EqualTo(0));
@@ -42,10 +40,8 @@ public class SettingsTests
     public void ExistingOperatorCharacter_Should_Not_Be_Added()
     {
         var settings = new SmartSettings();
-#pragma warning disable CA1861 // Not called repeatedly
         settings.Parser.AddCustomOperatorChars(new[] {settings.Parser.OperatorChars()[0], '°'});
         settings.Parser.AddCustomOperatorChars(new[] {'°'});
-#pragma warning restore CA1861
 
         Assert.Multiple(() =>
         {

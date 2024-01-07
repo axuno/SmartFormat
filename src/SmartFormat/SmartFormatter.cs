@@ -492,7 +492,7 @@ public class SmartFormatter
     #region: Private methods :
 
     private void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
-        IFormattingInfo formattingInfo)
+        FormattingInfo formattingInfo)
     {
         OnFormattingFailure?.Invoke(this,
             new FormattingErrorEventArgs(errorItem.RawText, startIndex,
@@ -614,8 +614,7 @@ public class SmartFormatter
     {
         if (formattingInfo.Placeholder is null)
         {
-            throw new ArgumentException(
-                $"{nameof(formattingInfo)}.{nameof(formattingInfo.Placeholder)} must not be null.");
+            throw new ArgumentException($"The property {nameof(formattingInfo)}.{nameof(formattingInfo.Placeholder)} must not be null.", nameof(formattingInfo));
         }
 
         var formatterName = formattingInfo.Placeholder.FormatterName;

@@ -32,12 +32,16 @@ public static class ReflectionTools
             }
         }
 
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(assembly, nameof(assembly));
+        ArgumentNullException.ThrowIfNull(genericTypeDefinition, nameof(genericTypeDefinition));
+#else
         if (assembly == null)
             throw new ArgumentNullException(nameof(assembly));
 
         if (genericTypeDefinition == null)
             throw new ArgumentNullException(nameof(genericTypeDefinition));
-
+#endif
         if (!genericTypeDefinition.IsGenericTypeDefinition)
             throw new ArgumentException(
                 @"Specified type is not a valid generic type definition.",
