@@ -48,7 +48,7 @@ public class ChooseFormatter : IFormatter
         var formats = formattingInfo.Format?.Split(SplitChar);
             
         // Check whether arguments can be handled by this formatter
-        if (formats is null || formats.Count < 2 || chooseOptions is null)
+        if (formats is null || formats.Count < 2)
         {
             // Auto detection calls just return a failure to evaluate
             if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))

@@ -856,7 +856,7 @@ public class Parser
                 // Placeholder without issues are left unmodified
                 for (var i = 0; i < currentResult.Items.Count; i++)
                 {
-                    if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
+                    if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Exists(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                     {
                         var parent = ph.Format ?? FormatPool.Instance.Get().Initialize(Settings, ph.BaseString);
                         currentResult.Items[i] = LiteralTextPool.Instance.Get().Initialize(Settings, parent, parent.BaseString, ph.StartIndex, ph.EndIndex);
@@ -867,7 +867,7 @@ public class Parser
                 // Replace erroneous Placeholders with an empty LiteralText
                 for (var i = 0; i < currentResult.Items.Count; i++)
                 {
-                    if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Any(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
+                    if (currentResult.Items[i] is Placeholder ph && parsingErrors.Issues.Exists(errItem => errItem.Index >= currentResult.Items[i].StartIndex && errItem.Index <= currentResult.Items[i].EndIndex))
                     {
                         var parent = ph.Format ?? FormatPool.Instance.Get().Initialize(Settings, ph.BaseString);
                         currentResult.Items[i] = LiteralTextPool.Instance.Get().Initialize(Settings, parent, parent.BaseString, ph.StartIndex, ph.StartIndex);
