@@ -62,7 +62,7 @@ public class NewtonsoftJsonSourceTests
     {
         var jObject = JObject.Parse(JsonNull);
         var result = GetFormatterWithJsonSource().Format("{Name:isnull:Value is Null|{}}", jObject);
-        Assert.AreEqual("Value is Null", result);
+        Assert.That(result, Is.EqualTo("Value is Null"));
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class NewtonsoftJsonSourceTests
             .AddExtensions(new NewtonsoftJsonSource())
             .AddExtensions(new DefaultFormatter());
         var result = smart.Format("{0}", new JValue('v'));
-        Assert.AreEqual("v", result);
+        Assert.That(result, Is.EqualTo("v"));
     }
 
     [Test]
@@ -81,7 +81,7 @@ public class NewtonsoftJsonSourceTests
     {
         var jObject = JObject.Parse(JsonOneLevel);
         var result = GetFormatterWithJsonSource().Format("{Name}", jObject);
-        Assert.AreEqual("Doe", result);
+        Assert.That(result, Is.EqualTo("Doe"));
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class NewtonsoftJsonSourceTests
     {
         var jObject = JObject.Parse(JsonTwoLevel);
         var result = GetFormatterWithJsonSource().Format("{Name.First}", jObject);
-        Assert.AreEqual("Joe", result);
+        Assert.That(result, Is.EqualTo("Joe"));
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class NewtonsoftJsonSourceTests
     {
         var jObject = JObject.Parse(JsonNull);
         var result = GetFormatterWithJsonSource().Format("{Name?.First}", jObject);
-        Assert.AreEqual("", result);
+        Assert.That(result, Is.EqualTo(""));
     }
 
     [Test]
@@ -107,9 +107,9 @@ public class NewtonsoftJsonSourceTests
         var smart = GetFormatterWithJsonSource(new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseSensitive});
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("50.00", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[0].Products[0].Price:0.00}", jObject));
-            Assert.AreEqual("True", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[0].OnStock}", jObject));
-            Assert.AreEqual("False", smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[1].OnStock}", jObject));
+            Assert.That(smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[0].Products[0].Price:0.00}", jObject), Is.EqualTo("50.00"));
+            Assert.That(smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[0].OnStock}", jObject), Is.EqualTo("True"));
+            Assert.That(smart.Format(CultureInfo.InvariantCulture, "{Manufacturers[1].Products[1].OnStock}", jObject), Is.EqualTo("False"));
         });
     }
 
@@ -119,7 +119,7 @@ public class NewtonsoftJsonSourceTests
         var jObject = JObject.Parse(JsonComplex);
         var smart = GetFormatterWithJsonSource(new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive});
         var result = smart.Format(CultureInfo.InvariantCulture, "{MaNuFaCtUrErS[0].PrOdUcTs[0].PrIcE:0.00}", jObject);
-        Assert.AreEqual("50.00", result);
+        Assert.That(result, Is.EqualTo("50.00"));
     }
 
     [Test]
@@ -127,7 +127,7 @@ public class NewtonsoftJsonSourceTests
     {
         var jObject = JObject.Parse(JsonComplex);
         var result = GetFormatterWithJsonSource().Format("{Stores:list:{}|, |, and }", jObject);
-        Assert.AreEqual("Lambton Quay, and Willis Street", result);
+        Assert.That(result, Is.EqualTo("Lambton Quay, and Willis Street"));
     }
 
     [Test]

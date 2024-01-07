@@ -132,7 +132,7 @@ public class DictionarySourceTests
         var formatter = Smart.CreateDefaultSmartFormat();
         var result = formatter.Format(format, addr.ToDictionary());
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -206,10 +206,16 @@ public class DictionarySourceTests
             .AddExtensions(new DefaultFormatter());
         var result = smart.Format("{One}", kvp);
 
-        Assert.That(result, Is.EqualTo("1"));
-        Assert.That(dictSource.RoDictionaryTypeCache.Keys.Count, Is.EqualTo(1));
-        Assert.That(dictSource.RoDictionaryTypeCache.Keys.First(), Is.EqualTo(typeof(KeyValuePair<string, object?>)));
-        Assert.That(dictSource.RoDictionaryTypeCache.Values.First(), Is.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo("1"));
+            Assert.That(dictSource.RoDictionaryTypeCache.Keys, Has.Count.EqualTo(1));
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(dictSource.RoDictionaryTypeCache.Keys.First(), Is.EqualTo(typeof(KeyValuePair<string, object?>)));
+            Assert.That(dictSource.RoDictionaryTypeCache.Values.First(), Is.Null);
+        });
     }
 
     public class CustomReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue?>

@@ -19,11 +19,15 @@ public class SettingsTests
     public void ExistingSelectorCharacter_Should_Not_Be_Added()
     {
         var settings = new SmartSettings();
+#pragma warning disable CA1861 // Not called repeatedly
         settings.Parser.AddCustomSelectorChars(new[] {'A', ' '});
         settings.Parser.AddCustomSelectorChars(new[] {' '});
-
-        Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == 'A'), Is.EqualTo(0));
-        Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == ' '), Is.EqualTo(1));
+#pragma warning restore CA1861
+        Assert.Multiple(() =>
+        {
+            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == 'A'), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == ' '), Is.EqualTo(1));
+        });
     }
 
     [Test]
@@ -38,11 +42,16 @@ public class SettingsTests
     public void ExistingOperatorCharacter_Should_Not_Be_Added()
     {
         var settings = new SmartSettings();
+#pragma warning disable CA1861 // Not called repeatedly
         settings.Parser.AddCustomOperatorChars(new[] {settings.Parser.OperatorChars()[0], '°'});
         settings.Parser.AddCustomOperatorChars(new[] {'°'});
+#pragma warning restore CA1861
 
-        Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == settings.Parser.OperatorChars()[0]), Is.EqualTo(0));
-        Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == '°'), Is.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == settings.Parser.OperatorChars()[0]), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == '°'), Is.EqualTo(1));
+        });
     }
 
     [TestCase('°')] // a custom char

@@ -82,8 +82,11 @@ public class DefaultFormatterTests
                        new string(value.Reverse().Select(c => c).ToArray());
         var resultSmartFormat = smart.Format(new ReverseFormatProvider(), $"{{0:{format}}}", value);
         var resultStringFormat = string.Format(new ReverseFormatProvider(), $"{{0:{format}}}", value);
-        Assert.That(resultSmartFormat, Is.EqualTo(expected));
-        Assert.That(resultStringFormat, Is.EqualTo(expected));
+        Assert.Multiple(() =>
+        {
+            Assert.That(resultSmartFormat, Is.EqualTo(expected));
+            Assert.That(resultStringFormat, Is.EqualTo(expected));
+        });
     }
 
     /// <summary>

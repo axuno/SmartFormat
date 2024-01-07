@@ -79,9 +79,12 @@ public class ParserTests
         }
         catch (Exception e)
         {
-            // Throws, because selector contains 2 illegal characters
-            Assert.That(e, Is.InstanceOf<ParsingErrors>());
-            Assert.That(((ParsingErrors)e).Issues.Count, Is.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                // Throws, because selector contains 2 illegal characters
+                Assert.That(e, Is.InstanceOf<ParsingErrors>());
+                Assert.That(((ParsingErrors) e).Issues, Has.Count.EqualTo(2));
+            });
         }
     }
 
@@ -99,16 +102,22 @@ public class ParserTests
             }
             catch (ParsingErrors e)
             {
-                Assert.IsTrue(e.HasIssues);
+                Assert.That(e.HasIssues, Is.True);
                 if (e.Issues.Count == 1)
                 {
-                    Assert.IsTrue(e.Message.Contains("has 1 issue"));
-                    Assert.IsTrue(e.MessageShort.Contains("has 1 issue"));
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(e.Message, Does.Contain("has 1 issue"));
+                        Assert.That(e.MessageShort, Does.Contain("has 1 issue"));
+                    });
                 }
                 else
                 {
-                    Assert.IsTrue(e.Message.Contains($"has {e.Issues.Count} issues"));
-                    Assert.IsTrue(e.MessageShort.Contains($"has {e.Issues.Count} issues"));
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(e.Message, Does.Contain($"has {e.Issues.Count} issues"));
+                        Assert.That(e.MessageShort, Does.Contain($"has {e.Issues.Count} issues"));
+                    });
                 }
             }
         }
@@ -148,11 +157,14 @@ public class ParserTests
         var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.Ignore}});
         using var parsed = parser.ParseFormat(invalidTemplate);
             
-        Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
-        Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "), "Literal text");
-        Assert.That(parsed.Items[1].RawText, Is.EqualTo(string.Empty), "Erroneous placeholder");
-        Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
-        Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)));
+        Assert.That(parsed.Items, Has.Count.EqualTo(4), "Number of parsed items");
+        Assert.Multiple(() =>
+        {
+            Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "), "Literal text");
+            Assert.That(parsed.Items[1].RawText, Is.EqualTo(string.Empty), "Erroneous placeholder");
+            Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
+            Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)));
+        });
         Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"), "Correct placeholder");
     }
 
@@ -167,10 +179,13 @@ public class ParserTests
         var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
         using var parsed = parser.ParseFormat(invalidTemplate);
 
-        Assert.That(parsed.Items.Count, Is.EqualTo(4), "Number of parsed items");
-        Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "));
-        Assert.That(parsed.Items[1].RawText, Is.EqualTo("{Name from {City}"));
-        Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
+        Assert.That(parsed.Items, Has.Count.EqualTo(4), "Number of parsed items");
+        Assert.Multiple(() =>
+        {
+            Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "));
+            Assert.That(parsed.Items[1].RawText, Is.EqualTo("{Name from {City}"));
+            Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
+        });
         if (lastItemIsPlaceholder)
         {
             Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)), "Last item should be Placeholder");
@@ -192,7 +207,7 @@ public class ParserTests
         var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.OutputErrorInResult}});
         using var parsed = parser.ParseFormat(invalidTemplate);
 
-        Assert.That(parsed.Items.Count, Is.EqualTo(1));
+        Assert.That(parsed.Items, Has.Count.EqualTo(1));
         Assert.That(parsed.Items[0].RawText, Does.StartWith("The format string has 3 issues"));
     }
 
@@ -204,13 +219,16 @@ public class ParserTests
 
         var format = parser.ParseFormat(formatString);
 
-        // Extract the substrings of literal text:
-        Assert.That(format.Substring( 1, 3).ToString(), Is.EqualTo("a|a"));
-        Assert.That(format.Substring(41, 4).ToString(), Is.EqualTo("gg|g"));
+        Assert.Multiple(() =>
+        {
+            // Extract the substrings of literal text:
+            Assert.That(format.Substring(1, 3).ToString(), Is.EqualTo("a|a"));
+            Assert.That(format.Substring(41, 4).ToString(), Is.EqualTo("gg|g"));
 
-        // Extract a substring that overlaps into the placeholder:
-        Assert.That(format.Substring(4, 3).ToString(), Is.EqualTo("a {bbb: ccc dd|d {:|||} {eee} ff|f }"));
-        Assert.That(format.Substring(20, 23).ToString(), Is.EqualTo("{bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
+            // Extract a substring that overlaps into the placeholder:
+            Assert.That(format.Substring(4, 3).ToString(), Is.EqualTo("a {bbb: ccc dd|d {:|||} {eee} ff|f }"));
+            Assert.That(format.Substring(20, 23).ToString(), Is.EqualTo("{bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
+        });
 
         // Make sure a invalid values are caught:
         var format1 = format;
@@ -222,17 +240,20 @@ public class ParserTests
         // Now, test nested format strings:
         var placeholder = (Placeholder)format.Items[1];
         format = placeholder.Format!;
-        Assert.That(format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
+        Assert.Multiple(() =>
+        {
+            Assert.That(format.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
 
-        Assert.That(format.Substring(5, 4).ToString(), Is.EqualTo("dd|d"));
-        Assert.That(format.Substring(8, 3).ToString(), Is.EqualTo("d {:|||}"));
-        Assert.That(format.Substring(8, 10).ToString(), Is.EqualTo("d {:|||} {eee}"));
-        Assert.That(format.Substring(8, 16).ToString(), Is.EqualTo("d {:|||} {eee} f"));
+            Assert.That(format.Substring(5, 4).ToString(), Is.EqualTo("dd|d"));
+            Assert.That(format.Substring(8, 3).ToString(), Is.EqualTo("d {:|||}"));
+            Assert.That(format.Substring(8, 10).ToString(), Is.EqualTo("d {:|||} {eee}"));
+            Assert.That(format.Substring(8, 16).ToString(), Is.EqualTo("d {:|||} {eee} f"));
 
-        // Make sure invalid values are caught:
-        Assert.That(() => format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
-        Assert.That(() => format.Substring(30), Throws.TypeOf<ArgumentOutOfRangeException>());
-        Assert.That(() => format.Substring(25, 5), Throws.TypeOf<ArgumentOutOfRangeException>());
+            // Make sure invalid values are caught:
+            Assert.That(() => format.Substring(-1, 10), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(30), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => format.Substring(25, 5), Throws.TypeOf<ArgumentOutOfRangeException>());
+        });
 
     }
 
@@ -244,10 +265,16 @@ public class ParserTests
 
         using var format = parser.ParseFormat(formatString);
         var placeholder = (Placeholder) format.Items[0];
-        Assert.That(placeholder.ToString(), Is.EqualTo(formatString));
-        Assert.That(placeholder.Selectors.Count, Is.EqualTo(2));
-        Assert.That(placeholder.Selectors[1].Operator[0], Is.EqualTo(','));
-        Assert.That(placeholder.Selectors[1].RawText, Is.EqualTo("-10"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder.ToString(), Is.EqualTo(formatString));
+            Assert.That(placeholder.Selectors, Has.Count.EqualTo(2));
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder.Selectors[1].Operator[0], Is.EqualTo(','));
+            Assert.That(placeholder.Selectors[1].RawText, Is.EqualTo("-10"));
+        });
     }
 
     [Test]
@@ -257,20 +284,26 @@ public class ParserTests
         var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
         var result = parser.ParseFormat(format);
 
-        Assert.That(result.IndexOf('|'), Is.EqualTo(2));
-        Assert.That(result.IndexOf('|', 3), Is.EqualTo(43));
-        Assert.That(result.IndexOf('|', 44), Is.EqualTo(-1));
-        Assert.That(result.IndexOf('#'), Is.EqualTo(-1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IndexOf('|'), Is.EqualTo(2));
+            Assert.That(result.IndexOf('|', 3), Is.EqualTo(43));
+            Assert.That(result.IndexOf('|', 44), Is.EqualTo(-1));
+            Assert.That(result.IndexOf('#'), Is.EqualTo(-1));
+        });
 
         // Test nested formats:
         var placeholder = (Placeholder) result.Items[1];
         result = placeholder.Format!;
-        Assert.That(result.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
 
-        Assert.That(result.IndexOf('|'), Is.EqualTo(7));
-        Assert.That(result.IndexOf('|', 8), Is.EqualTo(25));
-        Assert.That(result.IndexOf('|', 26), Is.EqualTo(-1));
-        Assert.That(result.IndexOf('#'), Is.EqualTo(-1));
+            Assert.That(result.IndexOf('|'), Is.EqualTo(7));
+            Assert.That(result.IndexOf('|', 8), Is.EqualTo(25));
+            Assert.That(result.IndexOf('|', 26), Is.EqualTo(-1));
+            Assert.That(result.IndexOf('#'), Is.EqualTo(-1));
+        });
     }
 
     [Test]
@@ -281,10 +314,13 @@ public class ParserTests
         var parsedFormat = parser.ParseFormat(format);
         var splits = parsedFormat.Split('|');
 
-        Assert.That(splits.Count, Is.EqualTo(3));
-        Assert.That(splits[0].ToString(), Is.EqualTo(" a"));
-        Assert.That(splits[1].ToString(), Is.EqualTo("aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
-        Assert.That(splits[2].ToString(), Is.EqualTo("g "));
+        Assert.That(splits, Has.Count.EqualTo(3));
+        Assert.Multiple(() =>
+        {
+            Assert.That(splits[0].ToString(), Is.EqualTo(" a"));
+            Assert.That(splits[1].ToString(), Is.EqualTo("aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
+            Assert.That(splits[2].ToString(), Is.EqualTo("g "));
+        });
 
         // Test nested formats:
         var placeholder = (Placeholder) parsedFormat.Items[1];
@@ -292,10 +328,13 @@ public class ParserTests
         Assert.That(parsedFormat.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
         splits = parsedFormat.Split('|');
 
-        Assert.That(splits.Count, Is.EqualTo(3));
-        Assert.That(splits[0].ToString(), Is.EqualTo(" ccc dd"));
-        Assert.That(splits[1].ToString(), Is.EqualTo("d {:|||} {eee} ff"));
-        Assert.That(splits[2].ToString(), Is.EqualTo("f "));
+        Assert.That(splits, Has.Count.EqualTo(3));
+        Assert.Multiple(() =>
+        {
+            Assert.That(splits[0].ToString(), Is.EqualTo(" ccc dd"));
+            Assert.That(splits[1].ToString(), Is.EqualTo("d {:|||} {eee} ff"));
+            Assert.That(splits[2].ToString(), Is.EqualTo("f "));
+        });
     }
 
     [TestCase("{0:name:}", "name", "", "")]
@@ -314,9 +353,12 @@ public class ParserTests
         // Named formatters will only be recognized by the parser, if their name occurs in one of FormatterExtensions.
         // If the name of the formatter does not exists, the string is treaded as format for the DefaultFormatter.
         var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
-        Assert.AreEqual(expectedName, placeholder.FormatterName.ToString());
-        Assert.AreEqual(expectedOptions, placeholder.FormatterOptions.ToString());
-        Assert.AreEqual(expectedFormat, placeholder.Format!.ToString());
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder.FormatterName.ToString(), Is.EqualTo(expectedName));
+            Assert.That(placeholder.FormatterOptions.ToString(), Is.EqualTo(expectedOptions));
+            Assert.That(placeholder.Format!.ToString(), Is.EqualTo(expectedFormat));
+        });
     }
 
     [Test]
@@ -325,7 +367,7 @@ public class ParserTests
         // find formatter formatter name, which does not exist in the (empty) list of formatter extensions
         var parser = GetRegularParser();
         var placeholderWithNonExistingName = (Placeholder)parser.ParseFormat("{0:formattername:}").Items[0];
-        Assert.AreEqual("formattername", placeholderWithNonExistingName.FormatterName.ToString());
+        Assert.That(placeholderWithNonExistingName.FormatterName.ToString(), Is.EqualTo("formattername"));
     }
 
     // Incomplete:
@@ -361,9 +403,12 @@ public class ParserTests
         var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
         var literalText = placeholder.Format?.GetLiteralText();
 
-        Assert.That(placeholder.FormatterName.ToString(), Is.Empty);
-        Assert.That(placeholder.FormatterOptions.ToString(), Is.Empty);
-        Assert.That(literalText, Is.EqualTo(expectedLiteralText));
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder.FormatterName.ToString(), Is.Empty);
+            Assert.That(placeholder.FormatterOptions.ToString(), Is.Empty);
+            Assert.That(literalText, Is.EqualTo(expectedLiteralText));
+        });
     }
 
     [TestCase(@"{0:format{}}", "format")]
@@ -379,9 +424,12 @@ public class ParserTests
         var placeholder = (Placeholder) parser.ParseFormat(format).Items[0];
         var literalText = placeholder.Format?.GetLiteralText();
 
-        Assert.That(placeholder.FormatterName.Length == 0);
-        Assert.That(placeholder.FormatterOptions.ToString(), Is.Empty);
-        Assert.That(literalText, Is.EqualTo(expectedLiteralText));
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder.FormatterName, Is.Empty);
+            Assert.That(placeholder.FormatterOptions.ToString(), Is.Empty);
+            Assert.That(literalText, Is.EqualTo(expectedLiteralText));
+        });
     }
         
     [Test]
@@ -396,9 +444,11 @@ public class ParserTests
             
         formatter.Parser.OnParsingFailure += (o, args) => parsingError = args.Errors;
         var res = formatter.Format("{NoName {Other} {Same", default(object)!);
-            
-        Assert.That(parsingError!.Issues.Count, Is.EqualTo(3));
-        Assert.That(parsingError.Issues[2].Issue,  Is.EqualTo(new Parser.ParsingErrorText()[SmartFormat.Core.Parsing.Parser.ParsingError.MissingClosingBrace]));
+        Assert.Multiple(() =>
+        {
+            Assert.That(parsingError!.Issues, Has.Count.EqualTo(3));
+            Assert.That(parsingError.Issues[2].Issue, Is.EqualTo(new Parser.ParsingErrorText()[SmartFormat.Core.Parsing.Parser.ParsingError.MissingClosingBrace]));
+        });
     }
 
     [Test]
@@ -436,9 +486,12 @@ public class ParserTests
         var c1 = (Placeholder) placeholders.Items[0];
         var c2 = (Placeholder) c1.Format?.Items[0]!;
         var c3 = (Placeholder) c2.Format?.Items[0]!;
-        Assert.AreEqual("c1", c1.Selectors[0].RawText);
-        Assert.AreEqual("c2", c2.Selectors[0].RawText);
-        Assert.AreEqual("c3", c3.Selectors[0].RawText);
+        Assert.Multiple(() =>
+        {
+            Assert.That(c1.Selectors[0].RawText, Is.EqualTo("c1"));
+            Assert.That(c2.Selectors[0].RawText, Is.EqualTo("c2"));
+            Assert.That(c3.Selectors[0].RawText, Is.EqualTo("c3"));
+        });
     }
 
     [Test]
@@ -456,14 +509,16 @@ public class ParserTests
 
         var format = parser.ParseFormat($"{{{selector}:{formatterName}({options}):{literal}}}");
         var placeholder = (Placeholder) format.Items[0];
-            
-        Assert.That(format.Items.Count, Is.EqualTo(1));
-        Assert.That(placeholder.Selectors[0].RawText, Is.EqualTo(selector));
-        Assert.That(format.HasNested, Is.True);
-        Assert.That(placeholder.FormatterName.ToString(), Is.EqualTo(formatterName));
-        Assert.That(placeholder.FormatterOptions.ToString(), Is.EqualTo(options.Replace("\\", "")));
-        Assert.That(placeholder.Format?.Items.Count, Is.EqualTo(3));
-        Assert.That(string.Concat(placeholder.Format?.Items[0].ToString(), placeholder.Format?.Items[1].ToString(), placeholder.Format?.Items[2].ToString()), Is.EqualTo(literal.Replace("\\", "")));
+        Assert.Multiple(() =>
+        {
+            Assert.That(format.Items, Has.Count.EqualTo(1));
+            Assert.That(placeholder.Selectors[0].RawText, Is.EqualTo(selector));
+            Assert.That(format.HasNested, Is.True);
+            Assert.That(placeholder.FormatterName.ToString(), Is.EqualTo(formatterName));
+            Assert.That(placeholder.FormatterOptions.ToString(), Is.EqualTo(options.Replace("\\", "")));
+            Assert.That(placeholder.Format?.Items.Count, Is.EqualTo(3));
+            Assert.That(string.Concat(placeholder.Format?.Items[0].ToString(), placeholder.Format?.Items[1].ToString(), placeholder.Format?.Items[2].ToString()), Is.EqualTo(literal.Replace("\\", "")));
+        });
     }
 
     [TestCase(@"\u1234", @"\u1234", 0, true)]
@@ -499,9 +554,12 @@ public class ParserTests
 
         var placeholder = result.Items[0] as Placeholder;
         Assert.That(placeholder, Is.Not.Null);
-        Assert.That(placeholder!.Selectors.Count, Is.EqualTo(1));
-        Assert.That(placeholder!.Selectors.Count, Is.EqualTo(placeholder!.GetSelectors().Count));
-        Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,2)));
+        Assert.That(placeholder!.Selectors, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder!.Selectors, Has.Count.EqualTo(placeholder!.GetSelectors().Count));
+            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1, 2)));
+        });
     }
 
     [TestCase("{a b}", ' ')]
@@ -514,10 +572,13 @@ public class ParserTests
 
         var placeholder = result.Items[0] as Placeholder;
         Assert.That(placeholder, Is.Not.Null);
-        Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
-        Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
-        Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(3, 1)));
-        Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2,1)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder!.Selectors, Has.Count.EqualTo(2));
+            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1, 1)));
+            Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(3, 1)));
+            Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2, 1)));
+        });
     }
 
     [TestCase("{A?.B}")]
@@ -540,22 +601,31 @@ public class ParserTests
 
         var placeholder = result.Items[0] as Placeholder;
         Assert.That(placeholder, Is.Not.Null);
-        Assert.That(placeholder!.Selectors.Count, Is.EqualTo(numOfSelectors));
+        Assert.That(placeholder!.Selectors, Has.Count.EqualTo(numOfSelectors));
         if (numOfSelectors == 2)
         {
-            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
-            // Group Sel_1 is empty
-            Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
-            // Concatenate because of regex simplification for 2 selectors
-            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value + reMatches[0].Groups["Sel_2_Op"].Value));
+            Assert.Multiple(() =>
+            {
+                Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
+                // Group Sel_1 is empty
+                Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
+                // Concatenate because of regex simplification for 2 selectors
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value + reMatches[0].Groups["Sel_2_Op"].Value));
+            });
         }
         else
         {
-            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
-            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
-            Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1"].Value));
-            Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
-            Assert.That(placeholder.Selectors[2].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
+            Assert.Multiple(() =>
+            {
+                Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_0"].Value));
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_1"].Value));
+            });
+            Assert.Multiple(() =>
+            {
+                Assert.That(placeholder.Selectors[1].Operator, Is.EqualTo(reMatches[0].Groups["Sel_1_Op"].Value));
+                Assert.That(placeholder.Selectors[2].ToString(), Is.EqualTo(reMatches[0].Groups["Sel_2"].Value));
+            });
         }
     }
 
@@ -573,10 +643,13 @@ public class ParserTests
 
         var placeholder = result.Items[0] as Placeholder;
         Assert.That(placeholder, Is.Not.Null);
-        Assert.That(placeholder!.Selectors.Count, Is.EqualTo(2));
-        Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1,1)));
-        Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(4,1)));
-        Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2,2)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(placeholder!.Selectors, Has.Count.EqualTo(2));
+            Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1, 1)));
+            Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(4, 1)));
+            Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2, 2)));
+        });
     }
 
     // Tags which will be skipped by method Parser.ParseHtmlTags()
@@ -615,7 +688,7 @@ public class ParserTests
 
         var result = parser.ParseFormat(input);
 
-        Assert.That(result.Items.Count, Is.EqualTo(1));
+        Assert.That(result.Items, Has.Count.EqualTo(1));
         var literalText = result.Items[0] as LiteralText;
         Assert.That(literalText, Is.Not.Null);
         Assert.That(literalText!.RawText, Is.EqualTo(input));
@@ -641,7 +714,7 @@ public class ParserTests
             case false:
             {
                 var result = parser.ParseFormat(input);
-                Assert.That(result.Items.Count, Is.EqualTo(3));
+                Assert.That(result.Items, Has.Count.EqualTo(3));
                 break;
             }
         }
@@ -784,17 +857,23 @@ public class ParserTests
 
         if (shouldFail)
         {
-            Assert.That(parsingFailures, Is.GreaterThan(0));
-            Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
-                "NO placeholder");
+            Assert.Multiple(() =>
+            {
+                Assert.That(parsingFailures, Is.GreaterThan(0));
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(0),
+                    "NO placeholder");
+            });
         }
         else
         {
-            Assert.That(parsingFailures, Is.EqualTo(0));
-            Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
-                "One placeholders");
-            Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
-                Is.EqualTo("{TheVariable}"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(parsingFailures, Is.EqualTo(0));
+                Assert.That(parsed.Items.Count(i => i.GetType() == typeof(Placeholder)), Is.EqualTo(1),
+                    "One placeholders");
+                Assert.That(parsed.Items.First(i => i.GetType() == typeof(Placeholder)).RawText,
+                    Is.EqualTo("{TheVariable}"));
+            });
         }
     }
 

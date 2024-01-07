@@ -33,17 +33,23 @@ public class PersistentVariableSourceTests
         pvs.Add(groupName1, vg1);
         pvs[groupName2] = vg2;
 
-        Assert.That(pvs.Count, Is.EqualTo(2));
-        Assert.That(pvs[groupName1], Is.EqualTo(vg1));
-        Assert.That(pvs[groupName2], Is.EqualTo(vg2));
-        Assert.That(pvs.Keys.Count, Is.EqualTo(2));
-        Assert.That(pvs.ContainsKey(groupName1));
-        Assert.That(pvs.Values.Count, Is.EqualTo(2));
-        Assert.That(pvs.Values.Contains(vg1));
-        Assert.That(pvs.Values.Contains(vg2));
-        Assert.That(pvs.ContainsKey(groupName2));
-        Assert.That(pvs.TryGetValue(groupName1, out _), Is.True);
-        Assert.That(pvs.TryGetValue(groupName1 + "False", out _), Is.False);
+        Assert.That(pvs, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(pvs[groupName1], Is.EqualTo(vg1));
+            Assert.That(pvs[groupName2], Is.EqualTo(vg2));
+            Assert.That(pvs.Keys, Has.Count.EqualTo(2));
+            Assert.That(pvs.ContainsKey(groupName1));
+            Assert.That(pvs.Values, Has.Count.EqualTo(2));
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(pvs.Values.Contains(vg1));
+            Assert.That(pvs.Values.Contains(vg2));
+            Assert.That(pvs.ContainsKey(groupName2));
+            Assert.That(pvs.TryGetValue(groupName1, out _), Is.True);
+            Assert.That(pvs.TryGetValue(groupName1 + "False", out _), Is.False);
+        });
     }
 
     [Test]
@@ -53,7 +59,7 @@ public class PersistentVariableSourceTests
         var kvp = new KeyValuePair<string, VariablesGroup>("theKey", new VariablesGroup());
         pvs.Add(kvp);
 
-        Assert.That(pvs.Contains(new KeyValuePair<string, VariablesGroup>(kvp.Key, kvp.Value)));
+        Assert.That(pvs, Does.Contain(new KeyValuePair<string, VariablesGroup>(kvp.Key, kvp.Value)));
     }
 
     [Test]
@@ -93,7 +99,7 @@ public class PersistentVariableSourceTests
         pvs.Add(kvp);
         pvs.Remove(kvp);
 
-        Assert.That(pvs.Count, Is.EqualTo(0));
+        Assert.That(pvs, Is.Empty);
         Assert.That(pvs.Remove("non-existent"), Is.EqualTo(false));
     }
 
@@ -103,7 +109,7 @@ public class PersistentVariableSourceTests
         var pvs = new PersistentVariablesSource { { "global", new VariablesGroup() } };
         pvs.Remove("global");
 
-        Assert.That(pvs.Count, Is.EqualTo(0));
+        Assert.That(pvs, Is.Empty);
         Assert.That(pvs.Remove("non-existent"), Is.EqualTo(false));
     }
 
@@ -115,7 +121,7 @@ public class PersistentVariableSourceTests
         pvs.Add(kvp);
         pvs.Clear();
 
-        Assert.That(pvs.Count, Is.EqualTo(0));
+        Assert.That(pvs, Is.Empty);
     }
 
     [Test]
@@ -130,7 +136,7 @@ public class PersistentVariableSourceTests
         var array = new KeyValuePair<string, VariablesGroup>[pvs.Count];
         pvs.CopyTo(array, 0);
 
-        Assert.That(pvs.Count, Is.EqualTo(array.Length));
+        Assert.That(pvs, Has.Count.EqualTo(array.Length));
         for (var i = 0; i < array.Length; i++)
         {
             Assert.That(pvs.ContainsKey(array[i].Key));
@@ -153,9 +159,12 @@ public class PersistentVariableSourceTests
 
         var pvsCopy = pvs.Clone();
 
-        Assert.That(pvsCopy.Count, Is.EqualTo(pvs.Count));
-        Assert.That(pvsCopy.Values, Is.EquivalentTo(pvs.Values));
-        Assert.That(pvsCopy.Keys, Is.EquivalentTo(pvs.Keys));
+        Assert.That(pvsCopy, Has.Count.EqualTo(pvs.Count));
+        Assert.Multiple(() =>
+        {
+            Assert.That(pvsCopy.Values, Is.EquivalentTo(pvs.Values));
+            Assert.That(pvsCopy.Keys, Is.EquivalentTo(pvs.Keys));
+        });
     }
 
     [Test]
@@ -195,10 +204,13 @@ public class PersistentVariableSourceTests
         var topInteger = smart.Format("{global.topInteger}");
         var topString = smart.Format("{global.topString}");
 
-        // Assert
-        Assert.That(globalGroup, Is.EqualTo("groupStringValue groupDateTime=2024-12-31"));
-        Assert.That(topString, Is.EqualTo(stringVar.ToString()));
-        Assert.That(topInteger, Is.EqualTo("12345"));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(globalGroup, Is.EqualTo("groupStringValue groupDateTime=2024-12-31"));
+            Assert.That(topString, Is.EqualTo(stringVar.ToString()));
+            Assert.That(topInteger, Is.EqualTo("12345"));
+        });
     }
 
     [Test]
@@ -223,8 +235,11 @@ public class PersistentVariableSourceTests
             new VariablesGroup
                 { new KeyValuePair<string, IVariable>("varName", new IntVariable(123)) });
 
-        Assert.That(pvs.Name, Is.EqualTo("theName"));
-        Assert.That(pvs.Group.ContainsKey("varName"), Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(pvs.Name, Is.EqualTo("theName"));
+            Assert.That(pvs.Group.ContainsKey("varName"), Is.True);
+        });
     }
 
     [TestCase("not-null", "not-null")]
@@ -276,8 +291,11 @@ public class PersistentVariableSourceTests
         // Without arguments, the variable from PersistentVariablesSource is used
         var persistentResult = smart.Format(formatString);
 
-        Assert.That(argumentResult, Is.EqualTo("val-from-argument"));
-        Assert.That(persistentResult, Is.EqualTo("val-from-persistent-source"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(argumentResult, Is.EqualTo("val-from-argument"));
+            Assert.That(persistentResult, Is.EqualTo("val-from-persistent-source"));
+        });
     }
 
     [Test]
@@ -294,7 +312,7 @@ public class PersistentVariableSourceTests
             {
                 pvs["global"].Add($"{i:0000}", new IntVariable((int)i));
             }), Throws.Nothing);
-        Assert.That(pvs["global"].Count, Is.EqualTo(1000));
+        Assert.That(pvs["global"], Has.Count.EqualTo(1000));
 
         // Restore to saved value
         ThreadSafeMode.SwitchTo(savedMode);

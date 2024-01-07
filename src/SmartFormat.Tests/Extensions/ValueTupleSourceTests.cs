@@ -39,7 +39,7 @@ public class ValueTupleSourceTests
         var formatter = GetSmartFormatter();
         var result = formatter.Format(format, (addr, dict1, dict2));
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("Name: {Person.FirstName} {City?.AreaCode}", true)]
@@ -85,7 +85,7 @@ public class ValueTupleSourceTests
         var formatter = GetSmartFormatter();
         var result = formatter.Format(format, null!, (addr, dict1, dict2));
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class ValueTupleSourceTests
     {
         var child = (Child: "The child", ChildName: "Child name", JustNull: default(string));
         var mainWithChild = (Main: "Main", child);
-        var expected = new List<object?> { mainWithChild.Item1, child.Child, child.ChildName, default(string)};
+        var expected = new List<object?> { mainWithChild.Main, child.Child, child.ChildName, default(string)};
 
         Assert.That(mainWithChild.GetValueTupleItemObjectsFlattened().ToList(), Is.EqualTo(expected));
     }
@@ -111,16 +111,16 @@ public class ValueTupleSourceTests
         });
 
         var result = smart.Format("{Member:isnull:{Club.Name}|{Name}} - {Hello}", (clubOrMember, say));
-        Assert.AreEqual($"{clubOrMember.Member.Name} - {say.Hello}", result);
+        Assert.That(result, Is.EqualTo($"{clubOrMember.Member.Name} - {say.Hello}"));
 
         result = smart.Format("{Member:isnull:{Club.Name}|{Name}} - {Hello}", (clubNoMember, say));
-        Assert.AreEqual($"{clubOrMember.Club.Name} - {say.Hello}", result);
+        Assert.That(result, Is.EqualTo($"{clubOrMember.Club.Name} - {say.Hello}"));
     }
 
     [Test]
     public void Not_Invoked_With_FormattingInfo()
     {
-        Assert.IsFalse(new ValueTupleSource().TryEvaluateSelector(new PureSelectorInfo()));
+        Assert.That(new ValueTupleSource().TryEvaluateSelector(new PureSelectorInfo()), Is.False);
     }
 
     private class PureSelectorInfo : ISelectorInfo

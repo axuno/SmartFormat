@@ -174,8 +174,11 @@ public class ReflectionSourceTests
         var derived = new DerivedMiscObject();
         var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings{ CaseSensitivity = CaseSensitivityType.CaseInsensitive });
 
-        Assert.AreEqual(string.Format($"{derived.Property}"), formatter.Format("{Property}", derived));
-        Assert.AreEqual(string.Format($"{derived.ReadonlyProperty}"), formatter.Format("{ReadonlyProperty}", derived));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.Format("{Property}", derived), Is.EqualTo(string.Format($"{derived.Property}")));
+            Assert.That(formatter.Format("{ReadonlyProperty}", derived), Is.EqualTo(string.Format($"{derived.ReadonlyProperty}")));
+        });
     }
 
     [Test]
@@ -188,17 +191,24 @@ public class ReflectionSourceTests
             
         var typeCache = reflectionSource.TypeCache;
         var obj = new {Obj = new MiscObject { MethodReturnValue = "The Method Value"}};
-            
-        // Invoke formatter 1st time
-        Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
-        Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Method)), out var found), Is.True);
-        if(found.method != null) Assert.That(found.method.Invoke(obj.Obj, Array.Empty<object>()), Is.EqualTo(obj.Obj.MethodReturnValue));
+        (System.Reflection.FieldInfo? field, System.Reflection.MethodInfo? method) found = default;
+        Assert.Multiple(() =>
+        {
+
+            // Invoke formatter 1st time
+            Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
+            Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Method)), out found), Is.True);
+        });
+        if (found.method != null) Assert.That(found.method.Invoke(obj.Obj, Array.Empty<object>()), Is.EqualTo(obj.Obj.MethodReturnValue));
 
         // Invoke formatter 2nd time
         obj.Obj.MethodReturnValue = "Another Method Value";
-        Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
-        Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Method)), out found), Is.True);
-        Assert.That(found.method?.Invoke(obj.Obj, Array.Empty<object>()), Is.EqualTo(obj.Obj.MethodReturnValue));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
+            Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Method)), out found), Is.True);
+            Assert.That(found.method?.Invoke(obj.Obj, Array.Empty<object>()), Is.EqualTo(obj.Obj.MethodReturnValue));
+        });
     }
         
     [Test]
@@ -206,18 +216,27 @@ public class ReflectionSourceTests
     {
         var formatter = Smart.CreateDefaultSmartFormat();
         var reflectionSource = formatter.GetSourceExtension<ReflectionSource>()!;
-        var typeCache = reflectionSource.TypeCache;            var obj = new {Obj = new MiscObject { Field = "The Field Value"}};
-            
-        // Invoke formatter 1st time
-        Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
-        Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out var found), Is.True);
-        Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
-            
+        var typeCache = reflectionSource.TypeCache;
+        var obj = new {Obj = new MiscObject { Field = "The Field Value"}};
+        (System.Reflection.FieldInfo? field, System.Reflection.MethodInfo? method) found = default;
+
+        Assert.Multiple(() =>
+        {
+
+            // Invoke formatter 1st time
+            Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
+            Assert.That(typeCache!.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out found), Is.True);
+            Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
+        });
+
         // Invoke formatter 2nd time
         obj.Obj.Field = "Another Field Value";
-        Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
-        Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out found), Is.True);
-        Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
+            Assert.That(typeCache.TryGetValue((typeof(MiscObject), nameof(MiscObject.Field)), out found), Is.True);
+            Assert.That(found.field?.GetValue(obj.Obj), Is.EqualTo(obj.Obj.Field));
+        });
     }
 
     [Test]
@@ -228,11 +247,14 @@ public class ReflectionSourceTests
         reflectionSource.IsTypeCacheEnabled = false;
         var typeCache = reflectionSource.TypeCache;
         var obj = new {Obj = new MiscObject { Field = "The Field Value", MethodReturnValue = "The Method Value"}};
-            
-        // Invoke formatter, expecting results, but empty cache
-        Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
-        Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
-        Assert.That(typeCache!.Count, Is.EqualTo(0));
+        Assert.Multiple(() =>
+        {
+
+            // Invoke formatter, expecting results, but empty cache
+            Assert.That(formatter.Format("{Obj.Field}", obj), Is.EqualTo(obj.Obj.Field));
+            Assert.That(formatter.Format("{Obj.Method}", obj), Is.EqualTo(obj.Obj.MethodReturnValue));
+            Assert.That(typeCache!, Is.Empty);
+        });
     }
 
     [Test]

@@ -22,10 +22,10 @@ public class LiteralTextTests
         var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = false}});
 
         var result = formatter.Format(formatWithFileBehavior);
-        Assert.AreEqual(string.Format(formatWithFileBehavior), result);
+        Assert.That(result, Is.EqualTo(string.Format(formatWithFileBehavior)));
 
         result = formatter.Format(formatWithCodeBehavior);
-        Assert.AreEqual(string.Format(formatWithCodeBehavior), result);
+        Assert.That(result, Is.EqualTo(string.Format(formatWithCodeBehavior)));
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class LiteralTextTests
         var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = true}});
 
         var result = formatter.Format(formatWithFileBehavior);
-        Assert.AreEqual(formatWithCodeBehavior, result);
+        Assert.That(result, Is.EqualTo(formatWithCodeBehavior));
     }
 
     [TestCase(@"Some text \u2022 with the value {0}", "Some text \u2022 with the value 123")]
@@ -46,7 +46,7 @@ public class LiteralTextTests
     public void UnicodeEscapeSequenceIsParsed(string format, string expectedOutput)
     {
         var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {Parser = new ParserSettings {ConvertCharacterStringLiterals = true}});
-        Assert.AreEqual(expectedOutput, formatter.Format(format, 123));
+        Assert.That(formatter.Format(format, 123), Is.EqualTo(expectedOutput));
     }
 
     [TestCase(@"Some text {0} \uABCP", @"\uABCP")]
@@ -69,8 +69,8 @@ public class LiteralTextTests
         var items = new[] { "one", "two", "three" };
         // Note the @ before the format string will switch off conversion of \n by the compiler
         var result = smart.Format(@"{0:list:{}|\n|\nand }", new object[] { items });
-            
-        Assert.AreEqual("one\ntwo\nand three", result);
+
+        Assert.That(result, Is.EqualTo("one\ntwo\nand three"));
     }
 
     [Test, Description("Illegal escape sequence should always throw")]

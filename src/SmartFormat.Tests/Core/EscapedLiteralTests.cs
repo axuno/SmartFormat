@@ -109,6 +109,6 @@ public class EscapedLiteralTests
         var full = "abc(de";
         var startIndex = 3;
         var resultBuffer = new Span<char>(new char[full.Length]);
-        Assert.That("(de", Is.EqualTo(EscapedLiteral.UnEscapeCharLiterals('\\', full.AsSpan(startIndex, full.Length - startIndex), true, resultBuffer).ToString()));
+        Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', full.AsSpan(startIndex, full.Length - startIndex), true, resultBuffer).ToString(), Is.EqualTo("(de"));
     }
 }

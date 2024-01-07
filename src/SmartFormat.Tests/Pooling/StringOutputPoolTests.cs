@@ -21,13 +21,19 @@ public class StringOutputPoolTests
         var sop = GetStringOutputPool();
         StringOutput so = new();
         Assert.That(() => so = sop.Get(), Throws.Nothing);
-        Assert.That(sop.Pool.CountActive, Is.EqualTo(1));
-        Assert.That(sop.Pool.CountInactive, Is.EqualTo(0));
-        Assert.That(sop.Pool.CountAll, Is.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(sop.Pool.CountActive, Is.EqualTo(1));
+            Assert.That(sop.Pool.CountInactive, Is.EqualTo(0));
+            Assert.That(sop.Pool.CountAll, Is.EqualTo(1));
 
-        Assert.That(() => sop.Return(so), Throws.Nothing);
-        Assert.That(sop.Pool.CountActive, Is.EqualTo(0));
-        Assert.That(sop.Pool.CountInactive, Is.EqualTo(1));
-        Assert.That(sop.Pool.CountAll, Is.EqualTo(1));
+            Assert.That(() => sop.Return(so), Throws.Nothing);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(sop.Pool.CountActive, Is.EqualTo(0));
+            Assert.That(sop.Pool.CountInactive, Is.EqualTo(1));
+            Assert.That(sop.Pool.CountAll, Is.EqualTo(1));
+        });
     }
 }

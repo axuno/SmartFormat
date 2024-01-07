@@ -14,7 +14,7 @@ namespace SmartFormat.Tests.Extensions;
 [TestFixture]
 public class PluralLocalizationFormatterTests
 {
-    public static SmartFormatter GetFormatter(SmartSettings? smartSettings = null)
+    private static SmartFormatter GetFormatter(SmartSettings? smartSettings = null)
     {
         var smart = Smart.CreateDefaultSmartFormat(smartSettings ?? new SmartSettings());
         smart.InsertExtension(1, new PluralLocalizationFormatter());
@@ -62,7 +62,7 @@ public class PluralLocalizationFormatterTests
     [TestCase("String", "String")]
     [TestCase(false, "other")]
     [TestCase(default(string?), "other")]
-    public void AutoDetect_Formatter_Should_Not_Handle_bool_string_null(object arg, string expected)
+    public void AutoDetect_Formatter_Should_Not_Handle_bool_string_null(object? arg, string expected)
     {
         var smart = new SmartFormatter()
             .AddExtensions(new DefaultSource())
@@ -137,19 +137,19 @@ public class PluralLocalizationFormatterTests
         for (ushort i = 0; i < expectedResults.Length; i++)
         {
             var actualResult = smart.Format(format, i);
-            Assert.AreEqual(expectedResults[i], actualResult);
+            Assert.That(actualResult, Is.EqualTo(expectedResults[i]));
         }
 
         for (uint i = 0; i < expectedResults.Length; i++)
         {
             var actualResult = smart.Format(format, i);
-            Assert.AreEqual(expectedResults[i], actualResult);
+            Assert.That(actualResult, Is.EqualTo(expectedResults[i]));
         }
 
         for (ulong i = 0; i < (ulong)expectedResults.Length; i++)
         {
             var actualResult = smart.Format(format, i);
-            Assert.AreEqual(expectedResults[i], actualResult);
+            Assert.That(actualResult, Is.EqualTo(expectedResults[i]));
         }
     }
 
@@ -267,9 +267,10 @@ public class PluralLocalizationFormatterTests
     {
         var smart = GetFormatter();
         var actualResult = smart.Format(format, arg0);
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
 
+#pragma warning disable CA1861 // Not called repeatedly, but called with different arguments
     [TestCase("{0:plural:zero|one|many}", new string[0], "zero")]
     [TestCase("{0:plural:zero|one|many}", new[] { "alice" }, "one")]
     [TestCase("{0:plural:zero|one|many}", new[] { "alice", "bob" }, "many")]
@@ -278,27 +279,28 @@ public class PluralLocalizationFormatterTests
         var smart = GetFormatter();
         var culture = new CultureInfo("en-US");
         var actualResult = smart.Format(culture, format, arg0);
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
+#pragma warning restore CA1861
 
     [Test]
     public void Test_With_CustomPluralRuleProvider()
     {
         var smart = GetFormatter();
         var actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")), "{0:plural:Frau|Frauen}", new string[2], "more");
-        Assert.AreEqual("Frauen", actualResult);
+        Assert.That(actualResult, Is.EqualTo("Frauen"));
 
         actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[2], "more");
-        Assert.AreEqual("people", actualResult);
+        Assert.That(actualResult, Is.EqualTo("people"));
 
         actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
-        Assert.AreEqual("person", actualResult);
+        Assert.That(actualResult, Is.EqualTo("person"));
 
         actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes}", new string[3], "several");
-        Assert.AreEqual("plusieurs personnes", actualResult);
+        Assert.That(actualResult, Is.EqualTo("plusieurs personnes"));
 
         actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes|beaucoup de personnes}", new string[3], "several");
-        Assert.AreEqual("beaucoup de personnes", actualResult);
+        Assert.That(actualResult, Is.EqualTo("beaucoup de personnes"));
     }
 
     [TestCase("{0:plural:one|many} {1:plural:one|many} {2:plural:one|many}", "many one many")]
@@ -310,7 +312,7 @@ public class PluralLocalizationFormatterTests
         var culture = new CultureInfo("en-US");
         var args = new object[] { new ConvertibleDecimal(0), new ConvertibleDecimal(1), new ConvertibleDecimal(2) };
         var actualResult = smart.Format(culture, format, args);
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.That(actualResult, Is.EqualTo(expectedResult));
     }
 
     [Test]

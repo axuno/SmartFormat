@@ -31,7 +31,7 @@ public class ChooseFormatterTests
     public void Choose_should_work_with_numbers_strings_and_booleans(string format, object arg0, string expectedResult)
     {
         var smart = Smart.CreateDefaultSmartFormat();
-        Assert.AreEqual(expectedResult, smart.Format(format, arg0));
+        Assert.That(smart.Format(format, arg0), Is.EqualTo(expectedResult));
     }
 
     [Test]
@@ -47,20 +47,20 @@ public class ChooseFormatterTests
     // bool and null args: always case-insensitive
     [TestCase("{0:choose(true|false):one|two|default}", false, true, "one")]
     [TestCase("{0:choose(True|FALSE):one|two|default}", false, false, "two")]
-    [TestCase("{0:choose(null):is null|default}", false, default, "is null")]
-    [TestCase("{0:choose(NULL):is null|default}", false, default, "is null")]
+    [TestCase("{0:choose(null):is null|default}", false, null, "is null")]
+    [TestCase("{0:choose(NULL):is null|default}", false, null, "is null")]
     // strings
     [TestCase("{0:choose(string|String):one|two|default}", true, "String", "two")]
     [TestCase("{0:choose(string|STRING):one|two|default}", true, "String", "default")]
     // Enum
     [TestCase("{0:choose(ignore|Ignore):one|two|default}", true, FormatErrorAction.Ignore, "two")]
     [TestCase("{0:choose(ignore|IGNORE):one|two|default}", true, FormatErrorAction.Ignore, "default")]
-    public void Choose_should_be_case_sensitive(string format, bool caseSensitive, object arg0, string expectedResult)
+    public void Choose_should_be_case_sensitive(string format, bool caseSensitive, object? arg0, string expectedResult)
     {
         var smart = Smart.CreateDefaultSmartFormat();
         smart.GetFormatterExtension<ChooseFormatter>()!.CaseSensitivity =
             caseSensitive ? CaseSensitivityType.CaseSensitive : CaseSensitivityType.CaseInsensitive;
-        Assert.AreEqual(expectedResult, smart.Format(format, arg0));
+        Assert.That(smart.Format(format, arg0), Is.EqualTo(expectedResult));
     }
         
     [TestCase("{0:choose(1|2|3):one|two|three|default}", 1, "one")]
@@ -71,10 +71,10 @@ public class ChooseFormatterTests
     [TestCase("{0:choose(1|2|3):one|two|three|default}", null, "default")]
     [TestCase("{0:choose(1|2|3):one|two|three|default}", true, "default")]
     [TestCase("{0:choose(1|2|3):one|two|three|default}", "whatever", "default")]
-    public void Choose_should_default_to_the_last_item(string format, object arg0, string expectedResult)
+    public void Choose_should_default_to_the_last_item(string format, object? arg0, string expectedResult)
     {
         var smart = Smart.CreateDefaultSmartFormat();
-        Assert.AreEqual(expectedResult, smart.Format(format, arg0));
+        Assert.That(smart.Format(format, arg0), Is.EqualTo(expectedResult));
     }
 
     [TestCase("{0:choose(Male|Female):man|woman}", Gender.Male, "man")]
@@ -84,7 +84,7 @@ public class ChooseFormatterTests
     public void Choose_should_work_with_enums(string format, object arg0, string expectedResult)
     {
         var smart = Smart.CreateDefaultSmartFormat();
-        Assert.AreEqual(expectedResult, smart.Format(format, arg0));
+        Assert.That(smart.Format(format, arg0), Is.EqualTo(expectedResult));
     }
         
     [TestCase("{0:choose(null):nothing|{}}", null, "nothing")]
@@ -92,10 +92,10 @@ public class ChooseFormatterTests
     [TestCase("{0:choose(null|5):nothing|five|{}}", null, "nothing")]
     [TestCase("{0:choose(null|5):nothing|five|{}}", 5, "five")]
     [TestCase("{0:choose(null|5):nothing|five|{}}", 6, "6")]
-    public void Choose_has_a_special_case_for_null(string format, object arg0, string expectedResult)
+    public void Choose_has_a_special_case_for_null(string format, object? arg0, string expectedResult)
     {
         var smart = Smart.CreateDefaultSmartFormat();
-        Assert.AreEqual(expectedResult, smart.Format(format, arg0));
+        Assert.That(smart.Format(format, arg0), Is.EqualTo(expectedResult));
     }
 
     [TestCase(null, "Must be a word like 'good', 'bad'")]
@@ -167,7 +167,10 @@ public class ChooseFormatterTests
         var result1 = smart.Format(CultureInfo.GetCultureInfo("de"), "{0:choose(ä|ü):umlautA|umlautU}", "Ä");
         var result2 = smart.Format(CultureInfo.GetCultureInfo("de"), "{0:choose(ä|ü):umlautA|umlautU}", "ä");
 
-        Assert.That(result1, Is.EqualTo("umlautA"));
-        Assert.That(result2, Is.EqualTo("umlautA"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result1, Is.EqualTo("umlautA"));
+            Assert.That(result2, Is.EqualTo("umlautA"));
+        });
     }
 }
