@@ -243,7 +243,7 @@ public static class PluralRules
         {
             <=0 => 0,
             > 0 and < 2 => 1,
-            >= 2 => 2
+            _ => 2
         };
     }
 
@@ -254,7 +254,7 @@ public static class PluralRules
             <=0 => 0,
             > 0 and < 2 => 1,
             >= 2 and < 3 => 2,
-            > 2 => 3
+            _ => 3
         };
     }
         
