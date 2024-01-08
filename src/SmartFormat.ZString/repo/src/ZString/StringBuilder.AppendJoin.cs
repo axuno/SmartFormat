@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Cysharp.Text
 {
-    internal partial struct Utf16ValueStringBuilder
+    public partial struct Utf16ValueStringBuilder
     {
         /// <summary>
         /// Concatenates the string representations of the elements in the provided array of objects, using the specified char separator between each member, then appends the result to the current instance of the string builder.
@@ -209,7 +209,7 @@ namespace Cysharp.Text
             }
         }
     }
-    internal partial struct Utf8ValueStringBuilder
+    public partial struct Utf8ValueStringBuilder
     {
         /// <summary>
         /// Concatenates the string representations of the elements in the provided array of objects, using the specified char separator between each member, then appends the result to the current instance of the string builder.

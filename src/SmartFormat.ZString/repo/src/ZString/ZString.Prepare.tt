@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Cysharp.Text
 {
-    internal static partial class ZString
+    public static partial class ZString
     {
 <# for(var i = 1; i <= TypeParamMax; i++) { #>
         /// <summary>Prepare string format to avoid parse template in each operation.</summary>

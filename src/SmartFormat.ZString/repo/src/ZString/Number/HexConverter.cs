@@ -8,7 +8,7 @@ namespace System
 {
     internal static class HexConverter
     {
-        internal enum Casing : uint
+        public enum Casing : uint
         {
             // Output [ '0' .. '9' ] and [ 'A' .. 'F' ].
             Upper = 0,

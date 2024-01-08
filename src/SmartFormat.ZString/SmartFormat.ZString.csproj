@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
-        <!-- Current Cysharp.ZString release version is 2.5.0 -->
+        <!-- Current Cysharp.ZString release version is 2.5.1 -->
         <RootNamespace>SmartFormat.ZString</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

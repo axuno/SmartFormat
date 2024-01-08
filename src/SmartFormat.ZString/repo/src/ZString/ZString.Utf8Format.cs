@@ -6,7 +6,7 @@ using static Cysharp.Text.Utf8ValueStringBuilder;
 
 namespace Cysharp.Text
 {
-    internal static partial class ZString
+    public static partial class ZString
     {
         /// <summary>Replaces one or more format items in a string with the string representation of some specified values.</summary>
         public static void Utf8Format<T1>(IBufferWriter<byte> bufferWriter, string format, T1 arg1)

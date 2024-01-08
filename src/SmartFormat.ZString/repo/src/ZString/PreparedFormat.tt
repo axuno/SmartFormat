@@ -13,7 +13,7 @@ namespace Cysharp.Text
 {
 <# foreach(var utf in utfTypes) { var isUtf16 = (utf == "Utf16"); #>
 <# for(var i = 1; i <= TypeParamMax; i++) { #>
-    internal sealed partial class <#= utf #>PreparedFormat<<#= CreateTypeArgument(i) #>>
+    public sealed partial class <#= utf #>PreparedFormat<<#= CreateTypeArgument(i) #>>
     {
         public string FormatString { get; }
         public int MinSize { get; }

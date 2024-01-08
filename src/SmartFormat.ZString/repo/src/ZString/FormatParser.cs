@@ -7,7 +7,7 @@ namespace Cysharp.Text
     {
         // {index[,alignment][:formatString]}
 
-        internal readonly ref struct ParseResult
+        public readonly ref struct ParseResult
         {
             public readonly int Index;
             public readonly ReadOnlySpan<char> FormatString;

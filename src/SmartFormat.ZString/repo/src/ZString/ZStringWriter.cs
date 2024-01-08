@@ -13,7 +13,7 @@ namespace Cysharp.Text
     /// <remarks>
     /// It's important to make sure the writer is always properly disposed.
     /// </remarks>
-    internal sealed class ZStringWriter : TextWriter
+    public sealed class ZStringWriter : TextWriter
     {
         private Utf16ValueStringBuilder sb;
         private bool isOpen;

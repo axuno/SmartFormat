@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Cysharp.Text
 {
-    internal partial struct Utf8ValueStringBuilder : IDisposable, IBufferWriter<byte>, IResettableBufferWriter<byte>
+    public partial struct Utf8ValueStringBuilder : IDisposable, IBufferWriter<byte>, IResettableBufferWriter<byte>
     {
-        internal delegate bool TryFormat<T>(T value, Span<byte> destination, out int written, StandardFormat format);
+        public delegate bool TryFormat<T>(T value, Span<byte> destination, out int written, StandardFormat format);
 
         const int ThreadStaticBufferSize = 64444;
         const int DefaultBufferSize = 65536; // use 64K default buffer.
@@ -495,7 +495,7 @@ namespace Cysharp.Text
             RegisterTryFormat<T?>(CreateNullableFormatter<T>());
         }
 
-        internal static class FormatterCache<T>
+        public static class FormatterCache<T>
         {
             public static TryFormat<T> TryFormatDelegate;
             static FormatterCache()
