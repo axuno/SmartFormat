@@ -2,7 +2,7 @@
 
 namespace Cysharp.Text
 {
-    internal partial struct Utf16ValueStringBuilder
+    public partial struct Utf16ValueStringBuilder
     {
         static object? CreateFormatter(Type type)
         {

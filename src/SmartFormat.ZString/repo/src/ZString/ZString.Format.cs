@@ -3,7 +3,7 @@ using System;
 
 namespace Cysharp.Text
 {
-    internal static partial class ZString
+    public static partial class ZString
     {
         /// <summary>Replaces one or more format items in a string with the string representation of some specified objects.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

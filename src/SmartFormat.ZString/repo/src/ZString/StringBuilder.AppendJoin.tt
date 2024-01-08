@@ -15,7 +15,7 @@ using System.Runtime.CompilerServices;
 namespace Cysharp.Text
 {
 <# foreach(var utf in utfTypes) { #>
-    internal partial struct <#= utf #>ValueStringBuilder
+    public partial struct <#= utf #>ValueStringBuilder
     {
         /// <summary>
         /// Concatenates the string representations of the elements in the provided array of objects, using the specified char separator between each member, then appends the result to the current instance of the string builder.
