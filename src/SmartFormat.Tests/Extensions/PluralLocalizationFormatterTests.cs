@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using NUnit.Framework;
@@ -23,12 +24,12 @@ public class PluralLocalizationFormatterTests
 
     private static void TestAllResults(CultureInfo cultureInfo, string format, ExpectedResults expectedValuesAndResults)
     {
-        foreach (var test in expectedValuesAndResults)
+        foreach (var testResult in expectedValuesAndResults)
         {
             var smart = GetFormatter();
-            var value = test.Key;
-            var expected = test.Value;
-            var actual = smart.Format(cultureInfo, format, value);
+            var count = testResult.Key;
+            var expected = testResult.Value;
+            var actual = smart.Format(cultureInfo, format, count);
 
             Assert.That(actual, Is.EqualTo(expected));
             Debug.WriteLine(actual);
@@ -153,6 +154,46 @@ public class PluralLocalizationFormatterTests
         }
     }
 
+    [TestCase(0, "{0} personne")] // 0 is singular
+    [TestCase(1, "{0} personne")] // 1 is singular
+    [TestCase(2, "{0} personnes")] // 2 or more is plural
+    [TestCase(50, "{0} personnes")]
+    public void Test_French_2words(int count, string expected)
+    {
+        var smart = GetFormatter();
+        var ci = CultureInfo.GetCultureInfo("fr");
+        var actual = smart.Format(ci, "{0:plural:{0} personne|{0} personnes}", count);
+
+        Assert.That(actual, Is.EqualTo(string.Format(ci, expected, count)));
+    }
+
+    [TestCase(0, "pas de personne")] // 0 is singular
+    [TestCase(1, "une personne")] // 1 is singular
+    [TestCase(2, "{0} personnes")] // 2 or more is plural
+    [TestCase(50, "{0} personnes")]
+    public void Test_French_3words(int count, string expected)
+    {
+        var smart = GetFormatter();
+        var ci = CultureInfo.GetCultureInfo("fr");
+        var actual = smart.Format(ci, "{0:plural:pas de personne|une personne|{0} personnes}", count);
+
+        Assert.That(actual, Is.EqualTo(string.Format(ci, expected, count)));
+    }
+
+    [TestCase(-1, "-")]
+    [TestCase(0, "pas de personne")] // 0 is singular
+    [TestCase(1, "une personne")] // 1 is singular
+    [TestCase(2, "{0} personnes")] // 2 is plural
+    [TestCase(50, "{0} personnes")] // more than 2
+    public void Test_French_4words(int count, string expected)
+    {
+        var smart = GetFormatter();
+        var ci = CultureInfo.GetCultureInfo("fr");
+        var actual = smart.Format(ci, "{0:plural:-|pas de personne|une personne|{0} personnes}", count);
+
+        Assert.That(actual, Is.EqualTo(string.Format(ci, expected, count)));
+    }
+
     [Test]
     public void Test_Turkish()
     {
@@ -273,7 +314,7 @@ public class PluralLocalizationFormatterTests
     [TestCase("{0:plural:zero|one|many}", new string[0], "zero")]
     [TestCase("{0:plural:zero|one|many}", new[] { "alice" }, "one")]
     [TestCase("{0:plural:zero|one|many}", new[] { "alice", "bob" }, "many")]
-    public void Test_should_allow_ienumerable_parameter(string format, object arg0, string expectedResult)
+    public void Should_Allow_IEnumerable_Parameter(string format, object arg0, string expectedResult)
     {
         var smart = GetFormatter();
         var culture = new CultureInfo("en-US");
@@ -282,23 +323,54 @@ public class PluralLocalizationFormatterTests
     }
 
     [Test]
-    public void Test_With_CustomPluralRuleProvider()
+    public void Use_CustomPluralRuleProvider()
     {
         var smart = GetFormatter();
-        var actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")), "{0:plural:Frau|Frauen}", new string[2], "more");
-        Assert.That(actualResult, Is.EqualTo("Frauen"));
 
-        actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[2], "more");
-        Assert.That(actualResult, Is.EqualTo("people"));
+        Assert.Multiple(() =>
+        {
+            // ** German **
+            var actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")),
+                "{0:plural:Frau|Frauen}", new string[2], "more");
+            Assert.That(actualResult, Is.EqualTo("Frauen"));
 
-        actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")), "{0:plural:person|people}", new string[1], "one");
-        Assert.That(actualResult, Is.EqualTo("person"));
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("de")),
+                "{0:plural:Frau|Frauen|einige Frauen|viele Frauen}", new string[4], "more");
+            Assert.That(actualResult, Is.EqualTo("viele Frauen"));
 
-        actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes}", new string[3], "several");
-        Assert.That(actualResult, Is.EqualTo("plusieurs personnes"));
+            // ** English **
 
-        actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")), "{0:plural:une personne|deux personnes|plusieurs personnes|beaucoup de personnes}", new string[3], "several");
-        Assert.That(actualResult, Is.EqualTo("beaucoup de personnes"));
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")),
+                "{0:plural:person|people}", new string[2], "more");
+            Assert.That(actualResult, Is.EqualTo("people"));
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("en")),
+                "{0:plural:person|people}", new string[1], "one");
+            Assert.That(actualResult, Is.EqualTo("person"));
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")),
+                "{0:plural:pas de personne|une personne|plusieurs personnes}", Array.Empty<string>(), "none");
+            Assert.That(actualResult, Is.EqualTo("pas de personne"));
+
+            // ** French **
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")),
+                "{0:plural:pas de personne|une personne|plusieurs personnes}", new string[1], "one");
+            Assert.That(actualResult, Is.EqualTo("une personne"));
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")),
+                "{0:plural:pas de personne|une personne|deux personnes}", new string[2], "two");
+            Assert.That(actualResult, Is.EqualTo("deux personnes"));
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")),
+                "{0:plural:pas de personne|une personne|deux personnes|plusieurs personnes}", new string[3], "several");
+            Assert.That(actualResult, Is.EqualTo("plusieurs personnes"));
+
+            actualResult = smart.Format(new CustomPluralRuleProvider(PluralRules.GetPluralRule("fr")),
+                "{0:plural:une personne|deux personnes|plusieurs personnes|beaucoup de personnes}", new string[3],
+                "many");
+            Assert.That(actualResult, Is.EqualTo("beaucoup de personnes"));
+        });
     }
 
     [TestCase("{0:plural:one|many} {1:plural:one|many} {2:plural:one|many}", "many one many")]
@@ -318,7 +390,10 @@ public class PluralLocalizationFormatterTests
     {
         var smart = GetFormatter();
         foreach (var number in new object[]
-                     { (long)123, (ulong)123, (short)123, (ushort)123, (int)123, (uint)123 })
+                 {
+                     (long)123, (ulong)123, (short)123, (ushort)123, (int)123, (uint)123,
+                     (long)-123, (short) -123, (int) -123
+                 })
         {
             Assert.That(smart.Format("{0:plural(en):zero|one|many}", number), Is.EqualTo("many"));
         }
@@ -362,5 +437,49 @@ public class PluralLocalizationFormatterTests
             
         var result = smart.Format(format, data);
         Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [TestCase(0, "nobody", "pas de personne")] // 0 is singular
+    [TestCase(1, "{0} person", "{0} personne")] // 1 is singular
+    [TestCase(2, "{0} people", "{0} personnes")] // 2 or more is plural
+    [TestCase(5, "a couple of people", "quelques personnes")]
+    [TestCase(15, "many people", "beaucoup de gens")]
+    [TestCase(50, "a lot of people", "une foule de personnes")]
+    public void Pluralization_With_Changed_Default_Rule_Delegate(int count, string rawExpectedEnglish, string rawExpectedFrench)
+    {
+        // Note: This test changes a default rule delegate *globally*.
+        //       It is not recommended, but possible.
+        PluralRules.IsoLangToDelegate["en"] = (value, wordsCount) =>
+        {
+            if (wordsCount != 6) return -1;
+
+            return Math.Abs(value) switch
+            {
+                <= 0 => 0,
+                > 0 and < 2 => 1,
+                >= 2 and < 3 => 2,
+                > 2 and < 10 => 3,
+                >= 10 and < 20 => 4,
+                >= 20 => 5
+            };
+        };
+        // Use the same rule delegate for English and French:
+        PluralRules.IsoLangToDelegate["fr"] = PluralRules.IsoLangToDelegate["en"];
+
+        var smart = GetFormatter();
+        var ciEnglish = CultureInfo.GetCultureInfo("en");
+        var ciFrench = CultureInfo.GetCultureInfo("fr");
+
+        var actualEnglish = smart.Format(ciEnglish, "{0:plural:nobody|{} person|{} people|a couple of people|many people|a lot of people}", count);
+        var actualFrench = smart.Format(ciFrench, "{0:plural:pas de personne|{} personne|{} personnes|quelques personnes|beaucoup de gens|une foule de personnes}", count);
+
+        // Restore default rule delegates:
+        PluralRules.RestoreDefault();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(actualEnglish, Is.EqualTo(string.Format(ciEnglish, rawExpectedEnglish, count)));
+            Assert.That(actualFrench, Is.EqualTo(string.Format(ciFrench, rawExpectedFrench, count)));
+        });
     }
 }

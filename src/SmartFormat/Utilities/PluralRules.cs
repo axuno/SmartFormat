@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace SmartFormat.Utilities;
 #pragma warning disable S3776 // disable sonar cognitive complexity warnings
@@ -15,10 +16,7 @@ namespace SmartFormat.Utilities;
 /// </summary>
 public static class PluralRules
 {
-    /// <summary>
-    /// Holds the ISO language code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
-    /// </summary>
-    public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate { get; } =
+    private static Dictionary<string, PluralRuleDelegate> DefaultLangToDelegate { get; } =
         new() {
             // Singular
             { "az", Singular }, // Azerbaijani
@@ -193,6 +191,22 @@ public static class PluralRules
             { "tzm", CentralMoroccoTamazight }
         };
 
+    /// <summary>
+    /// Holds the two-letter ISO language code as key, and the <see cref="PluralRuleDelegate"/> with the pluralization rule.
+    /// <para/>
+    /// Changing a value of this dictionary will change the pluralization rules globally. This is not recommended, but possible.
+    /// </summary>
+    public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate { get; private set; } =
+        new(DefaultLangToDelegate);
+
+    /// <summary>
+    /// Restores the default rules, e.g. after adding custom rules.
+    /// </summary>
+    public static void RestoreDefault()
+    {
+        IsoLangToDelegate = new Dictionary<string, PluralRuleDelegate>(DefaultLangToDelegate);
+    }
+
     private static PluralRuleDelegate Singular => (value, pluralWordsCount) => 0;
 
     private static PluralRuleDelegate DualOneOther => (value, pluralWordsCount) =>
@@ -214,10 +228,10 @@ public static class PluralRules
 
     private static PluralRuleDelegate DualFromZeroToTwo => (value, pluralWordsCount) =>
     {
-        if (pluralWordsCount == 2) return value < 2 ? 0 : 1;
+        if (pluralWordsCount == 2) return value is >= 0 and < 2 ? 0 : 1;
 
         if (pluralWordsCount == 3) return GetWordsCount3Value(value);
-
+        
         if (pluralWordsCount == 4) return GetWordsCount4Value(value);
 
         return -1;
@@ -225,36 +239,36 @@ public static class PluralRules
 
     private static int GetWordsCount3Value(decimal n)
     {
-        return n switch {
+        return n switch
+        {
             0 => 0,
             > 0 and < 2 => 1,
-            > 2 => 2,
-            _ => -1
+            _ => 2
         };
     }
 
     private static int GetWordsCount4Value(decimal n)
     {
-        return n switch {
+        return n switch
+        {
             < 0 => 0,
             0 => 1,
             > 0 and < 2 => 2,
-            > 2 => 3,
-            _ => -1
+            _ => 3
         };
     }
         
     private static PluralRuleDelegate TripleOneTwoOther => (value, pluralWordsCount) => value == 1 ? 0 : value == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
     private static PluralRuleDelegate RussianSerboCroatian => (value, pluralWordsCount) =>
         value % 10 == 1 && value % 100 != 11 ? 0 : // one
-        (value % 10).Between(2, 4) && !(value % 100).Between(12, 14) ? 1 : // few
+        (value % 10).BetweenWithoutFraction(2, 4) && !(value % 100).BetweenWithoutFraction(12, 14) ? 1 : // few
         2; // Russian & Serbo-Croatian
     private static PluralRuleDelegate Arabic => (value, pluralWordsCount) =>
         value == 0 ? 0 : // zero
         value == 1 ? 1 : // one
         value == 2 ? 2 : // two
-        (value % 100).Between(3, 10) ? 3 : // few
-        (value % 100).Between(11, 99) ? 4 : // many
+        (value % 100).BetweenWithoutFraction(3, 10) ? 3 : // few
+        (value % 100).BetweenWithoutFraction(11, 99) ? 4 : // many
         5; // other
     private static PluralRuleDelegate Breton => (value, pluralWordsCount) =>
         value switch
@@ -269,7 +283,7 @@ public static class PluralRules
     private static PluralRuleDelegate Czech => (value, pluralWordsCount) =>
         value == 0 ? 0 : // zero
         value == 1 ? 1 : // one
-        value.Between(2, 4) ? 2 : // few
+        value.BetweenWithoutFraction(2, 4) ? 2 : // few
         value % 1 == 0 ? 3 : // many
         4;  // other
 
@@ -284,17 +298,20 @@ public static class PluralRules
             _ => 5  // other
         };
     private static PluralRuleDelegate Manx => (value, pluralWordsCount) =>
-        (value % 10).Between(1, 2) || value % 20 == 0
+        (value % 10).BetweenWithoutFraction(1, 2) || value % 20 == 0
             ? 0
             : // one
             1;
     private static PluralRuleDelegate Langi => (value, pluralWordsCount) =>
-        value == 0 ? 0 : // zero
-        value is > 0 and < 2 ? 1 : // one
-        2;
+        value switch
+        {
+            0 => 0,
+            > 0 and < 2 => 1,
+            _ => 2
+        };
     private static PluralRuleDelegate Lithuanian => (value, pluralWordsCount) =>
-        value % 10 == 1 && !(value % 100).Between(11, 19) ? 0 : // one
-        (value % 10).Between(2, 9) && !(value % 100).Between(11, 19) ? 1 : // few
+        value % 10 == 1 && !(value % 100).BetweenWithoutFraction(11, 19) ? 0 : // one
+        (value % 10).BetweenWithoutFraction(2, 9) && !(value % 100).BetweenWithoutFraction(11, 19) ? 1 : // few
         2;
     private static PluralRuleDelegate Latvian => (value, pluralWordsCount) =>
         value == 0 ? 0 : // zero
@@ -307,37 +324,37 @@ public static class PluralRules
             1;
     private static PluralRuleDelegate Moldavian => (value, pluralWordsCount) =>
         value == 1 ? 0 : // one
-        value == 0 || value != 1 && (value % 100).Between(1, 19) ? 1 : // few
+        value == 0 || value != 1 && (value % 100).BetweenWithoutFraction(1, 19) ? 1 : // few
         2;
     private static PluralRuleDelegate Maltese => (value, pluralWordsCount) =>
         value == 1 ? 0 : // one
-        value == 0 || (value % 100).Between(2, 10) ? 1 : // few
-        (value % 100).Between(11, 19) ? 2 : // many
+        value == 0 || (value % 100).BetweenWithoutFraction(2, 10) ? 1 : // few
+        (value % 100).BetweenWithoutFraction(11, 19) ? 2 : // many
         3;
     private static PluralRuleDelegate Polish => (value, pluralWordsCount) =>
         value == 1 ? 0 : // one
-        (value % 10).Between(2, 4) && !(value % 100).Between(12, 14) ? 1 : // few
-        (value % 10).Between(0, 1) || (value % 10).Between(5, 9) || (value % 100).Between(12, 14) ? 2 : // many
+        (value % 10).BetweenWithoutFraction(2, 4) && !(value % 100).BetweenWithoutFraction(12, 14) ? 1 : // few
+        (value % 10).BetweenWithoutFraction(0, 1) || (value % 10).BetweenWithoutFraction(5, 9) || (value % 100).BetweenWithoutFraction(12, 14) ? 2 : // many
         3;
     private static PluralRuleDelegate Romanian => (value, pluralWordsCount) =>
         value == 1 ? 0 : // one
-        value == 0 || (value % 100).Between(1, 19) ? 1 : // few
+        value == 0 || (value % 100).BetweenWithoutFraction(1, 19) ? 1 : // few
         2;
     private static PluralRuleDelegate Tachelhit => (value, pluralWordsCount) =>
         value >= 0 && value <= 1 ? 0 : // one
-        value.Between(2, 10) ? 1 : // few
+        value.BetweenWithoutFraction(2, 10) ? 1 : // few
         2;
     private static PluralRuleDelegate Slovak => (value, pluralWordsCount) =>
         value == 1 ? 0 : // one
-        value.Between(2, 4) ? 1 : // few
+        value.BetweenWithoutFraction(2, 4) ? 1 : // few
         2;
     private static PluralRuleDelegate Slovenian => (value, pluralWordsCount) =>
         value % 100 == 1 ? 0 : // one
         value % 100 == 2 ? 1 : // two
-        (value % 100).Between(3, 4) ? 2 : // few
+        (value % 100).BetweenWithoutFraction(3, 4) ? 2 : // few
         3;
     private static PluralRuleDelegate CentralMoroccoTamazight => (value, pluralWordsCount) =>
-        value.Between(0, 1) || value.Between(11, 99)
+        value.BetweenWithoutFraction(0, 1) || value.BetweenWithoutFraction(11, 99)
             ? 0
             : // one
             1;
@@ -359,8 +376,8 @@ public static class PluralRules
     /// </remarks>
     public static PluralRuleDelegate GetPluralRule(string? twoLetterIsoLanguageName)
     {
-        if (twoLetterIsoLanguageName != null && IsoLangToDelegate.ContainsKey(twoLetterIsoLanguageName)) 
-            return IsoLangToDelegate[twoLetterIsoLanguageName];
+        if (twoLetterIsoLanguageName != null && IsoLangToDelegate.TryGetValue(twoLetterIsoLanguageName, out var rule)) 
+            return rule;
 
         throw new ArgumentException($"{nameof(IsoLangToDelegate)} not found for {twoLetterIsoLanguageName ?? "'null'"}", nameof(twoLetterIsoLanguageName));
     }
@@ -368,7 +385,7 @@ public static class PluralRules
     /// <summary>
     /// Returns <see langword="true"/> if the value is inclusively between the min and max and has no fraction.
     /// </summary>
-    private static bool Between(this decimal value, decimal min, decimal max)
+    private static bool BetweenWithoutFraction(this decimal value, decimal min, decimal max)
     {
         return value % 1 == 0 && value >= min && value <= max;
     }
