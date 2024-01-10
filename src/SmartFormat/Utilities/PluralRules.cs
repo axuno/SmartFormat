@@ -228,7 +228,7 @@ public static class PluralRules
 
     private static PluralRuleDelegate DualFromZeroToTwo => (value, pluralWordsCount) =>
     {
-        if (pluralWordsCount == 2) return value < 2 ? 0 : 1;
+        if (pluralWordsCount == 2) return value is >= 0 and < 2 ? 0 : 1;
 
         if (pluralWordsCount == 3) return GetWordsCount3Value(value);
         
@@ -239,9 +239,9 @@ public static class PluralRules
 
     private static int GetWordsCount3Value(decimal n)
     {
-        return Math.Abs(n) switch
+        return n switch
         {
-            <=0 => 0,
+            0 => 0,
             > 0 and < 2 => 1,
             _ => 2
         };
@@ -249,11 +249,11 @@ public static class PluralRules
 
     private static int GetWordsCount4Value(decimal n)
     {
-        return Math.Abs(n) switch
+        return n switch
         {
-            <=0 => 0,
-            > 0 and < 2 => 1,
-            >= 2 and < 3 => 2,
+            < 0 => 0,
+            0 => 1,
+            > 0 and < 2 => 2,
             _ => 3
         };
     }

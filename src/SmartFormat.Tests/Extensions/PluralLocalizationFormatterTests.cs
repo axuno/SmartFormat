@@ -180,15 +180,16 @@ public class PluralLocalizationFormatterTests
         Assert.That(actual, Is.EqualTo(string.Format(ci, expected, count)));
     }
 
+    [TestCase(-1, "-")]
     [TestCase(0, "pas de personne")] // 0 is singular
     [TestCase(1, "une personne")] // 1 is singular
-    [TestCase(2, "deux personnes")] // 2 is plural
+    [TestCase(2, "{0} personnes")] // 2 is plural
     [TestCase(50, "{0} personnes")] // more than 2
     public void Test_French_4words(int count, string expected)
     {
         var smart = GetFormatter();
         var ci = CultureInfo.GetCultureInfo("fr");
-        var actual = smart.Format(ci, "{0:plural:pas de personne|une personne|deux personnes|{0} personnes}", count);
+        var actual = smart.Format(ci, "{0:plural:-|pas de personne|une personne|{0} personnes}", count);
 
         Assert.That(actual, Is.EqualTo(string.Format(ci, expected, count)));
     }
