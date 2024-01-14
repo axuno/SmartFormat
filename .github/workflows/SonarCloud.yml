@@ -13,8 +13,8 @@ jobs:
     # (PRs from forks can't access secrets other than secrets.GITHUB_TOKEN for security reasons)
     if: ${{ !github.event.pull_request.head.repo.fork }}
     env:
-      version: '3.3.0'
-      versionFile: '3.3.0'
+      version: '3.3.1'
+      versionFile: '3.3.1'
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
