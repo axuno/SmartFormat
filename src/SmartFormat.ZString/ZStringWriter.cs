@@ -27,13 +27,15 @@ public sealed class ZStringWriter : TextWriter
 {
     private Utf16ValueStringBuilder sb;
     private bool isOpen;
-    private UnicodeEncoding encoding;
+    private UnicodeEncoding encoding = null!;
 
     /// <summary>
     /// Creates a new instance using <see cref="CultureInfo.CurrentCulture"/> as format provider.
     /// </summary>
     public ZStringWriter() : this(CultureInfo.CurrentCulture)
     {
+        sb = Cysharp.Text.ZString.CreateStringBuilder();
+        isOpen = true;
     }
 
     /// <summary>
@@ -41,8 +43,6 @@ public sealed class ZStringWriter : TextWriter
     /// </summary>
     public ZStringWriter(IFormatProvider formatProvider) : base(formatProvider)
     {
-        sb = Cysharp.Text.ZString.CreateStringBuilder();
-        isOpen = true;
     }
 
     /// <summary>
