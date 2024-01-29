@@ -4,7 +4,7 @@ using System.Buffers;
 
 namespace Cysharp.Text
 {
-    public sealed partial class Utf16PreparedFormat<T1>
+    internal sealed partial class Utf16PreparedFormat<T1>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -69,7 +69,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2>
+    internal sealed partial class Utf16PreparedFormat<T1, T2>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -139,7 +139,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -214,7 +214,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -294,7 +294,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -379,7 +379,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -469,7 +469,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -564,7 +564,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -664,7 +664,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -769,7 +769,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -879,7 +879,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -994,7 +994,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1114,7 +1114,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1239,7 +1239,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1369,7 +1369,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1504,7 +1504,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
+    internal sealed partial class Utf16PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1644,7 +1644,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1>
+    internal sealed partial class Utf8PreparedFormat<T1>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1710,7 +1710,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2>
+    internal sealed partial class Utf8PreparedFormat<T1, T2>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1781,7 +1781,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1857,7 +1857,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -1938,7 +1938,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2024,7 +2024,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2115,7 +2115,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2211,7 +2211,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2312,7 +2312,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2418,7 +2418,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2529,7 +2529,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2645,7 +2645,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2766,7 +2766,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -2892,7 +2892,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -3023,7 +3023,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
     {
         public string FormatString { get; }
         public int MinSize { get; }
@@ -3159,7 +3159,7 @@ namespace Cysharp.Text
             }
         }
     }
-    public sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
+    internal sealed partial class Utf8PreparedFormat<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
     {
         public string FormatString { get; }
         public int MinSize { get; }

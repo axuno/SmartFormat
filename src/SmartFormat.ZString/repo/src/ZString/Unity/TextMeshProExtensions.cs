@@ -4,7 +4,7 @@ using TMPro;
 
 namespace Cysharp.Text
 {
-    public static partial class TextMeshProExtensions
+    internal static partial class TextMeshProExtensions
     {
         public static void SetText<T>(this TMP_Text text, T arg0)
         {

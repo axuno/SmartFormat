@@ -15,7 +15,7 @@ namespace System
             return *((int*)&value);
         }
 
-        public readonly struct FloatingPointInfo
+        internal readonly struct FloatingPointInfo
         {
             public static readonly FloatingPointInfo Double = new FloatingPointInfo(
                 denormalMantissaBits: 52,
