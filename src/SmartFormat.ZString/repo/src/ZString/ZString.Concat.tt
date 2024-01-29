@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Cysharp.Text
 {
-    public static partial class ZString
+    internal static partial class ZString
     {
 <# for(var i = 1; i <= TypeParamMax; i++) { #>
         /// <summary>Concatenates the string representation of some specified objects.</summary>
