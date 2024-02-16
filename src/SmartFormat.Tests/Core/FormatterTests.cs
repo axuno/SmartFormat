@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
 using SmartFormat.Core.Settings;
@@ -343,5 +344,28 @@ public class FormatterTests
 
         // Restore to saved value
         ThreadSafeMode.SwitchTo(savedMode);
+    }
+
+    public class AbortFormatSource : ISource
+    {
+        public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
+        {
+            if (selectorInfo.SelectorText == "abort")
+                throw new AbortFormattingException();
+            return false;
+        }
+    }
+
+    [TestCase("Some text {abort}", "Some text ")]
+    [TestCase("Some text {1.abort}", "Some text ")]
+    [TestCase("Some text {0.abort.some.selector}", "Some text ")]
+    [TestCase("Some text {abort.some.selector:plural:Apple|{} Apples}", "Some text ")]
+    public void AbortFormattingException_PreventsFurtherProcessing(string text, string expected)
+    {
+        var formatter = GetSimpleFormatter();
+        formatter.AddExtensions(new AbortFormatSource());
+
+        var actual = formatter.Format(text, 1, 2);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }
