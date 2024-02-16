@@ -12,7 +12,6 @@ namespace SmartFormat.Core.Formatting;
 /// This exception can be raised from an <see cref="ISource"/> to prevent additional processing,
 /// particularly in scenarios where the data's state is not yet prepared or deemed valid.
 /// </summary>
-[Serializable]
 public class AbortFormattingException : Exception
 {
     /// <summary>
