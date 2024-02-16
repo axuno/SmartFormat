@@ -348,7 +348,7 @@ public class FormatterTests
 
     public class AbortFormatSource : ISource
     {
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
