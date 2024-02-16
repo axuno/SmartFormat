@@ -348,10 +348,16 @@ public class FormatterTests
 
     public class AbortFormatSource : ISource
     {
+        public string Message { get; set; }
+
         public bool TryEvaluateSelector(ISelectorInfo selectorInfo)
         {
             if (selectorInfo.SelectorText == "abort")
-                throw new AbortFormattingException();
+            {
+                if (Message == null)
+                    throw new AbortFormattingException();
+                throw new AbortFormattingException(Message);
+            }
             return false;
         }
     }
@@ -364,6 +370,19 @@ public class FormatterTests
     {
         var formatter = GetSimpleFormatter();
         formatter.AddExtensions(new AbortFormatSource());
+
+        var actual = formatter.Format(text, 1, 2);
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [TestCase("Some text {abort}", "", "Some text ")]
+    [TestCase("Some text {1.abort}", "Message", "Some text Message")]
+    [TestCase("Some text {0.abort.some.selector}", "A Message", "Some text A Message")]
+    [TestCase("Some text {abort.some.selector:plural:Apple|{} Apples}", "<Error>", "Some text <Error>")]
+    public void AbortFormattingException_PreventsFurtherProcessingAndIncludesMessage(string text, string message, string expected)
+    {
+        var formatter = GetSimpleFormatter();
+        formatter.AddExtensions(new AbortFormatSource { Message = message });
 
         var actual = formatter.Format(text, 1, 2);
         Assert.That(actual, Is.EqualTo(expected));
