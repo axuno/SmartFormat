@@ -387,6 +387,12 @@ public class SmartFormatter
             {
                 EvaluateSelectors(childFormattingInfo);
             }
+            catch (AbortFormattingException ex)
+            {
+                if (ex.Text != null)
+                    formattingInfo.Write(ex.Text);
+                continue;
+            }
             catch (Exception ex)
             {
                 // An error occurred while evaluation selectors
