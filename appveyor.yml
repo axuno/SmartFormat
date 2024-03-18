@@ -49,7 +49,7 @@ for:
     deploy:
       - provider: NuGet
         api_key:
-          secure: 1h8ZK9+soiZWtM4gpgQR1JOyIWuSFsR+hWgsIAPoR9aqVuX/S1g/azEPDz/ebxJQ
+          secure: imIejPMbtxG7+0SknaneTpV4MF5wrCqvyZy0IPz5Q+rbgLGlFcnrqVk3YLSOhIW4
         on:
           branch: main
   -
