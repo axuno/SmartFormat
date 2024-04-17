@@ -10,7 +10,7 @@ It uses extensions to provide named placeholders, localization, pluralization, g
         <AssemblyTitle>SmartFormat.Extensions.System.Text.Json</AssemblyTitle>
         <AssemblyName>SmartFormat.Extensions.System.Text.Json</AssemblyName>
         <PackageId>SmartFormat.Extensions.System.Text.Json</PackageId>
-        <PackageReleaseNotes>Please see release notes on 
+        <PackageReleaseNotes>Please see release notes on
 https://github.com/axuno/SmartFormat/releases/
         </PackageReleaseNotes>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -22,7 +22,7 @@ https://github.com/axuno/SmartFormat/releases/
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net6.0</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Nullable>enable</Nullable>
         <SignAssembly>true</SignAssembly>
@@ -39,7 +39,7 @@ https://github.com/axuno/SmartFormat/releases/
         <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
     </PropertyGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
       <PackageReference Include="System.Text.Json" Version="6.0.2" />
     </ItemGroup>
 

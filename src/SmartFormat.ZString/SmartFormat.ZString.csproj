@@ -75,7 +75,7 @@
       <None Remove="repo\tests\**" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netStandard2.0'">
         <PackageReference Include="System.Memory" Version="4.5.4" />
     </ItemGroup>
 
