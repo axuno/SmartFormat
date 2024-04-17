@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net6.0</TargetFrameworks>
         <!-- Current Cysharp.ZString release version is 2.5.1 -->
         <RootNamespace>SmartFormat.ZString</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -77,6 +77,10 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netStandard2.0'">
         <PackageReference Include="System.Memory" Version="4.5.4" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
