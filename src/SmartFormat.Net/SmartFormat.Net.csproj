@@ -9,31 +9,9 @@ It can format various data sources into a string with a minimal, intuitive synta
 It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
         </Description>
         <AssemblyTitle>SmartFormat.Net</AssemblyTitle>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>SmartFormat.Net</AssemblyName>
-        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
-        <SignAssembly>true</SignAssembly>
         <PackageId>SmartFormat.NET</PackageId>
-        <PackageReleaseNotes>Please see release notes on 
-https://github.com/axuno/SmartFormat/releases/
-        </PackageReleaseNotes>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageLicenseFile></PackageLicenseFile>
-        <PackageLicenseUrl></PackageLicenseUrl>
-        <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
-        <PackageIcon>SmartFormat_365x365.png</PackageIcon>
         <PackageTags>string-format stringformat template templating string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
-        <Nullable>enable</Nullable>
-        <WarningsAsErrors>nullable</WarningsAsErrors>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <!-- EmbedUntrackedSources for deterministic build -->
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
