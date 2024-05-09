@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.Extensions.Time
 EndProject
 # Include SmartFormat.ZString in the Deploy Sln File in order to get the release assembly into the SmartFormat.csproj package.
 # The SmartFormat.ZString.csproj is marked with IsPackable=false, so no nupkg/snupkg will be created.
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartFormat.ZString", "SmartFormat.ZString\SmartFormat.ZString.csproj", "{A15DAB96-3884-4063-9D1C-47367D408842}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,14 +73,6 @@ Global
 		{62553041-4606-47FC-B44E-8D6D51F23E22}.Release|Any CPU.Build.0 = Release|Any CPU
 		{62553041-4606-47FC-B44E-8D6D51F23E22}.Release|x86.ActiveCfg = Release|Any CPU
 		{62553041-4606-47FC-B44E-8D6D51F23E22}.Release|x86.Build.0 = Release|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Debug|x86.Build.0 = Debug|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Release|x86.ActiveCfg = Release|Any CPU
-		{A15DAB96-3884-4063-9D1C-47367D408842}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

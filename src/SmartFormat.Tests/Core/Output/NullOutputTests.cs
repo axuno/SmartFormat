@@ -25,7 +25,7 @@ public class NullOutputTests
     [Test]
     public void Output_Of_ValueStringBuilder()
     {
-        using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
+        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
         var so = new NullOutput();
         Assert.DoesNotThrow(() =>so.Write(sb, null));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 #nullable enable
 namespace SmartFormat.Demo.Sample_Extensions
@@ -82,21 +83,30 @@ namespace SmartFormat.Demo.Sample_Extensions
                 return new T();
             }
 
-            var index = (new Random()).Next(itemCount);
+            var index = GetRandomNumber(itemCount);
             return sc.ElementAt(index);
         }
 
-        #endregion
+        private static int GetRandomNumber(int itemCount)
+        {
+            using var rng = RandomNumberGenerator.Create();
+            var randomNumber = new byte[4]; // 4 for int32
+            rng.GetBytes(randomNumber);
+            var value = Math.Abs(BitConverter.ToInt32(randomNumber, 0));
+            return value % itemCount;
+        }
 
-        #region: Split :
+    #endregion
 
-        /// <summary>Splits the enumeration into segments,
-        /// each segment containing [count] items, and the last segment containing the remainder.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="count">The number of items to include in each segment.
-        /// The last segment might contain fewer items.</param>
-        public static IEnumerable<TSource[]> Split<TSource>(this IEnumerable<TSource> source, int count)
+    #region: Split :
+
+    /// <summary>Splits the enumeration into segments,
+    /// each segment containing [count] items, and the last segment containing the remainder.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="count">The number of items to include in each segment.
+    /// The last segment might contain fewer items.</param>
+    public static IEnumerable<TSource[]> Split<TSource>(this IEnumerable<TSource> source, int count)
         {
             ArgumentValidator.CheckForNullReference(source, "source");
             ArgumentValidator.CheckForZeroValue(count, "count");

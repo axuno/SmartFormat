@@ -227,7 +227,7 @@ public class Placeholder : FormatItem
     {
         if (_toStringCache != null) return _toStringCache;
 
-        using var sb = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(Length);
+        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(Length);
         sb.Append(SmartSettings.Parser.PlaceholderBeginChar);
         foreach (var s in Selectors)
         {

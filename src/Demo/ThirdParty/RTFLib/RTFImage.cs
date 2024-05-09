@@ -4,6 +4,7 @@
 namespace RTF
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
@@ -79,6 +80,7 @@ namespace RTF
             /// <param name="_flags">
             /// Flags used to specify the format of the Windows Metafile returned
             /// </param>
+            [SuppressMessage("Security", "CA5392:P/invoke methods should not be visible", Justification = "Method is safe.")]
             [DllImport("gdiplus.dll")]
             private static extern uint GdipEmfToWmfBits(IntPtr _hEmf, uint _bufferSize, byte[] _buffer, int _mappingMode, EmfToWmfBitsFlags _flags);
 

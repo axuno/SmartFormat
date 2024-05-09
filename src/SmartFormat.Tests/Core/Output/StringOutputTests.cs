@@ -27,7 +27,7 @@ public class StringOutputTests
     public void Output_Of_ValueStringBuilder()
     {
         var so = new StringOutput();
-        using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
+        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
         so.Write(sb, null!);
         Assert.That(so.ToString(), Is.EqualTo("text"));

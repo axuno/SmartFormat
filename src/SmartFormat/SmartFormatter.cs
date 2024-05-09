@@ -12,7 +12,7 @@ using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Pooling.SmartPools;
-using SmartFormat.Utilities;
+using SmartFormat.ZString;
 
 namespace SmartFormat;
 
@@ -292,7 +292,7 @@ public class SmartFormatter
             
         // Note: Making ZStringOutput a class instance variable has no advantage for speed,
         // but brings 10% less Gen 0 GC. Then, SmartFormatter would have to be IDisposable (dispose ZStringOutput)
-        using var zsOutput = new ZStringOutput(ZStringBuilderExtensions.CalcCapacity(formatParsed));
+        using var zsOutput = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formatParsed));
             
         var current = args.Count > 0 ? args[0] : args; // The first item is the default.
 
@@ -352,7 +352,7 @@ public class SmartFormatter
     {
         // Note: Making ZStringOutput a class instance variable has no advantage for speed,
         // but brings 10% less Gen 0 GC. Then, SmartFormatter would have to be IDisposable (to dispose ZStringOutput)
-        using var zsOutput = new ZStringOutput(ZStringBuilderExtensions.CalcCapacity(formatParsed));
+        using var zsOutput = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formatParsed));
         var current = args.Count > 0 ? args[0] : args; // The first item is the default.
         var formatDetails = FormatDetailsPool.Instance.Get().Initialize(this, formatParsed, args, provider, zsOutput);
         Format(formatDetails, formatParsed, current);

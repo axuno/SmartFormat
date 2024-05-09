@@ -333,7 +333,7 @@ public sealed class Format : FormatItem, IDisposable
     {
         if (_literalTextCache != null) return _literalTextCache;
 
-        using var sb = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(this);
+        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(this);
         foreach (var item in Items)
             if (item is LiteralText literalItem) sb.Append(literalItem.AsSpan());
 
@@ -349,7 +349,7 @@ public sealed class Format : FormatItem, IDisposable
     {
         if (_toStringCache != null) return _toStringCache;
 
-        using var sb = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(this);
+        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(this);
         foreach (var item in Items) sb.Append(item.AsSpan());
         _toStringCache = sb.ToString();
         return _toStringCache;
