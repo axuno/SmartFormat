@@ -10,6 +10,7 @@ using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Pooling.SmartPools;
 using SmartFormat.Utilities;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Extensions;
 
@@ -73,7 +74,7 @@ public class LocalizationFormatter : IFormatter, IInitializer
         // Try formatting if localized string was not found, but a format has nested items
         if (localized is null && formattingInfo.Format!.HasNested)
         {
-            using var zsOutput = new ZStringOutput(ZStringBuilderExtensions.CalcCapacity(formattingInfo.Format));
+            using var zsOutput = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formattingInfo.Format));
 
             var localizableFormatDetails = FormatDetailsPool.Instance.Get().Initialize(_formatter!,
                 formattingInfo.Format, InitializationObject.ObjectList, null, zsOutput);

@@ -3,14 +3,13 @@
 // Licensed under the MIT license.
 
 using SmartFormat.Core.Parsing;
-using SmartFormat.ZString;
 
-namespace SmartFormat.Utilities;
+namespace SmartFormat.ZString;
 
 /// <summary>
 /// Extensions to <see cref="ZStringBuilder"/>.
 /// </summary>
-internal static class ZStringBuilderExtensions
+internal static class ZStringBuilderUtilities
 {
     // DefaultBufferSize of Utf16ValueStringBuilder
     internal const int DefaultBufferSize = 32768;
@@ -41,7 +40,7 @@ internal static class ZStringBuilderExtensions
     {
         return CreateZStringBuilder(CalcCapacity(format));
     }
-        
+
     /// <summary>
     /// Creates a new instance of <see cref="ZStringBuilder"/> with the given initial capacity.
     /// </summary>
@@ -49,7 +48,7 @@ internal static class ZStringBuilderExtensions
     internal static ZStringBuilder CreateZStringBuilder(int capacity)
     {
         var sb = new ZStringBuilder(false);
-        if(capacity > DefaultBufferSize)
+        if (capacity > DefaultBufferSize)
             sb.Grow(capacity - DefaultBufferSize);
 
         return sb;

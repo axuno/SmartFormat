@@ -8,9 +8,11 @@ using Cysharp.Text;
 
 namespace SmartFormat.ZString;
 
+// --SONAR-OFF-- // This file is excluded from SonarCloud analysis.
+
 /// <summary>
 /// A 1:1 wrapper around <see cref="Utf16ValueStringBuilder"/>,
-/// so that we don't have to reference Cysharp.Text classes directly.
+/// so that we don't have to reference <see cref="Cysharp.Text"/> classes directly.
 /// </summary>
 /// <remarks>
 /// We cannot add/get <see cref="ZStringBuilder"/> into/from a list or stack,
@@ -54,8 +56,17 @@ public class ZStringBuilder : IDisposable
     /// </summary>
     public void Dispose() => _vsb.Dispose();
 
+    /// <summary>Clears the buffer.</summary>
     public void Clear() => _vsb.Clear();
+    /// <summary>
+    /// Tries to grow the buffer to the specified capacity.
+    /// </summary>
+    /// <param name="sizeHint"></param>
     public void TryGrow(int sizeHint) => _vsb.TryGrow(sizeHint);
+    /// <summary>
+    /// Grows the buffer to the specified capacity.
+    /// </summary>
+    /// <param name="sizeHint"></param>
     public void Grow(int sizeHint) => _vsb.Grow(sizeHint);
 
     /// <summary>Appends the default line terminator to the end of this instance.</summary>
@@ -67,104 +78,110 @@ public class ZStringBuilder : IDisposable
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
     public void AppendLine(string value) => _vsb.AppendLine(value);
 
+    /// <summary>Appends a contiguous region of arbitrary memory followed by the default line terminator to the end of this instance.</summary>
     public void AppendLine(ReadOnlySpan<char> value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
     public void AppendLine<T>(T value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Byte value) => _vsb.AppendLine(value);
+    public void AppendLine(byte value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Byte value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(byte value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.DateTime value) => _vsb.AppendLine(value);
+    public void AppendLine(DateTime value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.DateTime value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(DateTime value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.DateTimeOffset value) => _vsb.AppendLine(value);
+    public void AppendLine(DateTimeOffset value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.DateTimeOffset value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(DateTimeOffset value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Decimal value) => _vsb.AppendLine(value);
+    public void AppendLine(decimal value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Decimal value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(decimal value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Double value) => _vsb.AppendLine(value);
+    public void AppendLine(double value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Double value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(double value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Int16 value) => _vsb.AppendLine(value);
+    public void AppendLine(short value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Int16 value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(short value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Int32 value) => _vsb.AppendLine(value);
+    public void AppendLine(int value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Int32 value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(int value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Int64 value) => _vsb.AppendLine(value);
+    public void AppendLine(long value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Int64 value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(long value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.SByte value) => _vsb.AppendLine(value);
+    public void AppendLine(sbyte value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.SByte value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(sbyte value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Single value) => _vsb.AppendLine(value);
+    public void AppendLine(float value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Single value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(float value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.TimeSpan value) => _vsb.AppendLine(value);
+    public void AppendLine(TimeSpan value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.TimeSpan value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(TimeSpan value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.UInt16 value) => _vsb.AppendLine(value);
+    public void AppendLine(ushort value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.UInt16 value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(ushort value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.UInt32 value) => _vsb.AppendLine(value);
+    public void AppendLine(uint value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.UInt32 value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(uint value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.UInt64 value) => _vsb.AppendLine(value);
+    public void AppendLine(ulong value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.UInt64 value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(ulong value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Guid value) => _vsb.AppendLine(value);
+    public void AppendLine(Guid value) => _vsb.AppendLine(value);
 
     /// <summary>Appends the string representation of a specified value with numeric format strings followed by the default line terminator to the end of this instance.</summary>
-    public void AppendLine(System.Guid value, string format) => _vsb.AppendLine(value, format);
+    public void AppendLine(Guid value, string format) => _vsb.AppendLine(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
     public void Append(char value) => _vsb.Append(value);
 
+    /// <summary>
+    /// Appends a specified number of copies of the string representation of a specified value to this instance.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="repeatCount"></param>
     public void Append(char value, int repeatCount) => _vsb.Append(value, repeatCount);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
@@ -180,94 +197,94 @@ public class ZStringBuilder : IDisposable
     public void Append(ZStringBuilder value) => _vsb.Append(value._vsb);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Byte value) => _vsb.Append(value);
+    public void Append(byte value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Byte value, string format) => _vsb.Append(value, format);
+    public void Append(byte value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.DateTime value) => _vsb.Append(value);
+    public void Append(DateTime value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.DateTime value, string format) => _vsb.Append(value, format);
+    public void Append(DateTime value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.DateTimeOffset value) => _vsb.Append(value);
+    public void Append(DateTimeOffset value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.DateTimeOffset value, string format) => _vsb.Append(value, format);
+    public void Append(DateTimeOffset value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Decimal value) => _vsb.Append(value);
+    public void Append(decimal value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Decimal value, string format) => _vsb.Append(value, format);
+    public void Append(decimal value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Double value) => _vsb.Append(value);
+    public void Append(double value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Double value, string format) => _vsb.Append(value, format);
+    public void Append(double value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Int16 value) => _vsb.Append(value);
+    public void Append(short value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Int16 value, string format) => _vsb.Append(value, format);
+    public void Append(short value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Int32 value) => _vsb.Append(value);
+    public void Append(int value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Int32 value, string format) => _vsb.Append(value, format);
+    public void Append(int value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Int64 value) => _vsb.Append(value);
+    public void Append(long value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Int64 value, string format) => _vsb.Append(value, format);
+    public void Append(long value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.SByte value) => _vsb.Append(value);
+    public void Append(sbyte value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.SByte value, string format) => _vsb.Append(value, format);
+    public void Append(sbyte value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Single value) => _vsb.Append(value);
+    public void Append(float value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Single value, string format) => _vsb.Append(value, format);
+    public void Append(float value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.TimeSpan value) => _vsb.Append(value);
+    public void Append(TimeSpan value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.TimeSpan value, string format) => _vsb.Append(value, format);
+    public void Append(TimeSpan value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.UInt16 value) => _vsb.Append(value);
+    public void Append(ushort value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.UInt16 value, string format) => _vsb.Append(value, format);
+    public void Append(ushort value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.UInt32 value) => _vsb.Append(value);
+    public void Append(uint value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.UInt32 value, string format) => _vsb.Append(value, format);
+    public void Append(uint value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.UInt64 value) => _vsb.Append(value);
+    public void Append(ulong value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.UInt64 value, string format) => _vsb.Append(value, format);
+    public void Append(ulong value, string format) => _vsb.Append(value, format);
 
     /// <summary>Appends the string representation of a specified value to this instance.</summary>
-    public void Append(System.Guid value) => _vsb.Append(value);
+    public void Append(Guid value) => _vsb.Append(value);
 
     /// <summary>Appends the string representation of a specified value to this instance with numeric format strings.</summary>
-    public void Append(System.Guid value, string format) => _vsb.Append(value, format);
+    public void Append(Guid value, string format) => _vsb.Append(value, format);
 
     /// <summary>
     /// Inserts a string 0 or more times into this builder at the specified position.
@@ -277,7 +294,19 @@ public class ZStringBuilder : IDisposable
     /// <param name="count">The number of times to insert the string.</param>
     public void Insert(int index, string value, int count) => _vsb.Insert(index, value, count);
 
+    /// <summary>
+    /// Inserts a string into this builder at the specified position.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
     public void Insert(int index, string value) => _vsb.Insert(index, value);
+
+    /// <summary>
+    /// Inserts a contiguous region of arbitrary memory 0 or more times into this builder at the specified position.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <param name="count"></param>
     public void Insert(int index, ReadOnlySpan<char> value, int count) => _vsb.Insert(index, value, count);
 
     /// <summary>
@@ -308,6 +337,11 @@ public class ZStringBuilder : IDisposable
     /// </remarks>
     public void Replace(string oldValue, string newValue) => _vsb.Replace(oldValue, newValue);
 
+    /// <summary>
+    /// Replaces all occurrences of one <see cref="ReadOnlySpan{T}"/>  with another <see cref="ReadOnlySpan{T}"/> in this builder.
+    /// </summary>
+    /// <param name="oldValue"></param>
+    /// <param name="newValue"></param>
     public void Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => _vsb.Replace(oldValue, newValue);
 
     /// <summary>
@@ -324,6 +358,13 @@ public class ZStringBuilder : IDisposable
     public void Replace(string oldValue, string newValue, int startIndex, int count) =>
         _vsb.Replace(oldValue, newValue, startIndex, count);
 
+    /// <summary>
+    /// Replaces all occurrences of one <see cref="ReadOnlySpan{T}"/> with another <see cref="ReadOnlySpan{T}"/> in part of this builder.
+    /// </summary>
+    /// <param name="oldValue"></param>
+    /// <param name="newValue"></param>
+    /// <param name="startIndex">The index to start in this builder.</param>
+    /// <param name="count">The number of characters to read in this builder.</param>
     public void Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count) =>
         _vsb.Replace(oldValue, newValue, startIndex, count);
 
@@ -499,20 +540,60 @@ public class ZStringBuilder : IDisposable
     /// <param name="values"></param>
     public void AppendJoin<T>(char separator, params T[] values) => _vsb.AppendJoin(separator, values);
 
+    /// <summary>
+    /// Concatenates the string representations of the elements in the provided list of objects, using the specified char separator between each member, then appends the result to the current instance of the string builder.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(char separator, List<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates the provided span of objects, using the specified char separator between each member, then appends the result to the current instance of the string builder.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(char separator, ReadOnlySpan<T> values) => _vsb.AppendJoin(separator, values);
 
     /// <summary>
-    /// Concatenates and appends the members of a collection, using the specified char separator between each member.
+    /// Concatenates and appends the members of a <see cref="IEnumerable{T}"/>>, using the specified char separator between each member.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="separator"></param>
     /// <param name="values"></param>
     public void AppendJoin<T>(char separator, IEnumerable<T> values) => _vsb.AppendJoin(separator, values);
 
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="ICollection{T}"/>, using the specified char separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(char separator, ICollection<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="IList{T}"/>, using the specified char separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(char separator, IList<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="IReadOnlyList{T}"/>, using the specified char separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(char separator, IReadOnlyList<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="IReadOnlyCollection{T}"/>, using the specified char separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(char separator, IReadOnlyCollection<T> values) => _vsb.AppendJoin(separator, values);
 
     /// <summary>
@@ -523,7 +604,20 @@ public class ZStringBuilder : IDisposable
     /// <param name="values"></param>
     public void AppendJoin<T>(string separator, params T[] values) => _vsb.AppendJoin(separator, values);
 
+    /// <summary>
+    /// Concatenates the string representations of the elements in the provided list of objects, using the specified separator between each member, then appends the result to the current instance of the string builder.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(string separator, List<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates the provided <see cref="ReadOnlySpan{T}"/>>, using the specified separator between each member, then appends the result to the current instance of the string builder.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(string separator, ReadOnlySpan<T> values) => _vsb.AppendJoin(separator, values);
 
     /// <summary>
@@ -534,13 +628,42 @@ public class ZStringBuilder : IDisposable
     /// <param name="values"></param>
     public void AppendJoin<T>(string separator, IEnumerable<T> values) => _vsb.AppendJoin(separator, values);
 
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="ICollection{T}"/>>, using the specified separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(string separator, ICollection<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="IList{T}"/>, using the specified separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(string separator, IList<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="IReadOnlyList{T}"/>, using the specified separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(string separator, IReadOnlyList<T> values) => _vsb.AppendJoin(separator, values);
+
+    /// <summary>
+    /// Concatenates and appends the members of a <see cref="IReadOnlyCollection{T}"/>, using the specified separator between each member.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="separator"></param>
+    /// <param name="values"></param>
     public void AppendJoin<T>(string separator, IReadOnlyCollection<T> values) => _vsb.AppendJoin(separator, values);
 
     void IDisposable.Dispose()
     {
         _vsb.Dispose();
+        // Suppress finalization.
+        GC.SuppressFinalize(this);
     }
 }
