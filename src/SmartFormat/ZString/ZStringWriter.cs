@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -21,6 +22,7 @@ namespace SmartFormat.ZString;
 /// <remarks>
 /// It's important to make sure the writer is always properly disposed.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public sealed class ZStringWriter : TextWriter
 {
     private readonly Cysharp.Text.ZStringWriter _zw;
