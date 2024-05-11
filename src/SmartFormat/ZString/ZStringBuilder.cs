@@ -4,6 +4,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices.ComTypes;
 using Cysharp.Text;
 
 namespace SmartFormat.ZString;
@@ -18,6 +20,7 @@ namespace SmartFormat.ZString;
 /// We cannot add/get <see cref="ZStringBuilder"/> into/from a list or stack,
 /// because it contains a value type <see langword="struct"/> <see cref="Utf16ValueStringBuilder"/>.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public class ZStringBuilder : IDisposable
 {
     /**********************************
