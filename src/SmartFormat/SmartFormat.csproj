@@ -26,12 +26,12 @@ It uses extensions to provide named placeholders, localization, pluralization, g
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="ZString" Version="2.6.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netStandard2.0'">
         <PackageReference Include="System.Memory" Version="4.5.5" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-        <PackageReference Include="ZString" Version="2.6.0" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
