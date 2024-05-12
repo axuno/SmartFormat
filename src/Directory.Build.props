@@ -18,9 +18,8 @@
         <AnalysisLevel>latest</AnalysisLevel>
         <Features>strict</Features>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net6.0</TargetFrameworks>
-        <PackageReleaseNotes>
-            Please see release notes on
-            https://github.com/axuno/SmartFormat/releases/
+        <PackageReleaseNotes>Please see release notes on GitHub:
+https://github.com/axuno/SmartFormat/releases/
         </PackageReleaseNotes>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageLicenseFile></PackageLicenseFile>

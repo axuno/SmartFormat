@@ -5,9 +5,7 @@
     <TargetFrameworks>net6.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>SmartFormat.Demo.ico</ApplicationIcon>
-    <LangVersion>8.0</LangVersion>
-    <Nullable>disable</Nullable>
-    <NoWarn>1591,1573</NoWarn>
+    <NoWarn>$(NoWarn);1591,1573</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,86 +1,84 @@
-﻿
+﻿#nullable disable
 
+using System;
 
-namespace RTF
+namespace Demo.ThirdParty.RTFLib;
+
+partial class RTFBuilder
 {
-    using System;
+    #region Nested type: RTFBuilderUnWrapped
 
-    partial class RTFBuilder
+    // ----------------------------------------------------------------------------------------
+    //    _                ___        _..-._   Date: 12/11/08    23:38
+    //    \`.|\..----...-'`   `-._.-'' _.-..'     
+    //    /  ' `         ,       __.-'' 
+    //    )/` _/     \   `-_,   /     Solution: RTFLib
+    //    `-'" `"\_  ,_.-;_.-\_ ',    Project : RTFLib                                 
+    //        _.-'_./   {_.'   ; /    Author  : Anton
+    //       {_.-``-'         {_/     Assembly: 1.0.0.0
+    //                                Copyright © 2005-2008, Rogue Trader/MWM
+    //        Project Item Name:      RTFBuilder.UnWrapped.cs - Code
+    //        Purpose:                Cancels persistent Formatting Changes on an unwrapped RtfBuilder
+    // ----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Cancels persistent Formatting Changes on an unwrapped RtfBuilder
+    /// Exposed by the FormatLock on RtfBuilderbase
+    /// </summary>
+    private class RTFBuilderUnWrapped : IDisposable
     {
-        #region Nested type: RTFBuilderUnWrapped
+        #region Fields
 
-        // ----------------------------------------------------------------------------------------
-        //    _                ___        _..-._   Date: 12/11/08    23:38
-        //    \`.|\..----...-'`   `-._.-'' _.-..'     
-        //    /  ' `         ,       __.-'' 
-        //    )/` _/     \   `-_,   /     Solution: RTFLib
-        //    `-'" `"\_  ,_.-;_.-\_ ',    Project : RTFLib                                 
-        //        _.-'_./   {_.'   ; /    Author  : Anton
-        //       {_.-``-'         {_/     Assembly: 1.0.0.0
-        //                                Copyright © 2005-2008, Rogue Trader/MWM
-        //        Project Item Name:      RTFBuilder.UnWrapped.cs - Code
-        //        Purpose:                Cancels persistent Formatting Changes on an unwrapped RtfBuilder
-        // ----------------------------------------------------------------------------------------
-        /// <summary>
-        /// Cancels persistent Formatting Changes on an unwrapped RtfBuilder
-        /// Exposed by the FormatLock on RtfBuilderbase
-        /// </summary>
-        private class RTFBuilderUnWrapped : IDisposable
+        private readonly RTFBuilder _builder;
+        private readonly RTFFormatWrap wrapped;
+
+        #endregion
+
+        #region Constructor
+
+        public RTFBuilderUnWrapped(RTFBuilder builder)
         {
-            #region Fields
+            wrapped = new RTFFormatWrap(builder);
+            _builder = builder;
+            _builder._unwrapped = true;
+        }
 
-            private readonly RTFBuilder _builder;
-            private readonly RTFFormatWrap wrapped;
+        #endregion
 
-            #endregion
+        #region Override Methods
 
-            #region Constructor
+        ~RTFBuilderUnWrapped()
+        {
+            Dispose(false);
+        }
 
-            public RTFBuilderUnWrapped(RTFBuilder builder)
+        #endregion
+
+        #region Public Methods
+
+        public void Dispose(bool disposing)
+        {
+            if (_builder != null)
             {
-                wrapped = new RTFFormatWrap(builder);
-                _builder = builder;
-                _builder._unwrapped = true;
+                wrapped.Dispose();
+                _builder._unwrapped = false;
             }
-
-            #endregion
-
-            #region Override Methods
-
-            ~RTFBuilderUnWrapped()
+            if (disposing)
             {
-                Dispose(false);
+                GC.SuppressFinalize(this);
             }
+        }
 
-            #endregion
+        #endregion
 
-            #region Public Methods
+        #region IDisposable Members
 
-            public void Dispose(bool disposing)
-            {
-                if (_builder != null)
-                {
-                    wrapped.Dispose();
-                    _builder._unwrapped = false;
-                }
-                if (disposing)
-                {
-                    GC.SuppressFinalize(this);
-                }
-            }
-
-            #endregion
-
-            #region IDisposable Members
-
-            public void Dispose()
-            {
-                Dispose(true);
-            }
-
-            #endregion
+        public void Dispose()
+        {
+            Dispose(true);
         }
 
         #endregion
     }
+
+    #endregion
 }

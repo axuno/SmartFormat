@@ -3,11 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net6.0</TargetFrameworks>
-    <LangVersion>9.0</LangVersion>
-    <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <Nullable>disable</Nullable>
-	<NoWarn>1591,1573</NoWarn>
+	<NoWarn>$(NoWarn);1591,1573</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
