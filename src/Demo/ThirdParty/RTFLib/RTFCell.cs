@@ -1,117 +1,115 @@
-﻿
+﻿#nullable disable
 
+using System;
 
-namespace RTF
+namespace Demo.ThirdParty.RTFLib;
+
+public partial class RTFBuilder
 {
-    using System;
+    #region Nested type: RTFCell
 
-    public partial class RTFBuilder
+    // ----------------------------------------------------------------------------------------
+    //    _                ___        _..-._   Date: 12/11/08    23:46
+    //    \`.|\..----...-'`   `-._.-'' _.-..'     
+    //    /  ' `         ,       __.-'' 
+    //    )/` _/     \   `-_,   /     Solution: RTFLib
+    //    `-'" `"\_  ,_.-;_.-\_ ',    Project : RTFLib                                 
+    //        _.-'_./   {_.'   ; /    Author  : Anton
+    //       {_.-``-'         {_/     Assembly: 1.0.0.0
+    //                                Copyright © 2005-2008, Rogue Trader/MWM
+    //        Project Item Name:      RTFCell.cs - Code
+    //        Purpose:                Cell In Table Row
+    // ----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Cell In Table Row
+    /// </summary>
+    public class RTFCell : IBuilderContent
     {
-        #region Nested type: RTFCell
+        #region Fields
 
-        // ----------------------------------------------------------------------------------------
-        //    _                ___        _..-._   Date: 12/11/08    23:46
-        //    \`.|\..----...-'`   `-._.-'' _.-..'     
-        //    /  ' `         ,       __.-'' 
-        //    )/` _/     \   `-_,   /     Solution: RTFLib
-        //    `-'" `"\_  ,_.-;_.-\_ ',    Project : RTFLib                                 
-        //        _.-'_./   {_.'   ; /    Author  : Anton
-        //       {_.-``-'         {_/     Assembly: 1.0.0.0
-        //                                Copyright © 2005-2008, Rogue Trader/MWM
-        //        Project Item Name:      RTFCell.cs - Code
-        //        Purpose:                Cell In Table Row
-        // ----------------------------------------------------------------------------------------
-        /// <summary>
-        /// Cell In Table Row
-        /// </summary>
-        public class RTFCell : IBuilderContent
+        private RTFBuilder _builder;
+        private RTFCellDefinition _cellDefinition;
+        private bool _firstAccessContent;
+
+        #endregion
+
+        #region Constructor
+
+        public RTFCell(RTFBuilder builder, RTFCellDefinition cellDefinition)
         {
-            #region Fields
+            _builder = builder;
+            _cellDefinition = cellDefinition;
+            _firstAccessContent = true;
+        }
 
-            private RTFBuilder _builder;
-            private RTFCellDefinition _cellDefinition;
-            private bool _firstAccessContent;
+        #endregion
 
-            #endregion
+        #region Override Methods
 
-            #region Constructor
+        ~RTFCell()
+        {
+            Dispose(false);
+        }
 
-            public RTFCell(RTFBuilder builder, RTFCellDefinition cellDefinition)
+        #endregion
+
+        #region Methods
+
+        protected void Dispose(bool disposing)
+        {
+            if (disposing && _builder != null)
             {
-                _builder = builder;
-                _cellDefinition = cellDefinition;
-                _firstAccessContent = true;
+                _builder._sb.AppendLine("\\cell ");
             }
-
-            #endregion
-
-            #region Override Methods
-
-            ~RTFCell()
+            _builder = null;
+            if (disposing)
             {
-                Dispose(false);
+                GC.SuppressFinalize(this);
             }
+        }
 
-            #endregion
+        #endregion
 
-            #region Methods
+        #region IBuilderContent Members
 
-            protected void Dispose(bool disposing)
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        public RTFBuilderbase Content
+        {
+            get
             {
-                if (disposing && _builder != null)
+                if (_firstAccessContent)
                 {
-                    _builder._sb.AppendLine("\\cell ");
-                }
-                _builder = null;
-                if (disposing)
-                {
-                    GC.SuppressFinalize(this);
-                }
-            }
-
-            #endregion
-
-            #region IBuilderContent Members
-
-            public void Dispose()
-            {
-                Dispose(true);
-            }
-
-            public RTFBuilderbase Content
-            {
-                get
-                {
-                    if (_firstAccessContent)
+                    //par in table
+                    switch (_cellDefinition.Alignment)
                     {
-                        //par in table
-                        switch (_cellDefinition.Alignment)
-                        {
-                            case RTFAlignment.TopCenter:
-                            case RTFAlignment.BottomCenter:
-                            case RTFAlignment.MiddleCenter:
-                                _builder._sb.Append("\\qc ");
-                                break;
-                            case RTFAlignment.TopLeft:
-                            case RTFAlignment.MiddleLeft:
-                            case RTFAlignment.BottomLeft:
-                                _builder._sb.Append("\\ql ");
-                                break;
-                            case RTFAlignment.TopRight:
-                            case RTFAlignment.BottomRight:
-                            case RTFAlignment.MiddleRight:
-                                _builder._sb.Append("\\qr ");
-                                break;
-                        }
-                        _firstAccessContent = false;
+                        case RTFAlignment.TopCenter:
+                        case RTFAlignment.BottomCenter:
+                        case RTFAlignment.MiddleCenter:
+                            _builder._sb.Append("\\qc ");
+                            break;
+                        case RTFAlignment.TopLeft:
+                        case RTFAlignment.MiddleLeft:
+                        case RTFAlignment.BottomLeft:
+                            _builder._sb.Append("\\ql ");
+                            break;
+                        case RTFAlignment.TopRight:
+                        case RTFAlignment.BottomRight:
+                        case RTFAlignment.MiddleRight:
+                            _builder._sb.Append("\\qr ");
+                            break;
                     }
-                    return _builder;
+                    _firstAccessContent = false;
                 }
+                return _builder;
             }
-
-            #endregion
         }
 
         #endregion
     }
+
+    #endregion
 }

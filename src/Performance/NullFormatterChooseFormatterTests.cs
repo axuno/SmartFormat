@@ -25,13 +25,9 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
     [MemoryDiagnoser]
     public class NullFormatterChooseFormatterTests
     {
-        private SmartFormatter _smartNullFormatter, _smartChooseFormatter;
-        private Format _nullFormatCache, _chooseFormatCache;
-
-        public NullFormatterChooseFormatterTests()
-        {
-            Setup();
-        }
+        // Members get initialized in the Setup method
+        private SmartFormatter _smartNullFormatter = null!, _smartChooseFormatter = null!;
+        private Format _nullFormatCache = null!, _chooseFormatCache = null!;
 
         [GlobalSetup]
         public void Setup()
@@ -51,13 +47,13 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         [Benchmark]
         public void ChooseFormatTest()
         {
-            var result = _smartChooseFormatter.Format(_chooseFormatCache, "", new List<object> {null});
+            var result = _smartChooseFormatter.Format(_chooseFormatCache, "", new List<object?> {null});
         }
 
         [Benchmark]
         public void NullFormatTest()
         {
-            var result = _smartNullFormatter.Format(_nullFormatCache, "", new List<object> {null});
+            var result = _smartNullFormatter.Format(_nullFormatCache, "", new List<object?> {null});
         }
     }
 }

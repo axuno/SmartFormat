@@ -53,16 +53,16 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
     // [RPlotExporter]
     public class SourcePerformanceTests
     {
-        private const string _format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
+        private const string Format = "Address: {City.ZipCode} {City.Name}, {City.AreaCode}\n" +
                               "Name: {Person.FirstName} {Person.LastName}";
 
-        private const string _formatForLiteral = "Address: {0} {1}, {2}\nName: {3} {4}";
+        private const string FormatForLiteral = "Address: {0} {1}, {2}\nName: {3} {4}";
 
         private readonly SmartFormatter _literalFormatter;
         private readonly SmartFormatter _reflectionFormatter;
         private readonly SmartFormatter _dictionaryFormatter;
         private readonly SmartFormatter _jsonFormatter;
-        private Parser _pureParsingParser = new SmartFormatter().Parser;
+        private readonly Parser _pureParsingParser = new SmartFormatter().Parser;
 
         private readonly Address _reflectionAddress = new();
         private readonly Dictionary<string, object> _dictionaryAddress = new Address().ToDictionary();
@@ -113,9 +113,9 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
             );
 
             // Cache the parsing result, so we don't include parsing performance
-            _formatCache = new FormatCache(_jsonFormatter.Parser.ParseFormat(_format, _jsonFormatter.GetNotEmptyFormatterExtensionNames()));
+            _formatCache = new FormatCache(_jsonFormatter.Parser.ParseFormat(Format, _jsonFormatter.GetNotEmptyFormatterExtensionNames()));
 
-            _formatCacheLiteral = new FormatCache(_jsonFormatter.Parser.ParseFormat(_formatForLiteral, _jsonFormatter.GetNotEmptyFormatterExtensionNames()));
+            _formatCacheLiteral = new FormatCache(_jsonFormatter.Parser.ParseFormat(FormatForLiteral, _jsonFormatter.GetNotEmptyFormatterExtensionNames()));
 
         }
 
@@ -147,7 +147,7 @@ Job=.NET Core 5.0  Runtime=.NET Core 5.0
         {
             for (var i = 0; i < N; i++)
             {
-                _ = _pureParsingParser.ParseFormat(_format, _jsonFormatter.GetNotEmptyFormatterExtensionNames());  // "{City}{City}{City}{FirstName}{LastName}"
+                _ = _pureParsingParser.ParseFormat(Format, _jsonFormatter.GetNotEmptyFormatterExtensionNames());  // "{City}{City}{City}{FirstName}{LastName}"
             }
         }
 

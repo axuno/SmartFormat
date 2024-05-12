@@ -3,14 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
-    <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
-    <SignAssembly>true</SignAssembly>
     <AssemblyName>Performance_v27</AssemblyName>
     <RootNamespace>Performance</RootNamespace>
-	<Nullable>disable</Nullable>
-    <NoWarn>1591,1573</NoWarn>
+    <NoWarn>$(NoWarn);1591,1573</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
