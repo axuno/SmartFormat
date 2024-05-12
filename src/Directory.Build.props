@@ -17,6 +17,27 @@
         <AnalysisModeSecurity>All</AnalysisModeSecurity>
         <AnalysisLevel>latest</AnalysisLevel>
         <Features>strict</Features>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net6.0</TargetFrameworks>
+        <PackageReleaseNotes>
+            Please see release notes on
+            https://github.com/axuno/SmartFormat/releases/
+        </PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseFile></PackageLicenseFile>
+        <PackageLicenseUrl></PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
+        <PackageIcon>SmartFormat_365x365.png</PackageIcon>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
     </PropertyGroup>
 
 </Project>
