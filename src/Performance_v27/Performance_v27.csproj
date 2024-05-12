@@ -9,6 +9,8 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyName>Performance_v27</AssemblyName>
     <RootNamespace>Performance</RootNamespace>
+	<Nullable>disable</Nullable>
+    <NoWarn>1591,1573</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
