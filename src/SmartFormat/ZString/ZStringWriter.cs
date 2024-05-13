@@ -75,9 +75,9 @@ public sealed class ZStringWriter : TextWriter
     }
 
     /// <inheritdoc/>
-    public override void Write(string value)
+    public override void Write(string? value)
     {
-        _zw.Write(value);
+        _zw.Write(value ?? string.Empty);
     }
 
     /// <inheritdoc/>
@@ -99,9 +99,9 @@ public sealed class ZStringWriter : TextWriter
     }
 
     /// <inheritdoc/>
-    public override Task WriteAsync(string value)
+    public override Task WriteAsync(string? value)
     {
-        return _zw.WriteAsync(value);
+        return _zw.WriteAsync(value ?? string.Empty);
     }
 
     /// <inheritdoc/>
@@ -117,9 +117,9 @@ public sealed class ZStringWriter : TextWriter
     }
 
     /// <inheritdoc/>
-    public override Task WriteLineAsync(string value)
+    public override Task WriteLineAsync(string? value)
     {
-        return _zw.WriteLineAsync(value);
+        return _zw.WriteLineAsync(value ?? string.Empty);
     }
 
     /// <inheritdoc/>

@@ -8,7 +8,6 @@ It can format various data sources into a string with a minimal, intuitive synta
 It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
         </Description>
         <AssemblyTitle>SmartFormat</AssemblyTitle>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
         <AssemblyName>SmartFormat</AssemblyName>
         <PackageId>SmartFormat</PackageId>
         <PackageTags>string-format stringformat template templating string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>

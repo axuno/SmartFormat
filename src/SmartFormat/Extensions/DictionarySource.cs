@@ -97,11 +97,11 @@ public class DictionarySource : Source
 
         if (!TryGetDictionaryProperties(obj.GetType(), out var propertyTuple)) return false;
 
-        var keys = (IEnumerable) propertyTuple!.Value.KeyProperty.GetValue(obj);
+        var keys = (IEnumerable) propertyTuple!.Value.KeyProperty.GetValue(obj)!;
 
         foreach (var k in keys)
         {
-            if (!k.ToString().Equals(key, comparison))
+            if (!k.ToString()!.Equals(key, comparison))
                 continue;
 
             value = propertyTuple.Value.ItemProperty.GetValue(obj, new [] { k });
@@ -125,7 +125,7 @@ public class DictionarySource : Source
         }
 
         // get Key and Item properties of the dictionary
-        propertyTuple = (type.GetProperty(nameof(IDictionary.Keys)), type.GetProperty("Item"));
+        propertyTuple = (type.GetProperty(nameof(IDictionary.Keys)), type.GetProperty("Item"))!;
 
         System.Diagnostics.Debug.Assert(propertyTuple.Value.KeyProperty != null && propertyTuple.Value.ItemProperty != null, "Key and Item properties must not be null");
 
