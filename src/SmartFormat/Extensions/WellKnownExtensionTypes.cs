@@ -72,12 +72,12 @@ public static class WellKnownExtensionTypes
         var wellKnownList = typeof(T).IsAssignableFrom(typeof(ISource)) ? Sources : Formatters;
 
         // Unknown extensions will add to the end
-        if (!wellKnownList.TryGetValue(extensionToInsert.GetType().FullName, out var indexOfNewExt))
+        if (!wellKnownList.TryGetValue(extensionToInsert.GetType().FullName!, out var indexOfNewExt))
             return currentExtensions.Count;
             
         for (var i = currentExtensions.Count - 1; i >= 0; i--)
         {
-            var found = wellKnownList.TryGetValue(currentExtensions[i].GetType().FullName, out var index);
+            var found = wellKnownList.TryGetValue(currentExtensions[i].GetType().FullName!, out var index);
             if (!found) continue;
 
             if (index > indexOfNewExt)
@@ -169,9 +169,9 @@ public static class WellKnownExtensionTypes
     internal static T CreateInstanceForType<T>((Type ExtensionType, bool IsSingleton) wellKnown)
     {
         if (wellKnown.IsSingleton)
-            return (T) wellKnown.ExtensionType.GetProperty("Instance", BindingFlags.Static | BindingFlags.Public)!.GetValue(wellKnown);
+            return (T) wellKnown.ExtensionType.GetProperty("Instance", BindingFlags.Static | BindingFlags.Public)!.GetValue(wellKnown)!;
 
         // It's a transient type
-        return (T) Activator.CreateInstance(Type.GetType(wellKnown.ExtensionType.AssemblyQualifiedName!)!);
+        return (T) Activator.CreateInstance(Type.GetType(wellKnown.ExtensionType.AssemblyQualifiedName!)!)!;
     }
 }

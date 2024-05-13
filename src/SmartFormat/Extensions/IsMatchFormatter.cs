@@ -78,7 +78,7 @@ public class IsMatchFormatter : IFormatter, IInitializer
         }
 
         var regEx = new Regex(expression, RegexOptions, TimeSpan.FromMilliseconds(500));
-        var match = regEx.Match(formattingInfo.CurrentValue.ToString());
+        var match = regEx.Match(formattingInfo.CurrentValue.ToString()!);
 
         if (!match.Success)
         {
