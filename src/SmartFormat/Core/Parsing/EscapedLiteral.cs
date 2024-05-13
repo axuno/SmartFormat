@@ -56,7 +56,7 @@ public static class EscapedLiteral
         var unicode = input.Length - startIndex >= 4
             ? input.Slice(startIndex, 4)
             : input.Slice(startIndex);
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET6_0_OR_GREATER
         if (int.TryParse(unicode, NumberStyles.HexNumber, null, out var result))
 #else
             if (int.TryParse(unicode.ToString(), NumberStyles.HexNumber, null, out var result))
@@ -80,9 +80,12 @@ public static class EscapedLiteral
     {
         var max = input.Length;
         var resultIndex = 0;
-        for (var inputIndex = 0; inputIndex < max; inputIndex++)
+
+        var inputIndex = 0;
+        while (inputIndex < max)
         {
             int nextInputIndex;
+
             if (inputIndex + 1 < max)
             {
                 nextInputIndex = inputIndex + 1;
@@ -99,25 +102,25 @@ public static class EscapedLiteral
                 {
                     // GetUnicode will throw if code is illegal
                     resultBuffer[resultIndex++] = GetUnicode(input, nextInputIndex + 1);
-                    inputIndex += 5;  // move to last unicode character
-                    continue;
+                    inputIndex += 6;  // move to last unicode character
                 }
-
-                if (TryGetChar(input[nextInputIndex], out var realChar, includeFormatterOptionChars))
+                else if (TryGetChar(input[nextInputIndex], out var realChar, includeFormatterOptionChars))
                 {
                     resultBuffer[resultIndex++] = realChar;
+                    inputIndex += 2;
                 }
                 else
                 {
                     throw new ArgumentException($"Unrecognized escape sequence \"{input[inputIndex]}{input[nextInputIndex]}\" in literal.");
                 }
-                inputIndex++;
             }
             else
             {
                 resultBuffer[resultIndex++] = input[inputIndex];
+                inputIndex++;
             }
         }
+
         return resultBuffer.Slice(0, resultIndex);
     }
 

@@ -64,8 +64,8 @@ public class StringOutput : IOutput
     /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
     public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
     {
-#if NETSTANDARD2_1
-            _output.Append(text);
+#if NETSTANDARD2_1 || NET6_0_OR_GREATER
+        _output.Append(text);
 #else
         _output.Append(text.ToString());
 #endif
@@ -74,8 +74,8 @@ public class StringOutput : IOutput
     ///<inheritdoc/>
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
     {
-#if NETSTANDARD2_1
-            _output.Append(stringBuilder.AsSpan());
+#if NETSTANDARD2_1 || NET6_0_OR_GREATER
+        _output.Append(stringBuilder.AsSpan());
 #else
         _output.Append(stringBuilder.ToString());
 #endif

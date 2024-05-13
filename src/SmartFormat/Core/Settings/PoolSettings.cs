@@ -31,6 +31,6 @@ public struct PoolSettings
 #if DEBUG
         = true;
 #else
-            = false;
+        = false;
 #endif
 }
