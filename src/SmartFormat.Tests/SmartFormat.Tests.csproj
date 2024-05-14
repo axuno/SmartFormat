@@ -4,7 +4,7 @@
         <Description>Unit tests for SmartFormat</Description>
         <AssemblyTitle>SmartFormat.Test</AssemblyTitle>
         <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <TargetFrameworks>net462;net6.0</TargetFrameworks>
+        <TargetFrameworks>net462;net60</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <AssemblyName>SmartFormat.Tests</AssemblyName>
@@ -15,9 +15,9 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-        <PackageReference Include="NUnit" Version="4.0.1" />
-        <PackageReference Include="NUnit.Analyzers" Version="3.10.0">
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+        <PackageReference Include="NUnit" Version="4.1.0" />
+        <PackageReference Include="NUnit.Analyzers" Version="4.2.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

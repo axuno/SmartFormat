@@ -13,8 +13,8 @@ It uses extensions to provide named placeholders, localization, pluralization, g
         <PackageTags>string-format stringformat template templating string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-      <PackageReference Include="System.Text.Json" Version="6.0.2" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
+        <PackageReference Include="System.Text.Json" Version="8.0.3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,7 +24,7 @@ It uses extensions to provide named placeholders, localization, pluralization, g
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

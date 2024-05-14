@@ -64,11 +64,7 @@ public class RTFOutput : IOutput
     ///<inheritdoc/>
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo)
     {
-#if NETSTANDARD2_1
-            output.Append(stringBuilder.AsSpan());
-#else
         output.Append(stringBuilder.ToString());
-#endif
     }
         
     public override string ToString()
