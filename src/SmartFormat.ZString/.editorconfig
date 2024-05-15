@@ -1,7 +1,0 @@
-# Mark as top-most EditorConfig file
-# This ensures that no settings from any higher-level .editorconfig files are applied
-root = true
-
-[*.cs]
-indent_style = space
-indent_size = 4

@@ -1,6 +1,4 @@
-﻿// 
-// Copyright SmartFormat Project maintainers and contributors.
-// Licensed under the MIT license.
+﻿// Licensed under the MIT license.
 
 using System;
 using System.Collections.Generic;
@@ -99,6 +97,7 @@ public class ParsingErrors : Exception   //NOSONAR
     }
 
     ///<inheritdoc/>
+    [Obsolete("This API supports obsolete formatter-based serialization. It will be removed in version 4.")]
     protected ParsingErrors(
         System.Runtime.Serialization.SerializationInfo info,
         System.Runtime.Serialization.StreamingContext context) : base(info, context)

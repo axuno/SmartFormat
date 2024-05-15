@@ -107,7 +107,7 @@ public class ChooseFormatter : IFormatter
                     t => t.Equals(valAsString, StringComparison.OrdinalIgnoreCase));
         }
             
-        valAsString = currentValueString = formattingInfo.CurrentValue.ToString();
+        valAsString = currentValueString = formattingInfo.CurrentValue.ToString()!;
             
         return Array.FindIndex(chooseOptions,
             t => AreEqual(t, valAsString, formattingInfo.FormatDetails.Settings.CaseSensitivity));

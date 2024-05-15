@@ -1,115 +1,109 @@
-﻿
+﻿#nullable disable
 
+using System;
+using System.Drawing;
 
- 
+namespace Demo.ThirdParty.RTFLib;
 
-namespace RTF
+public partial class RTFBuilder
 {
-    using System;
-    using System.Drawing;
+    #region Nested type: RTFParaWrap
 
-    public partial class RTFBuilder
+    // ----------------------------------------------------------------------------------------
+    //    _                ___        _..-._   Date: 12/11/08    23:36
+    //    \`.|\..----...-'`   `-._.-'' _.-..'     
+    //    /  ' `         ,       __.-'' 
+    //    )/` _/     \   `-_,   /     Solution: RTFLib
+    //    `-'" `"\_  ,_.-;_.-\_ ',    Project : RTFLib                                 
+    //        _.-'_./   {_.'   ; /    Author  : Anton
+    //       {_.-``-'         {_/     Assembly: 1.0.0.0
+    //                                Copyright © 2005-2008, Rogue Trader/MWM
+    //        Project Item Name:      RTFBuilder.RTFParaWrap.cs - Code
+    //        Purpose:                Wraps RtfBuilderbase injecting appropriate rtf codes after paragraph append 
+    // ----------------------------------------------------------------------------------------
+    /// <summary>
+    /// Wraps RtfBuilderbase injecting appropriate rtf codes after paragraph append 
+    /// </summary>
+    private class RTFParaWrap : IDisposable
     {
-        #region Nested type: RTFParaWrap
+        #region Fields
 
-        // ----------------------------------------------------------------------------------------
-        //    _                ___        _..-._   Date: 12/11/08    23:36
-        //    \`.|\..----...-'`   `-._.-'' _.-..'     
-        //    /  ' `         ,       __.-'' 
-        //    )/` _/     \   `-_,   /     Solution: RTFLib
-        //    `-'" `"\_  ,_.-;_.-\_ ',    Project : RTFLib                                 
-        //        _.-'_./   {_.'   ; /    Author  : Anton
-        //       {_.-``-'         {_/     Assembly: 1.0.0.0
-        //                                Copyright © 2005-2008, Rogue Trader/MWM
-        //        Project Item Name:      RTFBuilder.RTFParaWrap.cs - Code
-        //        Purpose:                Wraps RtfBuilderbase injecting appropriate rtf codes after paragraph append 
-        // ----------------------------------------------------------------------------------------
-        /// <summary>
-        /// Wraps RtfBuilderbase injecting appropriate rtf codes after paragraph append 
-        /// </summary>
-        private class RTFParaWrap : IDisposable
+        private readonly RTFBuilder _builder;
+
+        #endregion
+
+        #region Constructor
+
+        public RTFParaWrap(RTFBuilder builder)
         {
-            #region Fields
-
-            private readonly RTFBuilder _builder;
-
-            #endregion
-
-            #region Constructor
-
-            public RTFParaWrap(RTFBuilder builder)
+            _builder = builder;
+            int len = _builder._sb.Length;
+            if (_builder._sf.Alignment == StringAlignment.Center)
             {
-                _builder = builder;
-                int len = _builder._sb.Length;
-                if (_builder._sf.Alignment == StringAlignment.Center)
-                {
-                    _builder._sb.Append("\\qc");
-                }
-                else if (_builder._sf.Alignment == StringAlignment.Far)
-                {
-                    _builder._sb.Append("\\qr");
-                }
-                if (_builder._firstLineIndent > 0)
-                {
-                    _builder._sb.Append("\\fi" + _builder._firstLineIndent);
-                }
-                if (_builder._lineIndent > 0)
-                {
-                    _builder._sb.Append("\\li" + _builder._lineIndent);
-                }
-
-
-                if (_builder._sb.Length > len)
-                {
-                    _builder._sb.Append(" ");
-                }
+                _builder._sb.Append("\\qc");
+            }
+            else if (_builder._sf.Alignment == StringAlignment.Far)
+            {
+                _builder._sb.Append("\\qr");
+            }
+            if (_builder._firstLineIndent > 0)
+            {
+                _builder._sb.Append("\\fi" + _builder._firstLineIndent);
+            }
+            if (_builder._lineIndent > 0)
+            {
+                _builder._sb.Append("\\li" + _builder._lineIndent);
             }
 
-            #endregion
 
-            #region Override Methods
-
-            ~RTFParaWrap()
+            if (_builder._sb.Length > len)
             {
-                Dispose(false);
+                _builder._sb.Append(" ");
             }
+        }
 
-            #endregion
+        #endregion
 
-            #region Methods
+        #region Override Methods
 
-            protected void Dispose(bool disposing)
+        ~RTFParaWrap()
+        {
+            Dispose(false);
+        }
+
+        #endregion
+
+        #region Methods
+
+        protected void Dispose(bool disposing)
+        {
+            if ( _builder != null && !_builder._unwrapped)
             {
-                if ( _builder != null && !_builder._unwrapped)
+                if (_builder._sf.Alignment != StringAlignment.Near || _builder._lineIndent > 0 || _builder._firstLineIndent > 0)
                 {
-                    if (_builder._sf.Alignment != StringAlignment.Near || _builder._lineIndent > 0 || _builder._firstLineIndent > 0)
-                    {
-                        _builder._firstLineIndent = 0;
-                        _builder._lineIndent = 0;
-                        _builder._sf.Alignment = StringAlignment.Near;
-                        _builder._sb.Append("\\pard ");
-                    }
-                }
-                if (disposing)
-                {
-                    GC.SuppressFinalize(this);
+                    _builder._firstLineIndent = 0;
+                    _builder._lineIndent = 0;
+                    _builder._sf.Alignment = StringAlignment.Near;
+                    _builder._sb.Append("\\pard ");
                 }
             }
-
-            #endregion
-
-            #region IDisposable Members
-
-            public void Dispose()
+            if (disposing)
             {
-                Dispose(true);
+                GC.SuppressFinalize(this);
             }
+        }
 
-            #endregion
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
 
         #endregion
     }
+
+    #endregion
 }
-
-

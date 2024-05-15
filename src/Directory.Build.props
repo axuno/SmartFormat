@@ -8,8 +8,8 @@
         <Copyright>Copyright 2011-$(CurrentYear) SmartFormat Project</Copyright>
         <RepositoryUrl>https://github.com/axuno/SmartFormat.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <Version>3.3.2</Version>
-        <FileVersion>3.3.2</FileVersion>
+        <Version>3.4.0</Version>
+        <FileVersion>3.4.0</FileVersion>
         <AssemblyVersion>3.0.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
         <LangVersion>latest</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -17,6 +17,26 @@
         <AnalysisModeSecurity>All</AnalysisModeSecurity>
         <AnalysisLevel>latest</AnalysisLevel>
         <Features>strict</Features>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net8.0</TargetFrameworks>
+        <PackageReleaseNotes>Please see release notes on GitHub:
+https://github.com/axuno/SmartFormat/releases/
+        </PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseFile></PackageLicenseFile>
+        <PackageLicenseUrl></PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
+        <PackageIcon>SmartFormat_365x365.png</PackageIcon>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+
+        <!-- EmbedUntrackedSources for deterministic build -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>PkgReadMe.md</PackageReadmeFile>
     </PropertyGroup>
 
 </Project>

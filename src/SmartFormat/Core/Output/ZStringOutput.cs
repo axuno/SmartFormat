@@ -33,7 +33,7 @@ public class ZStringOutput : IOutput, IDisposable
     /// </summary>
     public ZStringOutput()
     {
-        Output = Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
+        Output = ZStringBuilderUtilities.CreateZStringBuilder();
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class ZStringOutput : IOutput, IDisposable
     /// <param name="capacity">The estimated capacity required. This will reduce or avoid incremental buffer increases.</param>
     public ZStringOutput(int capacity)
     {
-        Output = Utilities.ZStringBuilderExtensions.CreateZStringBuilder(capacity);
+        Output = ZStringBuilderUtilities.CreateZStringBuilder(capacity);
     }
 
     /// <summary>

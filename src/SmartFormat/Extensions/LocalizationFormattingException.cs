@@ -35,8 +35,9 @@ public class LocalizationFormattingException : FormattingException
     }
 
     ///<inheritdoc/>
+    [Obsolete("This API supports obsolete formatter-based serialization. It will be removed in version 4.")]
     protected LocalizationFormattingException(
-        System.Runtime.Serialization.SerializationInfo info,
-        System.Runtime.Serialization.StreamingContext context) : base(info, context) 
-    { }
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) : base(info, context) 
+        { }
 }

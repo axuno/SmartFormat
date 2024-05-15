@@ -23,6 +23,7 @@ public class PoolingException : InvalidOperationException
     }
 
     ///<inheritdoc/>
+    [Obsolete("This API supports obsolete formatter-based serialization. It will be removed in version 4.")]
     protected PoolingException(
         System.Runtime.Serialization.SerializationInfo info,
         System.Runtime.Serialization.StreamingContext context) : base(info, context)

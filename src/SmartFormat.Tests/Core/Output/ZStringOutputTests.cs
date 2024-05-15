@@ -11,7 +11,7 @@ public class ZStringOutputTests
     [Test]
     public void Create_With_Capacity()
     {
-        using var zStringOutput = new ZStringOutput(SmartFormat.Utilities.ZStringBuilderExtensions.DefaultBufferSize + 10000);
+        using var zStringOutput = new ZStringOutput(ZString.ZStringBuilderUtilities.DefaultBufferSize + 10000);
         Assert.Multiple(() =>
         {
             Assert.That(zStringOutput.Output, Is.InstanceOf<ZStringBuilder>());
@@ -22,7 +22,7 @@ public class ZStringOutputTests
     [Test]
     public void Create_With_Other_ValueStringBuilder()
     {
-        using var vsb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
+        using var vsb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
         vsb.Append("text");
         using var zStringOutput = new ZStringOutput(vsb);
         Assert.That(zStringOutput, Is.Not.Null);
@@ -49,7 +49,7 @@ public class ZStringOutputTests
     public void Output_Of_ValueStringBuilder()
     {
         var so = new ZStringOutput();
-        using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
+        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
         so.Write(sb, null);
         Assert.That(so.ToString(), Is.EqualTo("text"));

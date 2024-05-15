@@ -32,7 +32,7 @@ public class TextWriterOOutputTests
     [Test]
     public void Output_Of_ValueStringBuilder()
     {
-        using var sb = SmartFormat.Utilities.ZStringBuilderExtensions.CreateZStringBuilder();
+        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
         var sw = new StringWriter(new StringBuilder());
         var two = new TextWriterOutput(sw);

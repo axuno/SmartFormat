@@ -22,9 +22,7 @@ Custom source or formatter extensions can be added easily using simple interface
 * Custom formatting and source extensions are easy to integrate
 * Comprehensive documentation: current Wiki, complete xmldoc
 
-### Supported Frameworks
-* .Net Framework 4.6.1 and later
-* .Net Standard 2.0
-* .Net Standard 2.1 and later for best optimizations
+### Note
+Use .Net Standard 2.1 and later for best optimizations
 
 [![Paypal-Donations](https://img.shields.io/badge/Donate-PayPal-important.svg?style=flat-square)](https://www.paypal.com/donate?hosted_button_id=KSC3LRAR26AHN)

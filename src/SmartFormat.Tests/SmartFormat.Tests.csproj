@@ -1,32 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<Description>Unit tests for SmartFormat</Description>
-		<AssemblyTitle>SmartFormat.Test</AssemblyTitle>
-		<Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <PropertyGroup>
+        <Description>Unit tests for SmartFormat</Description>
+        <AssemblyTitle>SmartFormat.Test</AssemblyTitle>
+        <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
+        <TargetFrameworks>net462;net60</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
-		<GenerateDocumentationFile>false</GenerateDocumentationFile>
-		<AssemblyName>SmartFormat.Tests</AssemblyName>
-		<AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
-        <DelaySign>false</DelaySign>
-		<SignAssembly>true</SignAssembly>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <AssemblyName>SmartFormat.Tests</AssemblyName>
         <IsPackable>false</IsPackable>
-		<Nullable>enable</Nullable>
+        <Nullable>enable</Nullable>
         <NeutralLanguage>en</NeutralLanguage>
-	</PropertyGroup>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-		<PackageReference Include="NUnit" Version="4.0.1" />
-		<PackageReference Include="NUnit.Analyzers" Version="3.10.0">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+        <PackageReference Include="NUnit" Version="4.1.0" />
+        <PackageReference Include="NUnit.Analyzers" Version="4.2.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
-	</ItemGroup>
+    </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <NoWarn>$(NoWarn);CA1861</NoWarn>
@@ -42,31 +39,30 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SmartFormat.Net\SmartFormat.Net.csproj" />
-        <ProjectReference Include="..\SmartFormat.ZString\SmartFormat.ZString.csproj" />
     </ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="Localization\LocTest1.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>LocTest1.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Localization\LocTest2.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>LocTest2.resx</DependentUpon>
-	  </Compile>
-	</ItemGroup>
+    <ItemGroup>
+        <Compile Update="Localization\LocTest1.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>LocTest1.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Localization\LocTest2.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>LocTest2.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-	<ItemGroup>
-	  <EmbeddedResource Update="Localization\LocTest1.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>LocTest1.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Localization\LocTest2.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>LocTest2.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	</ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Localization\LocTest1.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>LocTest1.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Localization\LocTest2.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>LocTest2.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
 </Project>
