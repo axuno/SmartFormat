@@ -40,7 +40,7 @@ for:
       - cmd: nuget install Appveyor.TestLogger
       - cmd: dotnet test --framework net60 SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
-      - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net6.0.xml" -n net6.0win
+      - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net60.xml" -n net6.0win
     artifacts:
       - path: 'artifacts\*.nupkg'
         type: NuGetPackage
@@ -65,4 +65,4 @@ for:
       - dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:
       - dotnet test --no-build --framework net60 SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\SmartFormat\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
-      - bash <(curl -s https://codecov.io/bash) -f ./SmartFormat.Tests/coverage.net6.0.xml -n net6.0linux
+      - bash <(curl -s https://codecov.io/bash) -f ./SmartFormat.Tests/coverage.net60.xml -n net6.0linux
