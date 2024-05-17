@@ -22,10 +22,10 @@
 * Many built-in formatting extensions
 * Custom formatting and source extensions are easy to integrate
 
-### Supported Frameworks
-* .Net Framework 4.6.1 and later
+### Supported Target Frameworks
+* .Net Framework 4.6.2 and later
 * .Net Standard 2.0
-* .Net Standard 2.1 and later for best optimizations
+* .Net Standard 2.1, .Net 6.0 or .Net 8.0 for best optimizations
  
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the **full** NuGet package *-or-*
