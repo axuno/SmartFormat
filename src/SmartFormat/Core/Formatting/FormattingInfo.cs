@@ -186,7 +186,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         // recursive method call
         FormatDetails.Formatter.Format(nestedFormatInfo);
     }
-        
+
     /// <summary>
     /// Creates a new <see cref="FormattingException"/>.
     /// </summary>

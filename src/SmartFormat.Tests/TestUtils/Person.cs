@@ -23,13 +23,13 @@ public class Person
 
     private static int GetRandomNumber(int min, int max)
     {
-#if !NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER
+        return RandomNumberGenerator.GetInt32(min, max);
+#else
         var randomNumber = new byte[4];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Math.Abs(BitConverter.ToInt32(randomNumber, 0) % 10) + 1;
-#else
-        return RandomNumberGenerator.GetInt32(min, max);
 #endif
     }
 

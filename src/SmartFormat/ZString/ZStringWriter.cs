@@ -144,7 +144,7 @@ public sealed class ZStringWriter : TextWriter
         return _zw.ToString();
     }
 
-#if !NETSTANDARD2_0 && !NETFRAMEWORK
+#if NETSTANDARD2_1 || NET6_0_OR_GREATER
 
     /// <summary>
     /// Writes a span of characters.

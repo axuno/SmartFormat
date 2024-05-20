@@ -310,7 +310,7 @@ public sealed class Format : FormatItem, IDisposable
     {
         var splits = FindAll(search, maxCount);
         var splitList = SplitListPool.Instance.Get().Initialize(this, splits);
-
+        
         // Keep track of the split lists we create,
         // so that they can be returned to the object pool for later reuse.
         _listOfSplitLists.Add(splitList);
