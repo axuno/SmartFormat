@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.SmartPools;
@@ -24,7 +23,7 @@ public class Parser
     private IndexContainer _index;
     private string _inputFormat;
     private Format _resultFormat;
-        
+
     #endregion
 
     #region: Settings :

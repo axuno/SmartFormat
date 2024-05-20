@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices.ComTypes;
 using Cysharp.Text;
 
 namespace SmartFormat.ZString;
