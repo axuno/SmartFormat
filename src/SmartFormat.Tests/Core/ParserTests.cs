@@ -75,7 +75,7 @@ public class ParserTests
         try
         {
             parser.ParseFormat(format);
-            Assert.That(true, "Should throw");
+            throw new InvalidOperationException("The parser should have thrown an exception.");
         }
         catch (Exception e)
         {
