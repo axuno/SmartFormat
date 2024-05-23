@@ -50,6 +50,7 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ github.event.repository.owner.login }}_SmartFormat" /o:"${{ github.event.repository.owner.login }}" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="**/SmartFormat.ZString/**/*" /d:sonar.cs.opencover.reportsPaths="./src/SmartFormat.Tests/**/coverage*.xml"
+          dotnet sln ./src/SmartFormat.sln remove ./src/Demo/Demo.csproj
           dotnet add ./src/SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
           dotnet restore ./src/SmartFormat.sln
           dotnet build ./src/SmartFormat.sln --no-restore /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:ContinuousIntegrationBuild=true /p:Version=${{ env.version }} /p:FileVersion=${{ env.versionFile }}
