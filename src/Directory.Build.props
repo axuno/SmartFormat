@@ -27,7 +27,7 @@ https://github.com/axuno/SmartFormat/releases/
         <PackageProjectUrl>https://github.com/axuno/SmartFormat</PackageProjectUrl>
         <PackageIcon>SmartFormat_365x365.png</PackageIcon>
         <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>../SmartFormat/SmartFormat.snk</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)SmartFormat.snk</AssemblyOriginatorKeyFile>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
