@@ -229,7 +229,7 @@ public class ObjectPoolClassesTests
     public void Dispose_Should_Clear_The_Pool(object poolAsObj)
     {
         const int shouldBeCreated = 5;
-
+        
         var pool = (ObjectPool<SomePoolObject>) poolAsObj;
             
         for (var i = 1; i <= shouldBeCreated; i++)
@@ -255,6 +255,7 @@ public class ObjectPoolClassesTests
     public void Disabled_Pooling_Should_Only_Return_New_Instances(object poolAsObj)
     {
         var pool = (ObjectPool<SomePoolObject>) poolAsObj;
+        var savedPoolingEnabled = pool.IsPoolingEnabled;
         pool.IsPoolingEnabled = false;
             
         var active = new List<SomePoolObject>();
@@ -267,6 +268,7 @@ public class ObjectPoolClassesTests
         {
             pool.Return(a);
         }
+        pool.IsPoolingEnabled = savedPoolingEnabled;
 
         Assert.Multiple(() =>
         {

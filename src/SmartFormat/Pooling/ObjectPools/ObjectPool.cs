@@ -31,7 +31,11 @@ internal abstract class ObjectPool<T> : IObjectPool<T> where T : class
     /// Indicates whether object pooling is enabled (<see langword="true"/>).
     /// <para>Default is taken from <see cref="PoolSettings.IsPoolingEnabled"/></para>
     /// </summary>
-    public bool IsPoolingEnabled { get; internal set; } = PoolSettings.IsPoolingEnabled;
+    public bool IsPoolingEnabled
+    {
+        get => PoolSettings.IsPoolingEnabled;
+        internal set => PoolSettings.IsPoolingEnabled = value;
+    }
 
     /// <summary>
     /// The configuration of how an <see cref="IObjectPool{U}"/> works.
