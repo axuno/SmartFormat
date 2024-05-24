@@ -84,7 +84,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     public void ReturnToPool()
     {
         Parent = null;
-        // Assign new value, but leave existing references untouched
+        // Assign new value, instance is returned to the pool elsewhere
         FormatDetails = InitializationObject.FormatDetails;
         Placeholder = null;
         Selector = null;

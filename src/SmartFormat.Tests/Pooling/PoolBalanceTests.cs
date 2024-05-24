@@ -112,7 +112,7 @@ public class PoolBalanceTests
 
         foreach (var p in pools)
         {
-            Assert.That(p.Counters!.CountAll, Is.EqualTo(0), "CountAll");
+            Assert.That(p.Counters!.CountAll, Is.EqualTo(0), $"{p.Type?.Name}: CountAll");
         }
     }
 }
