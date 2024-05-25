@@ -40,7 +40,6 @@ public class ObjectPoolClassesTests
             var constructedType = type.MakeGenericType(typeof(SomePoolObject));
             var instance = (ObjectPool<SomePoolObject>)Activator.CreateInstance(constructedType, policy)!;
                 
-            instance.IsPoolingEnabled = true;
             instance.Clear();
             yield return instance;
         }
@@ -255,8 +254,8 @@ public class ObjectPoolClassesTests
     public void Disabled_Pooling_Should_Only_Return_New_Instances(object poolAsObj)
     {
         var pool = (ObjectPool<SomePoolObject>) poolAsObj;
-        var savedPoolingEnabled = pool.IsPoolingEnabled;
-        pool.IsPoolingEnabled = false;
+        var savedPoolingEnabled = PoolSettings.IsPoolingEnabled;
+        PoolSettings.IsPoolingEnabled = false;
             
         var active = new List<SomePoolObject>();
         for (var i = 1; i <= 5; i++)
@@ -268,7 +267,7 @@ public class ObjectPoolClassesTests
         {
             pool.Return(a);
         }
-        pool.IsPoolingEnabled = savedPoolingEnabled;
+        PoolSettings.IsPoolingEnabled = savedPoolingEnabled;
 
         Assert.Multiple(() =>
         {

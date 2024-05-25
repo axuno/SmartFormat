@@ -43,7 +43,7 @@ public class ConcurrentPoolingTests
         };
 
         var options = new ParallelOptions { MaxDegreeOfParallelism = 10 };
-        var pool = new ObjectPoolConcurrent<ObjectPoolClassesTests.SomePoolObject>(policy) { IsPoolingEnabled = true };
+        var pool = new ObjectPoolConcurrent<ObjectPoolClassesTests.SomePoolObject>(policy);
 
         Assert.That(() =>
             Parallel.For(0L, 1000, options, (i, loopState) =>

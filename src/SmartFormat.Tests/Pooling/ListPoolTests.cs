@@ -10,7 +10,6 @@ public class ListPoolTests
     {
         ListPool<string>.Instance.Clear();
         var lp = ListPool<string>.Instance;
-        lp.Pool.IsPoolingEnabled = true;
         return lp;
     }
         

@@ -41,7 +41,7 @@ internal class ObjectPoolSingleThread<T> : ObjectPool<T> where T : class
     public override T Get()
     {
         // Always just create a new instance, if pooling is disabled
-        if (!IsPoolingEnabled) return PoolPolicy.FunctionOnCreate();
+        if (!PoolSettings.IsPoolingEnabled) return PoolPolicy.FunctionOnCreate();
 
         T element;
         if (_stack.Count == 0)
@@ -71,7 +71,7 @@ internal class ObjectPoolSingleThread<T> : ObjectPool<T> where T : class
     public override void Return(T element)
     {
         // Never put an instance to the stack, if pooling is disabled
-        if (!IsPoolingEnabled) return;
+        if (!PoolSettings.IsPoolingEnabled) return;
 
         // This is a safe, but expensive check
         if (PoolSettings.CheckReturnedObjectsExistInPool && _stack.Count > 0 && _stack.Contains(element))

@@ -13,7 +13,6 @@ public class StringBuilderPoolTests
     {
         StringBuilderPool.Instance.Clear();
         var sbp = StringBuilderPool.Instance;
-        sbp.Pool.IsPoolingEnabled = true;
         return sbp;
     }
 
