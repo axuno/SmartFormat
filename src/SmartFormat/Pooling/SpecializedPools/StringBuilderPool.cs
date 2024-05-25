@@ -43,8 +43,7 @@ internal sealed class StringBuilderPool : SpecializedPoolAbstract<StringBuilder>
     public int DefaultStringBuilderCapacity { get; set; } = 1024;
 
     /// <summary>
-    /// Gets a singleton instance of the pool.
+    /// Gets the existing instance of the pool or lazy-creates a new one, which is then added to the registry.
     /// </summary>
-    public static StringBuilderPool Instance =>
-        Lazy.IsValueCreated ? Lazy.Value : PoolRegistry.Add(Lazy.Value);
+    public static StringBuilderPool Instance => PoolRegistry.GetOrAdd(Lazy.Value);
 }

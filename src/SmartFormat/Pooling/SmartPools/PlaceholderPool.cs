@@ -40,8 +40,7 @@ internal sealed class PlaceholderPool : SmartPoolAbstract<Placeholder>
     }
 
     /// <summary>
-    /// Gets a singleton instance of the pool.
+    /// Gets the existing instance of the pool or lazy-creates a new one, which is then added to the registry.
     /// </summary>
-    public static PlaceholderPool Instance =>
-        Lazy.IsValueCreated ? Lazy.Value : PoolRegistry.Add(Lazy.Value);
+    public static PlaceholderPool Instance => PoolRegistry.GetOrAdd(Lazy.Value);
 }

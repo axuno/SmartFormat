@@ -10,7 +10,6 @@ public class HashSetPoolTests
     {
         ListPool<int>.Instance.Clear();
         var hsp = HashSetPool<int>.Instance;
-        hsp.Pool.IsPoolingEnabled = true;
         return hsp;
     }
         

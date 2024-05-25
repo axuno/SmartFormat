@@ -11,7 +11,6 @@ public class CollectionPoolTests
     {
         CollectionPool<List<int>, int>.Instance.Clear();
         var cp = CollectionPool<List<int>, int>.Instance;
-        cp.Pool.IsPoolingEnabled = true;
         return cp;
     }
 

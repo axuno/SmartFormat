@@ -15,25 +15,25 @@ internal static class PoolRegistry
     public static readonly ConcurrentDictionary<Type, object> Items = new();
 
     /// <summary>
-    /// Adds a pool to the registry.
+    /// Gets the instance of the pool that already exists in the registry,
+    /// or adds new pool to the registry and returns it.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="pool"></param>
-    /// <returns>The instance of pool which was added.</returns>
-    public static T Add<T>(T pool) where T: class
+    /// <returns>The instance of the pool that already exists, or that was newly added.</returns>
+    public static T GetOrAdd<T>(T pool) where T: class
     {
-        Items.TryAdd(pool.GetType(), pool);
-        return pool;
+        return (T) Items.GetOrAdd(typeof(T), pool);
     }
 
     /// <summary>
-    /// Removes a pool from the registry.
+    /// Tries to remove the pool from the registry.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="pool"></param>
-    public static void Remove<T>(T pool) where T: class
+    public static void TryRemove<T>(T pool) where T: class
     {
-        Items.TryRemove(pool.GetType(), out _);
+        Items.TryRemove(typeof(T), out _);
     }
 
     /// <summary>

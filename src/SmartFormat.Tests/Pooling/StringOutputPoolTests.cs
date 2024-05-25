@@ -11,7 +11,6 @@ public class StringOutputPoolTests
     {
         StringOutputPool.Instance.Clear();
         var sop = StringOutputPool.Instance;
-        sop.Pool.IsPoolingEnabled = true;
         return sop;
     }
         

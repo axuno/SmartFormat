@@ -31,8 +31,7 @@ internal sealed class HashSetPool<T> : CollectionPool<HashSet<T>, T>
     }
 
     /// <summary>
-    /// Gets a singleton instance of the pool.
+    /// Gets the existing instance of the pool or lazy-creates a new one, which is then added to the registry.
     /// </summary>
-    public static new HashSetPool<T> Instance =>
-        Lazy.IsValueCreated ? Lazy.Value : PoolRegistry.Add(Lazy.Value);
+    public static new HashSetPool<T> Instance => PoolRegistry.GetOrAdd(Lazy.Value);
 }

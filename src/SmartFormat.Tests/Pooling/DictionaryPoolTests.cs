@@ -10,7 +10,6 @@ public class DictionaryPoolTests
     {
         DictionaryPool<int, string>.Instance.Clear();
         var dp = DictionaryPool<int, string>.Instance;
-        dp.Pool.IsPoolingEnabled = true;
         return dp;
     }
 

@@ -41,7 +41,7 @@ internal class ObjectPoolConcurrent<T> : ObjectPool<T> where T : class
     public override T Get()
     {
         // Always just create a new instance, if pooling is disabled
-        if (!IsPoolingEnabled) return PoolPolicy.FunctionOnCreate();
+        if (!PoolSettings.IsPoolingEnabled) return PoolPolicy.FunctionOnCreate();
 
         if (!_stack.TryPop(out var element))
         {
@@ -58,7 +58,7 @@ internal class ObjectPoolConcurrent<T> : ObjectPool<T> where T : class
     public override void Return(T element)
     {
         // Never put an instance to the stack, if pooling is disabled
-        if (!IsPoolingEnabled) return;
+        if (!PoolSettings.IsPoolingEnabled) return;
             
         // This is a safe, but expensive check
         if (PoolSettings.CheckReturnedObjectsExistInPool && !_stack.IsEmpty && _stack.Contains(element))
