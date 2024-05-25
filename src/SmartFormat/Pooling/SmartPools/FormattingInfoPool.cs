@@ -41,8 +41,7 @@ internal sealed class FormattingInfoPool : SmartPoolAbstract<FormattingInfo>
     }
 
     /// <summary>
-    /// Gets a singleton instance of the pool.
+    /// Gets the existing instance of the pool or lazy-creates a new one, which is then added to the registry.
     /// </summary>
-    public static FormattingInfoPool Instance =>
-        Lazy.IsValueCreated ? Lazy.Value : PoolRegistry.Add(Lazy.Value);
+    public static FormattingInfoPool Instance => PoolRegistry.GetOrAdd(Lazy.Value);
 }

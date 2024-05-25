@@ -47,7 +47,7 @@ internal abstract class SpecializedPoolAbstract<T> : IDisposable where T : class
     internal void Reset(bool? isThreadSafeMode)
     {
         _isThreadSafeMode = isThreadSafeMode ?? SmartSettings.IsThreadSafeMode;
-        PoolRegistry.Remove(this);
+        PoolRegistry.TryRemove(this);
         Pool.Dispose();
         Pool = LazyCreateObjectPool();
     }
