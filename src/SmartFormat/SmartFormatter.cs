@@ -400,13 +400,6 @@ public class SmartFormatter
         }
     }
 
-    private void Format(FormatDetails formatDetails, Format format, object? current)
-    {
-        var formattingInfo = FormattingInfoPool.Instance.Get().Initialize(formatDetails, format, current);
-        Format(formattingInfo);
-        FormattingInfoPool.Instance.Return(formattingInfo);
-    }
-
     #endregion
 
     #region: FormatInto Overloads :
