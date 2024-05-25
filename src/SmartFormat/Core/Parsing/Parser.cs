@@ -203,7 +203,7 @@ public class Parser
         public int Selector;
 
         /// <summary>
-        /// Adds a number to number to the index and returns the sum, but not more than <see cref="ObjectLength"/>.
+        /// Adds a number to the index and returns the sum, but not more than <see cref="ObjectLength"/>.
         /// </summary>
         /// <param name="index"></param>
         /// <param name="add"></param>
@@ -234,8 +234,8 @@ public class Parser
             NamedFormatterOptionsStart = PositionUndefined, NamedFormatterOptionsEnd = PositionUndefined,
             Operator = PositionUndefined, Selector = PositionUndefined
         };
-            
-        // Initialize - will be re-assigned with new placeholders
+
+        // Initialize - can be re-assigned with new placeholders, while _resultFormat will become the parent
         _resultFormat = FormatPool.Instance.Get().Initialize(Settings, _inputFormat);
 
         // Store parsing errors until parsing is finished:
@@ -275,7 +275,7 @@ public class Parser
                     // Make sure that this is a nested placeholder before we un-nest it:
                     if (HasProcessedTooMayClosingBraces(parsingErrors)) continue;
 
-                    // End of the placeholder's Format, _resultFormat will change to parent.parent
+                    // End of the placeholder's Format, _resultFormat will change to ParentPlaceholder.Parent
                     FinishPlaceholderFormat(ref nestedDepth);
                 }
                 else if (inputChar == _parserSettings.CharLiteralEscapeChar && _parserSettings.ConvertCharacterStringLiterals ||
@@ -427,8 +427,6 @@ public class Parser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ParseAlternativeEscaping()
     {
-        // 2021-05-03/axuno: Removed "index.NamedFormatterStart = PositionUndefined"
-
         // See what is the next character
         var indexNextChar = _index.SafeAdd(_index.Current, 1);
         if (indexNextChar >= _inputFormat.Length)
@@ -589,7 +587,7 @@ public class Parser
             // Start the format:
             var newFormat = FormatPool.Instance.Get().Initialize(Settings, currentPlaceholder, _index.Current + 1);
             currentPlaceholder.Format = newFormat;
-            //FormatPool.Instance.Return(_resultFormat); // return to pool before reassigning
+            // _parentFormat still lives in the current placeholder!
             _resultFormat = newFormat;
             currentPlaceholder = null;
             // named formatters will not be parsed with string.Format compatibility switched ON.
@@ -605,7 +603,6 @@ public class Parser
             // End the placeholder with no format:
             nestedDepth--;
             currentPlaceholder.EndIndex = _index.SafeAdd(_index.Current, 1);
-            //_resultFormat = currentPlaceholder.Parent;  // removed 2021-08-08: The parent always is the _resultFormat
             currentPlaceholder = null;
         }
         else

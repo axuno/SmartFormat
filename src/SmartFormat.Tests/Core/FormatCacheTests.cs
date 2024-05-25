@@ -26,6 +26,16 @@ class FormatCacheTests
     }
 
     [Test]
+    public void Format_WithCache_List_Args()
+    {
+        var data = new System.Collections.Generic.List<object?> { "Joe", "Melbourne" };
+        var formatter = GetSimpleFormatter();
+        var formatString = "{0}, {1}";
+        var format = formatter.Parser.ParseFormat(formatString);
+        Assert.That(formatter.Format(format, data), Is.EqualTo($"{data[0]}, {data[1]}"));
+    }
+
+    [Test]
     public void Format_WithCache_Into_StringOutput()
     {
         var data = new {Name = "Joe", City = "Melbourne"};

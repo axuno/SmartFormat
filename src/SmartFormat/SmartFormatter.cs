@@ -172,7 +172,7 @@ public class SmartFormatter
         if (_formatterExtensions.Exists(sx => sx.GetType() == formatterExtension.GetType())) return this;
 
         // Extension name is in use by a different type
-        if(_formatterExtensions.Exists(fx => fx.Name.Equals(formatterExtension.Name)))
+        if (_formatterExtensions.Exists(fx => fx.Name.Equals(formatterExtension.Name)))
             throw new ArgumentException($"Formatter '{formatterExtension.GetType().Name}' uses existing name.", nameof(formatterExtension));
 
         if (formatterExtension is IInitializer formatterToInitialize)
@@ -288,10 +288,16 @@ public class SmartFormatter
     /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
     public string Format(IFormatProvider? provider, string format, IList<object?> args)
     {
-        var formatParsed = Parser.ParseFormat(format); // The parser gets the Format from the pool
-        var result = Format(provider, formatParsed, args);
-        FormatPool.Instance.Return(formatParsed);
-        return result;
+        var formatParsed = Parser.ParseFormat(format);
+        try
+        {
+            var result = Format(provider, formatParsed, args);
+            return result;
+        }
+        finally
+        {
+            FormatPool.Instance.Return(formatParsed); // The parser gets the Format from the pool 
+        }
     }
 
     #region ** Format overloads with cached Format **
@@ -299,7 +305,7 @@ public class SmartFormatter
     /// <summary>
     /// Replaces one or more format items in as specified string with the string representation of a specific object.
     /// </summary>
-    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="Parser.ParseFormat"/>.</param>
     /// <param name="args">The object to format.</param>
     /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
     public string Format(Format formatParsed, params object?[] args)
@@ -310,7 +316,7 @@ public class SmartFormatter
     /// <summary>
     /// Replaces one or more format items in as specified string with the string representation of a specific object.
     /// </summary>
-    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="Parser.ParseFormat"/>.</param>
     /// <param name="args">The object to format.</param>
     /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
     public string Format(Format formatParsed, IList<object?> args)
@@ -322,7 +328,7 @@ public class SmartFormatter
     /// Replaces one or more format items in a specified string with the string representation of a specific object.
     /// </summary>
     /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
-    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="Parser.ParseFormat"/>.</param>
     /// <param name="args">The object to format.</param>
     /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
     public string Format(IFormatProvider? provider, Format formatParsed, params object?[] args)
@@ -334,7 +340,7 @@ public class SmartFormatter
     /// Replaces one or more format items in a specified string with the string representation of a specific object.
     /// </summary>
     /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
-    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="Parser.ParseFormat"/>.</param>
     /// <param name="args">The object to format.</param>
     /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
     public string Format(IFormatProvider? provider, Format formatParsed, IList<object?> args)
@@ -394,13 +400,6 @@ public class SmartFormatter
         }
     }
 
-    private void Format(FormatDetails formatDetails, Format format, object? current)
-    {
-        var formattingInfo = FormattingInfoPool.Instance.Get().Initialize(formatDetails, format, current);
-        Format(formattingInfo);
-        FormattingInfoPool.Instance.Return(formattingInfo);
-    }
-
     #endregion
 
     #region: FormatInto Overloads :
@@ -437,8 +436,14 @@ public class SmartFormatter
     public void FormatInto(IOutput output, IFormatProvider? provider, string format, IList<object?> args)
     {
         var formatParsed = Parser.ParseFormat(format);
-        FormatInto(output, provider, formatParsed, args);
-        FormatPool.Instance.Return(formatParsed); // The parser gets the Format from the pool
+        try
+        {
+            FormatInto(output, provider, formatParsed, args);
+        }
+        finally
+        {
+            FormatPool.Instance.Return(formatParsed); // The parser gets the Format from the pool    
+        }
     }
 
     #region: FormatInto Overloads with cached Format :
@@ -448,7 +453,7 @@ public class SmartFormatter
     /// </summary>
     /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
     /// <param name="provider"></param>
-    /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+    /// <param name="format">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="Parser.ParseFormat"/>.</param>
     /// <param name="args">The objects to format.</param>
     public void FormatInto(IOutput output, IFormatProvider? provider, Format format, params object?[] args)
     {
@@ -460,15 +465,11 @@ public class SmartFormatter
     /// </summary>
     /// <param name="output">The <see cref="IOutput"/> where the result is written to.</param>
     /// <param name="provider"></param>
-    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="SmartFormat.Core.Parsing.Parser.ParseFormat"/>.</param>
+    /// <param name="formatParsed">An instance of <see cref="Core.Parsing.Format"/> that was returned by <see cref="Parser.ParseFormat"/>.</param>
     /// <param name="args">The objects to format.</param>
     public void FormatInto(IOutput output, IFormatProvider? provider, Format formatParsed, IList<object?> args)
     {
-        var current = args.Count > 0 ? args[0] : args; // The first item is the default.
-
-        var formatDetails = FormatDetailsPool.Instance.Get().Initialize(this, formatParsed, args, provider, output);
-        Format(formatDetails, formatParsed, current);
-        FormatDetailsPool.Instance.Return(formatDetails);
+        PerformActionWithFormattingInfo(this, provider, formatParsed, args, output, Format);
     }
 
     #endregion
@@ -646,6 +647,32 @@ public class SmartFormatter
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="FormattingInfo"/>
+    /// and performs the <see paramref="work"/> action
+    /// using the <see cref="FormattingInfo"/>.
+    /// </summary>
+    /// <param name="formatter"></param>
+    /// <param name="provider"></param>
+    /// <param name="formatParsed"></param>
+    /// <param name="args">The data argument.</param>
+    /// <param name="output"></param>
+    /// <param name="doWork">The <see cref="Action{T}"/>to invoke.</param>
+    /// <remarks>
+    /// The method uses object pooling to reduce GC pressure,
+    /// and assures that objects are returned to the pool after
+    /// <see paramref="work"/> is done (or an exception is thrown).
+    /// </remarks>
+    private static void PerformActionWithFormattingInfo(SmartFormatter formatter, IFormatProvider? provider, Format formatParsed, IList<object?> args, IOutput? output, Action<FormattingInfo> doWork)
+    {
+        var current = args.Count > 0 ? args[0] : args; // The first item is the default.
+        using var fdo = FormatDetailsPool.Instance.Pool.Get(out var formatDetails);
+        formatDetails.Initialize(formatter, formatParsed, args, provider, output ?? new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formatParsed)));
+        using var fio = FormattingInfoPool.Instance.Pool.Get(out var formattingInfo);
+        formattingInfo.Initialize(formatDetails, formatParsed, current);
+        doWork(formattingInfo);
     }
 
     #endregion
