@@ -80,9 +80,9 @@ public class TimeFormatterTests
         timeFormatter.FallbackLanguage = useFallbackLanguage ? "en" : string.Empty;
 
         if(useFallbackLanguage)
-            Assert.That(() => smart.Format("{0:time(nl):noless}", new TimeSpan(1,2,3)), Throws.Nothing);
+            Assert.That(() => smart.Format("{0:time(ie):noless}", new TimeSpan(1,2,3)), Throws.Nothing);
         else
-            Assert.That(() => smart.Format("{0:time(nl):noless}", new TimeSpan(1,2,3)), Throws.TypeOf<FormattingException>().And.Message.Contains(nameof(TimeTextInfo)));
+            Assert.That(() => smart.Format("{0:time(ie):noless}", new TimeSpan(1,2,3)), Throws.TypeOf<FormattingException>().And.Message.Contains(nameof(TimeTextInfo)));
     }
 
 
