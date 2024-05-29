@@ -141,6 +141,27 @@ public static class CommonLanguagesTimeTextInfo
     };
 
     /// <summary>
+    /// Gets the <see cref="TimeTextInfo"/> for the Dutch language.
+    /// </summary>
+    public static TimeTextInfo Dutch => new()
+    {
+        PluralRule = PluralRules.GetPluralRule("nl"),
+        Ptxt_week = ["{0} week", "{0} weken"],
+        Ptxt_day = ["{0} dag", "{0} dagen"],
+        Ptxt_hour = ["{0} uur", "{0} uur"],
+        Ptxt_minute = ["{0} minuut", "{0} minuten"],
+        Ptxt_second = ["{0} seconde", "{0} seconden"],
+        Ptxt_millisecond = ["{0} milliseconde", "{0} milliseconden"],
+        Ptxt_w = ["{0}w"],
+        Ptxt_d = ["{0}d"],
+        Ptxt_h = ["{0}u"],
+        Ptxt_m = ["{0}m"],
+        Ptxt_s = ["{0}s"],
+        Ptxt_ms = ["{0}ms"],
+        Ptxt_lessThan = "minder dan {0}"
+    }
+    
+    /// <summary>
     /// Adds a <see cref="TimeTextInfo"/> for a language.
     /// </summary>
     /// <param name="twoLetterIsoLanguageName">The string to get the associated <see cref="System.Globalization.CultureInfo"/></param>
@@ -177,6 +198,7 @@ public static class CommonLanguagesTimeTextInfo
             "pt" => Portuguese,
             "it" => Italian,
             "de" => German,
+            "nl" => Dutch,
             _ => null
         };
     }
