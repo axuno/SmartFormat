@@ -159,7 +159,7 @@ public static class CommonLanguagesTimeTextInfo
         Ptxt_s = ["{0}s"],
         Ptxt_ms = ["{0}ms"],
         Ptxt_lessThan = "minder dan {0}"
-    }
+    };
     
     /// <summary>
     /// Adds a <see cref="TimeTextInfo"/> for a language.
