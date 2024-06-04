@@ -52,7 +52,7 @@ public interface ISelectorInfo
     Placeholder? Placeholder { get; }
 
     /// <summary>
-    /// Infrequently used details, often used for debugging
+    /// Details about the current format, such as the <see cref="Output.IOutput"/> container.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     FormatDetails FormatDetails { get; }

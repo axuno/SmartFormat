@@ -109,7 +109,7 @@ public class FormatterTests
     }
 
     [Test]
-    public void Nested_Placeholders_Braces()
+    public void Nested_Placeholders_NestedScope_1()
     {
         var data = new {Person = new {FirstName = "John", LastName = "Long"}, Address = new {City = "London"}};
         var formatter = Smart.CreateDefaultSmartFormat();
@@ -119,6 +119,18 @@ public class FormatterTests
         var result = formatter.Format("{Person:{Address:City\\: {City}, Name\\: {FirstName}}}", data);
             
         Assert.That(result, Is.EqualTo("City: London, Name: John"));
+    }
+
+
+    [Test]
+    public void Nested_Placeholders_NestedScope_2()
+    {
+        var data = new { Child1 = new { Child2 = new { Child3 = "Child3" } }, Child4 = "Child4" };
+        var smart = Smart.CreateDefaultSmartFormat();
+        // "{}" and "{Child3}" use the same data object from outer scope, while "{Child4}" does not:
+        var result = smart.Format("{Child1.Child2.Child3:{}{:Child3}{Child4}}", data);
+
+        Assert.That(result, Is.EqualTo("Child3Child3Child4"));
     }
 
     [TestCase("({.Joe.})", ":{Joe}:")]

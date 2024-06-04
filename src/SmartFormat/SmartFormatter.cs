@@ -521,7 +521,7 @@ public class SmartFormatter
     /// Note: If there is no selector (like {:0.00}), <see cref="FormattingInfo.CurrentValue"/> is left unchanged.
     /// <br/>
     /// Child formats <b>inside <see cref="Placeholder"/>s</b> are evaluated in <see cref="DefaultFormatter"/>.
-    /// Example: "{ChildOne.ChildTwo.ChildThree: {Four}}" where "{Four}" is a child placeholder.
+    /// Example: "{ChildOne.ChildTwo.ChildThree:{}{Four}}" where "{} and {Four}" are child placeholders.
     /// </remarks>
     /// <param name="formattingInfo"></param>
     /// <exception cref="FormattingException"></exception>
@@ -542,15 +542,17 @@ public class SmartFormatter
             if (formattingInfo.SelectorOperator.Length > 0 &&
                 formattingInfo.SelectorOperator[0] == Settings.Parser.AlignmentOperator) continue;
 
+            // The result for the selector will be set by a source extension.
             formattingInfo.Result = null;
 
             var handled = InvokeSourceExtensions(formattingInfo);
+            // Set the value that will be used for formatting
             if (handled) formattingInfo.CurrentValue = formattingInfo.Result;
 
             if (firstSelector)
             {
                 firstSelector = false;
-                // Handle "nested scopes" like "{ChildOne.ChildTwo.ChildThree: {Four}}
+                // Handle "nested scopes" like "{ChildOne.ChildTwo.ChildThree:{}{:Four}}" where "{} and {:Four}" are child placeholders.
                 // by traversing the stack:
                 var parentFormattingInfo = formattingInfo;
                 while (!handled && parentFormattingInfo.Parent != null)
@@ -558,8 +560,10 @@ public class SmartFormatter
                     parentFormattingInfo = parentFormattingInfo.Parent;
                     // Ensure ISelectorInfo implementation returns the current selector values
                     parentFormattingInfo.Selector = selector;
+                    // The result for the selector will be set by a source extension.
                     parentFormattingInfo.Result = null;
                     handled = InvokeSourceExtensions(parentFormattingInfo);
+                    // Set the value that will be used for formatting
                     if (handled) formattingInfo.CurrentValue = parentFormattingInfo.Result;
                 }
             }
