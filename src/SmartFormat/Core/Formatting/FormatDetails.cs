@@ -12,8 +12,8 @@ using SmartFormat.Pooling.SmartPools;
 namespace SmartFormat.Core.Formatting;
 
 /// <summary>
-/// Contains extra information about the item currently being formatted.
-/// These objects are not often used, so they are all wrapped up here.
+/// Contains extra information about the item currently being formatted,
+/// such as the <see cref="IOutput"/> container.
 /// </summary>
 public class FormatDetails
 {

@@ -118,7 +118,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     public FormatDetails FormatDetails { get; private set; }
 
     /// <summary>
-    /// Gets or sets the current value.
+    /// Gets or sets the current value that is going to be formatted.
     /// </summary>
     public object? CurrentValue { get; set; }
 
@@ -217,7 +217,9 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     public string SelectorOperator => Selector?.Operator ?? string.Empty;
 
     /// <summary>
-    /// Gets the result after an <see cref="ISource"/> has assigned a value.
+    /// <see cref="ISource"/>s store the result of their assignment in the <see cref="Result"/> property.
+    /// In order to be used during formatting, the <see cref="Result"/> must transition
+    /// to the <see cref="CurrentValue"/> of the <see cref="IFormattingInfo"/>.
     /// </summary>
     public object? Result { get; set; }
 
