@@ -2,10 +2,16 @@
 name: Wiki Update
 about: Issue template for updates of the wiki
 title: 'Wiki Update'
-labels: ''
+labels: 'Docs'
 assignees: ''
 ---
 
-The wiki was updated. 
-There were commits made in the last 24 hours.
-See action `Check Wiki Updates` for more details.
+Number of commits  
+made to the Wiki in the last 24 hours: **{{ env.CommitCount }}**
+
+The wiki was last updated on 
+```
+Date:           {{ env.UpdatedOn }}
+Commit Hash:    {{ env.Hash }} 
+Commit Message: "{{ env.CommitMessage }}"
+```

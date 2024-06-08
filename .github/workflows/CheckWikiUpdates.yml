@@ -23,16 +23,16 @@ jobs:
             cd wiki
             DATE=$(git log -1 --format=%cd --date=iso)
             FORMATTED_DATE=$(date -d"$DATE" +'%Y-%m-%d %H:%M:%S')
-            echo "date=$FORMATTED_DATE" >> $GITHUB_ENV
-            echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+            echo "updatedOn=$FORMATTED_DATE" >> $GITHUB_ENV
+            echo "commitMessage=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
             echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
-            echo "count=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
+            echo "commitCount=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
       - name: Print variables
         run: |
-          echo ${{ env.date }}
-          echo ${{ env.message }}
+          echo ${{ env.updatedOn }}
+          echo ${{ env.commitMessage }}
           echo ${{ env.hash }}
-          echo ${{ env.count }}
+          echo ${{ env.commitCount }}
       - name: Checkout main repo
         uses: actions/checkout@v4
         with:
@@ -43,9 +43,13 @@ jobs:
       - name: Create issue if wiki was updated
         id: create-issue
         if: ${{ env.count }} != '0'
-        uses: JasonEtco/create-an-issue@v2
+        uses: JasonEtco/create-an-issue@v2.9.2
         env:
           GITHUB_TOKEN: ${{ secrets.WIKI_CHECK_TOKEN }}
+          UpdatedOn: ${{ env.updatedOn }}
+          CommitMessage: ${{ env.commitMessage }}
+          CommitCount: ${{ env.commitCount }}
+          Hash: ${{ env.hash }}
         with:
           filename: main-repo/.github/workflows/Wiki_Update_Issue_Template.md
           update_existing: true
