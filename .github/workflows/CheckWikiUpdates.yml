@@ -42,7 +42,7 @@ jobs:
           ref: ${{ github.ref }}
       - name: Create issue if wiki was updated
         id: create-issue
-        if: ${{ env.count }} != '0'
+        if: ${{ env.commitCount }} != '0'
         uses: JasonEtco/create-an-issue@v2.9.2
         env:
           GITHUB_TOKEN: ${{ secrets.WIKI_CHECK_TOKEN }}
