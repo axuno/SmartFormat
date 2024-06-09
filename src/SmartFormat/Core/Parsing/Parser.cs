@@ -398,7 +398,6 @@ public class Parser
         nestedDepth++;
         newPlaceholder = PlaceholderPool.Instance.Get().Initialize(_resultFormat, _index.Current, nestedDepth);
         _resultFormat.Items.Add(newPlaceholder);
-        _resultFormat.HasNested = true;
         _index.Operator = _index.SafeAdd(_index.Current, 1);
         _index.Selector = 0;
         _index.NamedFormatterStart = PositionUndefined;

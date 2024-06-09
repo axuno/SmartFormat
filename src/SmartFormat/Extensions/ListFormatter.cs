@@ -191,7 +191,7 @@ public class ListFormatter : IFormatter, ISource, IInitializer
             // The format is not nested,
             // so we will treat it as an ItemFormat:
             var newItemFormat = FormatPool.Instance.Get().Initialize(_smartSettings, itemFormat.BaseString,
-                itemFormat.StartIndex, itemFormat.EndIndex, true);
+                itemFormat.StartIndex, itemFormat.EndIndex);
             itemFormat.ParentPlaceholder = formattingInfo.Placeholder;
 
             var newPlaceholder = PlaceholderPool.Instance.Get().Initialize(newItemFormat, itemFormat.StartIndex, 0);

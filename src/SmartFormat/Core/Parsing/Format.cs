@@ -83,14 +83,12 @@ public sealed class Format : FormatItem, IDisposable
     /// <param name="baseString">The base format string-</param>
     /// <param name="startIndex">The start index within the format base string.</param>
     /// <param name="endIndex">The end index within the format base string.</param>
-    /// <param name="hasNested"><see langword="true"/> if the nested formats exist.</param>
+    /// <param name="hasNested"><see langword="true"/> if the format at least one nested <see cref="Placeholder"/>.</param>
     /// <returns>This <see cref="Format"/> instance.</returns>
+    [Obsolete("Use the overload without 'hasNested' instead.")]
     public Format Initialize(SmartSettings smartSettings, string baseString, int startIndex, int endIndex, bool hasNested)
     {
-        base.Initialize(smartSettings, null, baseString, startIndex, endIndex);
-        ParentPlaceholder = null;
-        HasNested = hasNested;
-
+        Initialize(smartSettings, baseString, startIndex, endIndex);
         return this;
     }
 
@@ -104,7 +102,6 @@ public sealed class Format : FormatItem, IDisposable
         Clear();
 
         ParentPlaceholder = null;
-        HasNested = false;
 
 #pragma warning disable S3267 // Don't use LINQ in favor of less GC
         // Return and clear FormatItems we own
@@ -143,11 +140,11 @@ public sealed class Format : FormatItem, IDisposable
     /// Gets the <see cref="List{T}"/> of <see cref="FormatItem"/>s.
     /// </summary>
     public List<FormatItem> Items { get; } = new();
-        
+
     /// <summary>
-    /// Returns <see langword="true"/>, if the <see cref="Format"/> is nested.
+    /// Returns <see langword="true"/>, if the <see cref="Items"/> contain at least one nested <see cref="Placeholder"/>.
     /// </summary>
-    public bool HasNested { get; internal set; }
+    public bool HasNested => Items.Exists(i => i is Placeholder);
 
     #endregion
 
@@ -199,7 +196,6 @@ public sealed class Format : FormatItem, IDisposable
             else
             {
                 // item is a placeholder -- we can't split a placeholder though.
-                substring.HasNested = true;
             }
 
             substring.Items.Add(newItem);

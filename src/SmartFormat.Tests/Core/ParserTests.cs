@@ -888,4 +888,11 @@ public class ParserTests
         var exception = ser.ReadObject(stream) as ParsingErrors;
         Assert.That(exception, Is.TypeOf<ParsingErrors>());
     }
+
+    [Test]
+    public void Initialize_Format()
+    {
+        Assert.That(() => { _ = new Format().Initialize(new SmartSettings(), string.Empty, 0, 0, false); },
+            Throws.Nothing, "Overload is marked as obsolete");
+    }
 }
