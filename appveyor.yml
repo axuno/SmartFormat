@@ -1,4 +1,8 @@
 version: 3.0.0.{build}  # Only change for mayor versions (e.g. 4.0.0)
+skip_commits:
+  files:
+    - '**/*.md'
+    - '.github/**/*'
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:

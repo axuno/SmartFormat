@@ -2,9 +2,13 @@ name: SonarCloud
 on:
   push:
     branches: [ main, 'version/**', 'pr/**', 'pr-**' ]
+    paths-ignore:
+      - '**/*.md'
   pull_request:
     branches: [ main, 'version/**', 'pr/**', 'pr-**' ]
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**/*.md'
 jobs:
   build:
     name: Build
