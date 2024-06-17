@@ -20,14 +20,17 @@ namespace SmartFormat.Core.Output;
 /// </remarks>
 public class StringOutput : IOutput
 {
-    private readonly StringBuilder _output;
+    /// <summary>
+    /// Returns the <see cref="StringBuilder"/> used for output.
+    /// </summary>
+    public StringBuilder Output { get; }
 
     /// <summary>
     /// Creates a new instance of <see cref="StringOutput"/>.
     /// </summary>
     public StringOutput()
     {
-        _output = new StringBuilder();
+        Output = new StringBuilder();
     }
 
     /// <summary>
@@ -36,7 +39,7 @@ public class StringOutput : IOutput
     /// <param name="capacity">The estimated capacity for the result string. Essential for performance and GC pressure.</param>
     public StringOutput(int capacity)
     {
-        _output = new StringBuilder(capacity);
+        Output = new StringBuilder(capacity);
     }
 
     /// <summary>
@@ -44,7 +47,7 @@ public class StringOutput : IOutput
     /// </summary>
     public StringOutput(StringBuilder output)
     {
-        _output = output;
+        Output = output;
     }
 
     /// <summary>
@@ -54,7 +57,7 @@ public class StringOutput : IOutput
     /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
     public void Write(string text, IFormattingInfo? formattingInfo = null)
     {
-        _output.Append(text);
+        Output.Append(text);
     }
 
     /// <summary>
@@ -65,9 +68,9 @@ public class StringOutput : IOutput
     public void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null)
     {
 #if NETSTANDARD2_1 || NET6_0_OR_GREATER
-        _output.Append(text);
+        Output.Append(text);
 #else
-        _output.Append(text.ToString());
+        Output.Append(text.ToString());
 #endif
     }
 
@@ -75,9 +78,9 @@ public class StringOutput : IOutput
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
     {
 #if NETSTANDARD2_1 || NET6_0_OR_GREATER
-        _output.Append(stringBuilder.AsSpan());
+        Output.Append(stringBuilder.AsSpan());
 #else
-        _output.Append(stringBuilder.ToString());
+        Output.Append(stringBuilder.ToString());
 #endif
     }
 
@@ -90,7 +93,7 @@ public class StringOutput : IOutput
     /// </summary>
     public void Clear()
     {
-        _output.Clear();
+        Output.Clear();
     }
 
     /// <summary>
@@ -98,6 +101,6 @@ public class StringOutput : IOutput
     /// </summary>
     public override string ToString()
     {
-        return _output.ToString();
+        return Output.ToString();
     }
 }

@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Output;
@@ -22,11 +21,6 @@ namespace SmartFormat;
 /// </summary>
 public class SmartFormatter
 {
-    private readonly List<ISource> _sourceExtensions = new();
-    private readonly List<IFormatter> _formatterExtensions = new();
-
-    #region: Constructor :
-
     /// <summary>
     /// Creates a new instance of a <see cref="SmartFormatter"/>.
     /// </summary>
@@ -38,40 +32,46 @@ public class SmartFormatter
     {
         Settings = settings ?? new SmartSettings();
         Parser = new Parser(Settings);
+
+        Registry = new Registry(this);
+        Evaluator = new Evaluator(this);
     }
 
-    #endregion
-
-    #region : EventHandlers :
-
     /// <summary>
-    /// Event raising, if an error occurs during formatting.
+    /// Event is raising, if an error occurs during evaluation of values or formats.
     /// </summary>
     public event EventHandler<FormattingErrorEventArgs>? OnFormattingFailure;
 
-    #endregion
+    /// <summary>
+    /// The methods gets called from <see cref="SmartFormat.Evaluator"/> to signal an error.
+    /// </summary>
+    /// <param name="args"></param>
+    internal void FormatError(FormattingErrorEventArgs args)
+    {
+        OnFormattingFailure?.Invoke(this, args);
+    }
 
-    #region: Extension Registry :
+    #region: Wrappers for ExtensionRegistry :
 
     /// <summary>
     /// Gets the list of <see cref="ISource" /> source extensions.
     /// </summary>
-    internal List<ISource> SourceExtensions => _sourceExtensions;
+    internal List<ISource> SourceExtensions => Registry.SourceExtensions;
 
     /// <summary>
     /// Gets the <see cref="IReadOnlyList{T}"/> of <see cref="ISource" /> source extensions.
     /// </summary>
-    public IReadOnlyList<ISource> GetSourceExtensions() => _sourceExtensions.AsReadOnly();
+    public IReadOnlyList<ISource> GetSourceExtensions() => Registry.GetSourceExtensions();
 
     /// <summary>
     /// Gets the list of <see cref="IFormatter" /> formatter extensions.
     /// </summary>
-    internal List<IFormatter> FormatterExtensions => _formatterExtensions;
+    internal List<IFormatter> FormatterExtensions => Registry.FormatterExtensions;
 
     /// <summary>
     /// Gets the <see cref="IReadOnlyList{T}"/> of <see cref="IFormatter" /> formatter extensions.
     /// </summary>
-    public IReadOnlyList<IFormatter> GetFormatterExtensions() => _formatterExtensions.AsReadOnly();
+    public IReadOnlyList<IFormatter> GetFormatterExtensions() => Registry.GetFormatterExtensions();
 
     /// <summary>
     /// Adds <see cref="ISource"/> extensions to the <see cref="GetSourceExtensions()"/> list of this formatter,
@@ -89,15 +89,7 @@ public class SmartFormatter
     /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
     public SmartFormatter AddExtensions(params ISource[] sourceExtensions)
     {
-        foreach (var source in sourceExtensions)
-        {
-            var index = WellKnownExtensionTypes.GetIndexToInsert(SourceExtensions, source);
-            _ = InsertExtension(index, source);
-
-            // Also add the class as a formatter, if possible
-            if (source is IFormatter formatter && FormatterExtensions.TrueForAll(fx => fx.GetType() != formatter.GetType())) AddExtensions(formatter);
-        }
-
+        Registry.AddExtensions(sourceExtensions);
         return this;
     }
 
@@ -117,15 +109,7 @@ public class SmartFormatter
     /// <returns>This <see cref="SmartFormatter"/> instance.</returns>
     public SmartFormatter AddExtensions(params IFormatter[] formatterExtensions)
     {
-        foreach (var formatter in formatterExtensions)
-        {
-            var index = WellKnownExtensionTypes.GetIndexToInsert(FormatterExtensions, formatter);
-            _ = InsertExtension(index, formatter);
-
-            // Also add the class as a source, if possible
-            if (formatter is ISource source && SourceExtensions.TrueForAll(sx => sx.GetType() != source.GetType())) AddExtensions(source);
-        }
-
+        Registry.AddExtensions(formatterExtensions);
         return this;
     }
 
@@ -144,13 +128,7 @@ public class SmartFormatter
     /// </exception>
     public SmartFormatter InsertExtension(int position, ISource sourceExtension)
     {
-        if (_sourceExtensions.Exists(sx => sx.GetType() == sourceExtension.GetType())) return this;
-
-        if (sourceExtension is IInitializer sourceToInitialize)
-            sourceToInitialize.Initialize(this);
-
-        _sourceExtensions.Insert(position, sourceExtension);
-
+        Registry.InsertExtension(position, sourceExtension);
         return this;
     }
 
@@ -169,17 +147,7 @@ public class SmartFormatter
     /// </exception>
     public SmartFormatter InsertExtension(int position, IFormatter formatterExtension)
     {
-        if (_formatterExtensions.Exists(sx => sx.GetType() == formatterExtension.GetType())) return this;
-
-        // Extension name is in use by a different type
-        if (_formatterExtensions.Exists(fx => fx.Name.Equals(formatterExtension.Name)))
-            throw new ArgumentException($"Formatter '{formatterExtension.GetType().Name}' uses existing name.", nameof(formatterExtension));
-
-        if (formatterExtension is IInitializer formatterToInitialize)
-            formatterToInitialize.Initialize(this);
-
-        _formatterExtensions.Insert(position, formatterExtension);
-
+        Registry.InsertExtension(position, formatterExtension);
         return this;
     }
 
@@ -191,7 +159,7 @@ public class SmartFormatter
     /// <returns>The class implementing <see cref="ISource"/> if found, else <see langword="null"/>.</returns>
     public T? GetSourceExtension<T>() where T : class, ISource
     {
-        return _sourceExtensions.OfType<T>().FirstOrDefault();
+        return Registry.GetSourceExtension<T>();
     }
 
     /// <summary>
@@ -202,7 +170,7 @@ public class SmartFormatter
     /// <returns>The class implementing <see cref="IFormatter"/> if found, else <see langword="null"/>.</returns>
     public T? GetFormatterExtension<T>() where T : class, IFormatter
     {
-        return _formatterExtensions.OfType<T>().FirstOrDefault();
+        return Registry.GetFormatterExtension<T>();
     }
 
     /// <summary>
@@ -212,8 +180,7 @@ public class SmartFormatter
     /// <returns><see langword="true"/>, if the extension was found and could be removed.</returns>
     public bool RemoveSourceExtension<T>() where T : class, ISource
     {
-        var source = _sourceExtensions.OfType<T>().FirstOrDefault();
-        return source is not null && _sourceExtensions.Remove(source);
+        return Registry.RemoveSourceExtension<T>();
     }
 
     /// <summary>
@@ -223,13 +190,10 @@ public class SmartFormatter
     /// <returns><see langword="true"/>, if the extension was found and could be removed.</returns>
     public bool RemoveFormatterExtension<T>() where T : class, IFormatter
     {
-        var format = _formatterExtensions.OfType<T>().FirstOrDefault();
-        return format is not null && _formatterExtensions.Remove(format);
+        return Registry.RemoveFormatterExtension<T>();
     }
 
     #endregion
-
-    #region: Properties :
 
     /// <summary>
     /// Gets or set the instance of the <see cref="Core.Parsing.Parser" />
@@ -241,7 +205,16 @@ public class SmartFormatter
     /// </summary>
     public SmartSettings Settings { get; }
 
-    #endregion
+    /// <summary>
+    /// The <see cref="Core.Extensions.Registry"/> is manages the extensions of the <see cref="SmartFormatter"/>.
+    /// </summary>
+    internal Registry Registry { get; }
+
+    /// <summary>
+    /// The <see cref="SmartFormat.Evaluator"/> class evaluates <see cref="Placeholder"/>s
+    /// using <see cref="ISource"/> extensions, and formats these values using <see cref="IFormatter"/> extensions.
+    /// </summary>
+    internal Evaluator Evaluator { get; }
 
     #region: Format Overloads :
 
@@ -346,7 +319,7 @@ public class SmartFormatter
     public string Format(IFormatProvider? provider, Format formatParsed, IList<object?> args)
     {
         // Note: Making ZStringOutput a class instance variable has no advantage for speed,
-        // but brings 10% less Gen 0 GC. Then, SmartFormatter would have to be IDisposable (to dispose ZStringOutput)
+        // but brings 10% less Gen 0 GC.
         using var zsOutput = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formatParsed));
         FormatInto(zsOutput, provider, formatParsed, args);
         return zsOutput.ToString();
@@ -355,49 +328,14 @@ public class SmartFormatter
     #endregion
 
     /// <summary>
-    /// Format the <see cref="FormattingInfo" /> argument.
+    /// Format all items of the <see cref="FormattingInfo.Format"/> property of the <paramref name="formattingInfo"/>.
     /// </summary>
-    /// <param name="formattingInfo"></param>
+    /// <param name="formattingInfo">The <see cref="FormattingInfo.Format"/> must not be null.</param>
+    /// <exception cref="ArgumentException">Throws if <see cref="FormattingInfo.Format"/> is null.</exception>
     public void Format(FormattingInfo formattingInfo)
     {
-        // Before we start, make sure we have at least one source extension and one formatter extension:
-        CheckForExtensions();
-        if (formattingInfo.Format is null) return;
-
-        foreach (var item in formattingInfo.Format.Items)
-        {
-            if (item is LiteralText literalItem)
-            {
-                formattingInfo.Write(literalItem.AsSpan());
-                continue;
-            }
-
-            // Otherwise, the item must be a placeholder.
-            var placeholder = (Placeholder) item;
-            var childFormattingInfo = formattingInfo.CreateChild(placeholder);
-            try
-            {
-                EvaluateSelectors(childFormattingInfo);
-            }
-            catch (Exception ex)
-            {
-                // An error occurred while evaluation selectors
-                var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors[placeholder.Selectors.Count - 1].EndIndex;
-                FormatError(item, ex, errorIndex, childFormattingInfo);
-                continue;
-            }
-
-            try
-            {
-                EvaluateFormatters(childFormattingInfo);
-            }
-            catch (Exception ex)
-            {
-                // An error occurred while evaluating formatters
-                var errorIndex = placeholder.Format?.StartIndex ?? placeholder.Selectors[placeholder.Selectors.Count - 1].EndIndex;
-                FormatError(item, ex, errorIndex, childFormattingInfo);
-            }
-        }
+        Registry.ThrowIfNoExtensions();
+        Evaluator.WriteFormat(formattingInfo);
     }
 
     #endregion
@@ -446,6 +384,8 @@ public class SmartFormatter
         }
     }
 
+    #endregion
+
     #region: FormatInto Overloads with cached Format :
 
     /// <summary>
@@ -460,6 +400,8 @@ public class SmartFormatter
         FormatInto(output, provider, format, (IList<object?>) args);
     }
 
+    #endregion
+
     /// <summary>
     /// Writes the formatting result into an <see cref="IOutput"/> instance.
     /// </summary>
@@ -469,215 +411,41 @@ public class SmartFormatter
     /// <param name="args">The objects to format.</param>
     public void FormatInto(IOutput output, IFormatProvider? provider, Format formatParsed, IList<object?> args)
     {
-        PerformActionWithFormattingInfo(this, provider, formatParsed, args, output, Format);
-    }
-
-    #endregion
-
-    #endregion
-
-    #region: Private methods :
-
-    internal void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
-        IFormattingInfo formattingInfo)
-    {
-        OnFormattingFailure?.Invoke(this,
-            new FormattingErrorEventArgs(errorItem.RawText, startIndex,
-                Settings.Formatter.ErrorAction != FormatErrorAction.ThrowError));
-        switch (Settings.Formatter.ErrorAction)
-        {
-            case FormatErrorAction.Ignore:
-                return;
-            case FormatErrorAction.ThrowError:
-                throw innerException as FormattingException ??
-                      new FormattingException(errorItem, innerException, startIndex);
-            case FormatErrorAction.OutputErrorInResult:
-                formattingInfo.FormatDetails.FormattingException =
-                    innerException as FormattingException ??
-                    new FormattingException(errorItem, innerException, startIndex);
-                formattingInfo.Write(innerException.Message);
-                formattingInfo.FormatDetails.FormattingException = null;
-                break;
-            case FormatErrorAction.MaintainTokens:
-                formattingInfo.Write(formattingInfo.Placeholder?.RawText ?? "'null'");
-                break;
-        }
-    }
-
-    private void CheckForExtensions()
-    {
-        if (_sourceExtensions.Count == 0)
-            throw new InvalidOperationException(
-                "No source extensions are available. Please add at least one source extension, such as the DefaultSource.");
-        if (_formatterExtensions.Count == 0)
-            throw new InvalidOperationException(
-                "No formatter extensions are available. Please add at least one formatter extension, such as the DefaultFormatter.");
-    }
-
-    /// <summary>
-    /// Evaluates all <see cref="Selector"/>s of a <see cref="Placeholder"/>.
-    /// </summary>
-    /// <remarks>
-    /// Note: If there is no selector (like {:0.00}), <see cref="FormattingInfo.CurrentValue"/> is left unchanged.
-    /// <br/>
-    /// Child formats <b>inside <see cref="Placeholder"/>s</b> are evaluated in <see cref="DefaultFormatter"/>.
-    /// Example: "{ChildOne.ChildTwo.ChildThree:{}{Four}}" where "{} and {Four}" are child placeholders.
-    /// </remarks>
-    /// <param name="formattingInfo"></param>
-    /// <exception cref="FormattingException"></exception>
-    private void EvaluateSelectors(FormattingInfo formattingInfo)
-    {
-        if (formattingInfo.Placeholder is null) return;
-
-        var firstSelector = true;
-        foreach (var selector in formattingInfo.Placeholder.Selectors)
-        {
-            // Don't evaluate empty selectors
-            // (used e.g. for Settings.Parser.NullableOperator and Settings.Parser.ListIndexEndChar final operators)
-            if (selector.Length == 0) continue;
-
-            // Ensure ISelectorInfo implementation returns the current selector values
-            formattingInfo.Selector = selector;
-            // Do not evaluate alignment-only selectors
-            if (formattingInfo.SelectorOperator.Length > 0 &&
-                formattingInfo.SelectorOperator[0] == Settings.Parser.AlignmentOperator) continue;
-
-            // The result for the selector will be set by a source extension.
-            formattingInfo.Result = null;
-
-            var handled = InvokeSourceExtensions(formattingInfo);
-            // Set the value that will be used for formatting
-            if (handled) formattingInfo.CurrentValue = formattingInfo.Result;
-
-            if (firstSelector)
-            {
-                firstSelector = false;
-                // Handle "nested scopes" like "{ChildOne.ChildTwo.ChildThree:{}{:Four}}" where "{} and {:Four}" are child placeholders.
-                // by traversing the stack:
-                var parentFormattingInfo = formattingInfo;
-                while (!handled && parentFormattingInfo.Parent != null)
-                {
-                    parentFormattingInfo = parentFormattingInfo.Parent;
-                    // Ensure ISelectorInfo implementation returns the current selector values
-                    parentFormattingInfo.Selector = selector;
-                    // The result for the selector will be set by a source extension.
-                    parentFormattingInfo.Result = null;
-                    handled = InvokeSourceExtensions(parentFormattingInfo);
-                    // Set the value that will be used for formatting
-                    if (handled) formattingInfo.CurrentValue = parentFormattingInfo.Result;
-                }
-            }
-
-            if (!handled)
-                throw formattingInfo.FormattingException($"No source extension could handle the selector named \"{selector.RawText}\"",
-                    selector);
-        }
-    }
-
-    private bool InvokeSourceExtensions(ISelectorInfo selectorInfo)
-    {
-        // less GC than using Linq
-        foreach (var sourceExtension in _sourceExtensions)
-        {
-            var handled = sourceExtension.TryEvaluateSelector(selectorInfo);
-            if (handled) return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Try to get a suitable formatter.
-    /// </summary>
-    /// <param name="formattingInfo"></param>
-    /// <exception cref="FormattingException"></exception>
-    private void EvaluateFormatters(FormattingInfo formattingInfo)
-    {
-        var handled = InvokeFormatterExtensions(formattingInfo);
-        if (!handled)
-            throw formattingInfo.FormattingException("No suitable Formatter could be found", formattingInfo.Format);
-    }
-
-    /// <summary>
-    /// First check whether the named formatter name exist in of the <see cref="FormatterExtensions" />,
-    /// next check whether the named formatter is able to process the format.
-    /// </summary>
-    /// <param name="formattingInfo"></param>
-    /// <returns>True if an FormatterExtension was found, else False.</returns>
-    private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
-    {
-        if (formattingInfo.Placeholder is null)
-        {
-            throw new ArgumentException($"The property {nameof(formattingInfo)}.{nameof(formattingInfo.Placeholder)} must not be null.", nameof(formattingInfo));
-        }
-
-        var formatterName = formattingInfo.Placeholder.FormatterName;
-        var comparison = Settings.GetCaseSensitivityComparison();
-
-        // Compatibility mode does not support formatter extensions except this one:
-        if (Settings.StringFormatCompatibility)
-        {
-            return
-                _formatterExtensions.First(fe => fe is DefaultFormatter)
-                    .TryEvaluateFormat(formattingInfo);
-        }
-
-        // Try to evaluate using the not empty formatter name from the format string
-        if (formatterName != string.Empty)
-        {
-            IFormatter? formatterExtension = null;
-            // less GC than using Linq
-            foreach (var fe in _formatterExtensions)
-            {
-                if (!fe.Name.Equals(formatterName, comparison)) continue;
-
-                formatterExtension = fe;
-                break;
-            }
-
-            if (formatterExtension is null)
-                throw formattingInfo.FormattingException($"No formatter with name '{formatterName}' found",
-                    formattingInfo.Format, formattingInfo.Selector?.SelectorIndex ?? -1);
-
-            return formatterExtension.TryEvaluateFormat(formattingInfo);
-        }
-
-        // Go through all (implicit) formatters which contain an empty name
-        // much higher performance and less GC than using Linq
-        foreach (var fe in _formatterExtensions)
-        {
-            if (!fe.CanAutoDetect) continue;
-            if (fe.TryEvaluateFormat(formattingInfo)) return true;
-        }
-
-        return false;
+        Registry.ThrowIfNoExtensions();
+        ExecuteFormattingAction(this, provider, formatParsed, args, output, Evaluator.WriteFormat);
     }
 
     /// <summary>
     /// Creates a new instance of <see cref="FormattingInfo"/>
-    /// and performs the <see paramref="work"/> action
+    /// and performs the <see paramref="doWork"/> action
     /// using the <see cref="FormattingInfo"/>.
     /// </summary>
     /// <param name="formatter"></param>
-    /// <param name="provider"></param>
+    /// <param name="provider">The <see cref="IFormatProvider"/>, or null for using the default.</param>
     /// <param name="formatParsed"></param>
-    /// <param name="args">The data argument.</param>
-    /// <param name="output"></param>
+    /// <param name="args">
+    /// The data argument. When it is a an <see cref="IList{T}"/>, the first element will be used for <paramref name="doWork"/>.
+    /// The list goes to <see cref="FormatDetails.OriginalArgs"/>.
+    /// </param>
+    /// <param name="output">The <see cref="IOutput"/> to use, or null using the default.</param>
     /// <param name="doWork">The <see cref="Action{T}"/>to invoke.</param>
     /// <remarks>
     /// The method uses object pooling to reduce GC pressure,
     /// and assures that objects are returned to the pool after
-    /// <see paramref="work"/> is done (or an exception is thrown).
+    /// <see paramref="doWork"/> is done (or an exception is thrown).
     /// </remarks>
-    private static void PerformActionWithFormattingInfo(SmartFormatter formatter, IFormatProvider? provider, Format formatParsed, IList<object?> args, IOutput? output, Action<FormattingInfo> doWork)
+    private static void ExecuteFormattingAction(SmartFormatter formatter, IFormatProvider? provider, Format formatParsed, IList<object?> args, IOutput output, Action<FormattingInfo> doWork)
     {
-        var current = args.Count > 0 ? args[0] : args; // The first item is the default.
+        // The first item is the default and will be used for the action,
+        // but all args go to FormatDetails.OriginalArgs
+        var current = args.Count > 0 ? args[0] : args;
+
         using var fdo = FormatDetailsPool.Instance.Pool.Get(out var formatDetails);
-        formatDetails.Initialize(formatter, formatParsed, args, provider, output ?? new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formatParsed)));
+        formatDetails.Initialize(formatter, formatParsed, args, provider, output);
+
         using var fio = FormattingInfoPool.Instance.Pool.Get(out var formattingInfo);
         formattingInfo.Initialize(formatDetails, formatParsed, current);
+
         doWork(formattingInfo);
     }
-
-    #endregion
 }

@@ -10,7 +10,7 @@ using SmartFormat.Core.Extensions;
 namespace SmartFormat.Core.Output;
 
 /// <summary>
-/// Wraps an UTF-16 <see cref="ZStringBuilder"/> so that it can be used for output.
+/// Wraps <see cref="ZStringBuilder"/> so that it can be used for output.
 /// <see cref="ZStringOutput"/> is used for the default output.
 /// </summary>
 /// <remarks>

@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using SmartFormat.Core.Settings;
@@ -329,12 +330,28 @@ public sealed class Format : FormatItem, IDisposable
     {
         if (_literalTextCache != null) return _literalTextCache;
 
-        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(this);
-        foreach (var item in Items)
-            if (item is LiteralText literalItem) sb.Append(literalItem.AsSpan());
+        var buffer = ArrayPool<char>.Shared.Rent(Length);
+        var bufferIndex = 0;
 
-        _literalTextCache = sb.ToString();
-        return _literalTextCache;
+        try
+        {
+            foreach (var item in Items)
+            {
+                if (item is LiteralText literalItem)
+                {
+                    var itemSpan = literalItem.AsSpan();
+                    itemSpan.CopyTo(buffer.AsSpan(bufferIndex, itemSpan.Length));
+                    bufferIndex += itemSpan.Length;
+                }
+            }
+
+            _literalTextCache = new string(buffer, 0, bufferIndex);
+            return _literalTextCache;
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(buffer);
+        }
     }
 
     /// <summary>
@@ -345,10 +362,26 @@ public sealed class Format : FormatItem, IDisposable
     {
         if (_toStringCache != null) return _toStringCache;
 
-        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(this);
-        foreach (var item in Items) sb.Append(item.AsSpan());
-        _toStringCache = sb.ToString();
-        return _toStringCache;
+        var buffer = ArrayPool<char>.Shared.Rent(BaseString.Length);
+        var bufferIndex = 0;
+
+        try
+        {
+            foreach (var item in Items)
+            {
+                var itemSpan = item.AsSpan();
+                itemSpan.CopyTo(buffer.AsSpan(bufferIndex, itemSpan.Length));
+                bufferIndex += itemSpan.Length;
+            }
+
+            _toStringCache = new string(buffer, 0, bufferIndex);
+
+            return _toStringCache;
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(buffer);
+        }
     }
 
     #endregion

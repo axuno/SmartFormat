@@ -227,42 +227,57 @@ public class Placeholder : FormatItem
     {
         if (_toStringCache != null) return _toStringCache;
 
-        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(Length);
-        sb.Append(SmartSettings.Parser.PlaceholderBeginChar);
+        Span<char> buffer = stackalloc char[Length + 2]; // +2 for the braces
+        var index = 0;
+        buffer[index++] = SmartSettings.Parser.PlaceholderBeginChar;
         foreach (var s in Selectors)
         {
             // alignment operators will be appended later
             if (s.Operator.Length > 0 && s.Operator[0] == SmartSettings.Parser.AlignmentOperator) continue;
-                
-            sb.Append(s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex));
+
+            var selectorSpan = s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex);
+            selectorSpan.CopyTo(buffer.Slice(index));
+            index += selectorSpan.Length;
         }
         if (Alignment != 0)
         {
-            sb.Append(SmartSettings.Parser.AlignmentOperator);
-            sb.Append(Alignment);
+            buffer[index++] = SmartSettings.Parser.AlignmentOperator;
+            var alignmentSpan = Alignment.ToString().AsSpan();
+            alignmentSpan.CopyTo(buffer.Slice(index));
+            index += alignmentSpan.Length;
         }
 
         if (FormatterName != string.Empty)
         {
-            sb.Append(SmartSettings.Parser.FormatterNameSeparator);
-            sb.Append(FormatterName);
+            buffer[index++] = SmartSettings.Parser.FormatterNameSeparator;
+            var formatterNameSpan = FormatterName.AsSpan();
+            formatterNameSpan.CopyTo(buffer.Slice(index));
+            index += formatterNameSpan.Length;
             if (FormatterOptions != string.Empty)
             {
-                sb.Append(SmartSettings.Parser.FormatterOptionsBeginChar);
-                sb.Append(FormatterOptions);
-                sb.Append(SmartSettings.Parser.FormatterOptionsEndChar);
+                buffer[index++] = SmartSettings.Parser.FormatterOptionsBeginChar;
+                var formatterOptionsSpan = FormatterOptions.AsSpan();
+                formatterOptionsSpan.CopyTo(buffer.Slice(index));
+                index += formatterOptionsSpan.Length;
+                buffer[index++] = SmartSettings.Parser.FormatterOptionsEndChar;
             }
         }
 
         if (Format != null)
         {
-            sb.Append(SmartSettings.Parser.FormatterNameSeparator);
-            sb.Append(Format);
+            buffer[index++] = SmartSettings.Parser.FormatterNameSeparator;
+            var formatSpan = Format.ToString().AsSpan();
+            formatSpan.CopyTo(buffer.Slice(index));
+            index += formatSpan.Length;
         }
 
-        sb.Append(SmartSettings.Parser.PlaceholderEndChar);
+        buffer[index++] = SmartSettings.Parser.PlaceholderEndChar;
 
-        _toStringCache = sb.ToString();
+#if NETSTANDARD2_1 || NET6_0_OR_GREATER
+        _toStringCache = new string(buffer.Slice(0, index));
+#else
+        _toStringCache = new string(buffer.Slice(0, index).ToArray());
+#endif
         return _toStringCache;
     }
 }

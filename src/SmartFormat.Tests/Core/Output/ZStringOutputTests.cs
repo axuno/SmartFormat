@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
-using SmartFormat.ZString;
+using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Tests.Core.Output;
 
@@ -14,7 +14,7 @@ public class ZStringOutputTests
         using var zStringOutput = new ZStringOutput(ZString.ZStringBuilderUtilities.DefaultBufferSize + 10000);
         Assert.Multiple(() =>
         {
-            Assert.That(zStringOutput.Output, Is.InstanceOf<ZStringBuilder>());
+            Assert.That(zStringOutput.Output, Is.InstanceOf<ZString.ZStringBuilder>());
             Assert.That(zStringOutput, Is.Not.Null);
         });
     }
@@ -53,5 +53,16 @@ public class ZStringOutputTests
         sb.Append("text");
         so.Write(sb, null);
         Assert.That(so.ToString(), Is.EqualTo("text"));
+    }
+
+    [Test]
+    public void CreateZStringBuilder_from_Format()
+    {
+        var input = new string('a', 123);
+        var format = new SmartFormat.Core.Parsing.Format().Initialize(new SmartSettings(), input, 0, input.Length);
+        // The capacity is calculated from the format length and the number of items
+        var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(format);
+        sb.Append(input);
+        Assert.That(sb.Length, Is.EqualTo(input.Length));
     }
 }

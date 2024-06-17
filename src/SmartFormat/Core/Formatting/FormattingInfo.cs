@@ -3,11 +3,14 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Formatting;
 
@@ -41,7 +44,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// </summary>
     /// <param name="parent"></param>
     /// <param name="formatDetails"></param>
-    /// <param name="format">The <see cref="Parsing.Format"/> argument is used with <see cref="CreateChild(Parsing.Format,object?)"/></param>
+    /// <param name="format"></param>
     /// <param name="currentValue"></param>
     public FormattingInfo Initialize (FormattingInfo? parent, FormatDetails formatDetails, Format format, object? currentValue)
     {
@@ -156,9 +159,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// <param name="text">The string to write to the <see cref="Output.IOutput"/></param>
     public void Write(string text)
     {
-        if (Alignment > 0) PreAlign(text.Length);
-        FormatDetails.Output.Write(text, this);
-        if (Alignment < 0) PostAlign(text.Length);
+        Write(text.AsSpan());
     }
 
     /// <summary>
@@ -166,25 +167,87 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// and takes care of alignment.
     /// </summary>
     /// <param name="text">The string to write to the <see cref="Output.IOutput"/></param>
-
     public void Write(ReadOnlySpan<char> text)
     {
-        if (Alignment > 0) PreAlign(text.Length);
-        FormatDetails.Output.Write(text, this);
-        if (Alignment < 0) PostAlign(text.Length);
+        if (Alignment == 0)
+        {
+            FormatDetails.Output.Write(text);
+            FormatDetails.Formatter.Evaluator.OnOutputWritten?.Invoke(this,
+                new Evaluator.OutputWrittenEventArgs(text.ToString()));
+            return;
+        }
+
+        // Create a buffer to store the aligned text
+        var totalLength = Math.Max(text.Length, Math.Abs(Alignment));
+        var alignedTextBuffer = ArrayPool<char>.Shared.Rent(totalLength);
+
+        try
+        {
+            // Fill with pre-alignment character
+            var filler = Alignment - text.Length;
+            if (filler > 0)
+            {
+                alignedTextBuffer.AsSpan(0, filler).Fill(FormatDetails.Settings.Formatter.AlignmentFillCharacter);
+            }
+
+            text.CopyTo(alignedTextBuffer.AsSpan(Math.Max(0, filler)));
+
+            // Fill with post-alignment character
+            filler = -Alignment - text.Length;
+            if (filler > 0)
+            {
+                alignedTextBuffer.AsSpan(text.Length).Fill(FormatDetails.Settings.Formatter.AlignmentFillCharacter);
+            }
+
+            // Write the aligned text to the output
+            FormatDetails.Output.Write(alignedTextBuffer.AsSpan(0, totalLength));
+
+            FormatDetails.Formatter.Evaluator.OnOutputWritten?.Invoke(this,
+                new Evaluator.OutputWrittenEventArgs(alignedTextBuffer.AsSpan(0, totalLength).ToString()));
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(alignedTextBuffer);
+        }
     }
 
     /// <summary>
-    /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance
-    /// and invokes formatting with <see cref="SmartFormatter"/> and with the child as parameter.
+    /// Creates a child <see cref="FormattingInfo"/> from the current <see cref="FormattingInfo"/> instance
+    /// and invokes the <see cref="Evaluator"/> to evaluate the <paramref name="format"/> items with the <paramref name="value"/>.
     /// </summary>
-    /// <param name="format">The <see cref="Format"/> to use.</param>
-    /// <param name="value">The value for the item in the format.</param>
+    /// <param name="format">The <see cref="Parsing.Format"/> to use.</param>
+    /// <param name="value">The value to use for evaluation.</param>
     public void FormatAsChild(Format format, object? value)
     {
-        var nestedFormatInfo = CreateChild(format, value);
-        // recursive method call
-        FormatDetails.Formatter.Format(nestedFormatInfo);
+        // recursive call
+        FormatDetails.Formatter.Evaluator.WriteFormat(CreateChild(format, value));
+    }
+
+    /// <summary>
+    /// Formats the current <paramref name="current"/> value using the <paramref name="format"/>
+    /// and returns the result as a new instance of <see cref="ZStringBuilder"/>.
+    /// </summary>
+    /// <param name="provider">The <see cref="IFormatProvider"/>, or null for using the default.</param>
+    /// <param name="format">The format that will be formatted.</param>
+    /// <param name="current">The data object used for formatting.</param>
+    /// <returns>A <see cref="ZStringBuilder"/>, that should be disposed after using it.</returns>
+    public ZStringBuilder FormatToZStringBuilder(IFormatProvider? provider, Format format, object? current)
+    {
+        var output = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(format));
+        ExecuteFormattingAction(provider, format, current, output, FormatDetails.Formatter.Evaluator.WriteFormat);
+
+        return output.Output;
+    }
+
+    /// <summary>
+    /// Tries to get the value for the given <paramref name="placeholder"/> from the registered <see cref="ISource"/>s.
+    /// </summary>
+    /// <param name="placeholder"></param>
+    /// <param name="result"></param>
+    /// <returns><see langword="true"/>, if one of the <see cref="ISource"/> returned a value.</returns>
+    public bool TryGetValue(Placeholder placeholder, out object? result)
+    {
+        return FormatDetails.Formatter.Evaluator.TryGetValue(this, placeholder, out result);
     }
 
     /// <summary>
@@ -223,6 +286,12 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// </summary>
     public object? Result { get; set; }
 
+    /// <summary>
+    /// Creates a child <see cref="FormattingInfo"/> from the current <see cref="FormattingInfo"/> instance for a <see cref="Parsing.Format"/>.
+    /// </summary>
+    /// <param name="format">The <see cref="Parsing.Format"/> used for creating a child <see cref="IFormattingInfo"/>.</param>
+    /// <param name="currentValue">The value to use for the child.</param>
+    /// <returns>The child <see cref="FormattingInfo"/>.</returns>
     private FormattingInfo CreateChild(Format format, object? currentValue)
     {
         var fi = FormattingInfoPool.Instance.Get().Initialize(this, FormatDetails, format, currentValue);
@@ -231,10 +300,10 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     }
 
     /// <summary>
-    /// Creates a child <see cref="IFormattingInfo"/> from the current <see cref="IFormattingInfo"/> instance for a <see cref="Placeholder"/>.
+    /// Creates a child <see cref="FormattingInfo"/> from the current <see cref="FormattingInfo"/> instance for a <see cref="Parsing.Placeholder"/>.
     /// </summary>
-    /// <param name="placeholder">The <see cref="Placeholder"/> used for creating a child <see cref="IFormattingInfo"/>.</param>
-    /// <returns>The child <see cref="IFormattingInfo"/>.</returns>
+    /// <param name="placeholder">The <see cref="Parsing.Placeholder"/> used for creating a child <see cref="IFormattingInfo"/>.</param>
+    /// <returns>The child <see cref="FormattingInfo"/>.</returns>
     public FormattingInfo CreateChild(Placeholder placeholder)
     {
         var fi = FormattingInfoPool.Instance.Get().Initialize(this, FormatDetails, placeholder, CurrentValue);
@@ -242,15 +311,31 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         return fi;
     }
 
-    private void PreAlign(int textLength)
+    /// <summary>
+    /// Creates a new instance of <see cref="FormattingInfo"/>
+    /// and performs the <see paramref="doWork"/> action
+    /// using the <see cref="FormattingInfo"/>.
+    /// </summary>
+    /// <param name="provider">The <see cref="IFormatProvider"/>, or null for using the default.</param>
+    /// <param name="formatParsed">The format that will be formatted.</param>
+    /// <param name="current">The data object used for formatting.</param>
+    /// <param name="output">The <see cref="IOutput"/> to use, or null for using a <b>new instance</b> of the default <seealso cref="ZStringOutput"/>.</param>
+    /// <param name="doWork">The <see cref="Action{T}"/>to invoke.</param>
+    /// <remarks>
+    /// The method uses object pooling to reduce GC pressure,
+    /// and assures that objects are returned to the pool after
+    /// <see paramref="doWork"/> is done (or an exception is thrown).
+    /// </remarks>
+    internal void ExecuteFormattingAction(IFormatProvider? provider, Format formatParsed, object? current, IOutput output, Action<FormattingInfo> doWork)
     {
-        var filler = Alignment - textLength;
-        if (filler > 0) FormatDetails.Output.Write(new string(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler), this);
-    }
+        var formatter = FormatDetails.Formatter;
 
-    private void PostAlign(int textLength)
-    {
-        var filler = -Alignment - textLength;
-        if (filler > 0) FormatDetails.Output.Write(new string(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler), this);
+        using var fdo = FormatDetailsPool.Instance.Pool.Get(out var formatDetails);
+        formatDetails.Initialize(formatter, formatParsed, formatDetails.OriginalArgs, provider, output);
+
+        using var fio = FormattingInfoPool.Instance.Pool.Get(out var formattingInfo);
+        formattingInfo.Initialize(formatDetails, formatParsed, current);
+
+        doWork(formattingInfo);
     }
 }
