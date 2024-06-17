@@ -247,7 +247,7 @@ internal partial class Evaluator
     }
 
     private void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
-        IFormattingInfo formattingInfo)
+        FormattingInfo formattingInfo)
     {
         var errorArgs = new FormattingErrorEventArgs(errorItem.RawText, startIndex,
             _settings.Formatter.ErrorAction != FormatErrorAction.ThrowError);
