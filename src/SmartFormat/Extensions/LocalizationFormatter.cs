@@ -74,7 +74,7 @@ public class LocalizationFormatter : IFormatter, IInitializer
         // Try formatting if localized string was not found, but a format has nested items
         if (localized is null && formattingInfo.Format!.HasNested)
         {
-            using var zsOutput = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formattingInfo.Format));
+            using var zsPo = ZStringOutputPool.Instance.Get(out var zsOutput);
 
             var localizableFormatDetails = FormatDetailsPool.Instance.Get().Initialize(_formatter!,
                 formattingInfo.Format, InitializationObject.ObjectList, null, zsOutput);

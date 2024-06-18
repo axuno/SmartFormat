@@ -6,6 +6,8 @@ using System;
 using System.Text;
 using SmartFormat.ZString;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Output;
 
@@ -26,7 +28,7 @@ public class ZStringOutput : IOutput, IDisposable
     /// <summary>
     /// Returns the <see cref="ZStringBuilder"/> used for output.
     /// </summary>
-    public ZStringBuilder Output { get; }
+    internal ZStringBuilder Output { get; }
 
     /// <summary>
     /// Creates a new instance of <see cref="ZStringOutput"/>.
@@ -69,6 +71,15 @@ public class ZStringOutput : IOutput, IDisposable
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
     {
         Output.Append(stringBuilder);
+    }
+
+    /// <summary>
+    /// Clears the <see cref="StringBuilder"/> used to create the output.
+    ///  <para>This method gets called by <see cref="StringOutputPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
+    /// </summary>
+    public void Clear()
+    {
+        Output.Clear();
     }
 
     /// <summary>

@@ -23,7 +23,7 @@ public class StringOutput : IOutput
     /// <summary>
     /// Returns the <see cref="StringBuilder"/> used for output.
     /// </summary>
-    public StringBuilder Output { get; }
+    internal StringBuilder Output { get; }
 
     /// <summary>
     /// Creates a new instance of <see cref="StringOutput"/>.
@@ -80,16 +80,13 @@ public class StringOutput : IOutput
 #if NETSTANDARD2_1 || NET6_0_OR_GREATER
         Output.Append(stringBuilder.AsSpan());
 #else
-        Output.Append(stringBuilder.ToString());
+        Output.Append(stringBuilder);
 #endif
     }
 
     /// <summary>
-    /// 
-    /// </summary>
-    /// <summary>
     /// Clears the <see cref="StringBuilder"/> used to create the output.
-    /// <para>This method gets called by <see cref="StringOutputPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
+    ///  <para>This method gets called by <see cref="StringOutputPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
     /// </summary>
     public void Clear()
     {

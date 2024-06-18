@@ -97,7 +97,8 @@ public class SubStringFormatterTests
         var formatter = smart.GetFormatterExtension<SubStringFormatter>()!;
 
         formatter.OutOfRangeBehavior = SubStringFormatter.SubStringOutOfRangeBehavior.ThrowException;
-        Assert.Throws<FormattingException>(() => smart.Format("{Name:substr(0,999)}", _person));
+        var exception = Assert.Throws<FormattingException>(() => smart.Format("{Name:substr(0,999)}", _person));
+        Assert.That(exception.ErrorItem, Is.Not.Null);
     }
 
     [Test]

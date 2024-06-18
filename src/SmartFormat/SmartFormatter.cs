@@ -318,9 +318,7 @@ public class SmartFormatter
     /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
     public string Format(IFormatProvider? provider, Format formatParsed, IList<object?> args)
     {
-        // Note: Making ZStringOutput a class instance variable has no advantage for speed,
-        // but brings 10% less Gen 0 GC.
-        using var zsOutput = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formatParsed));
+        using var zsPo = ZStringOutputPool.Instance.Get(out var zsOutput);
         FormatInto(zsOutput, provider, formatParsed, args);
         return zsOutput.ToString();
     }

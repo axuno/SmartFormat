@@ -10,7 +10,6 @@ using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
-using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Formatting;
 
@@ -224,19 +223,41 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     }
 
     /// <summary>
-    /// Formats the current <paramref name="current"/> value using the <paramref name="format"/>
-    /// and returns the result as a new instance of <see cref="ZStringBuilder"/>.
+    /// Uses the <paramref name="current"/> value to format the <paramref name="format"/>
+    /// and returns the result as a <see cref="Span{T}"/>.
+    /// <para/>
+    /// This method aims to be used by <see cref="IFormatter"/> implementations.
     /// </summary>
     /// <param name="provider">The <see cref="IFormatProvider"/>, or null for using the default.</param>
     /// <param name="format">The format that will be formatted.</param>
     /// <param name="current">The data object used for formatting.</param>
-    /// <returns>A <see cref="ZStringBuilder"/>, that should be disposed after using it.</returns>
-    public ZStringBuilder FormatToZStringBuilder(IFormatProvider? provider, Format format, object? current)
+    /// <returns>A <see cref="Span{T}"/> with the formatting result.</returns>
+    public Span<char> FormatAsSpan(IFormatProvider? provider, Format format, object? current)
     {
-        var output = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(format));
+        using var zsPo = ZStringOutputPool.Instance.Get(out var output);
         ExecuteFormattingAction(provider, format, current, output, FormatDetails.Formatter.Evaluator.WriteFormat);
 
-        return output.Output;
+        // Copy the result to an array buffer, because output gets disposed.
+        return output.Output.AsSpan().ToArray().AsSpan();
+    }
+
+    /// <summary>
+    /// Uses the <paramref name="current"/> value to format the <paramref name="placeholder"/>
+    /// and returns the result as a <see cref="Span{T}"/>.
+    /// <para/>
+    /// This method aims to be used by <see cref="IFormatter"/> implementations.
+    /// </summary>
+    /// <param name="provider">The <see cref="IFormatProvider"/>, or null for using the default.</param>
+    /// <param name="placeholder">The placeholder that will be formatted.</param>
+    /// <param name="current">The data object used for formatting.</param>
+    /// <returns>A <see cref="Span{T}"/> with the formatting result.</returns>
+    public Span<char> FormatAsSpan(IFormatProvider? provider, Placeholder placeholder, object? current)
+    {
+        using var fmtObject = FormatPool.Instance.Get(out var format);
+        format.Initialize(FormatDetails.Settings, placeholder.BaseString);
+        format.Items.Add(placeholder);
+
+        return FormatAsSpan(provider, format, current);
     }
 
     /// <summary>

@@ -204,7 +204,8 @@ public class EvaluatorTests
             {
                 // Get the value for the first placeholder:
                 fi.CurrentValue = args;
-                success1 = fi.TryGetValue((Placeholder) format.Items.First(), out _);
+                success1 = fi.TryGetValue((Placeholder) format.Items.First(), out _) ||
+                           fi.FormatDetails.FormattingException != null;
             });
 
         ExecuteFormattingAction(smart, null, format, new List<object?>(), new NullOutput(),
@@ -212,7 +213,7 @@ public class EvaluatorTests
             {
                 // Get the value for the last placeholder:
                 fi.CurrentValue = args;
-                success2 = fi.TryGetValue((Placeholder) format.Items.Last(), out value2);
+                success2 = fi.TryGetValue((Placeholder) format.Items.Last(), out value2) && fi.FormatDetails.FormattingException is null;
             });
 
         ExecuteFormattingAction(smart, null, format, new List<object?>(), new NullOutput(),
@@ -237,10 +238,10 @@ public class EvaluatorTests
     }
 
     /// <summary>
-    /// <see cref="FormattingInfo.FormatToZStringBuilder"/> aims to be used by <see cref="SmartFormat.Core.Extensions.IFormatter"/> implementations.
+    /// <see cref="FormattingInfo.FormatAsSpan(IFormatProvider, Format, object?)"/> aims to be used by <see cref="SmartFormat.Core.Extensions.IFormatter"/> implementations.
     /// </summary>
     [Test]
-    public void Format_to_ZStringOutput_Using_FormattingInfo()
+    public void Format_To_Span_Using_FormattingInfo()
     {
         var args = new { Name = "Joe" };
 
@@ -248,16 +249,36 @@ public class EvaluatorTests
         var smart = GetSimpleFormatter();
         var format = smart.Parser.ParseFormat("My name is {Name}");
 
-        ZStringBuilder? result = null;
         ExecuteFormattingAction(smart, null, format, new List<object?>(), new NullOutput(),
             fi =>
             {
                 // Get the value for the last placeholder:
                 fi.CurrentValue = args;
-                result = fi.FormatToZStringBuilder(null, format, args);
+                var result = fi.FormatAsSpan(null, format, args);
+                Assert.That(result.ToString(), Is.EqualTo("My name is Joe"));
             });
+    }
 
-        Assert.That(result?.ToString(), Is.EqualTo("My name is Joe"));
+    /// <summary>
+    /// <see cref="FormattingInfo.FormatAsSpan(IFormatProvider, Placeholder, object?)"/> aims to be used by <see cref="SmartFormat.Core.Extensions.IFormatter"/> implementations.
+    /// </summary>
+    [Test]
+    public void Placeholder_To_Span_Using_FormattingInfo()
+    {
+        var args = new { Name = "Joe" };
+
+        // prepare
+        var smart = GetSimpleFormatter();
+        var format = smart.Parser.ParseFormat("My name is {Name}");
+
+        ExecuteFormattingAction(smart, null, format, new List<object?>(), new NullOutput(),
+            fi =>
+            {
+                // Get the value for the last placeholder:
+                fi.CurrentValue = args;
+                var result = fi.FormatAsSpan(null, (Placeholder) format.Items.Last(), args);
+                Assert.That(result.ToString(), Is.EqualTo("Joe"));
+            });
     }
 
     #region ** Helpers **
