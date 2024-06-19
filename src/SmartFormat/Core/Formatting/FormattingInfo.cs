@@ -10,6 +10,7 @@ using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Formatting;
 
@@ -178,7 +179,9 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
 
         // Create a buffer to store the aligned text
         var totalLength = Math.Max(text.Length, Math.Abs(Alignment));
-        var alignedTextBuffer = ArrayPool<char>.Shared.Rent(totalLength);
+        var pool = ArrayPool<char>.Create(50_000_000, 2);
+
+        var alignedTextBuffer = pool.Rent(totalLength);
 
         try
         {
@@ -206,7 +209,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         }
         finally
         {
-            ArrayPool<char>.Shared.Return(alignedTextBuffer);
+            pool.Return(alignedTextBuffer);
         }
     }
 
@@ -224,34 +227,38 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
 
     /// <summary>
     /// Uses the <paramref name="current"/> value to format the <paramref name="format"/>
-    /// and returns the result as a <see cref="Span{T}"/>.
+    /// and returns the result as a <see cref="ZCharArray"/>.
     /// <para/>
+    /// The <see cref="ZCharArray"/> <b>must be disposed after use</b>.
     /// This method aims to be used by <see cref="IFormatter"/> implementations.
     /// </summary>
     /// <param name="provider">The <see cref="IFormatProvider"/>, or null for using the default.</param>
     /// <param name="format">The format that will be formatted.</param>
     /// <param name="current">The data object used for formatting.</param>
-    /// <returns>A <see cref="Span{T}"/> with the formatting result.</returns>
-    public Span<char> FormatAsSpan(IFormatProvider? provider, Format format, object? current)
+    /// <returns>A <see cref="ZCharArray"/> with the formatting result. The <see cref="ZCharArray"/> <b>must be disposed after use</b>.</returns>
+    public ZCharArray FormatAsSpan(IFormatProvider? provider, Format format, object? current)
     {
         using var zsPo = ZStringOutputPool.Instance.Get(out var output);
         ExecuteFormattingAction(provider, format, current, output, FormatDetails.Formatter.Evaluator.WriteFormat);
 
-        // Copy the result to an array buffer, because output gets disposed.
-        return output.Output.AsSpan().ToArray().AsSpan();
+        // Copy the result to a simple array buffer, because output gets disposed.
+        var buffer = new ZCharArray(output.Output.Length);
+        buffer.Write(output.Output.AsSpan());
+        return buffer;
     }
 
     /// <summary>
     /// Uses the <paramref name="current"/> value to format the <paramref name="placeholder"/>
-    /// and returns the result as a <see cref="Span{T}"/>.
+    /// and returns the result as a <see cref="ZCharArray"/>.
     /// <para/>
+    /// The <see cref="ZCharArray"/> <b>must be disposed after use</b>.
     /// This method aims to be used by <see cref="IFormatter"/> implementations.
     /// </summary>
     /// <param name="provider">The <see cref="IFormatProvider"/>, or null for using the default.</param>
     /// <param name="placeholder">The placeholder that will be formatted.</param>
     /// <param name="current">The data object used for formatting.</param>
-    /// <returns>A <see cref="Span{T}"/> with the formatting result.</returns>
-    public Span<char> FormatAsSpan(IFormatProvider? provider, Placeholder placeholder, object? current)
+    /// <returns>A <see cref="ZCharArray"/> with the formatting result. The <see cref="ZCharArray"/> <b>must be disposed after use</b>.</returns>
+    public ZCharArray FormatAsSpan(IFormatProvider? provider, Placeholder placeholder, object? current)
     {
         using var fmtObject = FormatPool.Instance.Get(out var format);
         format.Initialize(FormatDetails.Settings, placeholder.BaseString);

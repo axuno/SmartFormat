@@ -10,6 +10,7 @@ using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
 using SmartFormat.Pooling.SpecializedPools;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Parsing;
 
@@ -87,7 +88,8 @@ public sealed class Format : FormatItem, IDisposable
     /// <param name="hasNested"><see langword="true"/> if the format at least one nested <see cref="Placeholder"/>.</param>
     /// <returns>This <see cref="Format"/> instance.</returns>
     [Obsolete("Use the overload without 'hasNested' instead.")]
-    public Format Initialize(SmartSettings smartSettings, string baseString, int startIndex, int endIndex, bool hasNested)
+    public Format Initialize(SmartSettings smartSettings, string baseString, int startIndex, int endIndex,
+        bool hasNested)
     {
         Initialize(smartSettings, baseString, startIndex, endIndex);
         return this;
@@ -120,10 +122,11 @@ public sealed class Format : FormatItem, IDisposable
         {
             SplitListPool.Instance.Return(splitList);
         }
+
         _listOfSplitLists.Clear();
         // Items of _splitCache are returned via _listOfSplitLists
         _splitCache = null;
-            
+
         _toStringCache = null;
         _literalTextCache = null;
     }
@@ -174,7 +177,7 @@ public sealed class Format : FormatItem, IDisposable
         start = StartIndex + start;
         var end = start + length;
         ValidateArguments(start, length);
-            
+
         // If startIndex and endIndex already match this item, we're done:
         if (start == StartIndex && end == EndIndex) return this;
 
@@ -277,7 +280,8 @@ public sealed class Format : FormatItem, IDisposable
     #region: Split :
 
     // set the default
-    private char _splitCacheChar = '\0'; 
+    private char _splitCacheChar = '\0';
+
     // Items of the _splitCache are returned to the pool using _listOfSplitLists
     private IList<Format>? _splitCache;
     private readonly List<SplitList> _listOfSplitLists = new();
@@ -297,6 +301,7 @@ public sealed class Format : FormatItem, IDisposable
 
         return _splitCache;
     }
+
     /// <summary>
     /// Splits the <see cref="Format"/> items by the given search character.
     /// </summary>
@@ -307,7 +312,7 @@ public sealed class Format : FormatItem, IDisposable
     {
         var splits = FindAll(search, maxCount);
         var splitList = SplitListPool.Instance.Get().Initialize(this, splits);
-        
+
         // Keep track of the split lists we create,
         // so that they can be returned to the object pool for later reuse.
         _listOfSplitLists.Add(splitList);
@@ -330,31 +335,21 @@ public sealed class Format : FormatItem, IDisposable
     {
         if (_literalTextCache != null) return _literalTextCache;
 
-        var buffer = ArrayPool<char>.Shared.Rent(Length);
-        var bufferIndex = 0;
+        var buffer = new ZCharArray(Length);
 
-        try
+        foreach (var item in Items)
         {
-            foreach (var item in Items)
+            if (item is LiteralText literalItem)
             {
-                if (item is LiteralText literalItem)
-                {
-                    var itemSpan = literalItem.AsSpan();
-                    itemSpan.CopyTo(buffer.AsSpan(bufferIndex, itemSpan.Length));
-                    bufferIndex += itemSpan.Length;
-                }
+                buffer.Write(literalItem.AsSpan());
             }
+        }
 
-            _literalTextCache = new string(buffer, 0, bufferIndex);
-            return _literalTextCache;
-        }
-        finally
-        {
-            ArrayPool<char>.Shared.Return(buffer);
-        }
+        _literalTextCache = buffer.GetSpan().ToString();
+        return _literalTextCache;
     }
 
-    /// <summary>
+/// <summary>
     /// Reconstructs the format string, but doesn't include escaped chars
     /// and tries to reconstruct placeholders.
     /// </summary>
@@ -362,26 +357,16 @@ public sealed class Format : FormatItem, IDisposable
     {
         if (_toStringCache != null) return _toStringCache;
 
-        var buffer = ArrayPool<char>.Shared.Rent(BaseString.Length);
-        var bufferIndex = 0;
+        var buffer = new ZCharArray(BaseString.Length);
 
-        try
+        foreach (var item in Items)
         {
-            foreach (var item in Items)
-            {
-                var itemSpan = item.AsSpan();
-                itemSpan.CopyTo(buffer.AsSpan(bufferIndex, itemSpan.Length));
-                bufferIndex += itemSpan.Length;
-            }
-
-            _toStringCache = new string(buffer, 0, bufferIndex);
-
-            return _toStringCache;
+            buffer.Write(item.AsSpan());
         }
-        finally
-        {
-            ArrayPool<char>.Shared.Return(buffer);
-        }
+
+        _toStringCache = buffer.GetSpan().ToString();
+
+        return _toStringCache;
     }
 
     #endregion

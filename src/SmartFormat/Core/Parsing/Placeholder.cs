@@ -7,6 +7,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Parsing;
 
@@ -188,9 +189,8 @@ public class Placeholder : FormatItem
             if (_formatterOptionsCache != null) return _formatterOptionsCache;
             if (Length == 0) _formatterOptionsCache = string.Empty;
 
-            // It's enough to have a buffer with the same size as input length.
-            // The default max array length of ArrayPool<char>.Shared is 1,048,576.
-            var pool = ArrayPool<char>.Create(Length > 1024 ? Length : 1024, 1024);
+            // The *default* max array length of ArrayPool<char>.Shared is 1,048,576.
+            var pool = ArrayPool<char>.Shared;
             var resultBuffer = pool.Rent(Length);
             System.Diagnostics.Debug.Assert(resultBuffer.Length >= Length, "ArrayPool buffer size is smaller than it should be");
 
@@ -227,56 +227,48 @@ public class Placeholder : FormatItem
     {
         if (_toStringCache != null) return _toStringCache;
 
-        Span<char> buffer = stackalloc char[Length + 2]; // +2 for the braces
-        var index = 0;
-        buffer[index++] = SmartSettings.Parser.PlaceholderBeginChar;
+        using var buffer = new ZCharArray(Length + 2); // +2 for the braces
+
+        buffer.Write(SmartSettings.Parser.PlaceholderBeginChar);
         foreach (var s in Selectors)
         {
             // alignment operators will be appended later
             if (s.Operator.Length > 0 && s.Operator[0] == SmartSettings.Parser.AlignmentOperator) continue;
 
             var selectorSpan = s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex);
-            selectorSpan.CopyTo(buffer.Slice(index));
-            index += selectorSpan.Length;
+            buffer.Write(selectorSpan);
         }
         if (Alignment != 0)
         {
-            buffer[index++] = SmartSettings.Parser.AlignmentOperator;
-            var alignmentSpan = Alignment.ToString().AsSpan();
-            alignmentSpan.CopyTo(buffer.Slice(index));
-            index += alignmentSpan.Length;
+            buffer.Write(SmartSettings.Parser.AlignmentOperator);
+            buffer.Write(Alignment.ToString());
         }
 
         if (FormatterName != string.Empty)
         {
-            buffer[index++] = SmartSettings.Parser.FormatterNameSeparator;
-            var formatterNameSpan = FormatterName.AsSpan();
-            formatterNameSpan.CopyTo(buffer.Slice(index));
-            index += formatterNameSpan.Length;
+            buffer.Write(SmartSettings.Parser.FormatterNameSeparator);
+            buffer.Write(FormatterName);
+
             if (FormatterOptions != string.Empty)
             {
-                buffer[index++] = SmartSettings.Parser.FormatterOptionsBeginChar;
-                var formatterOptionsSpan = FormatterOptions.AsSpan();
-                formatterOptionsSpan.CopyTo(buffer.Slice(index));
-                index += formatterOptionsSpan.Length;
-                buffer[index++] = SmartSettings.Parser.FormatterOptionsEndChar;
+                buffer.Write(SmartSettings.Parser.FormatterOptionsBeginChar);
+                buffer.Write(FormatterOptions);
+                buffer.Write(SmartSettings.Parser.FormatterOptionsEndChar);
             }
         }
 
         if (Format != null)
         {
-            buffer[index++] = SmartSettings.Parser.FormatterNameSeparator;
-            var formatSpan = Format.ToString().AsSpan();
-            formatSpan.CopyTo(buffer.Slice(index));
-            index += formatSpan.Length;
+            buffer.Write(SmartSettings.Parser.FormatterNameSeparator);
+            buffer.Write(Format.AsSpan());
         }
 
-        buffer[index++] = SmartSettings.Parser.PlaceholderEndChar;
+        buffer.Write(SmartSettings.Parser.PlaceholderEndChar);
 
 #if NETSTANDARD2_1 || NET6_0_OR_GREATER
-        _toStringCache = new string(buffer.Slice(0, index));
+        _toStringCache = new string(buffer.GetSpan());
 #else
-        _toStringCache = new string(buffer.Slice(0, index).ToArray());
+        _toStringCache = buffer.GetSpan().ToString();
 #endif
         return _toStringCache;
     }

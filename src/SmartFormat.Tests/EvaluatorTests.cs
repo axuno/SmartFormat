@@ -9,7 +9,6 @@ using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Pooling.SmartPools;
 using SmartFormat.Tests.TestUtils;
-using SmartFormat.ZString;
 
 namespace SmartFormat.Tests;
 
@@ -255,7 +254,7 @@ public class EvaluatorTests
                 // Get the value for the last placeholder:
                 fi.CurrentValue = args;
                 var result = fi.FormatAsSpan(null, format, args);
-                Assert.That(result.ToString(), Is.EqualTo("My name is Joe"));
+                Assert.That(result.GetSpan().ToString(), Is.EqualTo("My name is Joe"));
             });
     }
 
@@ -277,7 +276,7 @@ public class EvaluatorTests
                 // Get the value for the last placeholder:
                 fi.CurrentValue = args;
                 var result = fi.FormatAsSpan(null, (Placeholder) format.Items.Last(), args);
-                Assert.That(result.ToString(), Is.EqualTo("Joe"));
+                Assert.That(result.GetSpan().ToString(), Is.EqualTo("Joe"));
             });
     }
 

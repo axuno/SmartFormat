@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Tests.Core.Output;
 
@@ -25,7 +26,7 @@ public class NullOutputTests
     [Test]
     public void Output_Of_ValueStringBuilder()
     {
-        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
+        using var sb = ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
         var so = new NullOutput();
         Assert.DoesNotThrow(() =>so.Write(sb, null));
