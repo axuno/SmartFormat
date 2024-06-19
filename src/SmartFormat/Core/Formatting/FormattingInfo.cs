@@ -238,12 +238,12 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// <returns>A <see cref="ZCharArray"/> with the formatting result. The <see cref="ZCharArray"/> <b>must be disposed after use</b>.</returns>
     public ZCharArray FormatAsSpan(IFormatProvider? provider, Format format, object? current)
     {
-        using var zsPo = ZStringOutputPool.Instance.Get(out var output);
-        ExecuteFormattingAction(provider, format, current, output, FormatDetails.Formatter.Evaluator.WriteFormat);
+        using var zsOutput = new ZStringOutput();
+        ExecuteFormattingAction(provider, format, current, zsOutput, FormatDetails.Formatter.Evaluator.WriteFormat);
 
         // Copy the result to a simple array buffer, because output gets disposed.
-        var buffer = new ZCharArray(output.Output.Length);
-        buffer.Write(output.Output.AsSpan());
+        var buffer = new ZCharArray(zsOutput.Output.Length);
+        buffer.Write(zsOutput.Output.AsSpan());
         return buffer;
     }
 

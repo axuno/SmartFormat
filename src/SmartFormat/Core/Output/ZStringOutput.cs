@@ -25,6 +25,8 @@ namespace SmartFormat.Core.Output;
 /// </remarks>
 public class ZStringOutput : IOutput, IDisposable
 {
+    // Adding an ObjectPool for ZStringOutput has no benefit.
+
     /// <summary>
     /// Returns the <see cref="ZStringBuilder"/> used for output.
     /// </summary>

@@ -318,7 +318,7 @@ public class SmartFormatter
     /// <returns>Returns the formatted input with items replaced with their string representation.</returns>
     public string Format(IFormatProvider? provider, Format formatParsed, IList<object?> args)
     {
-        using var zsPo = ZStringOutputPool.Instance.Get(out var zsOutput);
+        using var zsOutput = new ZStringOutput(ZStringBuilderUtilities.CalcCapacity(formatParsed));
         FormatInto(zsOutput, provider, formatParsed, args);
         return zsOutput.ToString();
     }
