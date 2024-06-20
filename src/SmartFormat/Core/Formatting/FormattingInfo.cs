@@ -46,7 +46,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// <param name="formatDetails"></param>
     /// <param name="format"></param>
     /// <param name="currentValue"></param>
-    public FormattingInfo Initialize (FormattingInfo? parent, FormatDetails formatDetails, Format format, object? currentValue)
+    public FormattingInfo Initialize(FormattingInfo? parent, FormatDetails formatDetails, Format format, object? currentValue)
     {
         Parent = parent;
         CurrentValue = currentValue;
@@ -66,7 +66,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// <param name="formatDetails"></param>
     /// <param name="placeholder"></param>
     /// <param name="currentValue"></param>
-    public FormattingInfo Initialize (FormattingInfo? parent, FormatDetails formatDetails, Placeholder placeholder,
+    public FormattingInfo Initialize(FormattingInfo? parent, FormatDetails formatDetails, Placeholder placeholder,
         object? currentValue)
     {
         Parent = parent;
@@ -92,7 +92,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         Placeholder = null;
         Selector = null;
         Alignment = 0;
-            
+
         Format = null;
         CurrentValue = null;
 
@@ -178,39 +178,29 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         }
 
         // Create a buffer to store the aligned text
-        var totalLength = Math.Max(text.Length, Math.Abs(Alignment));
-        var pool = ArrayPool<char>.Create(50_000_000, 2);
+        var buffer = new ZCharArray(text.Length + Math.Abs(Alignment));
 
-        var alignedTextBuffer = pool.Rent(totalLength);
-
-        try
+        // Fill with pre-alignment character
+        var filler = Alignment - text.Length;
+        if (filler > 0)
         {
-            // Fill with pre-alignment character
-            var filler = Alignment - text.Length;
-            if (filler > 0)
-            {
-                alignedTextBuffer.AsSpan(0, filler).Fill(FormatDetails.Settings.Formatter.AlignmentFillCharacter);
-            }
-
-            text.CopyTo(alignedTextBuffer.AsSpan(Math.Max(0, filler)));
-
-            // Fill with post-alignment character
-            filler = -Alignment - text.Length;
-            if (filler > 0)
-            {
-                alignedTextBuffer.AsSpan(text.Length).Fill(FormatDetails.Settings.Formatter.AlignmentFillCharacter);
-            }
-
-            // Write the aligned text to the output
-            FormatDetails.Output.Write(alignedTextBuffer.AsSpan(0, totalLength));
-
-            FormatDetails.Formatter.Evaluator.OnOutputWritten?.Invoke(this,
-                new Evaluator.OutputWrittenEventArgs(alignedTextBuffer.AsSpan(0, totalLength).ToString()));
+            buffer.Write(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler);
         }
-        finally
+
+        buffer.Write(text);
+
+        // Fill with post-alignment character
+        filler = -Alignment - text.Length;
+        if (filler > 0)
         {
-            pool.Return(alignedTextBuffer);
+            buffer.Write(FormatDetails.Settings.Formatter.AlignmentFillCharacter, filler);
         }
+
+        // Write the aligned text to the output
+        FormatDetails.Output.Write(buffer.GetSpan());
+
+        FormatDetails.Formatter.Evaluator.OnOutputWritten?.Invoke(this,
+            new Evaluator.OutputWrittenEventArgs(buffer.ToString()));
     }
 
     /// <summary>
@@ -296,12 +286,12 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// Gets the (raw) text of the <see cref="Parsing.Selector"/>.
     /// </summary>
     public string SelectorText => Selector?.RawText ?? string.Empty;
-        
+
     /// <summary>
     /// Gets index of the <see cref="Parsing.Selector"/> in the selector list.
     /// </summary>
     public int SelectorIndex => Selector?.SelectorIndex ?? -1;
-        
+
     /// <summary>
     /// Gets the operator string of the <see cref="Parsing.Selector"/> (e.g.: comma, dot).
     /// </summary>
