@@ -24,8 +24,10 @@
 
 ### Supported Target Frameworks
 * .Net Framework 4.6.2 and later
-* .Net Standard 2.0
-* .Net Standard 2.1, .Net 6.0 or .Net 8.0 for best optimizations
+* .Net Standard 2.0, .Net Standard 2.1
+* .Net 6.0 or .Net 8.0
+
+For the best optimizations and performance, use .NET 6.0 or .NET 8.0. You can expect a speed improvement of between 30% and 50% compared to .NET Framework 4.6.2.
  
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the **full** NuGet package *-or-*
@@ -40,11 +42,6 @@ Have a look at the [SmartFormat Wiki](https://github.com/axuno/SmartFormat/wiki)
 
 *SmartFormat* is licensed under [The MIT License (MIT)](LICENSE.md)
 
-The bundled project *SmartFormat.ZString* is Copyright © Cysharp, Inc. [Their software](https://github.com/Cysharp/ZString) 
-is licensed under [The MIT License (MIT)](src/SmartFormat.ZString/repo/LICENSE). 
-Their conversion methods under the `ZString/Number` directory 
-is Copyright © .NET Foundation and Contributors und is licensed
-under [The MIT License (MIT)](https://github.com/dotnet/runtime/blob/master/LICENSE.TXT).
 
 ## Thanks!
 
