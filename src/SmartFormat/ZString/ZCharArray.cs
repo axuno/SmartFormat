@@ -20,9 +20,7 @@ public struct ZCharArray : IDisposable
 {
     // ArrayPool is thread-safe
     private static readonly ArrayPool<char>
-        Pool = ArrayPool<char>.Create(MaxBufferCapacity, 50);
-
-    private static readonly object Locker = new();
+        Pool = ArrayPool<char>.Create(MaxBufferCapacity, 100);
 
     private char[]? _bufferArray;
     private int _currentLength;
@@ -55,11 +53,8 @@ public struct ZCharArray : IDisposable
     /// <param name="length">The length of the array.</param>
     public ZCharArray(int length)
     {
-        lock (Locker)
-        {
-            _bufferArray = Pool.Rent(length);
-            _currentLength = 0;
-        }
+        _bufferArray = Pool.Rent(length);
+        _currentLength = 0;
     }
 
     /// <summary>
@@ -69,11 +64,8 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public ReadOnlySpan<char> GetSpan()
     {
-        lock(Locker)
-        {
-            ThrowIfDisposed();
-            return _bufferArray.AsSpan(0, _currentLength);
-        }
+        ThrowIfDisposed();
+        return _bufferArray.AsSpan(0, _currentLength);
     }
 
     /// <summary>
@@ -84,11 +76,8 @@ public struct ZCharArray : IDisposable
     {
         get
         {
-            lock (Locker)
-            {
-                ThrowIfDisposed();
-                return _bufferArray.AsSpan(0, _currentLength);
-            }
+            ThrowIfDisposed();
+            return _bufferArray.AsSpan(0, _currentLength);
         }
     }
 
@@ -100,11 +89,8 @@ public struct ZCharArray : IDisposable
     {
         get
         {
-            lock (Locker)
-            {
-                ThrowIfDisposed();
-                return _currentLength;
-            }
+            ThrowIfDisposed();
+            return _currentLength;
         }
     }
 
@@ -116,11 +102,8 @@ public struct ZCharArray : IDisposable
     {
         get
         {
-            lock (Locker)
-            {
-                ThrowIfDisposed();
-                return _bufferArray!.Length;
-            }
+            ThrowIfDisposed();
+            return _bufferArray!.Length;
         }
     }
 
@@ -130,11 +113,8 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Reset()
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            _currentLength = 0;
-        }
+        ThrowIfDisposed();
+        _currentLength = 0;
     }
 
     /// <summary>
@@ -158,13 +138,10 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Write(Span<char> data)
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            GrowBufferIfNeeded(data.Length);
-            data.CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
-            _currentLength += data.Length;
-        }
+        ThrowIfDisposed();
+        GrowBufferIfNeeded(data.Length);
+        data.CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
+        _currentLength += data.Length;
     }
 
     /// <summary>
@@ -174,13 +151,10 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Write(ReadOnlySpan<char> data)
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            GrowBufferIfNeeded(data.Length);
-            data.CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
-            _currentLength += data.Length;
-        }
+        ThrowIfDisposed();
+        GrowBufferIfNeeded(data.Length);
+        data.CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
+        _currentLength += data.Length;
     }
 
     /// <summary>
@@ -190,13 +164,10 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Write(string data)
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            GrowBufferIfNeeded(data.Length);
-            data.AsSpan().CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
-            _currentLength += data.Length;
-        }
+        ThrowIfDisposed();
+        GrowBufferIfNeeded(data.Length);
+        data.AsSpan().CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
+        _currentLength += data.Length;
     }
 
     /// <summary>
@@ -206,12 +177,9 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Write(char c)
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            GrowBufferIfNeeded(1);
-            _bufferArray![_currentLength++] = c;
-        }
+        ThrowIfDisposed();
+        GrowBufferIfNeeded(1);
+        _bufferArray![_currentLength++] = c;
     }
 
     /// <summary>
@@ -222,15 +190,12 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Write(char c, int count)
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            GrowBufferIfNeeded(count);
+        ThrowIfDisposed();
+        GrowBufferIfNeeded(count);
 
-            for (var i = 0; i < count; i++)
-            {
-                _bufferArray![_currentLength++] = c;
-            }
+        for (var i = 0; i < count; i++)
+        {
+            _bufferArray![_currentLength++] = c;
         }
     }
 
@@ -246,18 +211,15 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Write(ISpanFormattable data, ReadOnlySpan<char> format, IFormatProvider provider)
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
+        ThrowIfDisposed();
 
-            Span<char> stackBuffer = stackalloc char[StackAllocCharBufferSizeLimit];
-            if (data.TryFormat(stackBuffer, out var written, format, provider))
-            {
-                GrowBufferIfNeeded(written);
-                stackBuffer.Slice(0, written).CopyTo(_bufferArray!.AsSpan(_currentLength));
-                _currentLength += written;
-                return;
-            }
+        Span<char> stackBuffer = stackalloc char[StackAllocCharBufferSizeLimit];
+        if (data.TryFormat(stackBuffer, out var written, format, provider))
+        {
+            GrowBufferIfNeeded(written);
+            stackBuffer.Slice(0, written).CopyTo(_bufferArray!.AsSpan(_currentLength));
+            _currentLength += written;
+            return;
         }
 
         throw new FormatException("The data could not be formatted.");
@@ -275,13 +237,10 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public void Write(IFormattable data, string format, IFormatProvider provider)
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            var formatted = data.ToString(format, provider).AsSpan();
-            GrowBufferIfNeeded(formatted.Length);
-            Write(formatted);
-        }
+        ThrowIfDisposed();
+        var formatted = data.ToString(format, provider).AsSpan();
+        GrowBufferIfNeeded(formatted.Length);
+        Write(formatted);
     }
 
     private void GrowBufferIfNeeded(int dataLength)
@@ -309,11 +268,8 @@ public struct ZCharArray : IDisposable
     /// <exception cref="ObjectDisposedException"></exception>
     public override string ToString()
     {
-        lock (Locker)
-        {
-            ThrowIfDisposed();
-            return new string(_bufferArray!, 0, _currentLength);
-        }
+        ThrowIfDisposed();
+        return new string(_bufferArray!, 0, _currentLength);
     }
 
     /// <summary>
@@ -321,12 +277,9 @@ public struct ZCharArray : IDisposable
     /// </summary>
     public void Dispose()
     {
-        lock (Locker)
-        {
-            if (IsDisposed) return;
+        if (IsDisposed) return;
 
-            Pool.Return(_bufferArray!);
-            _bufferArray = null;
-        }
+        Pool.Return(_bufferArray!);
+        _bufferArray = null;
     }
 }

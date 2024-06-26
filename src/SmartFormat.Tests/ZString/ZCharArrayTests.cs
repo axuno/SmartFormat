@@ -127,24 +127,4 @@ public class ZCharArrayTests
             Assert.That(result.All(r => r == $"Number: {compareCounter++:00000}"));
         });
     }
-    [Test]
-    public void Buffer_Parallel_Reads_Writes()
-    {
-        const int maxLoops = 100;
-        var options = new ParallelOptions { MaxDegreeOfParallelism = 10 };
-        var buffer = new ZCharArray(100);
-
-        Parallel.For(0, maxLoops, options, i =>
-        {
-            buffer.Write($"Thread {i:0000}: Hello!");
-        });
-
-        var result = buffer.ToString();
-        for (var i = 0; i < maxLoops; i++)
-        {
-            Assert.That(result, Does.Contain($"Thread {i:0000}: Hello!"));
-        }
-
-        Assert.That(buffer.Length, Is.EqualTo(maxLoops * "Thread 0000: Hello!".Length));
-    }
 }
