@@ -13,8 +13,6 @@ namespace SmartFormat.ZString;
 /// It simplifies passing around the buffer without intermediate memory allocations.
 /// <para/>
 /// Note that failing to dispose this struct after use will result in a memory leak.
-/// <para/>
-/// <see cref="ZCharArray"/> is thread-safe.
 /// </summary>
 public struct ZCharArray : IDisposable
 {
