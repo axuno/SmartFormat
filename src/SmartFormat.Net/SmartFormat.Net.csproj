@@ -27,6 +27,7 @@ It uses extensions to provide named placeholders, localization, pluralization, g
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SmartFormat.Extensions.LogiCalc\SmartFormat.Extensions.LogiCalc.csproj" />
         <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
         <ProjectReference Include="..\SmartFormat.Extensions.Newtonsoft.Json\SmartFormat.Extensions.Newtonsoft.Json.csproj" />
         <ProjectReference Include="..\SmartFormat.Extensions.System.Text.Json\SmartFormat.Extensions.System.Text.Json.csproj" />
