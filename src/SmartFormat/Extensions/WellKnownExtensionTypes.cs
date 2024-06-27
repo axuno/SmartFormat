@@ -53,7 +53,8 @@ public static class WellKnownExtensionTypes
         { "SmartFormat.Extensions.TemplateFormatter", 9000 },
         { "SmartFormat.Extensions.ChooseFormatter", 10000 },
         { "SmartFormat.Extensions.SubStringFormatter", 11000 },
-        { "SmartFormat.Extensions.DefaultFormatter", 12000 }
+        { "SmartFormat.Extensions.LogiCalcFormatter", 12000 },
+        { "SmartFormat.Extensions.DefaultFormatter", 13000 }
     };
 
     /// <summary>

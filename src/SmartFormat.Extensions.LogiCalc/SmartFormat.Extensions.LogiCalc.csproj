@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>This package is a SmartFormat extension to evaluate logical and mathematical expressions.
+
+SmartFormat is a lightweight text templating library written in C#.
+It can format various data sources into a string with a minimal, intuitive syntax similar to string.Format.
+It uses extensions to provide named placeholders, localization, pluralization, gender conjugation, and list and time formatting.
+        </Description>
+        <AssemblyTitle>SmartFormat.Extensions.LogiCalc</AssemblyTitle>
+        <AssemblyName>SmartFormat.Extensions.LogiCalc</AssemblyName>
+        <PackageId>SmartFormat.Extensions.Logicalc</PackageId>
+        <PackageTags>string-format stringformat template templating string-composition smartformat smart-format netstandard netcore netframework csharp c-sharp</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SmartFormat\SmartFormat.csproj" />
+        <None Include="../../SmartFormat_365x365.png" Pack="true" Visible="false" PackagePath="/" />
+        <None Include="../../PkgReadMe.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NCalcSync.signed" Version="4.3.3" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netStandard2.0'">
+        <PackageReference Include="System.Memory" Version="4.5.5" />
+        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    </ItemGroup>
+
+</Project>
