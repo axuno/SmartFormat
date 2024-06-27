@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Tests.Core.Output;
 
@@ -32,7 +33,7 @@ public class TextWriterOOutputTests
     [Test]
     public void Output_Of_ValueStringBuilder()
     {
-        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
+        using var sb = ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
         var sw = new StringWriter(new StringBuilder());
         var two = new TextWriterOutput(sw);

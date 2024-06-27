@@ -7,6 +7,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Core.Parsing;
 
@@ -188,9 +189,8 @@ public class Placeholder : FormatItem
             if (_formatterOptionsCache != null) return _formatterOptionsCache;
             if (Length == 0) _formatterOptionsCache = string.Empty;
 
-            // It's enough to have a buffer with the same size as input length.
-            // The default max array length of ArrayPool<char>.Shared is 1,048,576.
-            var pool = ArrayPool<char>.Create(Length > 1024 ? Length : 1024, 1024);
+            // The *default* max array length of ArrayPool<char>.Shared is 1,048,576.
+            var pool = ArrayPool<char>.Shared;
             var resultBuffer = pool.Rent(Length);
             System.Diagnostics.Debug.Assert(resultBuffer.Length >= Length, "ArrayPool buffer size is smaller than it should be");
 
@@ -227,42 +227,49 @@ public class Placeholder : FormatItem
     {
         if (_toStringCache != null) return _toStringCache;
 
-        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder(Length);
-        sb.Append(SmartSettings.Parser.PlaceholderBeginChar);
+        using var buffer = new ZCharArray(Length + 2); // +2 for the braces
+
+        buffer.Write(SmartSettings.Parser.PlaceholderBeginChar);
         foreach (var s in Selectors)
         {
             // alignment operators will be appended later
             if (s.Operator.Length > 0 && s.Operator[0] == SmartSettings.Parser.AlignmentOperator) continue;
-                
-            sb.Append(s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex));
+
+            var selectorSpan = s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex);
+            buffer.Write(selectorSpan);
         }
         if (Alignment != 0)
         {
-            sb.Append(SmartSettings.Parser.AlignmentOperator);
-            sb.Append(Alignment);
+            buffer.Write(SmartSettings.Parser.AlignmentOperator);
+            buffer.Write(Alignment.ToString());
         }
 
         if (FormatterName != string.Empty)
         {
-            sb.Append(SmartSettings.Parser.FormatterNameSeparator);
-            sb.Append(FormatterName);
+            buffer.Write(SmartSettings.Parser.FormatterNameSeparator);
+            buffer.Write(FormatterName);
+
             if (FormatterOptions != string.Empty)
             {
-                sb.Append(SmartSettings.Parser.FormatterOptionsBeginChar);
-                sb.Append(FormatterOptions);
-                sb.Append(SmartSettings.Parser.FormatterOptionsEndChar);
+                buffer.Write(SmartSettings.Parser.FormatterOptionsBeginChar);
+                buffer.Write(FormatterOptions);
+                buffer.Write(SmartSettings.Parser.FormatterOptionsEndChar);
             }
         }
 
         if (Format != null)
         {
-            sb.Append(SmartSettings.Parser.FormatterNameSeparator);
-            sb.Append(Format);
+            buffer.Write(SmartSettings.Parser.FormatterNameSeparator);
+            buffer.Write(Format.AsSpan());
         }
 
-        sb.Append(SmartSettings.Parser.PlaceholderEndChar);
+        buffer.Write(SmartSettings.Parser.PlaceholderEndChar);
 
-        _toStringCache = sb.ToString();
+#if NETSTANDARD2_1 || NET6_0_OR_GREATER
+        _toStringCache = new string(buffer.GetSpan());
+#else
+        _toStringCache = buffer.GetSpan().ToString();
+#endif
         return _toStringCache;
     }
 }

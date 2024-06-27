@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -67,6 +68,14 @@ public class FormatterTests
     {
         var formatter = Smart.CreateDefaultSmartFormat();
         Assert.That(formatter.Format("a{0}{1}b", new List<object?>{null, null}), Is.EqualTo("ab"));
+    }
+
+    [Test]
+    public void Formatter_With_Provider_ParsedFormat()
+    {
+        var formatter = Smart.CreateDefaultSmartFormat();
+        var parsed = formatter.Parser.ParseFormat("{0}");
+        Assert.That(formatter.Format(CultureInfo.InvariantCulture, parsed, "abc"), Is.EqualTo("abc"));
     }
 
     [Test]
@@ -301,7 +310,6 @@ public class FormatterTests
             Assert.That(formatter.GetFormatterExtensions(), Has.Count.EqualTo(formatter.FormatterExtensions.Count));
             Assert.That(formatter.GetFormatterExtension<DefaultFormatter>(), Is.InstanceOf(typeof(DefaultFormatter)));
         });
-        ;
     }
 
     [Test]

@@ -27,7 +27,7 @@
 * .Net Standard 2.0, .Net Standard 2.1
 * .Net 6.0 or .Net 8.0
 
-For the best optimizations and performance, use .NET 6.0 or .NET 8.0. You can expect a speed improvement of between 30% and 50% compared to .NET Framework 4.6.2.
+For the best optimizations and performance, use .NET 6.0 or .NET 8.0. You can expect a nice improvement in speed compared to .NET Framework 4.6.2.
  
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/SmartFormat.svg)](https://www.nuget.org/packages/SmartFormat.Net/) Install the **full** NuGet package *-or-*

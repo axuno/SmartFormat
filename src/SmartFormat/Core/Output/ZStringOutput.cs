@@ -6,11 +6,13 @@ using System;
 using System.Text;
 using SmartFormat.ZString;
 using SmartFormat.Core.Extensions;
+using SmartFormat.Pooling.ObjectPools;
+using SmartFormat.Pooling.SmartPools;
 
 namespace SmartFormat.Core.Output;
 
 /// <summary>
-/// Wraps an UTF-16 <see cref="ZStringBuilder"/> so that it can be used for output.
+/// Wraps <see cref="ZStringBuilder"/> so that it can be used for output.
 /// <see cref="ZStringOutput"/> is used for the default output.
 /// </summary>
 /// <remarks>
@@ -23,10 +25,12 @@ namespace SmartFormat.Core.Output;
 /// </remarks>
 public class ZStringOutput : IOutput, IDisposable
 {
+    // Adding an ObjectPool for ZStringOutput has no benefit.
+
     /// <summary>
     /// Returns the <see cref="ZStringBuilder"/> used for output.
     /// </summary>
-    public ZStringBuilder Output { get; }
+    internal ZStringBuilder Output { get; }
 
     /// <summary>
     /// Creates a new instance of <see cref="ZStringOutput"/>.
@@ -69,6 +73,15 @@ public class ZStringOutput : IOutput, IDisposable
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
     {
         Output.Append(stringBuilder);
+    }
+
+    /// <summary>
+    /// Clears the <see cref="StringBuilder"/> used to create the output.
+    ///  <para>This method gets called by <see cref="StringOutputPool"/> <see cref="PoolPolicy{T}.ActionOnReturn"/>.</para>
+    /// </summary>
+    public void Clear()
+    {
+        Output.Clear();
     }
 
     /// <summary>

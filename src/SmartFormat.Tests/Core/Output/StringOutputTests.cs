@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using SmartFormat.Core.Output;
+using SmartFormat.ZString;
 
 namespace SmartFormat.Tests.Core.Output;
 
@@ -27,7 +28,7 @@ public class StringOutputTests
     public void Output_Of_ValueStringBuilder()
     {
         var so = new StringOutput();
-        using var sb = ZString.ZStringBuilderUtilities.CreateZStringBuilder();
+        using var sb = ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
         so.Write(sb, null!);
         Assert.That(so.ToString(), Is.EqualTo("text"));

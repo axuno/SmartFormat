@@ -892,7 +892,9 @@ public class ParserTests
     [Test]
     public void Initialize_Format()
     {
+#pragma warning disable 618
         Assert.That(() => { _ = new Format().Initialize(new SmartSettings(), string.Empty, 0, 0, false); },
             Throws.Nothing, "Overload is marked as obsolete");
+#pragma warning restore 618
     }
 }
