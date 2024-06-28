@@ -8,7 +8,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using SmartFormat.Core.Extensions;
-using SmartFormat.Core.Settings;
 
 namespace SmartFormat.Extensions;
 
@@ -19,11 +18,11 @@ namespace SmartFormat.Extensions;
 /// Include this source, if any of these types shall be used.
 /// <para/>
 /// For support of <see cref="IReadOnlyDictionary{TKey,TValue}"/> <see cref="IsIReadOnlyDictionarySupported"/> must be set to <see langword="true"/>.
-/// This uses Reflection and is slower than the other types despite caching.
+/// This uses Reflection and is slower than the other types despite caching. The cache scope is limited to this instance of <see cref="DictionarySource"/>.
 /// </summary>
 public class DictionarySource : Source
 {
-    /// <inheritdoc />>
+    /// <inheritdoc />
     public override bool TryEvaluateSelector(ISelectorInfo selectorInfo)
     {
         var current = selectorInfo.CurrentValue;
@@ -48,16 +47,17 @@ public class DictionarySource : Source
 
         // This check is for dynamics (ExpandoObject):
         if (current is IDictionary<string, object?> dict)
-        {
-            // We're using the CaseSensitivityType of the dictionary,
-            // not the one from Settings.GetCaseSensitivityComparison().
-            // This is faster and has less GC than Key.Equals(...)
-            if (!dict.TryGetValue(selector, out var val)) return false;
+            foreach (var entry in dict)
+            {
+                var key = entry.Key;
 
-            selectorInfo.Result = val;
-            return true;
-        }
-        
+                if (!key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
+                    continue;
+
+                selectorInfo.Result = entry.Value;
+                return true;
+            }
+
         // This is for IReadOnlyDictionary<,> using Reflection
         if (IsIReadOnlyDictionarySupported && TryGetDictionaryValue(current, selector,
                 selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison(), out var value))
@@ -72,7 +72,7 @@ public class DictionarySource : Source
     #region *** IReadOnlyDictionary<,> ***
 
     /// <summary>
-    /// Gets the type cache <see cref="IDictionary{TKey,TValue}"/> for <see cref="IReadOnlyDictionary{TKey,TValue}"/>.
+    /// Gets the instance type cache <see cref="IDictionary{TKey,TValue}"/> for <see cref="IReadOnlyDictionary{TKey,TValue}"/>.
     /// It could e.g. be pre-filled or cleared in a derived class.
     /// </summary>
     /// <remarks>
@@ -80,9 +80,7 @@ public class DictionarySource : Source
     /// For writing, <see cref="ConcurrentDictionary{TKey, TValue}"/> is slower with more garbage (tested under net5.0).
     /// </remarks>
     protected internal readonly IDictionary<Type, (PropertyInfo, PropertyInfo)?> RoDictionaryTypeCache =
-        SmartSettings.IsThreadSafeMode
-            ? new ConcurrentDictionary<Type, (PropertyInfo, PropertyInfo)?>()
-            : new Dictionary<Type, (PropertyInfo, PropertyInfo)?>();
+        new Dictionary<Type, (PropertyInfo, PropertyInfo)?>();
 
     /// <summary>
     /// Gets or sets, whether the <see cref="IReadOnlyDictionary{TKey,TValue}"/> interface should be supported.

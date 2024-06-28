@@ -51,7 +51,7 @@ public class DictionarySourceTests
         d.Object = new { Prop1 = "a", Prop2 = "b", Prop3 = "c", };
 
         return new object[] {
-            d,
+            d
         };
     }
 

@@ -21,6 +21,22 @@ public class ReflectionSource : Source
 {
     private static readonly object[] Empty = Array.Empty<object>();
 
+    private static int _maxCacheSize = DefaultCacheSize;
+
+    /// <summary>
+    /// The default cache size.
+    /// </summary>
+    public const int DefaultCacheSize = 500;
+
+    /// <summary>
+    /// Gets or sets the maximum cache size. Default is <see cref="DefaultCacheSize"/>.
+    /// </summary>
+    public static int MaxCacheSize
+    {
+        get => _maxCacheSize;
+        set => _maxCacheSize = value > 0 ? value : DefaultCacheSize;
+    }
+
     /// <summary>
     /// Gets the type cache <see cref="IDictionary{TKey,TValue}"/>.
     /// It could e.g. be pre-filled or cleared in a derived class.
@@ -29,10 +45,15 @@ public class ReflectionSource : Source
     /// Note: For reading, <see cref="Dictionary{TKey, TValue}"/> and <see cref="ConcurrentDictionary{TKey, TValue}"/> perform equally.
     /// For writing, <see cref="ConcurrentDictionary{TKey, TValue}"/> is slower with more garbage (tested under net5.0).
     /// </remarks>
-    protected internal readonly IDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> TypeCache =
+    protected internal static readonly IDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> TypeCache =
         SmartSettings.IsThreadSafeMode
             ? new ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>()
-            : new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>();
+            : new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>(MaxCacheSize);
+
+    /// <summary>
+    /// Gets the key list for the type cache. Keeps track of the order of the FIFO cache.
+    /// </summary>
+    protected internal static readonly ConcurrentQueue<(Type, string?)> KeyList = new();
 
     /// <summary>
     /// Gets or sets, whether the type cache dictionary should be used.
@@ -74,8 +95,8 @@ public class ReflectionSource : Source
 
         if (EvaluateMembers(selectorInfo, selector, current, sourceType)) return true;
 
-        // We also cache failures so we don't need to call GetMembers again
-        if (IsTypeCacheEnabled) TypeCache[(sourceType, selector)] = (null, null);
+        // We also cache failures, so we don't need to call GetMembers again
+        if (IsTypeCacheEnabled) AddToCache(sourceType, selector, null, null);
 
         return false;
     }
@@ -97,7 +118,7 @@ public class ReflectionSource : Source
                     // Selector is a Field; retrieve the value:
                     var field = member as FieldInfo;
                     selectorInfo.Result = field?.GetValue(current);
-                    if (IsTypeCacheEnabled) TypeCache[(sourceType, selector)] = (field, null);
+                    if (IsTypeCacheEnabled) AddToCache(sourceType, selector, field, null);
                     return true;
                 case MemberTypes.Property:
                 case MemberTypes.Method:
@@ -111,7 +132,7 @@ public class ReflectionSource : Source
                     if (method?.ReturnType == typeof(void)) continue;
 
                     // Add to cache
-                    if (IsTypeCacheEnabled) TypeCache[(sourceType, selector)] = (null, method);
+                    if (IsTypeCacheEnabled) AddToCache(sourceType, selector, null, method);
 
                     // Retrieve the Selectors/ParseFormat value:
                     selectorInfo.Result = method?.Invoke(current, Array.Empty<object>());
@@ -119,6 +140,22 @@ public class ReflectionSource : Source
             }
 
         return false;
+    }
+
+    /// <summary>
+    /// Adds an item to the type cache, and removes the oldest item
+    /// if the new cache size would exceed <see cref="MaxCacheSize"/>.
+    /// </summary>
+    private static void AddToCache(Type sourceType, string selector, FieldInfo? field, MethodInfo? method)
+    {
+        while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
+        {
+            if (KeyList.TryDequeue(out var key))
+                TypeCache.Remove(key);
+        }
+
+        TypeCache[(sourceType, selector)] = (field, method);
+        KeyList.Enqueue((sourceType, selector));
     }
 
     private static bool TryGetMethodInfo(MemberInfo member, out MethodInfo? method)
