@@ -173,7 +173,7 @@ public class ReflectionSource : Source
 
         TypeCache[(sourceType, selector)] = (field, method);
 #else
-            while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
+        while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
         {
             // For frameworks NETCore3.1, we have to track insertion order by ourselves
             if (KeyList.TryDequeue(out var key))
