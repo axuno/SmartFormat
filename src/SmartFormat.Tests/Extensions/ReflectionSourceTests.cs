@@ -268,7 +268,9 @@ public class ReflectionSourceTests
         Assert.Multiple(() =>
         {
             Assert.That(ReflectionSource.TypeCache, Has.Count.EqualTo(ReflectionSource.MaxCacheSize));
+#if !NET6_0_OR_GREATER
             Assert.That(ReflectionSource.KeyList, Has.Count.EqualTo(ReflectionSource.TypeCache.Count));
+    #endif
             // Item2 of the value tuple is the name of the field or method
             Assert.That(ReflectionSource.TypeCache.First().Key.Item2, Is.EqualTo("SomeValue"), "Last added item is kept in cache");
         });

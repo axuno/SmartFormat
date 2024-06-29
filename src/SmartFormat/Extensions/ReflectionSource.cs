@@ -50,10 +50,13 @@ public class ReflectionSource : Source
             ? new ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>()
             : new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>(MaxCacheSize);
 
+#if !NET6_0_OR_GREATER
     /// <summary>
-    /// Gets the key list for the type cache. Keeps track of the order of the FIFO cache.
+    /// Keeps track of the insertion order into the <see cref="TypeCache"/>.
+    /// This is needed before NETCore3.1, where the dictionary is not ordered by insertion order.
     /// </summary>
     protected internal static readonly ConcurrentQueue<(Type, string?)> KeyList = new();
+#endif
 
     /// <summary>
     /// Gets or sets, whether the type cache dictionary should be used.
@@ -148,14 +151,25 @@ public class ReflectionSource : Source
     /// </summary>
     private static void AddToCache(Type sourceType, string selector, FieldInfo? field, MethodInfo? method)
     {
+#if NET6_0_OR_GREATER
         while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
         {
+            // From NETCore3.1, the dictionary is ordered by insertion order
+            TypeCache.Remove(TypeCache.First());
+        }
+
+        TypeCache[(sourceType, selector)] = (field, method);
+#else
+        while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
+        {
+            // Before NETCore3.1, we have to track insertion order by ourselves
             if (KeyList.TryDequeue(out var key))
                 TypeCache.Remove(key);
         }
 
         TypeCache[(sourceType, selector)] = (field, method);
         KeyList.Enqueue((sourceType, selector));
+#endif
     }
 
     private static bool TryGetMethodInfo(MemberInfo member, out MethodInfo? method)
