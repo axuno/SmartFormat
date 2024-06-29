@@ -105,7 +105,7 @@ public class ReflectionSource : Source
         if (EvaluateMembers(selectorInfo, selector, current, sourceType)) return true;
 
         // We also cache failures, so we don't need to call GetMembers again
-        if (IsTypeCacheEnabled) AddToCache(sourceType, selector, null, null);
+        AddToCache(sourceType, selector, null, null, IsTypeCacheEnabled);
 
         return false;
     }
@@ -113,6 +113,7 @@ public class ReflectionSource : Source
     private bool EvaluateMembers(ISelectorInfo selectorInfo, string selector, object current, Type sourceType)
     {
         const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
+        var comparison = selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison();
 
         // Note 1: GetMembers (opposite to GetMember!) returns all members, 
         //         both those defined by the type represented by the current T:System.Type object 
@@ -122,7 +123,8 @@ public class ReflectionSource : Source
         //         the first member is used.
         var members = sourceType.GetMembers(bindingFlags)
             .Where(m =>
-            string.Equals(m.Name, selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()));
+            string.Equals(m.Name, selector, comparison));
+
         foreach (var member in members)
             switch (member.MemberType)
             {
@@ -130,7 +132,7 @@ public class ReflectionSource : Source
                     // Selector is a Field; retrieve the value:
                     var field = member as FieldInfo;
                     selectorInfo.Result = field?.GetValue(current);
-                    if (IsTypeCacheEnabled) AddToCache(sourceType, selector, field, null);
+                    AddToCache(sourceType, selector, field, null, IsTypeCacheEnabled);
                     return true;
                 case MemberTypes.Property:
                 case MemberTypes.Method:
@@ -144,7 +146,7 @@ public class ReflectionSource : Source
                     if (method?.ReturnType == typeof(void)) continue;
 
                     // Add to cache
-                    if (IsTypeCacheEnabled) AddToCache(sourceType, selector, null, method);
+                    AddToCache(sourceType, selector, null, method, IsTypeCacheEnabled);
 
                     // Retrieve the Selectors/ParseFormat value:
                     selectorInfo.Result = method?.Invoke(current, Array.Empty<object>());
@@ -158,20 +160,22 @@ public class ReflectionSource : Source
     /// Adds an item to the type cache, and removes the oldest item
     /// if the new cache size would exceed <see cref="MaxCacheSize"/>.
     /// </summary>
-    private static void AddToCache(Type sourceType, string selector, FieldInfo? field, MethodInfo? method)
+    private static void AddToCache(Type sourceType, string selector, FieldInfo? field, MethodInfo? method, bool isCacheEnabled)
     {
+        if (!isCacheEnabled) return;
+
 #if NET6_0_OR_GREATER
         while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
         {
-            // From NETCore3.1, the dictionary is ordered by insertion order
+            // Starting from NETCore3.1, the dictionary is ordered by insertion order
             TypeCache.Remove(TypeCache.First());
         }
 
         TypeCache[(sourceType, selector)] = (field, method);
 #else
-        while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
+            while (TypeCache.Count > 0 && TypeCache.Count >= MaxCacheSize)
         {
-            // Before NETCore3.1, we have to track insertion order by ourselves
+            // For frameworks NETCore3.1, we have to track insertion order by ourselves
             if (KeyList.TryDequeue(out var key))
                 TypeCache.Remove(key);
         }

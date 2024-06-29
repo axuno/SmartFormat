@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using SmartFormat.Core.Extensions;
@@ -17,8 +16,9 @@ namespace SmartFormat.Extensions;
 /// and <see cref="IReadOnlyDictionary{TKey,TValue}"/>.
 /// Include this source, if any of these types shall be used.
 /// <para/>
-/// For support of <see cref="IReadOnlyDictionary{TKey,TValue}"/> <see cref="IsIReadOnlyDictionarySupported"/> must be set to <see langword="true"/>.
-/// This uses Reflection and is slower than the other types despite caching. The cache scope is limited to this instance of <see cref="DictionarySource"/>.
+/// For support of <see cref="IReadOnlyDictionary{TKey,TValue}"/>, <see cref="IsIReadOnlyDictionarySupported"/> must be set to <see langword="true"/>.
+/// This uses Reflection and is slower than the other types despite caching.
+/// The cache scope is limited to this instance of <see cref="DictionarySource"/>.
 /// </summary>
 public class DictionarySource : Source
 {
@@ -31,36 +31,25 @@ public class DictionarySource : Source
         if (current is null) return false;
 
         var selector = selectorInfo.SelectorText;
+        var comparison = selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison();
 
-        // See if current is an IDictionary (including generic dictionaries) and contains the selector:
-        if (current is IDictionary rawDict)
-            foreach (DictionaryEntry entry in rawDict)
-            {
-                var key = entry.Key as string ?? entry.Key.ToString()!;
+        // Try to get the selector value for IDictionary
+        if (TryGetIDictionaryValue(current, selector, comparison, out var value))
+        {
+            selectorInfo.Result = value;
+            return true;
+        }
 
-                if (!key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
-                    continue;
+        // Try to get the selector value for Dictionary<,> and dynamics (ExpandoObject)
+        if (TryGetGenericDictionaryValue(current, selector, comparison, out value))
+        {
+            selectorInfo.Result = value;
+            return true;
+        }
 
-                selectorInfo.Result = entry.Value;
-                return true;
-            }
-
-        // This check is for dynamics (ExpandoObject):
-        if (current is IDictionary<string, object?> dict)
-            foreach (var entry in dict)
-            {
-                var key = entry.Key;
-
-                if (!key.Equals(selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()))
-                    continue;
-
-                selectorInfo.Result = entry.Value;
-                return true;
-            }
-
-        // This is for IReadOnlyDictionary<,> using Reflection
-        if (IsIReadOnlyDictionarySupported && TryGetDictionaryValue(current, selector,
-                selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison(), out var value))
+        // Try to get the selector value for IReadOnlyDictionary<,>
+        if (IsIReadOnlyDictionarySupported && TryGetReadOnlyDictionaryValue(current, selector,
+                comparison, out value))
         {
             selectorInfo.Result = value;
             return true;
@@ -69,16 +58,56 @@ public class DictionarySource : Source
         return false;
     }
 
+    /// <summary>
+    /// See if <paramref name="current"/> is an IDictionary (including generic dictionaries) that contains the selector.
+    /// </summary>
+    private static bool TryGetIDictionaryValue(object current, string selectorText, StringComparison comparison, out object? value)
+    {
+        if (current is IDictionary rawDict)
+            foreach (DictionaryEntry entry in rawDict)
+            {
+                var key = entry.Key as string ?? entry.Key.ToString()!;
+
+                if (!key.Equals(selectorText, comparison))
+                    continue;
+
+                value = entry.Value;
+                return true;
+            }
+
+        value = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Try to get the selector value for <see cref="Dictionary{TKey,TValue}"/> and dynamics (<see cref="System.Dynamic.ExpandoObject"/>).
+    /// </summary>
+    private static bool TryGetGenericDictionaryValue(object current, string selectorText, StringComparison comparison,
+        out object? value)
+    {
+        if (current is IDictionary<string, object?> dict)
+            foreach (var entry in dict)
+            {
+                var key = entry.Key;
+
+                if (!key.Equals(selectorText, comparison))
+                    continue;
+
+                value = entry.Value;
+                return true;
+            }
+
+        value = null;
+        return false;
+    }
+    
     #region *** IReadOnlyDictionary<,> ***
 
     /// <summary>
     /// Gets the instance type cache <see cref="IDictionary{TKey,TValue}"/> for <see cref="IReadOnlyDictionary{TKey,TValue}"/>.
     /// It could e.g. be pre-filled or cleared in a derived class.
+    /// The cache scope is limited to this instance of <see cref="DictionarySource"/>.
     /// </summary>
-    /// <remarks>
-    /// Note: For reading, <see cref="Dictionary{TKey, TValue}"/> and <see cref="ConcurrentDictionary{TKey,TValue}"/> perform equally.
-    /// For writing, <see cref="ConcurrentDictionary{TKey, TValue}"/> is slower with more garbage (tested under net5.0).
-    /// </remarks>
     protected internal readonly IDictionary<Type, (PropertyInfo, PropertyInfo)?> RoDictionaryTypeCache =
         new Dictionary<Type, (PropertyInfo, PropertyInfo)?>();
 
@@ -89,7 +118,7 @@ public class DictionarySource : Source
     /// </summary>
     public bool IsIReadOnlyDictionarySupported { get; set; } = false;
     
-    private bool TryGetDictionaryValue(object obj, string key, StringComparison comparison, out object? value)
+    private bool TryGetReadOnlyDictionaryValue(object obj, string key, StringComparison comparison, out object? value)
     {
         value = null;
 
