@@ -16,6 +16,9 @@ namespace SmartFormat.Extensions;
 /// Class to evaluate any <see cref="object"/> using <see cref="System.Reflection"/>.
 /// A type cache is used in order to reduce reflection calls.
 /// Include this source, if any of these types shall be used.
+/// <para/>
+/// For <see cref="SmartSettings.CaseSensitivity"/>==<see cref="CaseSensitivityType.CaseInsensitive"/>,
+/// when there are multiple members with the same name but different case, the first member is used.
 /// </summary>
 public class ReflectionSource : Source
 {
@@ -40,15 +43,18 @@ public class ReflectionSource : Source
     /// <summary>
     /// Gets the type cache <see cref="IDictionary{TKey,TValue}"/>.
     /// It could e.g. be pre-filled or cleared in a derived class.
+    /// <para/>
+    /// We use the default <see cref="EqualityComparer{T}"/> for the key,
+    /// because case-sensitivity is handled in method <see cref="EvaluateMembers"/>.
     /// </summary>
     /// <remarks>
-    /// Note: For reading, <see cref="Dictionary{TKey, TValue}"/> and <see cref="ConcurrentDictionary{TKey, TValue}"/> perform equally.
+    /// For reading, <see cref="Dictionary{TKey, TValue}"/> and <see cref="ConcurrentDictionary{TKey, TValue}"/> perform equally.
     /// For writing, <see cref="ConcurrentDictionary{TKey, TValue}"/> is slower with more garbage (tested under net5.0).
     /// </remarks>
     protected internal static readonly IDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)> TypeCache =
-        SmartSettings.IsThreadSafeMode
-            ? new ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>()
-            : new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>(MaxCacheSize);
+    SmartSettings.IsThreadSafeMode
+        ? new ConcurrentDictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>(EqualityComparer<(Type, string?)>.Default)
+        : new Dictionary<(Type, string?), (FieldInfo? field, MethodInfo? method)>(MaxCacheSize, EqualityComparer<(Type, string?)>.Default);
 
 #if !NET6_0_OR_GREATER
     /// <summary>
@@ -107,12 +113,15 @@ public class ReflectionSource : Source
     private bool EvaluateMembers(ISelectorInfo selectorInfo, string selector, object current, Type sourceType)
     {
         const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
-            
-        // Important:
-        // GetMembers (opposite to GetMember!) returns all members, 
-        // both those defined by the type represented by the current T:System.Type object 
-        // AS WELL AS those inherited from its base types.
-        var members = sourceType.GetMembers(bindingFlags).Where(m =>
+
+        // Note 1: GetMembers (opposite to GetMember!) returns all members, 
+        //         both those defined by the type represented by the current T:System.Type object 
+        //         AS WELL AS those inherited from its base types.
+        // Note 2: Member names are case-sensitive, so we need to compare using Settings.CaseSensitivity.
+        //         When there are multiple members with the same name but different case,
+        //         the first member is used.
+        var members = sourceType.GetMembers(bindingFlags)
+            .Where(m =>
             string.Equals(m.Name, selector, selectorInfo.FormatDetails.Settings.GetCaseSensitivityComparison()));
         foreach (var member in members)
             switch (member.MemberType)

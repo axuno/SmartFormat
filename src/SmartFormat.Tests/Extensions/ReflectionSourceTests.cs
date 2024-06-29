@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
@@ -79,6 +78,19 @@ public class ReflectionSourceTests
         var args = GetArgs();
         var actual = formatter.Format(format, args);
         Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Members_CaseInsensitive_With_Same_OrdinalIgnoreCase_Name()
+    {
+        var formatter = GetFormatter(new SmartSettings
+            { CaseSensitivity = CaseSensitivityType.CaseInsensitive });
+        
+        // The first property matches the case-insensitive name
+        var args = new { Data = new { Value = 123, VALUE = "456" } };
+
+        var actual = formatter.Format("{Data.Value} and {Data.VALUE} with type {Data.VALUE.GetType}", args);
+        Assert.That(actual, Is.EqualTo("123 and 123 with type System.Int32"));
     }
 
     /// <summary>
