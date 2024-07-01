@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using NCalc.Factories;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
@@ -27,6 +26,7 @@ namespace SmartFormat.Extensions;
 /// </remarks>
 public class LogiCalcFormatter : IFormatter
 {
+    // Todo: Make the cache static and thread-safe?
     private readonly Dictionary<string, object?> _parameters = new(50);
 
     [ThreadStatic] // creates isolated versions of the cache dictionary in each thread
@@ -46,14 +46,14 @@ public class LogiCalcFormatter : IFormatter
     public IReadOnlyDictionary<string, object?> NCalcParameters => _parameters;
 
     /// <summary>
-    /// Gets or sets the <see cref="NCalc.Handlers.EvaluateFunctionHandler"/>.
+    /// Contains the functions that can be used in the NCalc expressions.
     /// </summary>
-    public NCalc.Handlers.EvaluateFunctionHandler? EvaluateFunction { get; set; }
+    public Dictionary<string, NCalc.ExpressionFunction> Functions { get; } = new();
 
     /// <summary>
-    /// Gets or sets the <see cref="NCalc.Handlers.EvaluateParameterHandler"/>.
+    /// Contains the dynamic parameters than can be used in the NCalc expressions.
     /// </summary>
-    public NCalc.Handlers.EvaluateParameterHandler? EvaluateParameter { get; set; }
+    public Dictionary<string, object?> Parameters { get; } = new();
 
     ///<inheritdoc />
     public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
@@ -78,21 +78,30 @@ public class LogiCalcFormatter : IFormatter
                     $"{{,{formattingInfo.Alignment}:d:{formattingInfo.FormatterOptions}}}");
 
                 var nCalcOptions = formattingInfo.FormatDetails.Settings.CaseSensitivity == CaseSensitivityType.CaseInsensitive
-                    ? NCalc.ExpressionOptions.IgnoreCase
+                    ? NCalc.ExpressionOptions.IgnoreCaseAtBuiltInFunctions
                     : NCalc.ExpressionOptions.None;
                 nCalcOptions |= NCalc.ExpressionOptions.NoCache;
                 // Todo: Would this make sense?
                 // nCalcOptions |= NCalc.ExpressionOptions.AllowNullParameter;
 
-                cache.LogExpr = LogicalExpressionFactory.Create(expressionValue.ToString(),
+                cache.LogExpr = NCalc.Factories.LogicalExpressionFactory.Create(expressionValue.ToString(),
                     new NCalc.ExpressionContext(nCalcOptions, CultureInfo.InvariantCulture));
                 
                 _formatNCalcCache.Add(key, cache);
             }
 
-            var nCalcExpression = new NCalc.Expression(cache.LogExpr) { Parameters = _parameters };
-            if (EvaluateFunction != null) nCalcExpression.EvaluateFunction += EvaluateFunction;
-            if (EvaluateParameter != null) nCalcExpression.EvaluateParameter += EvaluateParameter;
+            var nCalcExpression = new NCalc.Expression(cache.LogExpr)
+            {
+                Parameters = Parameters,
+                Functions = Functions
+            };
+
+            // Add the parameters from the Placeholder
+            // Don't mix placeholder parameters with user-defined parameters
+            foreach (var keyValuePair in _parameters)
+            {
+                nCalcExpression.Parameters.Add(keyValuePair);
+            }
 
             var result = nCalcExpression.Evaluate();
             formattingInfo.FormatAsChild(cache.Format, result);
