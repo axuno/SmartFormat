@@ -118,10 +118,7 @@ public class LogiCalcFormatterTests
 
         var smart = GetFormatter();
         var nc = (LogiCalcFormatter) smart.GetFormatterExtensions().First(f => f.GetType() == typeof(LogiCalcFormatter));
-        nc.EvaluateFunction += (name, args) =>
-        {
-            if (name == "MyFunction") args.Result = ((int?) args.Parameters[0].Evaluate()) / 5;
-        };
+        nc.Functions["MyFunction"] = args => ((int?) args[0].Evaluate()) / 5;
 
         const string format = "{:calc:MyFunction({One})}";
         
@@ -134,10 +131,7 @@ public class LogiCalcFormatterTests
     {
         var smart = GetFormatter();
         var nc = (LogiCalcFormatter) smart.GetFormatterExtensions().First(f => f.GetType() == typeof(LogiCalcFormatter));
-        nc.EvaluateParameter += (name, args) =>
-        {
-            if (name == "MyParameter") args.Result = 1234567;
-        };
+        nc.Parameters["MyParameter"] = 1234567;
 
         const string format = "{:calc:[MyParameter]}";
         
