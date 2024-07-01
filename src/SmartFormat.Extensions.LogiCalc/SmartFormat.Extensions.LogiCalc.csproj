@@ -24,7 +24,7 @@ It uses extensions to provide named placeholders, localization, pluralization, g
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="NCalcSync.signed" Version="4.3.3" />
+        <PackageReference Include="NCalcSync.signed" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netStandard2.0'">
