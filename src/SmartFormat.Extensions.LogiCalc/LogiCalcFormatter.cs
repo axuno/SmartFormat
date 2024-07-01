@@ -26,11 +26,12 @@ namespace SmartFormat.Extensions;
 /// </remarks>
 public class LogiCalcFormatter : IFormatter
 {
-    // Todo: Make the cache static and thread-safe?
     private readonly Dictionary<string, object?> _parameters = new(50);
 
-    [ThreadStatic] // creates isolated versions of the cache dictionary in each thread
-    private static Dictionary<string, (Format Format, NCalc.Domain.LogicalExpression LogExpr)>? _formatNCalcCache;
+    private static readonly
+        System.Threading.ThreadLocal<Dictionary<string, (Format Format, NCalc.Domain.LogicalExpression LogExpr)>>
+        FormatNCalcCache = new(() =>
+            new Dictionary<string, (Format Format, NCalc.Domain.LogicalExpression LogExpr)>(100));
 
     ///<inheritdoc/>
     public string Name { get; set; } = "calc";
@@ -58,21 +59,19 @@ public class LogiCalcFormatter : IFormatter
     ///<inheritdoc />
     public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
     {
-        _formatNCalcCache ??= new Dictionary<string, (Format, NCalc.Domain.LogicalExpression)>(100);
-
         var format = formattingInfo.Format;
         if (format == null) return false;
-        
+
         var fi = (FormattingInfo) formattingInfo;
-        
+
         _parameters.Clear();
         using var expressionValue = CreateNCalcExpression(fi, _parameters);
-        
+
         try
         {
             // Create Format and LogicalExpression if they don't exist for the Placeholder
             var key = formattingInfo.Placeholder!.ToString();
-            if (!_formatNCalcCache.TryGetValue(key, out var cache))
+            if (!FormatNCalcCache.Value!.TryGetValue(key, out var cache))
             {
                 cache.Format = formattingInfo.FormatDetails.Formatter.Parser.ParseFormat(
                     $"{{,{formattingInfo.Alignment}:d:{formattingInfo.FormatterOptions}}}");
@@ -86,8 +85,8 @@ public class LogiCalcFormatter : IFormatter
 
                 cache.LogExpr = NCalc.Factories.LogicalExpressionFactory.Create(expressionValue.ToString(),
                     new NCalc.ExpressionContext(nCalcOptions, CultureInfo.InvariantCulture));
-                
-                _formatNCalcCache.Add(key, cache);
+
+                FormatNCalcCache.Value.Add(key, cache);
             }
 
             var nCalcExpression = new NCalc.Expression(cache.LogExpr)
@@ -110,7 +109,7 @@ public class LogiCalcFormatter : IFormatter
         {
             throw new FormattingException(format, exception, format.StartIndex);
         }
-        
+
         return true;
     }
 
