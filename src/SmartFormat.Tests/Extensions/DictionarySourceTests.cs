@@ -7,7 +7,6 @@ using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Tests.TestUtils;
-using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions;
 
@@ -51,7 +50,7 @@ public class DictionarySourceTests
         d.Object = new { Prop1 = "a", Prop2 = "b", Prop3 = "c", };
 
         return new object[] {
-            d,
+            d
         };
     }
 
@@ -76,17 +75,17 @@ public class DictionarySourceTests
     }
 
     [Test]
-    public void Test_Dynamic()
+    public void Test_Dynamic_CaseSensitive()
     {
-        var formatter = Smart.CreateDefaultSmartFormat();
+        var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseSensitive});
         formatter.AddExtensions(new DictionarySource());
 
-        var formats = new[]
+        var formats = new string[]
         {
             "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.X}",
             "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{X}}"
         };
-        var expected = new[]
+        var expected = new string[]
         {
             "Chained: 1 2 a a z",
             "Nested: 1 2 a a z"
@@ -98,20 +97,20 @@ public class DictionarySourceTests
     [Test]
     public void Test_Dynamic_CaseInsensitive()
     {
-        var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings {CaseSensitivity = CaseSensitivityType.CaseInsensitive});
+        var formatter = Smart.CreateDefaultSmartFormat(new SmartSettings { CaseSensitivity = CaseSensitivityType.CaseInsensitive});
         formatter.AddExtensions(new DictionarySource());
 
         var formats = new string[]
         {
-            "Chained: {0.Numbers.One} {Numbers.Two} {Letters.A} {Object.Prop1} {Raw.x}",
-            "Nested: {0:{Numbers:{One} {Two}}} {Letters:{A}} {Object:{Prop1}} {Raw:{x}}"
+            "Chained: {0.Numbers.ONE} {Numbers.TWO} {Letters.A} {Object.PROP1} {Raw.x}",
+            "Nested: {0:{Numbers:{ONE} {TWO}}} {Letters:{A}} {Object:{PROP1}} {Raw:{x}}"
         };
         var expected = new string[]
         {
             "Chained: 1 2 a a z",
             "Nested: 1 2 a a z"
         };
-        var args = (object[])GetDynamicArgs();
+        var args = (object[]) GetDynamicArgs();
         formatter.Test(formats, args, expected);
     }
 
