@@ -24,7 +24,7 @@ jobs:
             DATE=$(git log -1 --format=%cd --date=iso)
             FORMATTED_DATE=$(date -d"$DATE" +'%Y-%m-%d %H:%M:%S')
             echo "updatedOn=$FORMATTED_DATE" >> $GITHUB_ENV
-            echo "commitMessage=$(git log -1 --pretty=%B)" | sed 's/%/%25/g' | sed 's/\r/%0D/g' | sed 's/\n/%0A/g' | sed 's/:/%3A/g' | sed 's/ /%20/g' >> $GITHUB_ENV
+            printf "commitMessage='%s'" "$(git log -1 --pretty=%B | tr "'" "_")" >> $GITHUB_ENV
             echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
             echo "commitCount=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
       - name: Print variables
