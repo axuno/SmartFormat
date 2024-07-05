@@ -23,16 +23,16 @@ jobs:
             cd wiki
             DATE=$(git log -1 --format=%cd --date=iso)
             FORMATTED_DATE=$(date -d"$DATE" +'%Y-%m-%d %H:%M:%S')
-            echo "updatedOn=$FORMATTED_DATE" >> $GITHUB_ENV
-            printf "commitMessage='%s'" "$(git log -1 --pretty=%B | tr "'" "_")" >> $GITHUB_ENV
+            echo "updatedOn=\"$FORMATTED_DATE\"" >> $GITHUB_ENV
+            printf "commitMessage=\"%s\"" "$(git log -1 --pretty=%B | tr "'" "_")" >> $GITHUB_ENV
             echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
             echo "commitCount=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
       - name: Print variables
         run: |
-          echo ${{ env.updatedOn }}
-          echo ${{ env.commitMessage }}
-          echo ${{ env.hash }}
-          echo ${{ env.commitCount }}
+          echo "${{ env.updatedOn }}"
+          echo "${{ env.commitMessage }}"
+          echo "${{ env.hash }}"
+          echo "${{ env.commitCount }}"
       - name: Checkout main repo
         uses: actions/checkout@v4
         with:
