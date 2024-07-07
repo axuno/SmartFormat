@@ -34,11 +34,6 @@ public struct ZCharArray : IDisposable
     public const int MaxBufferCapacity = 10_000_000;
 
     /// <summary>
-    /// The maximum size of the stack-allocated buffer.
-    /// </summary>
-    public const int StackAllocCharBufferSizeLimit = 256;
-
-    /// <summary>
     /// Creates a new <see cref="ZCharArray"/> with a length of <see cref="DefaultBufferCapacity"/>>.
     /// </summary>
     public ZCharArray() : this(DefaultBufferCapacity)
@@ -205,22 +200,22 @@ public struct ZCharArray : IDisposable
     /// <param name="data"></param>
     /// <param name="format"></param>
     /// <param name="provider"></param>
-    /// <exception cref="FormatException"></exception>
     /// <exception cref="ObjectDisposedException"></exception>
-    public void Write(ISpanFormattable data, ReadOnlySpan<char> format, IFormatProvider provider)
+    public void Write(ISpanFormattable data, ReadOnlySpan<char> format, IFormatProvider? provider = null)
     {
         ThrowIfDisposed();
 
-        Span<char> stackBuffer = stackalloc char[StackAllocCharBufferSizeLimit];
-        if (data.TryFormat(stackBuffer, out var written, format, provider))
+        // Increases the buffer size until its big enough
+        while (true)
         {
-            GrowBufferIfNeeded(written);
-            stackBuffer.Slice(0, written).CopyTo(_bufferArray!.AsSpan(_currentLength));
-            _currentLength += written;
-            return;
-        }
+            if (data.TryFormat(_bufferArray.AsSpan(_currentLength), out var written, format, provider))
+            {
+                _currentLength += written;
+                return;
+            }
 
-        throw new FormatException("The data could not be formatted.");
+            GrowBufferIfNeeded(1_000);
+        }
     }
 #endif
 
@@ -231,9 +226,8 @@ public struct ZCharArray : IDisposable
     /// <param name="data"></param>
     /// <param name="format"></param>
     /// <param name="provider"></param>
-    /// <exception cref="FormatException"></exception>
     /// <exception cref="ObjectDisposedException"></exception>
-    public void Write(IFormattable data, string format, IFormatProvider provider)
+    public void Write(IFormattable data, string format, IFormatProvider? provider = null)
     {
         ThrowIfDisposed();
         var formatted = data.ToString(format, provider).AsSpan();
