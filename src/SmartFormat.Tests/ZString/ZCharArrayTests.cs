@@ -70,6 +70,45 @@ public class ZCharArrayTests
 
         Assert.That(buffer.ToString(), Is.EqualTo("12.3400"));
     }
+
+    [Test]
+    public void ISpanFormattable_Exceeding_BufferLength()
+    {
+        var buffer = new ZCharArray(16);
+        var initialBufferCapacity = buffer.Capacity;
+        var data = new SpanFormattable();
+        buffer.Write(data, Span<char>.Empty);
+
+        Assert.Multiple(() =>
+        {
+            // On first attempt, the data will not fit into the buffer
+            Assert.That(data.TrialNo, Is.GreaterThan(1));
+            Assert.That(buffer.Capacity, Is.GreaterThan(initialBufferCapacity));
+        });
+    }
+
+    internal record SpanFormattable : ISpanFormattable
+    {
+        internal int TrialNo;
+
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return nameof(SpanFormattable);
+        }
+
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+        {
+            if (++TrialNo == 1)
+            {
+                charsWritten = 0;
+                return false;
+            }
+
+            destination.Fill('#');
+            charsWritten = destination.Length;
+            return true;
+        }
+    }
 #endif
 
     [Test]
@@ -96,7 +135,7 @@ public class ZCharArrayTests
             Assert.That(buffer.Length, Is.EqualTo(0));
         });
     }
-
+    
     [Test]
     public void Buffer_Thread_Safety()
     {

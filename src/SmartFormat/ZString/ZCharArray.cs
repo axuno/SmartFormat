@@ -205,7 +205,7 @@ public struct ZCharArray : IDisposable
     {
         ThrowIfDisposed();
 
-        // Increases the buffer size until its big enough
+        // Increases the buffer size until it's big enough
         while (true)
         {
             if (data.TryFormat(_bufferArray.AsSpan(_currentLength), out var written, format, provider))

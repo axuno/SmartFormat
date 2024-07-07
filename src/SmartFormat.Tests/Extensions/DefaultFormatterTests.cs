@@ -76,24 +76,32 @@ public class DefaultFormatterTests
     public void ISpanFormattable_Exceeding_Stackalloc_Buffer()
     {
         var smart = GetFormatter();
-        var data = new ISpanFormattableTest(DefaultFormatter.StackAllocCharBufferSize + 1);
+        var data = new ISpanFormattableTest();
         var result = smart.Format("{0}", data);
-        Assert.That(result, Is.EqualTo(data.ToString()));
+
+        Assert.Multiple(() =>
+        {
+            // On first attempt, the data will not fit into the buffer
+            Assert.That(data.TrialNo, Is.GreaterThan(1));
+            Assert.That(result, Is.EqualTo(data.ToString()));
+        });
     }
 
-    private class ISpanFormattableTest : ISpanFormattable
+    internal class ISpanFormattableTest : ISpanFormattable
     {
         char[] _buffer;
 
-        public ISpanFormattableTest(int size)
+        internal int TrialNo;
+
+        public ISpanFormattableTest()
         {
-            _buffer = new char[size];
+            _buffer = new char[1024];
             _buffer.AsSpan().Fill('b');
         }
 
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
         {
-            if (destination.Length < _buffer.Length)
+            if (++TrialNo == 1 || destination.Length < _buffer.Length)
             {
                 charsWritten = 0;
                 return false;

@@ -7,16 +7,31 @@ using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions;
 
+#if NET6_0_OR_GREATER
 /// <summary>
-/// Do the default formatting, same logic as "String.Format".
+/// Does the default formatting.
+/// This formatter in always required, unless you implement your own.
+/// <pre/>
+/// It supports <see cref="ISpanFormattable"/>, <see cref="IFormattable"/>, and <see cref="ICustomFormatter"/>.
 /// </summary>
+#else
+/// <summary>
+/// Does the default formatting.
+/// This formatter in always required, unless you implement your own.
+/// <pre/>
+/// It supports <see cref="IFormattable"/> and <see cref="ICustomFormatter"/>.
+/// </summary>
+#endif
 public class DefaultFormatter : IFormatter
 {
+
+#if NET6_0_OR_GREATER
     /// <summary>
     /// The maximum size of the stack-allocated buffer
-    /// for formatting <see cref="ISpanFormattable"/> objects.
+    /// for formatting <see cref="System.ISpanFormattable"/> objects.
     /// </summary>
     internal const int StackAllocCharBufferSize = 512;
+#endif
     
     /// <summary>
     /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
@@ -68,7 +83,7 @@ public class DefaultFormatter : IFormatter
         if (current is ISpanFormattable spanFormattable)
         {
             // ISpanFormattable has the same speed as IFormattable,
-            // but brings less GC pressure (about 25% less for processing 1234567.890123f).
+            // but brings less GC pressure (e.g. 25% less for processing 1234567.890123f).
 
             var fmtTextSpan = format != null ? format.AsSpan() : Span<char>.Empty;
 
