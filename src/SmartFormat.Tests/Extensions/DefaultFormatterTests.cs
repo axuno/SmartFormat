@@ -69,6 +69,63 @@ public class DefaultFormatterTests
 
     #endregion
 
+    #region * ISpanFormattable Test *
+
+#if NET6_0_OR_GREATER
+    [Test]
+    public void ISpanFormattable_Exceeding_Stackalloc_Buffer()
+    {
+        var smart = GetFormatter();
+        var data = new ISpanFormattableTest();
+        var result = smart.Format("{0}", data);
+
+        Assert.Multiple(() =>
+        {
+            // On first attempt, the data will not fit into the buffer
+            Assert.That(data.TrialNo, Is.GreaterThan(1));
+            Assert.That(result, Is.EqualTo(data.ToString()));
+        });
+    }
+
+    internal class ISpanFormattableTest : ISpanFormattable
+    {
+        char[] _buffer;
+
+        internal int TrialNo;
+
+        public ISpanFormattableTest()
+        {
+            _buffer = new char[1024];
+            _buffer.AsSpan().Fill('b');
+        }
+
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+        {
+            if (++TrialNo == 1 || destination.Length < _buffer.Length)
+            {
+                charsWritten = 0;
+                return false;
+            }
+
+            _buffer.AsSpan().CopyTo(destination);
+            charsWritten = _buffer.Length;
+            return true;
+        }
+
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return string.Format(formatProvider, format ?? string.Empty, new string(_buffer));
+        }
+
+        public override string ToString()
+        {
+            return new string(_buffer);
+        }
+    }
+#endif
+
+    #endregion
+
     #region *** Format with custom formatter ***
 
     [TestCase("format", "value", true)]
@@ -113,8 +170,7 @@ public class DefaultFormatterTests
                    new string((arg as string ?? "?").Reverse().Select(c => c).ToArray());
         }
     }
-
-    #endregion
+#endregion
 
     #region *** FormatDelegate Tests **
 

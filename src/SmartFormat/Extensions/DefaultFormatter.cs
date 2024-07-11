@@ -7,16 +7,37 @@ using SmartFormat.Core.Extensions;
 
 namespace SmartFormat.Extensions;
 
+#if NET6_0_OR_GREATER
 /// <summary>
-/// Do the default formatting, same logic as "String.Format".
+/// Does the default formatting.
+/// This formatter in always required, unless you implement your own.
+/// <pre/>
+/// It supports <see cref="ISpanFormattable"/>, <see cref="IFormattable"/>, and <see cref="ICustomFormatter"/>.
 /// </summary>
+#else
+/// <summary>
+/// Does the default formatting.
+/// This formatter in always required, unless you implement your own.
+/// <pre/>
+/// It supports <see cref="IFormattable"/> and <see cref="ICustomFormatter"/>.
+/// </summary>
+#endif
 public class DefaultFormatter : IFormatter
 {
+
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// The maximum size of the stack-allocated buffer
+    /// for formatting <see cref="System.ISpanFormattable"/> objects.
+    /// </summary>
+    internal const int StackAllocCharBufferSize = 512;
+#endif
+    
     /// <summary>
     /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
     /// </summary>
     [Obsolete("Use property \"Name\" instead", true)]
-    public string[] Names { get; set; } = {"default", "d", string.Empty};
+    public string[] Names { get; set; } = { "default", "d", string.Empty };
 
     ///<inheritdoc/>
     public string Name { get; set; } = "d";
@@ -42,37 +63,57 @@ public class DefaultFormatter : IFormatter
             return true;
         }
 
-        // Use the provider to see if a CustomFormatter is available:
-        var provider = formattingInfo.FormatDetails.Provider;
+        /* 
+         * The order of precedence is:
+         * 1. ICustomFormatter from the IFormatProvider
+         * 2. ISpanFormattable (for .NET 6.0 or later)
+         * 3. IFormattable
+         * 4. ToString
+         */
 
-        //  We will try using IFormatProvider, IFormattable, and if all else fails, ToString.
-        string? result; 
+        var provider = formattingInfo.FormatDetails.Provider;
         if (provider?.GetFormat(typeof(ICustomFormatter)) is ICustomFormatter cFormatter)
         {
             var formatText = format?.GetLiteralText();
-            result = cFormatter.Format(formatText, current, provider);
-        }
-        // IFormattable
-        // Note: This is what ValueStringBuilder is implementing in the same way
-        else if (current is IFormattable formattable)
-        {
-            var formatText = format?.ToString();
-            result = formattable.ToString(formatText, provider);
-        }
-        else if (current is string str)
-        {
-            formattingInfo.Write(str.AsSpan());
+            formattingInfo.Write(cFormatter.Format(formatText, current, provider).AsSpan());
             return true;
         }
-        // ToString:
-        else
+
+#if NET6_0_OR_GREATER
+        if (current is ISpanFormattable spanFormattable)
         {
-            result = current?.ToString();
+            // ISpanFormattable has the same speed as IFormattable,
+            // but brings less GC pressure (e.g. 25% less for processing 1234567.890123f).
+
+            var fmtTextSpan = format != null ? format.AsSpan() : Span<char>.Empty;
+
+            // Try to use the stack buffer first
+            Span<char> buffer = stackalloc char[StackAllocCharBufferSize];
+
+            if (spanFormattable.TryFormat(buffer, out var written, fmtTextSpan, provider))
+            {
+                formattingInfo.Write(buffer.Slice(0, written));
+                return true;
+            }
+
+            // If the stack buffer is too small, use a heap buffer
+            using var arrayBuffer = new ZString.ZCharArray(2_000_000);
+            arrayBuffer.Write(spanFormattable, fmtTextSpan, provider);
+            formattingInfo.Write(arrayBuffer.GetSpan());
+            return true;
+        }
+#endif
+
+        if (current is IFormattable formattable)
+        {
+            var fmtTextString = format?.ToString();
+            formattingInfo.Write(formattable.ToString(fmtTextString, provider).AsSpan());
+            return true;
         }
 
-        // Output the result:
-        formattingInfo.Write(result != null ? result.AsSpan() : ReadOnlySpan<char>.Empty);
-
+        // Fallback to ToString (string.ToString() returns 'this')
+        var result = current != null ? current.ToString().AsSpan() : Span<char>.Empty;
+        formattingInfo.Write(result);
         return true;
     }
 }
