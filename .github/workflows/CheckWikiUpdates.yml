@@ -1,0 +1,59 @@
+name: Check for Wiki Updates
+
+on:
+  workflow_dispatch: # Allows manual trigger
+  # push: # Uncomment to run on push
+  schedule:
+    - cron: '0 0 * * *' # Runs once a day
+
+jobs:
+  check-wiki:
+    if: ${{ github.repository == 'axuno/SmartFormat' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki  # Checkout wiki to wiki folder
+
+      - name: Get last commit date, message and number of commits
+        id: get-info
+        run: |
+            cd wiki
+            DATE=$(git log -1 --format=%cd --date=iso)
+            FORMATTED_DATE=$(date -d"$DATE" +'%Y-%m-%d %H:%M:%S')
+            echo "updatedOn=$FORMATTED_DATE" >> $GITHUB_ENV
+            # The :a;N;$!ba; part buffers the input to ensure that all newline characters are replaced, not just those at the end of each line read
+            printf "commitMessage=\"%s\"\n" "$(git log -1 --pretty=%B | sed ':a;N;$!ba;s/\n/ ↲ /g' | sed "s/'/\\\\'/g")" >> $GITHUB_ENV
+            echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
+            echo "commitCount=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
+      - name: Print variables
+        run: |
+          echo ${{ env.updatedOn }}
+          echo "${{ env.commitMessage }}"
+          echo ${{ env.hash }}
+          echo ${{ env.commitCount }}
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          path: main-repo # Checkout main repo to main-repo folder
+          token: ${{ secrets.WIKI_CHECK_TOKEN }}
+          ref: ${{ github.ref }}
+      - name: Create issue if wiki was updated
+        id: create-issue
+        if: ${{ env.commitCount != '0' }}
+        uses: JasonEtco/create-an-issue@v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.WIKI_CHECK_TOKEN }}
+          UpdatedOn: ${{ env.updatedOn }}
+          CommitMessage: ${{ env.commitMessage }}
+          CommitCount: ${{ env.commitCount }}
+          Hash: ${{ env.hash }}
+        with:
+          filename: main-repo/.github/workflows/Wiki_Update_Issue_Template.md
+          update_existing: true
+          search_existing: open
+      - name: Show issue URL
+        run: 'echo Created ${{ steps.create-issue.outputs.url }}'
