@@ -29,7 +29,7 @@ public interface ISelectorInfo
     string SelectorText { get; }
 
     /// <summary>
-    /// The index of the selector in a multi-part selector.
+    /// The index of the selector in a multipart selector.
     /// Example: {Person.Birthday.Year} has 3 selectors,
     /// and Year has a SelectorIndex of 2.
     /// </summary>
