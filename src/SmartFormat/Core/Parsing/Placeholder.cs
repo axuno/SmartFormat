@@ -189,10 +189,10 @@ public class Placeholder : FormatItem
             if (_formatterOptionsCache != null) return _formatterOptionsCache;
             if (Length == 0) _formatterOptionsCache = string.Empty;
 
-            // The *default* max array length of ArrayPool<char>.Shared is 1,048,576.
+            // The *default* max array length of ArrayPool<char>.Shared is 1,048,576
+            // but renting more will still return the size we need.
             var pool = ArrayPool<char>.Shared;
             var resultBuffer = pool.Rent(Length);
-            System.Diagnostics.Debug.Assert(resultBuffer.Length >= Length, "ArrayPool buffer size is smaller than it should be");
 
             try
             {
