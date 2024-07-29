@@ -6,7 +6,6 @@
 using System;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Output;
 using SmartFormat.Core.Parsing;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.SmartPools;
@@ -225,6 +224,8 @@ internal partial class Evaluator
     /// <exception cref="FormattingException"></exception>
     private void InvokeFormatters(FormattingInfo formattingInfo)
     {
+        if (formattingInfo.DisableFormattingExtensions) return;
+
         var placeholder = formattingInfo.Placeholder!;
         
         try

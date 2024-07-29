@@ -3,7 +3,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Output;
@@ -17,7 +16,7 @@ namespace SmartFormat.Core.Formatting;
 /// <summary>
 /// The class contains the fields and methods which are necessary for formatting.
 /// </summary>
-public class FormattingInfo : IFormattingInfo, ISelectorInfo
+public class FormattingInfo : IFormattingInfo, ISelectorInfo, IFormattingExtensionsToggle
 {
     /// <summary>
     /// CTOR for object pooling.
@@ -52,6 +51,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         CurrentValue = currentValue;
         FormatDetails = formatDetails;
         Format = format;
+        DisableFormattingExtensions = false;
         // inherit alignment
         if (parent != null) Alignment = parent.Alignment;
         else if (format.ParentPlaceholder != null) Alignment = format.ParentPlaceholder.Alignment;
@@ -73,6 +73,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         FormatDetails = formatDetails;
         Placeholder = placeholder;
         Format = placeholder.Format;
+        DisableFormattingExtensions = false;
         CurrentValue = currentValue;
         // inherit alignment
         Alignment = placeholder.Alignment;
@@ -94,6 +95,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
         Alignment = 0;
 
         Format = null;
+        DisableFormattingExtensions = false;
         CurrentValue = null;
 
         // Children can safely be returned
@@ -303,6 +305,9 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo
     /// to the <see cref="CurrentValue"/> of the <see cref="IFormattingInfo"/>.
     /// </summary>
     public object? Result { get; set; }
+
+    /// <inheritdoc />
+    public bool DisableFormattingExtensions { get; set; }
 
     /// <summary>
     /// Creates a child <see cref="FormattingInfo"/> from the current <see cref="FormattingInfo"/> instance for a <see cref="Parsing.Format"/>.

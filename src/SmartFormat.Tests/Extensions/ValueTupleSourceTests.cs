@@ -131,6 +131,6 @@ public class ValueTupleSourceTests
         public string SelectorOperator { get; } = string.Empty;
         public object? Result { get; set; }
         public Placeholder? Placeholder { get; }
-        public FormatDetails FormatDetails { get; } = (FormatDetails) null!; // dummy
+        public FormatDetails FormatDetails { get; } = null!; // dummy
     }
 }
