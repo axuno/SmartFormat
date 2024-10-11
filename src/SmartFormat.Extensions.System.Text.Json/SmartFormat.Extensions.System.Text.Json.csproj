@@ -14,7 +14,7 @@ It uses extensions to provide named placeholders, localization, pluralization, g
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netStandard2.0' or '$(TargetFramework)' == 'netStandard2.1'">
-        <PackageReference Include="System.Text.Json" Version="8.0.4" />
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
     </ItemGroup>
 
     <ItemGroup>
