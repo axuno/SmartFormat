@@ -63,10 +63,10 @@ for:
     build_script:
       - cd $APPVEYOR_BUILD_FOLDER/src
       - dotnet --version
-      - dotnet sln SmartFormat.sln remove ./Demo/Demo.csproj ./Demo.NetFramework/Demo.NetFramework.csproj
+      - dotnet sln SmartFormat.sln remove ./Demo/Demo.csproj
       - dotnet restore SmartFormat.sln --verbosity quiet
       - dotnet add ./SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
       - dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:
-      - dotnet test --no-build --framework net60 SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
+      - dotnet test --no-build --framework net60 SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
       - bash <(curl -s https://codecov.io/bash) -f ./SmartFormat.Tests/coverage.net60.xml -n net6.0linux
