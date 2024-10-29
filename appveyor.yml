@@ -42,7 +42,8 @@ for:
           }
     test_script:
       - cmd: nuget install Appveyor.TestLogger
-      - cmd: dotnet test --framework net60 --test-adapter-path:. --logger:Appveyor SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
+      # using correct --framework net6.0 does not produce report file (it does for --framework net60)
+      - cmd: dotnet test SmartFormat.sln --test-adapter-path:. --logger:Appveyor /p:configuration=release /p:AltCover=true /p:AltCoverStrongNameKey="..\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net60.xml" -n net6.0win
     artifacts:
@@ -68,5 +69,6 @@ for:
       - dotnet add ./SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
       - dotnet build SmartFormat.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:
-      - dotnet test --no-build --framework net60 SmartFormat.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
+      # using correct --framework net6.0 does not produce report file (it does for --framework net60)
+      - dotnet test SmartFormat.sln --no-build /p:configuration=release /p:AltCover=true /p:AltCoverStrongNameKey="../SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
       - bash <(curl -s https://codecov.io/bash) -f ./SmartFormat.Tests/coverage.net60.xml -n net6.0linux
