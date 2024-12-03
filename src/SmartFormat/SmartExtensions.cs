@@ -1,4 +1,4 @@
-// 
+//
 // Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
 
@@ -19,20 +19,22 @@ public static class SmartExtensions
     /// <param name="sb">The StringBuilder that will be used for output</param>
     /// <param name="format">The template that defines how the arguments are formatted</param>
     /// <param name="args">A list of arguments to be used in formatting</param>
-    public static void AppendSmart(this StringBuilder sb, string format, params object[] args)
+    public static StringBuilder AppendSmart(this StringBuilder sb, string format, params object[] args)
     {
         var output = new StringOutput(sb);
         Smart.Default.FormatInto(output, format, args);
+        return sb;
     }
 
     /// <summary> AppendLines a formatted string, using the same semantics as Smart.Format. </summary>
     /// <param name="sb">The StringBuilder that will be used for output</param>
     /// <param name="format">The template that defines how the arguments are formatted</param>
     /// <param name="args">A list of arguments to be used in formatting</param>
-    public static void AppendLineSmart(this StringBuilder sb, string format, params object[] args)
+    public static StringBuilder AppendLineSmart(this StringBuilder sb, string format, params object[] args)
     {
         AppendSmart(sb, format, args);
         sb.AppendLine();
+        return sb;
     }
 
     #endregion
