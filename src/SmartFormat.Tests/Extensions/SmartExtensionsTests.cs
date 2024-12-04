@@ -34,12 +34,35 @@ public class SmartExtensionsTests
     }
 
     [Test]
+    public void Test_AppendLine_Chained()
+    {
+        var actual = new StringBuilder()
+            .AppendLineSmart("{0} {1} {2}", "these", "are", "the")
+            .Append("args")
+            .ToString();
+
+        Assert.That(actual, Is.EqualTo("these are the" + Environment.NewLine + "args"));
+    }
+
+    [Test]
     public void Test_Append()
     {
         var sb = new StringBuilder();
         sb.AppendSmart("{0} {1} {2} {3}", "these", "are", "the", "args");
 
         var actual = sb.ToString();
+
+        Assert.That(actual, Is.EqualTo("these are the args"));
+    }
+
+    [Test]
+    public void Test_Append_Chained()
+    {
+        var actual = new StringBuilder()
+            .AppendSmart("{0} {1}", "these", "are")
+            .Append(' ')
+            .AppendSmart("{0} {1}", "the", "args")
+            .ToString();
 
         Assert.That(actual, Is.EqualTo("these are the args"));
     }
