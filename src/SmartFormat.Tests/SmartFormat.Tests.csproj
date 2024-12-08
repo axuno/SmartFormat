@@ -4,7 +4,7 @@
         <Description>Unit tests for SmartFormat</Description>
         <AssemblyTitle>SmartFormat.Test</AssemblyTitle>
         <Authors>axuno gGmbH, Scott Rippey, Bernhard Millauer and other contributors.</Authors>
-        <TargetFrameworks>net462;net60</TargetFrameworks>
+        <TargetFrameworks>net462;net6.0</TargetFrameworks>
         <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <AssemblyName>SmartFormat.Tests</AssemblyName>
