@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Parsing;
@@ -199,7 +200,7 @@ public class ConditionalFormatter : IFormatter
 
         for (var i = 0; i < andOrs.Count; i++)
         {
-            var v = decimal.Parse(values[i].Value);
+            var v = decimal.Parse(values[i].Value, CultureInfo.InvariantCulture);
             var exp = false;
             switch (comps[i].Value)
             {
