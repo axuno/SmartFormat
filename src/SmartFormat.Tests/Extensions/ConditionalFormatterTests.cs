@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
@@ -157,6 +158,29 @@ public class ConditionalFormatterTests
                      { (long)123, (ulong)123, (short)123, (ushort)123, (int)123, (uint)123 })
         {
             Assert.That(smart.Format("{0:cond:=123?yes|no}", number), Is.EqualTo("yes"));
+        }
+    }
+
+    [TestCase("en")]
+    [TestCase("fr")]
+    [TestCase("nb-NO")]
+    public void Test_DecimalParsingUses_InvariantCulture(string culture)
+    {
+        const string format = "{0:cond:<=0.25?I am less than 0.25|I am over 0.25}";
+        const string expected = "I am over 0.25";
+
+        var currentCulture = CultureInfo.CurrentCulture;
+        var cultureInfo = CultureInfo.CreateSpecificCulture(culture);
+        CultureInfo.CurrentCulture = cultureInfo;
+
+        try
+        {
+            var smart = Smart.CreateDefaultSmartFormat();
+            smart.Test(format, new object[] { 0.3 }, expected);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = currentCulture;
         }
     }
 }
