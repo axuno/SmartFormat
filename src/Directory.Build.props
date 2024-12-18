@@ -8,8 +8,8 @@
         <Copyright>Copyright 2011-$(CurrentYear) SmartFormat Project</Copyright>
         <RepositoryUrl>https://github.com/axuno/SmartFormat.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <Version>3.5.1</Version>
-        <FileVersion>3.5.1</FileVersion>
+        <Version>3.5.2</Version>
+        <FileVersion>3.5.2</FileVersion>
         <AssemblyVersion>3.0.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
         <LangVersion>latest</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>

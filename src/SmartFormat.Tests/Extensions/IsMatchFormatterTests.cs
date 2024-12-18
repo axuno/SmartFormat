@@ -140,7 +140,7 @@ public class IsMatchFormatterTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(EscapedLiteral.EscapeCharLiterals('\\', regExEscaped, 0, regExEscaped.Length, true), Is.EqualTo(optionsEscaped));
+            Assert.That(EscapedLiteral.EscapeCharLiterals('\\', regExEscaped, 0, regExEscaped.Length, true), Is.EquivalentTo(optionsEscaped));
             Assert.That(regEx.Match(search).Success, Is.True);
         });
 
