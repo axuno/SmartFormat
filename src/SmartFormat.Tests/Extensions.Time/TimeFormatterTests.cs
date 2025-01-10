@@ -12,6 +12,15 @@ namespace SmartFormat.Tests.Extensions;
 [TestFixture]
 public class TimeFormatterTests
 {
+    private const string SeparatorLanguage = "zu";
+    static TimeFormatterTests()
+    {
+
+        var englishWithSeparator = CommonLanguagesTimeTextInfo.English;
+        englishWithSeparator.Ptxt_separator = new[] { " and ", ", " };
+        CommonLanguagesTimeTextInfo.AddLanguage(SeparatorLanguage, englishWithSeparator);
+    }
+
     private static SmartFormatter GetFormatter()
     {
         var smart = Smart.CreateDefaultSmartFormat(new SmartSettings
@@ -129,6 +138,20 @@ public class TimeFormatterTests
     [TestCase("{4:time:}","de", "weniger als 1 Sekunde")]
     [TestCase("{5:time:}", "de", "5 Tage")]
     public void Test_Defaults(string format, string language, string expected)
+    {
+        var args = GetArgs();
+        var smart = GetFormatter();
+        var actual = smart.Format(CultureInfo.GetCultureInfo(language), format, args);
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [TestCase("{0:time:}", SeparatorLanguage, "less than 1 second")]
+    [TestCase("{1:time:}", SeparatorLanguage, "1 day, 1 hour, 1 minute and 1 second")]
+    [TestCase("{2:time:}", SeparatorLanguage, "2 hours and 2 seconds")]
+    [TestCase("{3:time:}", SeparatorLanguage, "3 days and 3 seconds")]
+    [TestCase("{4:time:}", SeparatorLanguage, "less than 1 second")]
+    [TestCase("{5:time:}", SeparatorLanguage, "5 days")]
+    public void Test_English_Separator(string format, string language, string expected)
     {
         var args = GetArgs();
         var smart = GetFormatter();

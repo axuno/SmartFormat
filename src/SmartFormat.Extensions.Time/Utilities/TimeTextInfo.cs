@@ -83,6 +83,23 @@ public class TimeTextInfo
     /// </summary>
     public string[] Ptxt_week { get; set;} = Array.Empty<string>();
 
+    /// <summary>
+    /// Text for separator between units.
+    /// First value is for the separator between the last two units (and also if only two units are present).
+    ///
+    /// eg.
+    /// [" and", ", "] would result in "1 day, 10 minutes and 10 seconds"
+    /// </summary>
+    public string[] Ptxt_separator { get; set; } = Array.Empty<string>();
+
+    public virtual string GetSeparatorText(int currentIndex, int unitCount)
+    {
+        if (Ptxt_separator.Length == 0) return " ";
+        if (Ptxt_separator.Length == 1 || unitCount == 2) return Ptxt_separator[0];
+
+        return Ptxt_separator[currentIndex + 1 == unitCount ? 0 : 1];
+    }
+
     private static string GetValue(PluralRules.PluralRuleDelegate pluralRule, int value, IReadOnlyList<string> units)
     {
         // Get the plural index from the plural rule,

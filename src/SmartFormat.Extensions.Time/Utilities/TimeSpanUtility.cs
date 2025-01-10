@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -84,8 +85,7 @@ public static class TimeSpanUtility
         }
 
         // Create our result:
-        var textStarted = false;
-        var result = new StringBuilder();
+        var result = new List<string>();
         for (var i = rangeMax; i >= _rangeMin; i = (TimeSpanFormatOptions) ((int) i >> 1))
         {
             // Determine the value and title:
@@ -122,21 +122,28 @@ public static class TimeSpanUtility
             }
 
             //Determine whether to display this value
-            if (!ShouldTruncate(value, textStarted, out var displayThisValue)) continue;
+            if (!ShouldTruncate(value, result.Any(), out var displayThisValue)) continue;
 
-            PrepareOutput(value, i == _rangeMin, textStarted, result, ref displayThisValue);
+            PrepareOutput(value, i == _rangeMin, result.Any(), result, ref displayThisValue);
 
             // Output the value:
             if (displayThisValue)
             {
-                if (textStarted) result.Append(' ');
                 var unitTitle = _timeTextInfo.GetUnitText(i, value, _abbreviate);
-                result.Append(unitTitle);
-                textStarted = true;
+                if (!string.IsNullOrEmpty(unitTitle)) result.Add(unitTitle);
             }
         }
 
-        return result.ToString();
+        var resultString = new StringBuilder();
+        for (var i = 0; i < result.Count; i++)
+        {
+            if (i > 0)
+                resultString.Append(_timeTextInfo.GetSeparatorText(i, result.Count));
+
+            resultString.Append(result[i]);
+        }
+
+        return resultString.ToString();
     }
 
     private static bool ShouldTruncate(int value, bool textStarted, out bool displayThisValue)
@@ -163,7 +170,7 @@ public static class TimeSpanUtility
         return false;
     }
 
-    private static void PrepareOutput(int value, bool isRangeMin, bool hasTextStarted, StringBuilder result, ref bool displayThisValue)
+    private static void PrepareOutput(int value, bool isRangeMin, bool hasTextStarted, List<string> result, ref bool displayThisValue)
     {
         // we need to display SOMETHING (even if it's zero)
         if (isRangeMin && !hasTextStarted)
@@ -173,7 +180,7 @@ public static class TimeSpanUtility
             {
                 // Output the "less than 1 unit" text:
                 var unitTitle = _timeTextInfo!.GetUnitText(_rangeMin, 1, _abbreviate);
-                result.Append(_timeTextInfo.GetLessThanText(unitTitle));
+                result.Add(_timeTextInfo.GetLessThanText(unitTitle));
                 displayThisValue = false;
             }
         }
