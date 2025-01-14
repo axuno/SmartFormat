@@ -2,7 +2,12 @@
 // Copyright SmartFormat Project maintainers and contributors.
 // Licensed under the MIT license.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Reflection;
+using System.Text.Json;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Extensions.Time.Utilities;
@@ -17,129 +22,45 @@ public static class CommonLanguagesTimeTextInfo
     /// <summary>
     /// Gets the <see cref="TimeTextInfo"/> for the English language.
     /// </summary>
-    public static TimeTextInfo English => new()
-    {
-        PluralRule = PluralRules.GetPluralRule("en"),
-        Ptxt_week = new[] { "{0} week", "{0} weeks" },
-        Ptxt_day = new[] { "{0} day", "{0} days" },
-        Ptxt_hour = new[] { "{0} hour", "{0} hours" },
-        Ptxt_minute = new[] { "{0} minute", "{0} minutes" },
-        Ptxt_second = new[] { "{0} second", "{0} seconds" },
-        Ptxt_millisecond = new[] { "{0} millisecond", "{0} milliseconds" },
-        Ptxt_w = new[] { "{0}w" },
-        Ptxt_d = new[] { "{0}d" },
-        Ptxt_h = new[] { "{0}h" },
-        Ptxt_m = new[] { "{0}m" },
-        Ptxt_s = new[] { "{0}s" },
-        Ptxt_ms = new[] { "{0}ms" },
-        Ptxt_lessThan = "less than {0}"
-    };
-        
+    [Obsolete("Use GetTimeTextInfo(\"en\") instead")]
+    [ExcludeFromCodeCoverage]
+    public static TimeTextInfo English => GetTimeTextInfo("en")!;
+
     /// <summary>
     /// Gets the <see cref="TimeTextInfo"/> for the French language.
     /// </summary>
-    public static TimeTextInfo French => new()
-    {
-        PluralRule = PluralRules.GetPluralRule("fr"),
-        Ptxt_week = new[] { "{0} semaine", "{0} semaines" },
-        Ptxt_day = new[] { "{0} jour", "{0} jours" },
-        Ptxt_hour = new[] { "{0} heure", "{0} heures" },
-        Ptxt_minute = new[] { "{0} minute", "{0} minutes" },
-        Ptxt_second = new[] { "{0} seconde", "{0} secondes" },
-        Ptxt_millisecond = new[] { "{0} milliseconde", "{0} millisecondes" },
-        Ptxt_w = new[] { "{0}sem" },
-        Ptxt_d = new[] { "{0}j" },
-        Ptxt_h = new[] { "{0}h" },
-        Ptxt_m = new[] { "{0}m" },
-        Ptxt_s = new[] { "{0}s" },
-        Ptxt_ms = new[] { "{0}ms" },
-        Ptxt_lessThan = "moins que {0}"
-    };
+    [Obsolete("Use GetTimeTextInfo(\"fr\") instead")]
+    [ExcludeFromCodeCoverage]
+    public static TimeTextInfo French => GetTimeTextInfo("fr")!;
 
     /// <summary>
     /// Gets the <see cref="TimeTextInfo"/> for the Spanish language.
     /// </summary>
-    public static TimeTextInfo Spanish => new()
-    {
-        PluralRule = PluralRules.GetPluralRule("es"),
-        Ptxt_week = new[] { "{0} semana", "{0} semanas" },
-        Ptxt_day = new[] { "{0} día", "{0} días" },
-        Ptxt_hour = new[] { "{0} hore", "{0} horas" },
-        Ptxt_minute = new[] { "{0} minuto", "{0} minutos" },
-        Ptxt_second = new[] { "{0} segundo", "{0} segundos" },
-        Ptxt_millisecond = new[] { "{0} milisegundo", "{0} milisegundos" },
-        Ptxt_w = new[] { "{0}sem" },
-        Ptxt_d = new[] { "{0}d" },
-        Ptxt_h = new[] { "{0}h" },
-        Ptxt_m = new[] { "{0}m" },
-        Ptxt_s = new[] { "{0}s" },
-        Ptxt_ms = new[] { "{0}ms" },
-        Ptxt_lessThan = "menos que {0}"
-    };
+    [Obsolete("Use GetTimeTextInfo(\"es\") instead")]
+    [ExcludeFromCodeCoverage]
+    public static TimeTextInfo Spanish => GetTimeTextInfo("es")!;
 
     /// <summary>
     /// Gets the <see cref="TimeTextInfo"/> for the Portuguese language.
     /// </summary>
-    public static TimeTextInfo Portuguese => new()
-    {
-        PluralRule = PluralRules.GetPluralRule("pt"),
-        Ptxt_week = new[] { "{0} semana", "{0} semanas" },
-        Ptxt_day = new[] { "{0} dia", "{0} dias" },
-        Ptxt_hour = new[] { "{0} hora", "{0} horas" },
-        Ptxt_minute = new[] { "{0} minuto", "{0} minutos" },
-        Ptxt_second = new[] { "{0} segundo", "{0} segundos" },
-        Ptxt_millisecond = new[] { "{0} milissegundo", "{0} milissegundos" },
-        Ptxt_w = new[] { "{0}sem" },
-        Ptxt_d = new[] { "{0}d" },
-        Ptxt_h = new[] { "{0}h" },
-        Ptxt_m = new[] { "{0}m" },
-        Ptxt_s = new[] { "{0}s" },
-        Ptxt_ms = new[] { "{0}ms" },
-        Ptxt_lessThan = "menos do que {0}"
-    };
+    [Obsolete("Use GetTimeTextInfo(\"pt\") instead")]
+    [ExcludeFromCodeCoverage]
+    public static TimeTextInfo Portuguese => GetTimeTextInfo("pt")!;
 
     /// <summary>
     /// Gets the <see cref="TimeTextInfo"/> for the Italian language.
     /// </summary>
-    public static TimeTextInfo Italian => new()
-    {
-        PluralRule = PluralRules.GetPluralRule("it"),
-        Ptxt_week = new[] { "{0} settimana", "{0} settimane" },
-        Ptxt_day = new[] { "{0} giorno", "{0} giorni" },
-        Ptxt_hour = new[] { "{0} ora", "{0} ore" },
-        Ptxt_minute = new[] { "{0} minuto", "{0} minuti" },
-        Ptxt_second = new[] { "{0} secondo", "{0} secondi" },
-        Ptxt_millisecond = new[] { "{0} millisecondo", "{0} millisecondi" },
-        Ptxt_w = new[] { "{0}set" },
-        Ptxt_d = new[] { "{0}g" },
-        Ptxt_h = new[] { "{0}h" },
-        Ptxt_m = new[] { "{0}m" },
-        Ptxt_s = new[] { "{0}s" },
-        Ptxt_ms = new[] { "{0}ms" },
-        Ptxt_lessThan = "meno di {0}"
-    };
+    [Obsolete("Use GetTimeTextInfo(\"it\") instead")]
+    [ExcludeFromCodeCoverage]
+    public static TimeTextInfo Italian => GetTimeTextInfo("it")!;
 
     /// <summary>
     /// Gets the <see cref="TimeTextInfo"/> for the German language.
     /// </summary>
-    public static TimeTextInfo German => new()
-    {
-        PluralRule = PluralRules.GetPluralRule("de"),
-        Ptxt_week = new[] { "{0} Woche", "{0} Wochen" },
-        Ptxt_day = new[] { "{0} Tag", "{0} Tage" },
-        Ptxt_hour = new[] { "{0} Stunde", "{0} Stunden" },
-        Ptxt_minute = new[] { "{0} Minute", "{0} Minuten" },
-        Ptxt_second = new[] { "{0} Sekunde", "{0} Sekunden" },
-        Ptxt_millisecond = new[] { "{0} Millisekunde", "{0} Millisekunden" },
-        Ptxt_w = new[] { "{0}w" },
-        Ptxt_d = new[] { "{0}t" },
-        Ptxt_h = new[] { "{0}h" },
-        Ptxt_m = new[] { "{0}m" },
-        Ptxt_s = new[] { "{0}s" },
-        Ptxt_ms = new[] { "{0}ms" },
-        Ptxt_lessThan = "weniger als {0}"
-    };
-
+    [Obsolete("Use GetTimeTextInfo(\"de\") instead")]
+    [ExcludeFromCodeCoverage]
+    public static TimeTextInfo German => GetTimeTextInfo("de")!;
+ 
     /// <summary>
     /// Adds a <see cref="TimeTextInfo"/> for a language.
     /// </summary>
@@ -169,15 +90,41 @@ public static class CommonLanguagesTimeTextInfo
         if (_customLanguage.TryGetValue(twoLetterIsoLanguageName, out var timeTextInfo))
             return timeTextInfo;
 
-        return twoLetterIsoLanguageName switch
+        timeTextInfo = LoadTimeTextInfo(twoLetterIsoLanguageName);
+        if (timeTextInfo is null) return null;
+
+        _customLanguage.Add(twoLetterIsoLanguageName, timeTextInfo);
+        return timeTextInfo;
+    }
+
+    private static TimeTextInfo? LoadTimeTextInfo(string languageCode)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = $"SmartFormat.Extensions.Time.Resources.{languageCode}.json";
+
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null) return null;
+
+        using var reader = new StreamReader(stream);
+        var json = reader.ReadToEnd();
+        var data = JsonSerializer.Deserialize<TimeTextInfoData>(json);
+
+        return new TimeTextInfo
         {
-            "en" => English,
-            "fr" => French,
-            "es" => Spanish,
-            "pt" => Portuguese,
-            "it" => Italian,
-            "de" => German,
-            _ => null
+            PluralRule = PluralRules.GetPluralRule(data!.PluralRule),
+            Ptxt_week = data.Ptxt_week,
+            Ptxt_day = data.Ptxt_day,
+            Ptxt_hour = data.Ptxt_hour,
+            Ptxt_minute = data.Ptxt_minute,
+            Ptxt_second = data.Ptxt_second,
+            Ptxt_millisecond = data.Ptxt_millisecond,
+            Ptxt_w = data.Ptxt_w,
+            Ptxt_d = data.Ptxt_d,
+            Ptxt_h = data.Ptxt_h,
+            Ptxt_m = data.Ptxt_m,
+            Ptxt_s = data.Ptxt_s,
+            Ptxt_ms = data.Ptxt_ms,
+            Ptxt_lessThan = data.Ptxt_lessThan
         };
     }
 }

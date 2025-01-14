@@ -4,8 +4,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 
 namespace SmartFormat.Extensions.Time.Utilities;
 
@@ -63,7 +63,7 @@ public static class TimeSpanUtility
     /// <para>These will be combined with the default timeSpanFormatOptions.</para>
     /// </param>
     /// <param name="timeTextInfo">An object that supplies the text to use for output</param>
-    public static IList<string> ToTimeParts(this TimeSpan fromTime, TimeSpanFormatOptions options,
+    internal static IList<string> ToTimeParts(this TimeSpan fromTime, TimeSpanFormatOptions options,
         TimeTextInfo timeTextInfo)
     {
         // If there are any missing options, merge with the defaults:

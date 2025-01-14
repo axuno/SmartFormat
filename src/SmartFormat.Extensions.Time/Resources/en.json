@@ -1,0 +1,16 @@
+{
+  "PluralRule": "en",
+  "Ptxt_week": [ "{0} week", "{0} weeks" ],
+  "Ptxt_day": [ "{0} day", "{0} days" ],
+  "Ptxt_hour": [ "{0} hour", "{0} hours" ],
+  "Ptxt_minute": [ "{0} minute", "{0} minutes" ],
+  "Ptxt_second": [ "{0} second", "{0} seconds" ],
+  "Ptxt_millisecond": [ "{0} millisecond", "{0} milliseconds" ],
+  "Ptxt_w": [ "{0}w" ],
+  "Ptxt_d": [ "{0}d" ],
+  "Ptxt_h": [ "{0}h" ],
+  "Ptxt_m": [ "{0}m" ],
+  "Ptxt_s": [ "{0}s" ],
+  "Ptxt_ms": [ "{0}ms" ],
+  "Ptxt_lessThan": "less than {0}"
+}
