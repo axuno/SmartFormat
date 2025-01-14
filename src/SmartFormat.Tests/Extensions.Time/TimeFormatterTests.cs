@@ -5,6 +5,7 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Extensions.Time.Utilities;
+using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions;
@@ -102,11 +103,18 @@ public class TimeFormatterTests
         Assert.That(() => smart.Format("{0:time:}", DateTime.UtcNow), Throws.Exception.TypeOf<FormattingException>());
     }
 
-    [Test]
-    public void Formatter_With_NestedFormat_Should_Throw()
+    [TestCase("{0:time: {:list:|, | and }}", "en", "less than 1 second")]
+    [TestCase("{1:time: {:list:|, | and }}", "en", "1 day, 1 hour, 1 minute and 1 second")]
+    [TestCase("{2:time: {:list:|, | and }}", "en", "2 hours and 2 seconds")]
+    [TestCase("{3:time: {:list:|, | and }}", "en", "3 days and 3 seconds")]
+    [TestCase("{4:time: {:list:|, | and }}", "en", "less than 1 second")]
+    [TestCase("{5:time: {:list:|, | and }}", "en", "5 days")]
+    public void NestedListFormatTest(string format, string language, string expected)
     {
+        var args = GetArgs();
         var smart = GetFormatter();
-        Assert.That(() => smart.Format("{0:time:{}}", DateTime.UtcNow), Throws.Exception.TypeOf<FormattingException>());
+        var actual = smart.Format(CultureInfo.GetCultureInfo(language), format, args);
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]

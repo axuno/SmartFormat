@@ -3,6 +3,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -48,10 +49,27 @@ public static class TimeSpanUtility
     public static string ToTimeString(this TimeSpan fromTime, TimeSpanFormatOptions options,
         TimeTextInfo timeTextInfo)
     {
+        return string.Join(" ", fromTime.ToTimeParts(options, timeTextInfo));
+    }
+
+    /// <summary>
+    /// <para>Turns a TimeSpan into a list of human-readable text parts.</para>
+    /// <para>Uses the specified timeSpanFormatOptions.</para>
+    /// <para>For example: "31.23:59:00.555" = "31 days 23 hours 59 minutes 0 seconds 555 milliseconds"</para>
+    /// </summary>
+    /// <param name="fromTime"></param>
+    /// <param name="options">
+    /// <para>A combination of flags that determine the formatting options.</para>
+    /// <para>These will be combined with the default timeSpanFormatOptions.</para>
+    /// </param>
+    /// <param name="timeTextInfo">An object that supplies the text to use for output</param>
+    public static IList<string> ToTimeParts(this TimeSpan fromTime, TimeSpanFormatOptions options,
+        TimeTextInfo timeTextInfo)
+    {
         // If there are any missing options, merge with the defaults:
         // Also, as a safeguard against missing DefaultFormatOptions, let's also merge with the AbsoluteDefaults:
         options = options.Merge(DefaultFormatOptions).Merge(AbsoluteDefaults);
-            
+
         // Extract the individual options:
         var rangeMax = options.Mask(TimeSpanFormatOptionsPresets.Range).AllFlags().Last();
         _rangeMin = options.Mask(TimeSpanFormatOptionsPresets.Range).AllFlags().First();
@@ -84,8 +102,7 @@ public static class TimeSpanUtility
         }
 
         // Create our result:
-        var textStarted = false;
-        var result = new StringBuilder();
+        var result = new List<string>();
         for (var i = rangeMax; i >= _rangeMin; i = (TimeSpanFormatOptions) ((int) i >> 1))
         {
             // Determine the value and title:
@@ -122,21 +139,19 @@ public static class TimeSpanUtility
             }
 
             //Determine whether to display this value
-            if (!ShouldTruncate(value, textStarted, out var displayThisValue)) continue;
+            if (!ShouldTruncate(value, result.Any(), out var displayThisValue)) continue;
 
-            PrepareOutput(value, i == _rangeMin, textStarted, result, ref displayThisValue);
+            PrepareOutput(value, i == _rangeMin, result.Any(), result, ref displayThisValue);
 
             // Output the value:
             if (displayThisValue)
             {
-                if (textStarted) result.Append(' ');
                 var unitTitle = _timeTextInfo.GetUnitText(i, value, _abbreviate);
-                result.Append(unitTitle);
-                textStarted = true;
+                if (!string.IsNullOrEmpty(unitTitle)) result.Add(unitTitle);
             }
         }
 
-        return result.ToString();
+        return result;
     }
 
     private static bool ShouldTruncate(int value, bool textStarted, out bool displayThisValue)
@@ -163,7 +178,7 @@ public static class TimeSpanUtility
         return false;
     }
 
-    private static void PrepareOutput(int value, bool isRangeMin, bool hasTextStarted, StringBuilder result, ref bool displayThisValue)
+    private static void PrepareOutput(int value, bool isRangeMin, bool hasTextStarted, List<string> result, ref bool displayThisValue)
     {
         // we need to display SOMETHING (even if it's zero)
         if (isRangeMin && !hasTextStarted)
@@ -173,7 +188,7 @@ public static class TimeSpanUtility
             {
                 // Output the "less than 1 unit" text:
                 var unitTitle = _timeTextInfo!.GetUnitText(_rangeMin, 1, _abbreviate);
-                result.Append(_timeTextInfo.GetLessThanText(unitTitle));
+                result.Add(_timeTextInfo.GetLessThanText(unitTitle));
                 displayThisValue = false;
             }
         }

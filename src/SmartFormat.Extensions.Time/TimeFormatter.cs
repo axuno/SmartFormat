@@ -3,7 +3,9 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions.Time.Utilities;
@@ -119,25 +121,37 @@ public class TimeFormatter : IFormatter
     public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
     {
         var format = formattingInfo.Format;
+        var current = formattingInfo.CurrentValue;
+
+        // Now we have to check for a nested format.
+        // That is the one needed for the ListFormatter
+        var timeParts = GetTimeParts(formattingInfo);
+        if (timeParts is null) return false;
+
+        if (format is { Length: > 0, HasNested: true })
+        {
+            current = timeParts; // must be an IList to work with ListFormatter
+
+            format.Items.RemoveAt(0); // That's the format for the TimeFormatter
+            formattingInfo.FormatAsChild(format, current);
+            return true;
+        }
+
+        formattingInfo.Write(string.Join(" ", timeParts));
+        return true;
+    }
+
+    private IList<string>? GetTimeParts(IFormattingInfo formattingInfo)
+    {
+        var format = formattingInfo.Format;
         var formatterName = formattingInfo.Placeholder?.FormatterName ?? string.Empty;
         var current = formattingInfo.CurrentValue;
 
-        // Check whether arguments can be handled by this formatter
-        if (format is {HasNested: true})
-        {
-            // Auto detection calls just return a failure to evaluate
-            if(formatterName == string.Empty)
-                return false;
-                
-            // throw, if the formatter has been called explicitly
-            throw new FormatException($"Formatter named '{formatterName}' cannot handle nested formats.");
-        }
-            
         var options = formattingInfo.FormatterOptions.Trim();
         var formatText = format?.RawText.Trim() ?? string.Empty;
 
         // Not clear, whether we can process this format
-        if (formatterName == string.Empty && options == string.Empty && formatText == string.Empty) return false;
+        if (formatterName == string.Empty && options == string.Empty && formatText == string.Empty) return null;
 
         // In SmartFormat 2.x, the format could be included in options, with empty format.
         // Using compatibility with v2, there is no reliable way to set a language as an option
@@ -145,12 +159,12 @@ public class TimeFormatter : IFormatter
         var formattingOptions = v2Compatibility ? options : formatText;
 
         var fromTime = GetFromTime(current, formattingOptions);
-            
+
         if (fromTime is null)
         {
             // Auto detection calls just return a failure to evaluate
             if (formatterName == string.Empty)
-                return false;
+                return null;
 
             // throw, if the formatter has been called explicitly
             throw new FormatException(
@@ -158,11 +172,9 @@ public class TimeFormatter : IFormatter
         }
 
         var timeTextInfo = GetTimeTextInfo(formattingInfo, v2Compatibility);
-            
+
         var timeSpanFormatOptions = TimeSpanFormatOptionsConverter.Parse(v2Compatibility ? options : formatText);
-        var timeString = fromTime.Value.ToTimeString(timeSpanFormatOptions, timeTextInfo);
-        formattingInfo.Write(timeString);
-        return true;
+        return fromTime.Value.ToTimeParts(timeSpanFormatOptions, timeTextInfo);
     }
 
     private static TimeSpan? GetFromTime(object? current, string? formattingOptions)
