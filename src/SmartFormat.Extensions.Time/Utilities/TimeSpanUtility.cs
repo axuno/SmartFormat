@@ -49,10 +49,27 @@ public static class TimeSpanUtility
     public static string ToTimeString(this TimeSpan fromTime, TimeSpanFormatOptions options,
         TimeTextInfo timeTextInfo)
     {
+        return string.Join(" ", fromTime.ToTimeParts(options, timeTextInfo));
+    }
+
+    /// <summary>
+    /// <para>Turns a TimeSpan into a list of human-readable text parts.</para>
+    /// <para>Uses the specified timeSpanFormatOptions.</para>
+    /// <para>For example: "31.23:59:00.555" = "31 days 23 hours 59 minutes 0 seconds 555 milliseconds"</para>
+    /// </summary>
+    /// <param name="fromTime"></param>
+    /// <param name="options">
+    /// <para>A combination of flags that determine the formatting options.</para>
+    /// <para>These will be combined with the default timeSpanFormatOptions.</para>
+    /// </param>
+    /// <param name="timeTextInfo">An object that supplies the text to use for output</param>
+    public static IList<string> ToTimeParts(this TimeSpan fromTime, TimeSpanFormatOptions options,
+        TimeTextInfo timeTextInfo)
+    {
         // If there are any missing options, merge with the defaults:
         // Also, as a safeguard against missing DefaultFormatOptions, let's also merge with the AbsoluteDefaults:
         options = options.Merge(DefaultFormatOptions).Merge(AbsoluteDefaults);
-            
+
         // Extract the individual options:
         var rangeMax = options.Mask(TimeSpanFormatOptionsPresets.Range).AllFlags().Last();
         _rangeMin = options.Mask(TimeSpanFormatOptionsPresets.Range).AllFlags().First();
@@ -134,16 +151,7 @@ public static class TimeSpanUtility
             }
         }
 
-        var resultString = new StringBuilder();
-        for (var i = 0; i < result.Count; i++)
-        {
-            if (i > 0)
-                resultString.Append(_timeTextInfo.GetSeparatorText(i, result.Count));
-
-            resultString.Append(result[i]);
-        }
-
-        return resultString.ToString();
+        return result;
     }
 
     private static bool ShouldTruncate(int value, bool textStarted, out bool displayThisValue)
