@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using SmartFormat.Core.Extensions;
@@ -24,13 +25,14 @@ public class TimeFormatter : IFormatter
     /// Obsolete. <see cref="IFormatter"/>s only have one unique name.
     /// </summary>
     [Obsolete("Use property \"Name\" instead", true)]
+    [ExcludeFromCodeCoverage]
     public string[] Names { get; set; } = {"timespan", "time", string.Empty};
 
     ///<inheritdoc/>
     public string Name { get; set; } = "time";
 
     ///<inheritdoc/>
-    public bool CanAutoDetect { get; set; } = true;
+    public bool CanAutoDetect { get; set; } = false;
 
     #region Constructors
 
@@ -60,6 +62,7 @@ public class TimeFormatter : IFormatter
     /// <see cref="TimeFormatter"/> makes use of <see cref="PluralRules"/> and <see cref="PluralLocalizationFormatter"/>.
     /// </remarks>
     [Obsolete("This constructor is not required. Changed process to determine the default culture.", true)]
+    [ExcludeFromCodeCoverage]   
     public TimeFormatter(string defaultTwoLetterLanguageName)
     {
         if (CommonLanguagesTimeTextInfo.GetTimeTextInfo(defaultTwoLetterLanguageName) == null)
@@ -111,6 +114,7 @@ public class TimeFormatter : IFormatter
     /// 3. The <see cref="CultureInfo.CurrentUICulture"/>.<br/>
     /// </remarks>
     [Obsolete("This property is not supported any more. Changed process to get or set the default culture.", true)]
+    [ExcludeFromCodeCoverage]
     public string DefaultTwoLetterISOLanguageName { get; set; } = "en";
 
     #endregion
@@ -121,19 +125,37 @@ public class TimeFormatter : IFormatter
     public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
     {
         var format = formattingInfo.Format;
-        var current = formattingInfo.CurrentValue;
+
+        // Auto-detection calls just return a failure to evaluate
+        if (string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName))
+            return false;
+
+#if NET6_0_OR_GREATER
+        if (formattingInfo.CurrentValue is not (TimeSpan or DateTime or DateTimeOffset or TimeOnly))
+            throw new FormattingException(formattingInfo.Format?.Items.FirstOrDefault(),
+                $"'{nameof(TimeFormatter)}' can only process types of " +
+                $"{nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}, {nameof(TimeOnly)}, " +
+                $"but not '{formattingInfo.CurrentValue?.GetType()}'", 0);
+#else
+        if (formattingInfo.CurrentValue is not (TimeSpan or DateTime or DateTimeOffset))
+            throw new FormattingException(formattingInfo.Format?.Items.FirstOrDefault(),
+                $"'{nameof(TimeFormatter)}' can only process types of " +
+                $"{nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}, " +
+                $"but not '{formattingInfo.CurrentValue?.GetType()}'", 0);
+#endif
 
         // Now we have to check for a nested format.
         // That is the one needed for the ListFormatter
         var timeParts = GetTimeParts(formattingInfo);
         if (timeParts is null) return false;
 
-        if (format is { Length: > 0, HasNested: true })
+        if (format is { Length: > 1, HasNested: true })
         {
-            current = timeParts; // must be an IList to work with ListFormatter
-
-            format.Items.RemoveAt(0); // That's the format for the TimeFormatter
-            formattingInfo.FormatAsChild(format, current);
+            // Remove the format for the TimeFormatter
+            format.Items.RemoveAt(0);
+            // Try to invoke the child format - usually the ListFormatter
+            // to format the list of time parts
+            formattingInfo.FormatAsChild(format, timeParts);
             return true;
         }
 
@@ -145,39 +167,28 @@ public class TimeFormatter : IFormatter
     {
         var format = formattingInfo.Format;
         var formatterName = formattingInfo.Placeholder?.FormatterName ?? string.Empty;
+
         var current = formattingInfo.CurrentValue;
 
         var options = formattingInfo.FormatterOptions.Trim();
         var formatText = format?.RawText.Trim() ?? string.Empty;
-
-        // Not clear, whether we can process this format
-        if (formatterName == string.Empty && options == string.Empty && formatText == string.Empty) return null;
 
         // In SmartFormat 2.x, the format could be included in options, with empty format.
         // Using compatibility with v2, there is no reliable way to set a language as an option
         var v2Compatibility = options != string.Empty && formatText == string.Empty;
         var formattingOptions = v2Compatibility ? options : formatText;
 
-        var fromTime = GetFromTime(current, formattingOptions);
+        var fromTime = GetFromTime(current);
 
-        if (fromTime is null)
-        {
-            // Auto detection calls just return a failure to evaluate
-            if (formatterName == string.Empty)
-                return null;
-
-            // throw, if the formatter has been called explicitly
-            throw new FormatException(
-                $"Formatter named '{formatterName}' can only process types of {nameof(TimeSpan)}, {nameof(DateTime)}, {nameof(DateTimeOffset)}");
-        }
+        if (fromTime == null) return null;
 
         var timeTextInfo = GetTimeTextInfo(formattingInfo, v2Compatibility);
 
-        var timeSpanFormatOptions = TimeSpanFormatOptionsConverter.Parse(v2Compatibility ? options : formatText);
+        var timeSpanFormatOptions = TimeSpanFormatOptionsConverter.Parse(formattingOptions);
         return fromTime.Value.ToTimeParts(timeSpanFormatOptions, timeTextInfo);
     }
 
-    private static TimeSpan? GetFromTime(object? current, string? formattingOptions)
+    private static TimeSpan? GetFromTime(object? current)
     {
         TimeSpan? fromTime = null;
 
@@ -186,17 +197,16 @@ public class TimeFormatter : IFormatter
             case TimeSpan timeSpan:
                 fromTime = timeSpan;
                 break;
+#if NET6_0_OR_GREATER
+            case TimeOnly timeOnly:
+                fromTime = timeOnly.ToTimeSpan();
+                break;
+#endif
             case DateTime dateTime:
-                if (formattingOptions != string.Empty)
-                {
-                    fromTime = SystemTime.Now().ToUniversalTime().Subtract(dateTime.ToUniversalTime());
-                }
+                fromTime = SystemTime.Now().ToUniversalTime().Subtract(dateTime.ToUniversalTime());
                 break;
             case DateTimeOffset dateTimeOffset:
-                if (formattingOptions != string.Empty)
-                {
-                    fromTime = SystemTime.OffsetNow().UtcDateTime.Subtract(dateTimeOffset.UtcDateTime);
-                }
+                fromTime = SystemTime.OffsetNow().UtcDateTime.Subtract(dateTimeOffset.UtcDateTime);
                 break;
         }
 
@@ -224,7 +234,7 @@ public class TimeFormatter : IFormatter
         throw new ArgumentException($"{nameof(TimeTextInfo)} could not be found for the given {nameof(IFormatProvider)}.", nameof(formattingInfo));
     }
 
-    #endregion
+#endregion
 
     private static CultureInfo GetCultureInfo(IFormattingInfo formattingInfo, bool v2Compatibility)
     {

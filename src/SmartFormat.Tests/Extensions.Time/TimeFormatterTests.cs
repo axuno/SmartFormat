@@ -5,7 +5,6 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
 using SmartFormat.Extensions.Time.Utilities;
-using SmartFormat.Tests.TestUtils;
 using SmartFormat.Utilities;
 
 namespace SmartFormat.Tests.Extensions;
@@ -42,7 +41,7 @@ public class TimeFormatterTests
     }
 
     [Test]
-    public void UseTimeFormatter_WithIllegalLanguage()
+    public void UseTimeFormatter_WithUnsupportedLanguage()
     {
         var smart = GetFormatter();
         var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
@@ -72,23 +71,8 @@ public class TimeFormatterTests
         Assert.That(ex, Is.InstanceOf<Exception>().And.Message.Contains(nameof(TimeTextInfo)));
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public void UseTimeFormatter_With_Unimplemented_Language(bool useFallbackLanguage)
-    {
-        var smart = GetFormatter();
-        var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
-        timeFormatter.FallbackLanguage = useFallbackLanguage ? "en" : string.Empty;
-
-        if(useFallbackLanguage)
-            Assert.That(() => smart.Format("{0:time(nl):noless}", new TimeSpan(1,2,3)), Throws.Nothing);
-        else
-            Assert.That(() => smart.Format("{0:time(nl):noless}", new TimeSpan(1,2,3)), Throws.TypeOf<FormattingException>().And.Message.Contains(nameof(TimeTextInfo)));
-    }
-
-
     [Test]
-    public void UseTimeFormatter_WithLegalLanguage()
+    public void UseTimeFormatter_WithSupportedlLanguage()
     {
         var smart = GetFormatter();
 
@@ -96,11 +80,33 @@ public class TimeFormatterTests
         Assert.DoesNotThrow(() => smart.Format(CultureInfo.GetCultureInfo("en"), "{0:time:noless}", new TimeSpan(1,2,3)));
     }
 
-    [Test]
-    public void Explicit_Formatter_With_Unsupported_ArgType_Should_Throw()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void UseTimeFormatter_With_Unimplemented_FallbackLanguage(bool useFallbackLanguage)
     {
         var smart = GetFormatter();
-        Assert.That(() => smart.Format("{0:time:}", DateTime.UtcNow), Throws.Exception.TypeOf<FormattingException>());
+        var timeFormatter = smart.GetFormatterExtension<TimeFormatter>()!;
+        timeFormatter.FallbackLanguage = useFallbackLanguage ? "en" : string.Empty;
+
+        if (useFallbackLanguage)
+            Assert.That(() => smart.Format("{0:time(nl):noless}", new TimeSpan(1, 2, 3)), Throws.Nothing);
+        else
+            Assert.That(() => smart.Format("{0:time(nl):noless}", new TimeSpan(1, 2, 3)), Throws.TypeOf<FormattingException>().And.Message.Contains(nameof(TimeTextInfo)));
+    }
+
+    [Test]
+    public void Explicit_Formatter_With_UnsupportedArgType_Should_Throw()
+    {
+        var smart = GetFormatter();
+        // Arrays are not supported
+        Assert.That(() => smart.Format("{0:time:}", Array.Empty<TimeSpan>()), Throws.Exception.TypeOf<FormattingException>());
+    }
+
+    [Test]
+    public void Formatter_ReturnsFalse_For_Implicit_Invocation()
+    {
+        var tf = new TimeFormatter();
+        Assert.That(tf.TryEvaluateFormat(new FormattingInfo()), Is.False);
     }
 
     [TestCase("{0:time: {:list:|, | and }}", "en", "less than 1 second")]
@@ -171,6 +177,28 @@ public class TimeFormatterTests
         Assert.That(actual, Is.EqualTo(expected));
     }
 
+    [Test]
+    public void TimeSpanRoundedToString()
+    {
+        var tsInfo = CommonLanguagesTimeTextInfo.GetTimeTextInfo("en")!;
+        var result = new TimeSpan(0, 23, 0, 0)
+            .Round(TimeSpan.FromDays(1).Ticks).ToTimeString(TimeSpanFormatOptions.None, tsInfo);
+
+        Assert.That(result, Is.EqualTo("1 day"));
+    }
+
+#if NET6_0_OR_GREATER
+    [Test]
+    public void TimeOnlyArgument()
+    {
+        var args = GetArgs();
+        var smart = GetFormatter();
+
+        var actual = smart.Format("{0:time(en):noless}", new TimeOnly(13, 12, 11));
+        Assert.That(actual, Is.EqualTo("13 hours 12 minutes 11 seconds"));
+    }
+#endif
+
     [TestCase(0)]
     [TestCase(12)]
     [TestCase(23)]
@@ -198,6 +226,32 @@ public class TimeFormatterTests
         // Make sure that logic for TimeSpan and DateTime arguments are the same
         Assert.That(actual, Is.EqualTo(smart.Format(format, now - dateTime)));
             
+        SystemTime.ResetDateTime();
+    }
+
+    [Test]
+    public void DateTimeOffset_As_Argument_Should_FormatAsTimeSpan_ToLocaltime()
+    {
+        var smart = GetFormatter();
+        var dateTimeOffset = new DateTimeOffset(2025, 1, 1, 12, 0, 0, TimeSpan.Zero);
+        SystemTime.SetDateTimeOffset(dateTimeOffset.AddDays(1));
+        var format = "{0:time(en):abbr hours noless:}";
+
+        var actual = smart.Format(format, dateTimeOffset);
+        Assert.That(actual, Is.EqualTo("24h"));
+        SystemTime.ResetDateTime();
+    }
+
+    [Test]
+    public void DateTime_As_Argument_Should_FormatAsTimeSpan_ToLocaltime()
+    {
+        var smart = GetFormatter();
+        var dateTime = new DateTime(2025, 1, 1, 12, 0, 0, DateTimeKind.Unspecified);
+        SystemTime.SetDateTime(dateTime.AddDays(5));
+        var format = "{0:time(en):abbr days noless:}";
+
+        var actual = smart.Format(format, dateTime);
+        Assert.That(actual, Is.EqualTo("5d"));
         SystemTime.ResetDateTime();
     }
 
