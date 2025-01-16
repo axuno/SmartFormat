@@ -163,7 +163,7 @@ public class ParserTests
             Assert.That(parsed.Items[0].RawText, Is.EqualTo("Hello, I'm "), "Literal text");
             Assert.That(parsed.Items[1].RawText, Is.EqualTo(string.Empty), "Erroneous placeholder");
             Assert.That(parsed.Items[2].RawText, Is.EqualTo(" "));
-            Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)));
+            Assert.That(parsed.Items[3], Is.TypeOf<Placeholder>());
         });
         Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"), "Correct placeholder");
     }
@@ -188,12 +188,12 @@ public class ParserTests
         });
         if (lastItemIsPlaceholder)
         {
-            Assert.That(parsed.Items[3], Is.TypeOf(typeof(Placeholder)), "Last item should be Placeholder");
+            Assert.That(parsed.Items[3], Is.TypeOf<Placeholder>(), "Last item should be Placeholder");
             Assert.That(parsed.Items[3].RawText, Does.Contain("{Street}"));
         }
         else
         {
-            Assert.That(parsed.Items[3], Is.TypeOf(typeof(LiteralText)), "Last item should be LiteralText");
+            Assert.That(parsed.Items[3], Is.TypeOf<LiteralText>(), "Last item should be LiteralText");
             Assert.That(parsed.Items[3].RawText, Does.Contain("{Street"));
         }
     }
@@ -458,7 +458,7 @@ public class ParserTests
         var format = "{0:yyyy/MM/dd HH:mm:ss";
 
         Assert.That(() => parser.ParseFormat(format),
-            Throws.Exception.InstanceOf(typeof(ParsingErrors)).And.Message
+            Throws.Exception.InstanceOf<ParsingErrors>().And.Message
                 .Contains(new Parser.ParsingErrorText()[Parser.ParsingError.MissingClosingBrace]));
     }
         
@@ -533,7 +533,7 @@ public class ParserTests
         var result = parser.ParseFormat(formatString);
 
         var literal = result.Items[itemIndex];
-        Assert.That(literal, Is.TypeOf(typeof(LiteralText)));
+        Assert.That(literal, Is.TypeOf<LiteralText>());
         Assert.That(literal.BaseString.Substring(literal.StartIndex, literal.Length), Is.EqualTo(unicodeLiteral));
             
         if(isLegal) 

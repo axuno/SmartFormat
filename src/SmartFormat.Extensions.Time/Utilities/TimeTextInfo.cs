@@ -83,11 +83,11 @@ public class TimeTextInfo
     /// </summary>
     public string[] Ptxt_week { get; set;} = Array.Empty<string>();
 
-    private static string GetValue(PluralRules.PluralRuleDelegate pluralRule, int value, IReadOnlyList<string> units)
+    private static string GetValue(PluralRules.PluralRuleDelegate pluralRule, int value, string[] units)
     {
         // Get the plural index from the plural rule,
         // unless there's only 1 unit in the first place:
-        var pluralIndex = units.Count == 1 ? 0 : pluralRule(value, units.Count);
+        var pluralIndex = units.Length == 1 ? 0 : pluralRule(value, units.Length);
         return string.Format(units[pluralIndex], value);
     }
 

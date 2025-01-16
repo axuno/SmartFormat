@@ -282,7 +282,7 @@ public class EvaluatorTests
 
     #region ** Helpers **
 
-    private static void ExecuteFormattingAction(SmartFormatter formatter, IFormatProvider? provider, Format formatParsed, IList<object?> args, IOutput output, Action<FormattingInfo> doWork)
+    private static void ExecuteFormattingAction(SmartFormatter formatter, IFormatProvider? provider, Format formatParsed, List<object?> args, IOutput output, Action<FormattingInfo> doWork)
     {
         // The first item is the default and will be used for the action,
         // but all args go to FormatDetails.OriginalArgs

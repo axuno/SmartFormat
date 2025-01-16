@@ -105,7 +105,7 @@ public class ReflectionSourceTests
         var smart = GetFormatter();
 
         var args = GetArgs();
-        Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("ToLower"));
+        Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf<FormattingException>().And.Message.Contains("ToLower"));
     }
 
     /// <summary>
@@ -119,28 +119,28 @@ public class ReflectionSourceTests
         var format = "{0} {0.ToLower} {toloWer} {touPPer}";
         //var expected = "Zero zero zero ZERO";
         var args = GetArgs();
-        Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("ToLower"));
+        Assert.That(() => smart.Format(format, args), Throws.Exception.TypeOf<FormattingException>().And.Message.Contains("ToLower"));
     }
 
     [Test]
     public void Void_Methods_Should_Just_Be_Ignored()
     {
         var smart = GetFormatter();
-        Assert.That(() => smart.Format("{0.Clear}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Clear"));
+        Assert.That(() => smart.Format("{0.Clear}", smart.SourceExtensions), Throws.Exception.TypeOf<FormattingException>().And.Message.Contains("Clear"));
     }
 
     [Test]
     public void Methods_With_Parameter_Should_Just_Be_Ignored()
     {
         var smart = GetFormatter();
-        Assert.That(() => smart.Format("{0.Add}", smart.SourceExtensions), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("Add"));
+        Assert.That(() => smart.Format("{0.Add}", smart.SourceExtensions), Throws.Exception.TypeOf<FormattingException>().And.Message.Contains("Add"));
     }
 
     [Test]
     public void Properties_With_No_Getter_Should_Just_Be_Ignored()
     {
         var smart = GetFormatter();
-        Assert.That(() => smart.Format("{Misc.OnlySetterProperty}", new { Misc = new MiscObject() }), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("OnlySetterProperty"));
+        Assert.That(() => smart.Format("{Misc.OnlySetterProperty}", new { Misc = new MiscObject() }), Throws.Exception.TypeOf<FormattingException>().And.Message.Contains("OnlySetterProperty"));
     }
         
 
