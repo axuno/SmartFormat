@@ -58,7 +58,7 @@ internal class SplitList : IList<Format>
     {
         get
         {
-            if (index > _splits.Count) throw new ArgumentOutOfRangeException(nameof(index));
+            if (index > _splits.Count) throw new ArgumentOutOfRangeException(nameof(index)); //NOSONAR - ArgumentOutOfRangeException.ThrowIfGreaterThan < net5.0
 
             if (_splits.Count == 0) return _format;
 

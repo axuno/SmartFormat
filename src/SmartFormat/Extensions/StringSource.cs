@@ -88,7 +88,7 @@ public class StringSource : Source
         return method.Invoke(selectorInfo, currentValue);
     }
 
-    private bool Length(ISelectorInfo selectorInfo, string currentValue)
+    private static bool Length(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = currentValue.Length;
         return true;
@@ -100,7 +100,7 @@ public class StringSource : Source
         return true;
     }
 
-    private bool ToUpperInvariant(ISelectorInfo selectorInfo, string currentValue)
+    private static bool ToUpperInvariant(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = currentValue.ToUpperInvariant();
         return true;
@@ -112,30 +112,30 @@ public class StringSource : Source
         return true;
     }
 
-    private bool ToLowerInvariant(ISelectorInfo selectorInfo, string currentValue)
+    private static bool ToLowerInvariant(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = currentValue.ToLowerInvariant();
         return true;
     }
 
-    private bool Trim(ISelectorInfo selectorInfo, string currentValue)
+    private static bool Trim(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = currentValue.Trim();
         return true;
     }
 
-    private bool TrimStart(ISelectorInfo selectorInfo, string currentValue)
+    private static bool TrimStart(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = currentValue.TrimStart();
         return true;
     }
 
-    private bool TrimEnd(ISelectorInfo selectorInfo, string currentValue)
+    private static bool TrimEnd(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = currentValue.TrimEnd();
         return true;
     }
-    private bool ToCharArray(ISelectorInfo selectorInfo, string currentValue)
+    private static bool ToCharArray(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result =currentValue.ToCharArray();
         return true;
@@ -190,13 +190,13 @@ public class StringSource : Source
         return true;
     }
 
-    private bool ToBase64(ISelectorInfo selectorInfo, string currentValue)
+    private static bool ToBase64(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = Convert.ToBase64String(Encoding.UTF8.GetBytes(currentValue));
         return true;
     }
 
-    private bool FromBase64(ISelectorInfo selectorInfo, string currentValue)
+    private static bool FromBase64(ISelectorInfo selectorInfo, string currentValue)
     {
         selectorInfo.Result = Encoding.UTF8.GetString(Convert.FromBase64String(currentValue));
         return true;

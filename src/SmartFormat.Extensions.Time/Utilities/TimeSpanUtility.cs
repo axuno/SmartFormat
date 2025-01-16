@@ -139,9 +139,9 @@ public static class TimeSpanUtility
             }
 
             //Determine whether to display this value
-            if (!ShouldTruncate(value, result.Any(), out var displayThisValue)) continue;
+            if (!ShouldTruncate(value, result.Count != 0, out var displayThisValue)) continue;
 
-            PrepareOutput(value, i == _rangeMin, result.Any(), result, ref displayThisValue);
+            PrepareOutput(value, i == _rangeMin, result.Count != 0, result, ref displayThisValue);
 
             // Output the value:
             if (displayThisValue)

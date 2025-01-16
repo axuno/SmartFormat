@@ -11,7 +11,7 @@ public class PoolPolicyTests
     public void Illegal_Pool_Size_Should_Throw()
     {
         Assert.That(() => new PoolPolicy<object> { MaximumPoolSize = 0 },
-            Throws.InstanceOf(typeof(PoolingException))
+            Throws.InstanceOf<PoolingException>()
                 .And
                 .Property(nameof(PoolingException.PoolType))
                 .EqualTo(typeof(object)));

@@ -166,8 +166,6 @@ public class TimeFormatter : IFormatter
     private IList<string>? GetTimeParts(IFormattingInfo formattingInfo)
     {
         var format = formattingInfo.Format;
-        var formatterName = formattingInfo.Placeholder?.FormatterName ?? string.Empty;
-
         var current = formattingInfo.CurrentValue;
 
         var options = formattingInfo.FormatterOptions.Trim();

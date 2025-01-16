@@ -244,7 +244,7 @@ public class FormatterTests
         var firstExtension = new DefaultFormatter();
         formatter.AddExtensions(firstExtension);
         var dupeExtension = new NullFormatter {Name = firstExtension.Name};
-        Assert.That(() => formatter.AddExtensions(dupeExtension), Throws.TypeOf(typeof(ArgumentException)));
+        Assert.That(() => formatter.AddExtensions(dupeExtension), Throws.TypeOf<ArgumentException>());
     }
 
     [Test]
@@ -296,7 +296,7 @@ public class FormatterTests
         Assert.Multiple(() =>
         {
             Assert.That(formatter.GetSourceExtensions(), Has.Count.EqualTo(formatter.SourceExtensions.Count));
-            Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf(typeof(DefaultSource)));
+            Assert.That(formatter.GetSourceExtension<DefaultSource>(), Is.InstanceOf<DefaultSource>());
         });
         ;
     }
@@ -308,7 +308,7 @@ public class FormatterTests
         Assert.Multiple(() =>
         {
             Assert.That(formatter.GetFormatterExtensions(), Has.Count.EqualTo(formatter.FormatterExtensions.Count));
-            Assert.That(formatter.GetFormatterExtension<DefaultFormatter>(), Is.InstanceOf(typeof(DefaultFormatter)));
+            Assert.That(formatter.GetFormatterExtension<DefaultFormatter>(), Is.InstanceOf<DefaultFormatter>());
         });
     }
 
@@ -316,7 +316,7 @@ public class FormatterTests
     public void Not_Existing_Formatter_Name_Should_Throw()
     {
         var smart = GetSimpleFormatter();
-        Assert.That(() => smart.Format("{0:not_existing_formatter_name:}", new object()), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains("not_existing_formatter_name"));
+        Assert.That(() => smart.Format("{0:not_existing_formatter_name:}", new object()), Throws.Exception.TypeOf<FormattingException>().And.Message.Contains("not_existing_formatter_name"));
     }
 
     [Test]

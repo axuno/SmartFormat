@@ -91,18 +91,16 @@ public class Address
     public static States ParseState(string state)
     {
         // See if the abbreviation matches one of the states:
-        States result = States.Unknown;
+        var result = States.Unknown;
         if (AbbreviationAttribute.TryFindAbbreviation<States>(state, true, ref result))
             return result;
 
         // Try to parse the full state name:
-        try {
-            return (States)Enum.Parse(typeof(States), state, true);
-        } catch {
-            // Couldn't parse the full state name!
-            return States.Unknown;
-        }
+        if (Enum.TryParse(state, out result))
+            return result;
 
+        // Couldn't parse the full state name!
+        return States.Unknown;
     }
     #endregion
 

@@ -70,7 +70,7 @@ public class StringSourceTests
     {
         var smart = GetSimpleFormatter();
         var format = $"{{0.{selector}}}";
-        Assert.That(() => smart.Format(format, "dummy"), Throws.Exception.TypeOf(typeof(FormattingException)).And.Message.Contains($"selector named \"{selector}\""));
+        Assert.That(() => smart.Format(format, "dummy"), Throws.Exception.TypeOf<FormattingException>().And.Message.Contains($"selector named \"{selector}\""));
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class StringSourceTests
     {
         var smart = GetSimpleFormatter();
         var format = "{0.FromBase64}";
-        Assert.That(() => smart.Format(format, "dummy"), Throws.Exception.TypeOf(typeof(FormattingException)));
+        Assert.That(() => smart.Format(format, "dummy"), Throws.Exception.TypeOf<FormattingException>());
     }
 
 

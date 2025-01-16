@@ -63,7 +63,7 @@ public class ValueTupleSourceTests
         else
         {
             Assert.That(() => formatter.Format(format, (dict1, dict2, addr)),
-                Throws.Exception.TypeOf(typeof(FormattingException)));
+                Throws.Exception.TypeOf<FormattingException>());
         }
     }
 
