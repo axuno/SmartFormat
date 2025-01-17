@@ -17,8 +17,8 @@ jobs:
     # (PRs from forks can't access secrets other than secrets.GITHUB_TOKEN for security reasons)
     if: ${{ !github.event.pull_request.head.repo.fork }}
     env:
-      version: '3.5.2'
-      versionFile: '3.5.2'
+      version: '3.5.3'
+      versionFile: '3.5.3'
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -53,7 +53,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ github.event.repository.owner.login }}_SmartFormat" /o:"${{ github.event.repository.owner.login }}" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="**/SmartFormat.ZString/**/*" /d:sonar.cs.opencover.reportsPaths="./src/SmartFormat.Tests/**/coverage*.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ github.event.repository.owner.login }}_SmartFormat" /o:"${{ github.event.repository.owner.login }}" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.scanner.scanAll=false /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="**/SmartFormat.ZString/**/*" /d:sonar.cs.opencover.reportsPaths="./src/SmartFormat.Tests/**/coverage*.xml"
           dotnet sln ./src/SmartFormat.sln remove ./src/Demo/Demo.csproj
           dotnet add ./src/SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
           dotnet restore ./src/SmartFormat.sln

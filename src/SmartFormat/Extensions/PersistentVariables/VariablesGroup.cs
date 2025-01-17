@@ -123,11 +123,7 @@ public class VariablesGroup : IVariablesGroup, IVariable, IDictionary<string, IV
     /// <returns><see langword="true"/> if a variable with the specified name was removed, <see langword="false"/> if one was not.</returns>
     public bool Remove(string name)
     {
-        if (_variableLookup.TryGetValue(name, out var v))
-        {
-            return _variableLookup.Remove(name);
-        }
-        return false;
+        return _variableLookup.Remove(name);
     }
 
     /// <summary>
