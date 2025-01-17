@@ -49,7 +49,7 @@ public class PluralLocalizationFormatter : IFormatter
     }
 
     /// <summary>
-    /// Gets or sets the two letter ISO language name.
+    /// Gets or sets the two-letter ISO language name.
     /// </summary>
     /// <remarks>
     /// Culture is now determined in this sequence:<br/>
@@ -79,7 +79,7 @@ public class PluralLocalizationFormatter : IFormatter
     /// With <see cref="CanAutoDetect"/> == <see langword="false"/>, the formatter can only be
     /// called by its name in the input format string.
     /// <para/>
-    /// <b>Auto detection only works with more than 1 format argument.
+    /// <b>Auto-detection only works with more than 1 format argument.
     /// It is recommended to set <see cref="CanAutoDetect"/> to <see langword="false"/>. This will be the default in a future version.
     /// </b>
     /// </summary>
@@ -111,8 +111,8 @@ public class PluralLocalizationFormatter : IFormatter
 
         var useAutoDetection = string.IsNullOrEmpty(formattingInfo.Placeholder?.FormatterName);
 
-        // This extension requires at least two plural words for auto detection
-        // Valid types for auto detection are checked later
+        // This extension requires at least two plural words for auto-detection
+        // Valid types for auto-detection are checked later
         if (useAutoDetection && pluralWords.Count <= 1) return false;
 
         decimal value;
@@ -133,7 +133,7 @@ public class PluralLocalizationFormatter : IFormatter
                 break;
             default:
             {
-                // Auto detection calls just return a failure to evaluate
+                // Auto-detection calls just return a failure to evaluate
                 if (useAutoDetection) return false;
 
                 // throw, if the formatter has been called explicitly
@@ -150,7 +150,7 @@ public class PluralLocalizationFormatter : IFormatter
 
         if (pluralIndex < 0 || pluralWords.Count <= pluralIndex)
             throw new FormattingException(format, $"Invalid number of plural parameters in {nameof(PluralLocalizationFormatter)}",
-                pluralWords.Last().EndIndex);
+                pluralWords.Count - 1);
 
         // Output the selected word (allowing for nested formats):
         var pluralForm = pluralWords[pluralIndex];

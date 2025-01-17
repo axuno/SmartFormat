@@ -139,13 +139,7 @@ public class PersistentVariablesSource : Source, IDictionary<string, VariablesGr
     /// <returns><see langword="true"/> if a <see cref="VariablesGroup"/> with a matching name was found and removed, or <see langword="true"/> if one was not.</returns>
     public bool Remove(string name)
     {
-        if (GroupLookup.TryGetValue(name, out var v))
-        {
-            GroupLookup.Remove(name);
-            return true;
-        }
-
-        return false;
+        return GroupLookup.Remove(name);
     }
 
     /// <inheritdoc cref="Remove(string)"/>
