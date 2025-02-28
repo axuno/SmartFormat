@@ -18,7 +18,12 @@ namespace SmartFormat;
 /// </summary>
 public static class Smart
 {
-    [ThreadStatic] // creates isolated versions of the formatter in each thread
+    /// <summary>
+    /// Creates isolated versions of the formatter in each thread.
+    /// This is required, because even if Smart.Default.Format(string, object?[]) is thread-safe,
+    /// other methods like Smart.Default.Extensions.Remove(...) are not.
+    /// </summary>
+    [ThreadStatic]
     private static SmartFormatter? _formatter;
 
     #region: Smart.Format :

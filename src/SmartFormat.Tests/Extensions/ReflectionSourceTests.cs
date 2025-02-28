@@ -302,13 +302,14 @@ public class ReflectionSourceTests
         var options = new ParallelOptions { MaxDegreeOfParallelism = 100 };
         ReflectionSource.TypeCache.Clear();
 
+        // Use a single instance of SmartFormatter that is thread-safe
+        var smart = new SmartFormatter()
+            .AddExtensions(new DefaultSource(), new ReflectionSource())
+            .AddExtensions(new DefaultFormatter());
+
         Assert.That(code: () =>
             Parallel.For(0L, 1000, options, (i, loopState) =>
             {
-                var smart = new SmartFormatter()
-                    .AddExtensions(new DefaultSource(), new ReflectionSource())
-                    .AddExtensions(new DefaultFormatter());
-
                 var args = new { Data = new { Value = i} };
 
                 // register unique thread ids

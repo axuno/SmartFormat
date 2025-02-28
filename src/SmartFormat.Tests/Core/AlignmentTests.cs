@@ -52,7 +52,7 @@ public class AlignmentTests
         var smart = GetSimpleFormatter();
         string? name = null;
         var obj = new { name };
-        var result = GetSimpleFormatter().Format("Name: {name,-10}| Column 2", obj);
+        var result = smart.Format("Name: {name,-10}| Column 2", obj);
         Assert.That(result, Is.EqualTo("Name:           | Column 2"));
     }
 
