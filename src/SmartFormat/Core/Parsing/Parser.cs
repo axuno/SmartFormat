@@ -15,7 +15,7 @@ namespace SmartFormat.Core.Parsing;
 /// </summary>
 public class Parser
 {
-    private const int PositionUndefined = -1;
+    private const int PositionUndefined = ParserState.IndexContainer.PositionUndefined;
     private readonly ParsingErrorText _parsingErrorText = new ();
 
     #region: Settings :
@@ -146,96 +146,19 @@ public class Parser
     #region: Parsing :
 
     /// <summary>
-    /// The Container for indexes pointing to positions within the input format.
-    /// </summary>
-    private sealed record IndexContainer
-    {
-        /// <summary>
-        /// The length of the target object, where indexes will be used.
-        /// E.g.: ReadOnlySpan&lt;char&gt;().Length or string.Length
-        /// </summary>
-        public int ObjectLength;
-            
-        /// <summary>
-        /// The current index within the input format
-        /// </summary>
-        public int Current;
-
-        /// <summary>
-        /// The index within the input format after an item (like <see cref="Placeholder"/>, <see cref="Selector"/>, <see cref="LiteralText"/> etc.) was added.
-        /// </summary>
-        public int LastEnd;
-
-        /// <summary>
-        /// The start index of the formatter name within the input format.
-        /// </summary>
-        public int NamedFormatterStart;
-
-        /// <summary>
-        /// The start index of the formatter options within the input format.
-        /// </summary>
-        public int NamedFormatterOptionsStart;
-
-        /// <summary>
-        /// The end index of the formatter options within the input format.
-        /// </summary>
-        public int NamedFormatterOptionsEnd;
-
-        /// <summary>
-        /// The index of the operator within the input format.
-        /// </summary>
-        public int Operator;
-
-        /// <summary>
-        /// The current index of the selector <b>across all</b> <see cref="Placeholder"/>s.
-        /// </summary>
-        public int Selector;
-
-        /// <summary>
-        /// Adds a number to the index and returns the sum, but not more than <see cref="ObjectLength"/>.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="add"></param>
-        /// <returns>The sum, but not more than <see cref="ObjectLength"/></returns>
-        public int SafeAdd(int index, int add)
-        {
-            // The design is the way, that an end index
-            // is always 1 above the last position.
-            // Meaning that the maximum of 'FormatItem.EndIndex' equals 'inputFormat.Length'
-            index += add;
-            System.Diagnostics.Debug.Assert(index >= 0);
-            return index < ObjectLength ? index : ObjectLength;
-        }
-    }
-
-    private sealed record ParserState(IndexContainer Index, string InputFormat, Format ResultFormat)
-    {
-        public readonly IndexContainer Index = Index;
-        public readonly string InputFormat = InputFormat;
-        public Format ResultFormat = ResultFormat;
-    }
-
-    /// <summary>
     /// Parses a format string. This method is thread-safe.
     /// </summary>
     /// <param name="inputFormat"></param>
     /// <returns>The <see cref="Format"/> for the parsed string.</returns>
     public Format ParseFormat(string inputFormat)
     {
-        var indexContainer = new IndexContainer
-        {
-            ObjectLength = inputFormat.Length, Current = PositionUndefined, LastEnd = 0,
-            NamedFormatterStart = PositionUndefined,
-            NamedFormatterOptionsStart = PositionUndefined, NamedFormatterOptionsEnd = PositionUndefined,
-            Operator = PositionUndefined, Selector = PositionUndefined
-        };
-
         // Initialize the state that will be passed around for thread-safety
         // instead of using stateful instance variables
-        var state = new ParserState(indexContainer,
-            inputFormat,
-            // Initialize - can be re-assigned with new placeholders, while _resultFormat will become the parent
-            FormatPool.Instance.Get().Initialize(Settings, inputFormat));
+        // Format: Can be re-assigned with new placeholders, while resultFormat will become the parent
+        var state = ParserStatePool.Instance.Get()
+            .Initialize(inputFormat, FormatPool.Instance.Get().Initialize(Settings, inputFormat));
+
+        var indexContainer = state.Index;
 
         // Store parsing errors until parsing is finished:
         var parsingErrors = ParsingErrorsPool.Instance.Get().Initialize(state.ResultFormat);
@@ -253,7 +176,7 @@ public class Parser
                 // We're parsing literal text with an HTML tag
                 if (_parserSettings.ParseInputAsHtml && inputChar == '<')
                 {
-                    Parser.ParseHtmlTags(state);
+                    ParseHtmlTags(state);
                     continue;
                 }
 
@@ -331,12 +254,15 @@ public class Parser
         }
 
         ParsingErrorsPool.Instance.Return(parsingErrors);
-        return state.ResultFormat;
+        var resultFormat = state.ResultFormat;
+        ParserStatePool.Instance.Return(state);
+
+        return resultFormat;
     }
 
     /// <summary>
     /// Adds a new <see cref="LiteralText"/> item, if there are characters left to process.
-    /// Sets <see cref="IndexContainer.LastEnd"/>.
+    /// Sets <see cref="ParserState.IndexContainer.LastEnd"/>.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void AddLiteralCharsParsedBefore(ParserState state)
@@ -394,7 +320,7 @@ public class Parser
     }
 
     /// <summary>
-    /// Creates a new <see cref="Placeholder"/>, adds it to the current format and sets values in <see cref="IndexContainer"/>.
+    /// Creates a new <see cref="Placeholder"/>, adds it to the current format and sets values in <see cref="ParserState.IndexContainer"/>.
     /// </summary>
     /// <param name="nestedDepth">The counter for nesting levels.</param>
     /// <param name="state"></param>
