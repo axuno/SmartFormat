@@ -45,17 +45,17 @@ for:
       - cmd: dotnet test SmartFormat.sln --framework net6.0 --test-adapter-path:. --logger:Appveyor /p:configuration=release /p:AltCover=true /p:AltCoverStrongNameKey="..\SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|NUnit3.TestAdapter" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\SmartFormat.Tests\coverage.net6.0.xml" -n net6.0win
-    artifacts:
-      - path: 'artifacts\*.nupkg'
-        type: NuGetPackage
-      - path: 'artifacts\*.snupkg'
-        type: NuGetPackage
-    deploy:
-      - provider: NuGet
-        api_key:
-          secure: ts2TxfjYx538JH6FZCKCEmdqBrFVRbiws5A+Dol8KQ2N+f5L5UB3WorPKCA5eSKv
-        on:
-          branch: main
+    # artifacts:
+    #   - path: 'artifacts\*.nupkg'
+    #     type: NuGetPackage
+    #   - path: 'artifacts\*.snupkg'
+    #     type: NuGetPackage
+    # deploy:
+    #   - provider: NuGet
+    #     api_key:
+    #       secure: ts2TxfjYx538JH6FZCKCEmdqBrFVRbiws5A+Dol8KQ2N+f5L5UB3WorPKCA5eSKv
+    #     on:
+    #       branch: main
   -
     matrix:
       only:
