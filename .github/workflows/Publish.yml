@@ -1,0 +1,102 @@
+﻿name: Publish
+# This job builds and publishes the package to NuGet.
+# It depends on the included tests job to complete successfully.
+# The version number is determined by the latest 'v*' tag for the main branch.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+    # ubuntu-latest = ubuntu-24.04 does not include mono (2025-08-01)
+
+    steps:
+    - name: Checkout main
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for all tags and branches
+        ref: main
+    - name: Set Git config for line endings
+      run: git config --global core.autocrlf true
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          6.0.x
+          3.1.x
+    - name: Get version tag
+      # The latest tag for the selected branch.
+      # Get it and strip off any leading 'v' from the version tag
+      run: | 
+         Version=$(git tag --list 'v*' --sort=-v:refname | head -n 1 | sed 's/^v//')
+         echo "VERSION=$Version" >> $GITHUB_ENV
+         echo "Version: $Version"
+    - name: Reset branch to specified tag
+      run: git reset --hard v${{ env.VERSION }}
+    - name: Remove Demo
+      run: dotnet sln ./src/SmartFormat.sln remove ./src/Demo/Demo.csproj
+    - name: Restore dependencies
+      run: dotnet restore ./src/SmartFormat.sln
+    - name: Build
+      run: dotnet build ./src/SmartFormat.sln --no-restore --configuration Release -p:nowarn=1591
+    - name: Test
+      run: dotnet test ./src/SmartFormat.sln --no-build --configuration Release --verbosity quiet
+
+  publish:
+    runs-on: ubuntu-22.04
+    needs: tests
+
+    steps:
+    - name: Checkout main
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for all tags and branches
+        ref: main
+    - name: Set Git config for line endings
+      run: git config --global core.autocrlf true
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x    
+    - name: Get version tag
+        # The latest tag for the selected branch.
+        # Get it and strip off any leading 'v' from the version tag
+      run: | 
+           # The version variable will be e.g. like "5.1.0-pre.1" (pre-release) or "5.1.0" (release)
+           Version=$(git tag --list 'v*' --sort=-v:refname | head -n 1 | sed 's/^v//')
+           echo "VERSION=$Version" >> $GITHUB_ENV
+           echo "Version: $Version"
+    - name: Set version variables
+      run: |
+           FileVersion=${VERSION%%-*}
+           AssemblyVersion=${VERSION%%.*}.0.0
+           echo "FILE_VERSION=$FileVersion" >> $GITHUB_ENV
+           echo "ASSEMBLY_VERSION=$AssemblyVersion" >> $GITHUB_ENV
+           echo "File Version: $FileVersion"
+           echo "Assembly Version: $AssemblyVersion"
+    - name: Reset branch to specified tag
+      run: git reset --hard v${{ env.VERSION }}
+    - name: Restore dependencies
+      run: dotnet restore ./src/SmartFormat.Deploy.sln
+    - name: Build and pack for publishing
+      run: |  
+        # For version e.g. "5.1.0-pre.1", the FileVersion will be "5.1.0" and the AssemblyVersion will be "5.0.0"
+        # AssemblyVersion must only change for major releases
+        dotnet build ./src/SmartFormat.Deploy.sln --configuration Release -p:Version=${{env.VERSION}} -p:FileVersion=${{env.FILE_VERSION}} -p:AssemblyVersion=${{env.ASSEMBLY_VERSION}} -p:Nullable=enable -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:ContinuousIntegrationBuild=true
+        dotnet pack ./src/SmartFormat.Deploy.sln --configuration Release -p:Version=${{env.VERSION}} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --no-build -p:PackageVersion=${{env.VERSION}} /p:PackageOutputPath=${{ github.workspace }}/artifacts
+    - name: Store artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages_${{env.VERSION}}.${{github.run_number}}
+        path: |
+          ${{ github.workspace }}/artifacts/
+          ${{ github.workspace }}/artifacts/
+    - name: Push package to NuGet
+      # Does not fail, if the package already exists
+      # Note: Symbol packages get uploaded automatically with the main package
+      run: |
+          for pkg in ${{ github.workspace }}/artifacts/*.nupkg; do
+            dotnet nuget push "$pkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+          done
