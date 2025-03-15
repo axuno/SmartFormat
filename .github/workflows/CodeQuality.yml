@@ -1,4 +1,4 @@
-name: SonarCloud
+name: CodeQuality
 on:
   push:
     branches: [ main, 'version/**', 'pr/**', 'pr-**' ]
@@ -16,9 +16,6 @@ jobs:
     # SonarCloud do not support analysis of forked PRs, even when those PRs come from members of the organization
     # (PRs from forks can't access secrets other than secrets.GITHUB_TOKEN for security reasons)
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    env:
-      version: '3.5.3'
-      versionFile: '3.5.3'
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -43,29 +40,49 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar-scanner
       - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: powershell
+        shell: pwsh
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+      - name: Get version tag
+        shell: pwsh
+        run: |
+          # Get the latest tag and strip off any leading 'v'
+          $Version = (git tag --list 'v*' --sort=-v:refname | Select-Object -First 1) -replace '^v', ''
+          echo "VERSION=$Version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "Version: $Version"
+      - name: Set version variables
+        shell: pwsh
+        run: |
+          # Extract FileVersion and AssemblyVersion
+          $FileVersion = $env:VERSION -replace '-.*', ''
+          $AssemblyVersion = ($env:VERSION -split '\.')[0] + '.0.0'
+          echo "FILE_VERSION=$FileVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "ASSEMBLY_VERSION=$AssemblyVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "File Version: $FileVersion"
+          echo "Assembly Version: $AssemblyVersion"
       - name: Build, test and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: powershell
+        shell: pwsh
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ github.event.repository.owner.login }}_SmartFormat" /o:"${{ github.event.repository.owner.login }}" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.scanner.scanAll=false /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="**/SmartFormat.ZString/**/*" /d:sonar.cs.opencover.reportsPaths="./src/SmartFormat.Tests/**/coverage*.xml"
           dotnet sln ./src/SmartFormat.sln remove ./src/Demo/Demo.csproj
           dotnet add ./src/SmartFormat.Tests/SmartFormat.Tests.csproj package AltCover
           dotnet restore ./src/SmartFormat.sln
-          dotnet build ./src/SmartFormat.sln --no-restore /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:ContinuousIntegrationBuild=true /p:Version=${{ env.version }} /p:FileVersion=${{ env.versionFile }}
-          dotnet test ./src/SmartFormat.sln --no-build --verbosity normal /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|SmartFormat.ZString|NUnit3.TestAdapter"
+          dotnet build ./src/SmartFormat.sln --no-restore /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:ContinuousIntegrationBuild=true -p:Version=${{env.VERSION}} -p:FileVersion=${{env.FILE_VERSION}} -p:AssemblyVersion=${{env.ASSEMBLY_VERSION}}
+          dotnet test ./src/SmartFormat.sln --no-build --verbosity normal --configuration Release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|SmartFormat.ZString|NUnit3.TestAdapter|AltCover" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-      - name: Pack
-        run: |
-          echo "Packing Version: ${{ env.version }}, File Version: ${{ env.versionFile }}"
-          dotnet pack ./src/SmartFormat.Deploy.sln /verbosity:minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:ContinuousIntegrationBuild=true /p:PackageOutputPath=${{ github.workspace }}/artifacts /p:Version=${{ env.version }} /p:FileVersion=${{ env.versionFile }}
-      - name: Upload Artifacts
+      - name: Store coverage report as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Packages_${{ env.version }}
-          path: ${{ github.workspace }}/artifacts/
+          name: coverage-report
+          path: ./src/SmartFormat.Tests/coverage.*.xml  # store all coverage reports
+      - name: Upload coverage to Codecov  
+        uses: codecov/codecov-action@v4  
+        with:  
+          # files: automatically finds all in ./src/SmartFormat.Tests
+          name: coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
