@@ -18,11 +18,21 @@ namespace SmartFormat;
 /// <summary>
 /// This class contains the Format method that constructs
 /// the composite string by invoking each extension.
+/// <para>
+/// <b>Thread-safety</b>:<br/>
+/// <see cref="Smart"/>.Format methods are thread-safe when <see cref="SmartSettings.IsThreadSafeMode"/> is <see langword="true"/>.
+/// Other methods (e.g. AddExtensions, changing SmartSettings) are not thread-safe.
+/// </para>
 /// </summary>
 public class SmartFormatter
 {
     /// <summary>
     /// Creates a new instance of a <see cref="SmartFormatter"/>.
+    /// <para>
+    /// <b>Thread-safety</b>:<br/>
+    /// <see cref="Smart"/>.Format methods are thread-safe when <see cref="SmartSettings.IsThreadSafeMode"/> is <see langword="true"/>.
+    /// Other methods (e.g. AddExtensions, changing SmartSettings) are not thread-safe.
+    /// </para>
     /// </summary>
     /// <param name="settings">
     /// The <see cref="SmartSettings"/> to use, or <see langword="null"/> for default settings.

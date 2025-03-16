@@ -12,6 +12,12 @@ namespace SmartFormat.Core.Parsing;
 
 /// <summary>
 /// Parses a format string.
+/// <para/>
+/// <para>
+/// <b>Thread-safety</b>:<br/>
+/// The <see cref="ParseFormat"/> method is thread-safe.
+/// Other methods (e.g. changing SmartSettings or other properties) is not thread-safe.
+/// </para>
 /// </summary>
 public class Parser
 {
@@ -147,6 +153,8 @@ public class Parser
 
     /// <summary>
     /// Parses a format string. This method is thread-safe.
+    /// <para/>
+    /// Changing the <see cref="Settings"/> or properties is not thread-safe.
     /// </summary>
     /// <param name="inputFormat"></param>
     /// <returns>The <see cref="Format"/> for the parsed string.</returns>

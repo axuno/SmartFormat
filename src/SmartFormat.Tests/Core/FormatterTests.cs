@@ -321,33 +321,21 @@ public class FormatterTests
     }
 
     [Test]
-    public void Parallel_ThreadStatic_Smart_Format()
+    public void Parallel_Static_Smart_Format()
     {
         // Switch to thread safety - otherwise the test would throw an InvalidOperationException
         var savedMode = ThreadSafeMode.SwitchOn();
-            
+
         var results = new ConcurrentDictionary<long, string>();
         var threadIds = new ConcurrentDictionary<int, int>();
         var options = new ParallelOptions { MaxDegreeOfParallelism = 100 };
         long resultCounter = 0;
-        long formatterInstancesCounter = 0;
 
         Assert.That(code: () =>
             Parallel.For(0L, 1000, options, (i, loopState) =>
             {
-                // If the ChooseFormatter extension does not exist,
-                // we re-use an existing SmartFormatter instance
-                if (Smart.Default.GetFormatterExtension<ChooseFormatter>() is not null)
-                {
-                    // Remove an extension we don't need for the test.
-                    // We are in a thread-static context, so it is safe here.
-                    if (Smart.Default.RemoveFormatterExtension<ChooseFormatter>())
-                        Interlocked.Increment(ref formatterInstancesCounter);
-                }
-
                 // register unique thread ids
                 threadIds.TryAdd(Environment.CurrentManagedThreadId, Environment.CurrentManagedThreadId);
-                // Smart.Default is a thread-static instance of the SmartFormatter,
                 // which is used here.
                 results.TryAdd(i, Smart.Format("{0}", i));
                 Interlocked.Increment(ref resultCounter);
@@ -357,7 +345,6 @@ public class FormatterTests
         {
             Assert.That(threadIds, Has.Count.AtLeast(2)); // otherwise the test is not significant
             Assert.That(Smart.CreateDefaultSmartFormat().GetFormatterExtension<ChooseFormatter>(), Is.Not.Null);
-            Assert.That(threadIds, Has.Count.EqualTo(formatterInstancesCounter));
             Assert.That(results, Has.Count.EqualTo(resultCounter));
         });
 
