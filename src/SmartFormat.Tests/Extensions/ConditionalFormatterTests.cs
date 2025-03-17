@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Extensions;
@@ -182,5 +186,47 @@ public class ConditionalFormatterTests
         {
             CultureInfo.CurrentCulture = currentCulture;
         }
+    }
+
+    [Test]
+    public void Parallel_ConditionalFormatter()
+    {
+        // Switch to thread safety - otherwise the test would throw an InvalidOperationException
+        var savedMode = ThreadSafeMode.SwitchOn();
+
+        var results = new ConcurrentDictionary<long, string>();
+        var threadIds = new ConcurrentDictionary<int, int>();
+        var options = new ParallelOptions { MaxDegreeOfParallelism = 100 };
+        long resultCounter = 0;
+
+        // One instance for all threads
+        var smart = new SmartFormatter().AddExtensions(new DefaultSource())
+            .AddExtensions(new DefaultFormatter(), new ConditionalFormatter());
+
+        Assert.That(code: () =>
+            Parallel.For(0L, 1000, options, (i, loopState) =>
+            {
+                // register unique thread ids
+                threadIds.TryAdd(Environment.CurrentManagedThreadId, Environment.CurrentManagedThreadId);
+
+                // Re-use the same SmartFormatter instance, where the Format method is thread-safe.
+                results.TryAdd(i, smart.Format("{0:D3} {1:cond:Yes|No}", i, false));
+                Interlocked.Increment(ref resultCounter);
+            }), Throws.Nothing);
+
+        var sortedResult = results.OrderBy(r => r.Value).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(threadIds, Has.Count.AtLeast(2)); // otherwise the test is not significant
+            Assert.That(results, Has.Count.EqualTo(resultCounter));
+            for (var i = 0; i < resultCounter; i++)
+            {
+                Assert.That(sortedResult[i].Value, Is.EqualTo(i.ToString("D3") + " No"));
+            }
+        });
+
+        // Restore to saved value
+        ThreadSafeMode.SwitchTo(savedMode);
     }
 }

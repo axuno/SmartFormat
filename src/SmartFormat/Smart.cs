@@ -14,16 +14,22 @@ namespace SmartFormat;
 /// The default instance has all extensions registered.
 /// <para>For optimized performance, create a <see cref="SmartFormatter"/> instance and register the
 /// particular extensions that are needed.</para>
-/// <para><see cref="Smart"/> methods are not thread safe.</para>
+/// <para>
+/// <b>Thread-safety</b>:<br/>
+/// <see cref="Smart"/>.Format methods are thread-safe when <see cref="SmartSettings.IsThreadSafeMode"/> is <see langword="true"/>.
+/// Other methods (e.g. AddExtensions, changing SmartSettings) are not thread-safe.
+/// </para>
 /// </summary>
 public static class Smart
 {
     /// <summary>
-    /// Creates isolated versions of the formatter in each thread.
-    /// This is required, because even if Smart.Default.Format(string, object?[]) is thread-safe,
-    /// other methods like Smart.Default.Extensions.Remove(...) are not.
+    /// A <see cref="SmartFormatter"/> instance with core extensions registered.
+    /// <para>
+    /// <b>Thread-safety</b>:<br/>
+    /// <see cref="Smart"/>.Format methods are thread-safe when <see cref="SmartSettings.IsThreadSafeMode"/> is <see langword="true"/>.
+    /// Other methods (e.g. AddExtensions, changing SmartSettings) are not thread-safe.
+    /// </para>
     /// </summary>
-    [ThreadStatic]
     private static SmartFormatter? _formatter;
 
     #region: Smart.Format :
@@ -68,7 +74,7 @@ public static class Smart
     /// <returns>The format items in the specified format string replaced with the string representation or the corresponding object.</returns>
     public static string Format(string format, object? arg0, object? arg1, object? arg2)
     {
-        return Default.Format(format,  arg0, arg1, arg2);
+        return Default.Format(format, arg0, arg1, arg2);
     }
 
     /// <summary>
@@ -103,24 +109,20 @@ public static class Smart
     /// <summary>
     /// Gets or sets the default <see cref="SmartFormatter"/>.
     /// If not set, the <see cref="CreateDefaultSmartFormat"/> will be used.
-    /// <para>
-    /// Using the <see cref="ThreadStaticAttribute"/>, <see cref="Default"/> returns isolated instances of the <see cref="SmartFormatter"/> in each thread.
-    /// </para>
-    /// <para>
-    /// It is recommended to set the thread-<see langword="static"/>
-    /// <see cref="Default"/> <see cref="SmartFormatter"/> with the extensions that are actually needed.
-    /// As <see cref="Default"/> is thread-static, this must be done on each thread.
-    /// </para>
+    /// <para/>
+    /// It is recommended to set the <see cref="Default"/> <see cref="SmartFormatter"/> with the extensions that are actually needed.
     /// </summary>
     public static SmartFormatter Default
     {
         get
         {
-            // formatter was not yet in use on current thread
             _formatter ??= CreateDefaultSmartFormat();
             return _formatter;
         }
-        set => _formatter = value;
+        set
+        {
+            _formatter = value;
+        }
     }
 
     /// <summary>
