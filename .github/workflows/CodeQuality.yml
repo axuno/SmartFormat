@@ -80,7 +80,7 @@ jobs:
           name: coverage-report
           path: ./src/SmartFormat.Tests/coverage.*.xml  # store all coverage reports
       - name: Upload coverage to Codecov  
-        uses: codecov/codecov-action@v4  
+        uses: codecov/codecov-action@v5  
         with:  
           # files: automatically finds all in ./src/SmartFormat.Tests
           name: coverage
