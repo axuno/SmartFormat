@@ -45,6 +45,6 @@ Have a look at the [SmartFormat Wiki](https://github.com/axuno/SmartFormat/wiki)
 
 ## Thanks!
 
-We would like to thank [JetBrains](https://www.jetbrains.com/?from=SmartFormat) for supporting the project with free licenses of their fantastic tools.
+We would like to thank [JetBrains](https://www.jetbrains.com/) for supporting the project with free licenses of their fantastic tools.
 
-<img src="https://raw.githubusercontent.com/axuno/SmartFormat/main/jetbrains.svg" alt="JetBrains" width="100" />
+![JetBrains logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)
