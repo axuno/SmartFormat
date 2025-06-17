@@ -19,6 +19,11 @@ jobs:
     outputs:
       VERSION: ${{ steps.set_version.outputs.VERSION }}
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for all tags and branches
+
     - name: Verify tag exists
       run: |
         git fetch --tags --quiet
