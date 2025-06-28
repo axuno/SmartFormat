@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Resources;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
@@ -122,6 +123,75 @@ public class LocalizationProviderTests
         var result = provider.GetString("does-not-exist", CultureInfo.InvariantCulture);
         Assert.That(result, Is.Null);
     }
+
+    [Test]
+    public void GetString_UsesFallbackCulture_WhenValueNotFoundInRequestedCulture()
+    {
+        // Provide a resource value for "Greeting" only in "en-US"
+        var resources = new Dictionary<(string, string), string>
+        {
+            { ("Greeting", "en-US"), "Hello" }
+        };
+
+        var fakeResourceManager = new FakeResourceManager("TestResource", resources);
+        var provider = new LocalizationProvider();
+        provider.AddResource(fakeResourceManager);
+
+        // Set the fallback culture to en-US.
+        provider.FallbackCulture = CultureInfo.GetCultureInfo("en-US");
+
+        // Request "Greeting" using "fr-FR" which is missing, expecting to fallback to "en-US".
+        var result = provider.GetString("Greeting", CultureInfo.GetCultureInfo("fr-FR"));
+
+        // Assert:
+        Assert.That(result, Is.EqualTo("Hello"));
+    }
+
+    [Test]
+    public void GetString_ReturnsKey_WhenResourceNotFound_AndReturnNameIfNotFoundIsTrue()
+    {
+        var resources = new Dictionary<(string, string), string>();
+        var fakeResourceManager = new FakeResourceManager("TestResource", resources);
+
+        var provider = new LocalizationProvider();
+        provider.AddResource(fakeResourceManager);
+        provider.ReturnNameIfNotFound = true;
+
+        // No resource exists, so we get the key back.
+        var result = provider.GetString("NonExistingKey", CultureInfo.GetCultureInfo("en-US"));
+
+        Assert.That(result, Is.EqualTo("NonExistingKey"));
+    }
+
+    #region * Fake ResourceManager *
+
+    // A fake resource manager to simulate resource lookup.
+    private class FakeResourceManager : ResourceManager
+    {
+        private readonly Dictionary<(string Key, string CultureName), string> _resources;
+        private readonly string _baseName;
+
+        public FakeResourceManager(string baseName, Dictionary<(string, string), string> resources)
+        {
+            _baseName = baseName;
+            _resources = resources;
+        }
+
+        public override string BaseName => _baseName;
+
+        public override string? GetString(string? name, CultureInfo? culture)
+        {
+            if (name is null || culture is null)
+                return null;
+
+            if (_resources.TryGetValue((name, culture.Name), out var value))
+                return value;
+
+            return null;
+        }
+    }
+
+    #endregion
 
     #region * Custom ILocalizationProvider Implementation *
 

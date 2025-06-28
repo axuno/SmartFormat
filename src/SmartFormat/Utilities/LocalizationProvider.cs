@@ -52,11 +52,7 @@ public class LocalizationProvider : ILocalizationProvider
     /// <returns><see langword="true"/>, if the resource could be removed, else <see langword="false"/>.</returns>
     public virtual bool Remove(string resourceBaseName)
     {
-        if (!Resources.ContainsKey(resourceBaseName)) return false;
-            
-        Resources.Remove(resourceBaseName);
-        return true;
-
+        return Resources.Remove(resourceBaseName);
     }
 
     /// <summary>
@@ -111,7 +107,8 @@ public class LocalizationProvider : ILocalizationProvider
                 ? resourceManager.GetString(name, cultureInfo)
                 : resourceManager.GetString(name);
 
-            if (value is null && FallbackCulture != null) resourceManager.GetString(name, FallbackCulture);
+            if (value is null && FallbackCulture != null)
+                value = resourceManager.GetString(name, FallbackCulture);
                 
             if (value is null) continue;
 
