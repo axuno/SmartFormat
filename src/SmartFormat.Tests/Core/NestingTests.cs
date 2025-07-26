@@ -33,23 +33,49 @@ public class NestingTests
     }
 
     [Test]
-    public void Nesting_CurrentScope_propertyName_outrules_OuterScope_propertyName()
+    public void Nesting_CurrentScope_propertyName_Outrules_OuterScope_propertyName()
     {
         var smart = Smart.CreateDefaultSmartFormat();
-        var nestedObject = new
-        {
-            IdenticalName = "Name from parent", 
+        // Note the same property name in both parent and child scope
+        var nestedObject = new {
+            IdenticalName = "Name from parent",
             ParentValue = "Parent value",
-            Child = new {IdenticalName = "Name from Child", ChildValue = "Child value"}
+            Child = new { IdenticalName = "Name from Child", ChildValue = "Child value" }
         };
+
+        var nestedObject2 = new {
+            IdenticalName = "Name from parent",
+            ParentValue = "Parent value",
+            // Property "IdenticalName" does not exist in child scope
+            Child = new { ChildValue = "Child value" }
+        };
+
+        /*
+            - If a property does not exist in the current (child) scope:
+              SmartFormat will attempt to resolve the property in the outer (parent) scope. This is standard behavior and is demonstrated in your test `Nesting_CurrentScope_propertyName_outrules_OuterScope_propertyName()`.
+
+            - If the property exists in the child scope but its value is NULL:  
+              SmartFormat does NOT fallback to the parent scope. It treats the property as present,
+              and the result is NULL.  
+              It will only fallback if the property is missing (not defined) in the child scope.
+         */
 
         Assert.Multiple(() =>
         {
-            // Access to outer scope, if no current scope variable is found
-            Assert.That(smart.Format("{Child:{ParentValue} - {Child.ChildValue}|}", nestedObject), Is.EqualTo(string.Format($"{nestedObject.ParentValue} - {nestedObject.Child.ChildValue}")));
+            // Access to OUTER scope with scoped notation, if variable does NOT EXIST in current scope
+            Assert.That(smart.Format("{Child:{ParentValue} - {ChildValue}}", nestedObject),
+                Is.EqualTo(string.Format($"{nestedObject.ParentValue} - {nestedObject.Child.ChildValue}")));
 
             // Access to current scope, although outer scope variable with same name exists
-            Assert.That(smart.Format("{Child:{IdenticalName} - {Child.IdenticalName}|}", nestedObject), Is.Not.EqualTo(string.Format($"{nestedObject.IdenticalName} - {nestedObject.Child.IdenticalName}")));
+            // This would also apply if the current scope variable was NULL
+            Assert.That(smart.Format("{Child:{IdenticalName} - {IdenticalName}}", nestedObject),
+                Is.Not.EqualTo(string.Format($"{nestedObject.IdenticalName} - {nestedObject.Child.IdenticalName}")));
+            // but instead, even with mixed scoped and dot notation
+            Assert.That(smart.Format("{Child:{IdenticalName} - {Child.IdenticalName}}", nestedObject),
+                Is.EqualTo(string.Format($"{nestedObject.Child.IdenticalName} - {nestedObject.Child.IdenticalName}")));
+
+            // Property does not exist in child scope, but exists in outer scope
+            Assert.That(smart.Format("Fallback: {Child:{IdenticalName}}", nestedObject2), Is.EqualTo("Fallback: Name from parent"));
         });
     }
 
