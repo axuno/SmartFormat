@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: windows-latest
+    runs-on: windows-2022
     # SonarCloud do not support analysis of forked PRs, even when those PRs come from members of the organization
     # (PRs from forks can't access secrets other than secrets.GITHUB_TOKEN for security reasons)
     if: ${{ !github.event.pull_request.head.repo.fork }}
