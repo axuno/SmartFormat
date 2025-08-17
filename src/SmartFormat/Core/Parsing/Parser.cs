@@ -15,8 +15,9 @@ namespace SmartFormat.Core.Parsing;
 /// <para/>
 /// <para>
 /// <b>Thread-safety</b>:<br/>
-/// The <see cref="ParseFormat"/> method is thread-safe.
-/// Other methods (e.g. changing SmartSettings or other properties) is not thread-safe.
+/// The <see cref="ParseFormat"/> method is stateless w.r.t. the instance
+/// is safe for concurrent calls provided <see cref="SmartSettings"/> are not concurrently mutated,
+/// and <see cref="SmartSettings.IsThreadSafeMode"/> is <see langword="true"/>.
 /// </para>
 /// </summary>
 public class Parser
@@ -149,123 +150,215 @@ public class Parser
 
     #endregion
 
-    #region: Parsing :
+    #region: Parsing and ParseContext :
+
+    /// <summary>
+    /// Defines the current state of the parser within the main loop.
+    /// </summary>
+    private enum ParseContext
+    {
+        /// <summary>
+        /// Top-level literal text or inside a placeholder's Format section
+        /// </summary>
+        LiteralText,
+        /// <summary>
+        /// Inside the selector / header portion of a placeholder.
+        /// It is only the header (selectors + optional formatter name start),
+        /// not the entire placeholder including nested formats
+        /// </summary>
+        SelectorHeader
+    }
 
     /// <summary>
     /// Parses a format string. This method is thread-safe.
     /// <para/>
-    /// Changing the <see cref="Settings"/> or properties is not thread-safe.
+    /// <para>
+    /// <b>Thread-safety</b>:<br/>
+    /// The <see cref="ParseFormat"/> method is stateless w.r.t. the instance
+    /// is safe for concurrent calls provided <see cref="SmartSettings"/> are not concurrently mutated,
+    /// and <see cref="SmartSettings.IsThreadSafeMode"/> is <see langword="true"/>.
+    /// </para>
     /// </summary>
     /// <param name="inputFormat"></param>
     /// <returns>The <see cref="Format"/> for the parsed string.</returns>
     public Format ParseFormat(string inputFormat)
     {
-        // Initialize the state that will be passed around for thread-safety
-        // instead of using stateful instance variables
-        // Format: Can be re-assigned with new placeholders, while resultFormat will become the parent
-        var state = ParserStatePool.Instance.Get()
-            .Initialize(inputFormat, FormatPool.Instance.Get().Initialize(Settings, inputFormat));
+        using var statePool = ParserStatePool.Instance.Get(out var state);
+        // The result format must not be returned to the pool by the parser
+        state.Initialize(inputFormat, FormatPool.Instance.Get().Initialize(Settings, inputFormat));
 
         var indexContainer = state.Index;
 
-        // Store parsing errors until parsing is finished:
         var parsingErrors = ParsingErrorsPool.Instance.Get().Initialize(state.ResultFormat);
 
+        // Context variables
+        var currentContext = ParseContext.LiteralText;
         Placeholder? currentPlaceholder = null;
-
-        // Used for nested placeholders
         var nestedDepth = 0;
 
         for (indexContainer.Current = 0; indexContainer.Current < state.InputFormat.Length; indexContainer.Current++)
         {
             var inputChar = state.InputFormat[indexContainer.Current];
-            if (currentPlaceholder == null)
+
+            switch (currentContext)
             {
-                // We're parsing literal text with an HTML tag
-                if (_parserSettings.ParseInputAsHtml && inputChar == '<')
-                {
-                    ParseHtmlTags(state);
-                    continue;
-                }
-
-                if (inputChar == _parserSettings.PlaceholderBeginChar)
-                {
-                    AddLiteralCharsParsedBefore(state);
-
-                    if (EscapeLikeStringFormat(_parserSettings.PlaceholderBeginChar, state)) continue;
-
-                    CreateNewPlaceholder(ref nestedDepth, state, out currentPlaceholder);
-                }
-                else if (inputChar == _parserSettings.PlaceholderEndChar)
-                {
-                    AddLiteralCharsParsedBefore(state);
-
-                    if (EscapeLikeStringFormat(_parserSettings.PlaceholderEndChar, state)) continue;
-
-                    // Make sure that this is a nested placeholder before we un-nest it:
-                    if (HasProcessedTooMayClosingBraces(parsingErrors, state)) continue;
-
-                    // End of the placeholder's Format, _resultFormat will change to ParentPlaceholder.Parent
-                    FinishPlaceholderFormat(ref nestedDepth, state);
-                }
-                else if (inputChar == _parserSettings.CharLiteralEscapeChar &&
-                         _parserSettings.ConvertCharacterStringLiterals ||
-                         !Settings.StringFormatCompatibility && inputChar == _parserSettings.CharLiteralEscapeChar)
-                {
-                    ParseAlternativeEscaping(state);
-                }
-                else if (state.Index.NamedFormatterStart != PositionUndefined && !ParseNamedFormatter(state))
-                {
-                    // continue the loop
-                }
-            }
-            else
-            {
-                // Placeholder is NOT null, so that means 
-                // we're parsing the selectors:
-                ParseSelector(ref currentPlaceholder, parsingErrors, ref nestedDepth, state);
+                case ParseContext.SelectorHeader:
+                    ProcessSelector(inputChar, state, parsingErrors, ref currentContext, ref currentPlaceholder,
+                        ref nestedDepth);
+                    break;
+                case ParseContext.LiteralText:
+                    ProcessLiteralText(inputChar, state, parsingErrors, ref currentContext, ref currentPlaceholder,
+                        ref nestedDepth);
+                    break;
             }
         }
 
-        // We're at the end of the input string
+        // Finalize parsing and handle any remaining issues
+        FinalizeParsing(state, parsingErrors, currentPlaceholder);
 
-        // 1. Is the last item a placeholder, that is not finished yet?
+        // Check for any parsing errors:
+        if (parsingErrors.HasIssues)
+        {
+            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(parsingErrors, Settings.Parser.ErrorAction == ParseErrorAction.ThrowError));
+            return HandleParsingErrors(parsingErrors, state.ResultFormat);
+        }
+
+        ParsingErrorsPool.Instance.Return(parsingErrors);
+        return state.ResultFormat;
+    }
+
+    /// <summary>
+    /// Handles parsing when the current state is LiteralText.
+    /// This method is responsible for identifying the start of placeholders, handling escaped characters,
+    /// and managing the closing of nested placeholders.
+    /// </summary>
+    private void ProcessLiteralText(char inputChar, ParserState state, ParsingErrors parsingErrors,
+        ref ParseContext currentContext, ref Placeholder? currentPlaceholder, ref int nestedDepth)
+    {
+        // We're parsing literal text with an HTML tag
+        if (_parserSettings.ParseInputAsHtml && inputChar == '<')
+        {
+            ParseHtmlTags(state);
+            return;
+        }
+
+        if (inputChar == _parserSettings.PlaceholderBeginChar)
+        {
+            AddLiteralCharsParsedBefore(state);
+            if (EscapeLikeStringFormat(_parserSettings.PlaceholderBeginChar, state)) return;
+
+            // Context transition
+            CreateNewPlaceholder(ref nestedDepth, state, out currentPlaceholder);
+            currentContext = ParseContext.SelectorHeader;
+        }
+        else if (inputChar == _parserSettings.PlaceholderEndChar)
+        {
+            AddLiteralCharsParsedBefore(state);
+            if (EscapeLikeStringFormat(_parserSettings.PlaceholderEndChar, state)) return;
+            if (HasProcessedTooManyClosingBraces(parsingErrors, state)) return;
+
+            // End of a nested placeholder's Format.
+            FinishPlaceholderFormat(ref nestedDepth, state);
+        }
+        else if (inputChar == _parserSettings.CharLiteralEscapeChar &&
+                 (_parserSettings.ConvertCharacterStringLiterals || !Settings.StringFormatCompatibility))
+        {
+            ParseAlternativeEscaping(state);
+        }
+        else if (state.Index.NamedFormatterStart != PositionUndefined && !ParseNamedFormatter(state))
+        {
+            // continue the loop
+        }
+    }
+
+    /// <summary>
+    /// Handles parsing when the current context is <see cref="ParseContext.SelectorHeader"/>.
+    /// This method is responsible for parsing selectors, operators, and identifying the start
+    /// of a format specifier ':' or the end of the placeholder '}'.
+    /// </summary>
+    private void ProcessSelector(char inputChar, ParserState state, ParsingErrors parsingErrors,
+        ref ParseContext currentContext, ref Placeholder? currentPlaceholder, ref int nestedDepth)
+    {
+        if (currentPlaceholder == null)
+        {
+            throw new InvalidOperationException($"Invalid parser context: {nameof(ProcessSelector)} called with a null {nameof(currentPlaceholder)}.");
+        }
+
+        if (_operatorChars.Contains(inputChar) || _customOperatorChars.Contains(inputChar))
+        {
+            // Add the selector segment before the operator:
+            if (state.Index.Current != state.Index.LastEnd)
+            {
+                currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, state.InputFormat, state.Index.LastEnd, state.Index.Current, state.Index.Operator, state.Index.Selector));
+                state.Index.Selector++;
+                state.Index.Operator = state.Index.Current;
+            }
+            state.Index.LastEnd = state.Index.SafeAdd(state.Index.Current, 1);
+        }
+        else if (inputChar == _parserSettings.FormatterNameSeparator)
+        {
+            AddLastSelector(ref currentPlaceholder, state, parsingErrors);
+
+            // Start the format section of the placeholder.
+            var newFormat = FormatPool.Instance.Get().Initialize(Settings, currentPlaceholder, state.Index.Current + 1);
+            currentPlaceholder.Format = newFormat;
+            state.ResultFormat = newFormat;
+            currentPlaceholder = null; // We are now parsing the format, not the selectors.
+            state.Index.NamedFormatterStart = Settings.StringFormatCompatibility ? PositionUndefined : state.Index.LastEnd;
+            state.Index.NamedFormatterOptionsStart = PositionUndefined;
+            state.Index.NamedFormatterOptionsEnd = PositionUndefined;
+
+            // We are now parsing the literal text *inside* the placeholder's format.
+            currentContext = ParseContext.LiteralText;
+        }
+        else if (inputChar == _parserSettings.PlaceholderEndChar)
+        {
+            AddLastSelector(ref currentPlaceholder, state, parsingErrors);
+
+            // End the placeholder with no format.
+            nestedDepth--;
+            currentPlaceholder.EndIndex = state.Index.SafeAdd(state.Index.Current, 1);
+            currentPlaceholder = null;
+
+            // Switch Context
+            currentContext = ParseContext.LiteralText;
+        }
+        else
+        {
+            // Ensure the selector characters are valid:
+            if (!_validSelectorChars.Contains(inputChar))
+                parsingErrors.AddIssue(state.ResultFormat,
+                    $"'0x{Convert.ToUInt32(inputChar):X}': " +
+                    _parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                    state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
+        }
+    }
+
+    /// <summary>
+    /// Finalizes parsing at the end of the input string.
+    /// </summary>
+    private void FinalizeParsing(ParserState state, ParsingErrors parsingErrors, Placeholder? currentPlaceholder)
+    {
+        // 1. Is the last item a placeholder that is not finished yet?
         if (state.ResultFormat.ParentPlaceholder != null || currentPlaceholder != null)
         {
             parsingErrors.AddIssue(state.ResultFormat, _parsingErrorText[ParsingError.MissingClosingBrace],
-                state.InputFormat.Length,
-                state.InputFormat.Length);
+                state.InputFormat.Length, state.InputFormat.Length);
             state.ResultFormat.EndIndex = state.InputFormat.Length;
         }
+        // 2. The last item must be a literal, so add it if necessary
         else if (state.Index.LastEnd != state.InputFormat.Length)
         {
-            // 2. The last item must be a literal, so add it
             state.ResultFormat.Items.Add(LiteralTextPool.Instance.Get().Initialize(Settings, state.ResultFormat, state.InputFormat,
                 state.Index.LastEnd, state.InputFormat.Length));
         }
 
-        // This may happen with a missing closing brace, e.g. "{0:yyyy/MM/dd HH:mm:ss"
+        // Unwind any unclosed nested formats (due to missing closing braces)
         while (state.ResultFormat.ParentPlaceholder != null)
         {
             state.ResultFormat = state.ResultFormat.ParentPlaceholder.Parent;
             state.ResultFormat.EndIndex = state.InputFormat.Length;
         }
-
-        // Check for any parsing errors:
-        if (parsingErrors.HasIssues)
-        {
-            OnParsingFailure?.Invoke(this,
-                new ParsingErrorEventArgs(parsingErrors,
-                    Settings.Parser.ErrorAction == ParseErrorAction.ThrowError));
-
-            return HandleParsingErrors(parsingErrors, state.ResultFormat);
-        }
-
-        ParsingErrorsPool.Instance.Return(parsingErrors);
-        var resultFormat = state.ResultFormat;
-        ParserStatePool.Instance.Return(state);
-
-        return resultFormat;
     }
 
     /// <summary>
@@ -292,7 +385,7 @@ public class Parser
     /// <param name="state"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool HasProcessedTooMayClosingBraces(ParsingErrors parsingErrors, ParserState state)
+    private bool HasProcessedTooManyClosingBraces(ParsingErrors parsingErrors, ParserState state)
     {
         if (state.ResultFormat.ParentPlaceholder != null) return false;
 
@@ -496,71 +589,6 @@ public class Parser
         }
 
         return true;
-    }
-
-    /// <summary>
-    /// Handles the selectors.
-    /// </summary>
-    /// <param name="currentPlaceholder"></param>
-    /// <param name="parsingErrors"></param>
-    /// <param name="nestedDepth"></param>
-    /// <param name="state"></param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void ParseSelector(ref Placeholder? currentPlaceholder, ParsingErrors parsingErrors, ref int nestedDepth, ParserState state)
-    {
-        if (currentPlaceholder == null)
-        {
-            throw new ArgumentNullException(nameof(currentPlaceholder), $"Unexpected null reference");
-        }
-
-        var inputChar = state.InputFormat[state.Index.Current];
-        if (_operatorChars.Contains(inputChar) || _customOperatorChars.Contains(inputChar))
-        {
-            // Add the selector:
-            if (state.Index.Current != state.Index.LastEnd)  // if equal, we're already parsing a selector
-            {
-                currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, state.InputFormat, state.Index.LastEnd, state.Index.Current, state.Index.Operator, state.Index.Selector));
-                state.Index.Selector++;
-                state.Index.Operator = state.Index.Current;
-            }
-
-            state.Index.LastEnd = state.Index.SafeAdd(state.Index.Current, 1);
-        }
-        else if (inputChar == _parserSettings.FormatterNameSeparator)
-        {
-            // Add the selector:
-            AddLastSelector(ref currentPlaceholder, state, parsingErrors);
-
-            // Start the format:
-            var newFormat = FormatPool.Instance.Get().Initialize(Settings, currentPlaceholder, state.Index.Current + 1);
-            currentPlaceholder.Format = newFormat;
-            // parentFormat still lives in the current placeholder!
-            state.ResultFormat = newFormat;
-            currentPlaceholder = null;
-            // named formatters will not be parsed with string.Format compatibility switched ON.
-            // But this way we can handle e.g. Smart.Format("{Date:yyyy/MM/dd HH:mm:ss}") like string.Format
-            state.Index.NamedFormatterStart = Settings.StringFormatCompatibility ? PositionUndefined : state.Index.LastEnd;
-            state.Index.NamedFormatterOptionsStart = PositionUndefined;
-            state.Index.NamedFormatterOptionsEnd = PositionUndefined;
-        }
-        else if (inputChar == _parserSettings.PlaceholderEndChar)
-        {
-            AddLastSelector(ref currentPlaceholder, state, parsingErrors);
-
-            // End the placeholder with no format:
-            nestedDepth--;
-            currentPlaceholder.EndIndex = state.Index.SafeAdd(state.Index.Current, 1);
-            currentPlaceholder = null;
-        }
-        else
-        {
-            // Ensure the selector characters are valid:
-            if (!_validSelectorChars.Contains(inputChar))
-                parsingErrors.AddIssue(state.ResultFormat,
-                    $"'0x{Convert.ToUInt32(inputChar):X}': " +
-                    _parsingErrorText[ParsingError.InvalidCharactersInSelector],
-                    state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
-        }
     }
 
     /// <summary>
