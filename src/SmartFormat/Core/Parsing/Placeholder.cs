@@ -197,14 +197,16 @@ public class Placeholder : FormatItem
             try
             {
                 _formatterOptionsCache = EscapedLiteral
-                    .UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar, BaseString.AsSpan(FormatterOptionsStartIndex, FormatterOptionsLength), true, resultBuffer).ToString();
+                    .UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar,
+                        BaseString.AsSpan(FormatterOptionsStartIndex, FormatterOptionsLength), true,
+                        SmartSettings.Parser.ConvertCharacterStringLiterals, resultBuffer).ToString();
 
             }
             finally
             {
                 pool.Return(resultBuffer);
             }
-                
+
             return _formatterOptionsCache;
         }
     }

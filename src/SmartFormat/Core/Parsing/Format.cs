@@ -3,7 +3,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using SmartFormat.Core.Settings;
@@ -349,7 +348,7 @@ public sealed class Format : FormatItem, IDisposable
         return _literalTextCache;
     }
 
-/// <summary>
+    /// <summary>
     /// Reconstructs the format string, but doesn't include escaped chars
     /// and tries to reconstruct placeholders.
     /// </summary>

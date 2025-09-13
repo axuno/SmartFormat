@@ -72,13 +72,26 @@ public class LiteralText : FormatItem
     {
         if (Length == 0) return ReadOnlySpan<char>.Empty;
 
-        // The buffer is only for 1 character - each escaped char goes into its own LiteralText
-        return SmartSettings.Parser.ConvertCharacterStringLiterals &&
-               BaseString.AsSpan(StartIndex)[0] == SmartSettings.Parser.CharLiteralEscapeChar
-            ? EscapedLiteral.UnEscapeCharLiterals(SmartSettings.Parser.CharLiteralEscapeChar,
-                BaseString.AsSpan(StartIndex, Length),
-                false, new char[1])
-            : BaseString.AsSpan(StartIndex, Length);
+        var span = BaseString.AsSpan(StartIndex, Length);
+
+        return SmartSettings.Parser.ConvertCharacterStringLiterals switch
+        {
+            // Convert escaped literals, e.g. \n, \t, or \u2022
+            // Each escaped char goes into its own LiteralText object.
+            true when span[0] == SmartSettings.Parser.CharLiteralEscapeChar
+                => EscapedLiteral.UnEscapeCharLiterals(
+                    SmartSettings.Parser.CharLiteralEscapeChar,
+                    span,
+                    false,
+                    true,
+                    // Each escaped literal has just 1 character in size.
+                    new char[1]),
+            // Special case: Escaped escape char, i.e. "\\", when ConvertCharacterStringLiterals is false.
+            false when span.Length == 2 && span[0] == span[1] && span[0] == SmartSettings.Parser.CharLiteralEscapeChar
+                => span.Slice(1), // simplify instead of calling UnEscapeCharLiterals
+            // No conversion
+            _ => span
+        };
     }
 
     /// <summary>
