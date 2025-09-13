@@ -10,15 +10,21 @@ using System.Linq;
 namespace SmartFormat.Core.Parsing;
 
 /// <summary>
-/// Handles escaped literals, like \\ or \n
+/// Handles escaped literals, like \\ \{ \n \u2022
 /// </summary>
 public static class EscapedLiteral
 {
     private static readonly Dictionary<char, char> GeneralLookupTable = new() {
-        // General
+        // Escaping the escape character itself
         {'\\', '\\'},
+        // Placeholder related
         {'{', '{'},
         {'}', '}'},
+        // escaped colons can be used anywhere in the format string
+        {':', ':'}
+    };
+
+    private static readonly Dictionary<char, char> CharLiteralLookupTable = new() {
         {'0', '\0'},
         {'a', '\a'},
         {'b', '\b'},
@@ -26,12 +32,11 @@ public static class EscapedLiteral
         {'n', '\n'},
         {'r', '\r'},
         {'t', '\t'},
-        {'v', '\v'},
-        {':', ':'} // escaped colons can be used anywhere in the format string
+        {'v', '\v'}
     };
 
     private static readonly Dictionary<char, char> FormatterOptionsLookupTable = new() {
-        // Smart.Format characters used in formatter options
+        // characters used in formatter options
         {'(', '('},
         {')', ')'}
     };
@@ -42,13 +47,13 @@ public static class EscapedLiteral
     /// <param name="input">The input character.</param>
     /// <param name="result">The matching character.</param>
     /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
+    /// <param name="includeCharacterLiterals">If <see langword="true"/>, \n, \t etc. will be escaped, else not.</param>
     /// <returns><see langword="true"/>, if a matching character was found.</returns>
-    public static bool TryGetChar(char input, out char result, bool includeFormatterOptionChars)
+    public static bool TryGetChar(char input, out char result, bool includeFormatterOptionChars, bool includeCharacterLiterals = true)
     {
-        return includeFormatterOptionChars
-            ? GeneralLookupTable.TryGetValue(input, out result) ||
-              FormatterOptionsLookupTable.TryGetValue(input, out result)
-            : GeneralLookupTable.TryGetValue(input, out result);
+        return GeneralLookupTable.TryGetValue(input, out result) ||
+               (includeCharacterLiterals && CharLiteralLookupTable.TryGetValue(input, out result)) ||
+               (includeFormatterOptionChars && FormatterOptionsLookupTable.TryGetValue(input, out result));
     }
 
     private static char GetUnicode(ReadOnlySpan<char> input, int startIndex)
@@ -74,9 +79,10 @@ public static class EscapedLiteral
     /// <param name="escapingSequenceStart"></param>
     /// <param name="input"></param>
     /// <param name="includeFormatterOptionChars">If <see langword="true"/>, (){}: will be escaped, else not.</param>
+    /// <param name="includeCharacterLiterals">If <see langword="true"/>, \n \t etc. will be escaped, else not.</param>
     /// <param name="resultBuffer">The buffer to fill. It's enough to have a buffer with the same size as the input length.</param>
     /// <returns>The input having escaped characters replaced with their real value.</returns>
-    public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars, Span<char> resultBuffer)
+    public static ReadOnlySpan<char> UnEscapeCharLiterals(char escapingSequenceStart, ReadOnlySpan<char> input, bool includeFormatterOptionChars, bool includeCharacterLiterals, Span<char> resultBuffer)
     {
         var max = input.Length;
         var resultIndex = 0;
@@ -104,7 +110,7 @@ public static class EscapedLiteral
                     resultBuffer[resultIndex++] = GetUnicode(input, nextInputIndex + 1);
                     inputIndex += 6;  // move to last unicode character
                 }
-                else if (TryGetChar(input[nextInputIndex], out var realChar, includeFormatterOptionChars))
+                else if (TryGetChar(input[nextInputIndex], out var realChar, includeFormatterOptionChars, includeCharacterLiterals))
                 {
                     resultBuffer[resultIndex++] = realChar;
                     inputIndex += 2;
@@ -132,8 +138,9 @@ public static class EscapedLiteral
     /// <param name="startIndex"></param>
     /// <param name="length"></param>
     /// <param name="includeFormatterOptionChars"><see langword="true"/>, if characters for formatter options should be included. Default is <see langword="false"/>.</param>
+    /// <param name="includeCharLiterals"><see langword="true"/>, if character literals should be included. Default is <see langword="true"/>.</param>
     /// <returns>Returns the escaped characters.</returns>
-    public static IEnumerable<char> EscapeCharLiterals(char escapeSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars)
+    public static IEnumerable<char> EscapeCharLiterals(char escapeSequenceStart, string input, int startIndex, int length, bool includeFormatterOptionChars, bool includeCharLiterals = true)
     {
         var max = startIndex + length;
         for (var index = startIndex; index < max; index++)
@@ -143,6 +150,13 @@ public static class EscapedLiteral
             {
                 yield return escapeSequenceStart;
                 yield return GeneralLookupTable.First(kv => kv.Value == c).Key;
+                continue;
+            }
+
+            if (CharLiteralLookupTable.ContainsValue(c))
+            {
+                yield return escapeSequenceStart;
+                yield return CharLiteralLookupTable.First(kv => kv.Value == c).Key;
                 continue;
             }
 

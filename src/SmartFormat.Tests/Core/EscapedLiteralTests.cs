@@ -35,7 +35,7 @@ public class EscapedLiteralTests
         {
             try
             {
-                EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), false, resultBuffer);
+                EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), false, true, resultBuffer);
                 Assert.Fail("Failure expected.");
             }
             catch (Exception e)
@@ -45,7 +45,7 @@ public class EscapedLiteralTests
         }
         else
         {
-            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), false, resultBuffer);
+            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), false, true, resultBuffer);
             Assert.That(result.ToString(), Is.EqualTo(expected));
         }
     }
@@ -59,7 +59,7 @@ public class EscapedLiteralTests
         {
             try
             {
-                EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), true, resultBuffer);
+                EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), true, true, resultBuffer);
                 Assert.Fail("Failure expected.");
             }
             catch (Exception e)
@@ -69,7 +69,7 @@ public class EscapedLiteralTests
         }
         else
         {
-            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), true, resultBuffer);
+            var result = EscapedLiteral.UnEscapeCharLiterals('\\', input.AsSpan(0, input.Length), true, true, resultBuffer);
             Assert.That(result.ToString(), Is.EqualTo(expected));
         }
     }
@@ -100,7 +100,7 @@ public class EscapedLiteralTests
     {
         var resultBuffer = new Span<char>(new char[pattern.Length]);
         var optionsEscaped = new string(EscapedLiteral.EscapeCharLiterals('\\', pattern, 0, pattern.Length, true).ToArray());
-        Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', optionsEscaped.AsSpan(0, optionsEscaped.Length), true, resultBuffer).ToString(), Is.EqualTo(pattern));
+        Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', optionsEscaped.AsSpan(0, optionsEscaped.Length), true, true, resultBuffer).ToString(), Is.EqualTo(pattern));
     }
 
     [Test]
@@ -109,6 +109,6 @@ public class EscapedLiteralTests
         var full = "abc(de";
         var startIndex = 3;
         var resultBuffer = new Span<char>(new char[full.Length]);
-        Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', full.AsSpan(startIndex, full.Length - startIndex), true, resultBuffer).ToString(), Is.EqualTo("(de"));
+        Assert.That(EscapedLiteral.UnEscapeCharLiterals('\\', full.AsSpan(startIndex, full.Length - startIndex), true, true, resultBuffer).ToString(), Is.EqualTo("(de"));
     }
 }

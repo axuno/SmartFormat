@@ -634,7 +634,7 @@ public class Parser
             // Skip escaped terminating characters
             if (state.InputFormat[state.Index.Current] == _parserSettings.CharLiteralEscapeChar &&
                 (_formatOptionsTerminatorChars.Contains(nextChar) ||
-                 EscapedLiteral.TryGetChar(nextChar, out _, true)))
+                 EscapedLiteral.TryGetChar(nextChar, out _, true, false)))
             {
                 state.Index.Current = state.Index.SafeAdd(state.Index.Current, 1);
                 if (_formatOptionsTerminatorChars.Contains(

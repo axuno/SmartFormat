@@ -462,11 +462,30 @@ public class ParserTests
                 .Contains(new Parser.ParsingErrorText()[Parser.ParsingError.MissingClosingBrace]));
     }
         
-    [Test]
-    public void Literal_Escaping_In_Literal()
+    [TestCase(true, "{}")]
+    [TestCase(false, "{}")]
+    public void Literal_Escaping_In_Literal(bool convert, string expected)
     {
-        var parser = GetRegularParser(new SmartSettings {StringFormatCompatibility = false});
-        Assert.That(parser.ParseFormat("\\{\\}").ToString(), Is.EqualTo("{}"));
+        var parser = GetRegularParser(new SmartSettings { Parser = new ParserSettings { ConvertCharacterStringLiterals = convert } });
+        Assert.That(parser.ParseFormat(@"\{\}").ToString(), Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Escaping_TheEscapingCharacter_ShouldWork()
+    {
+        // Issue https://github.com/axuno/SmartFormat/issues/493 fixed:
+        // Escaping the escaping character, i.e. "\\", now works correctly
+        // when ConvertCharacterStringLiterals is false.
+        var parser = GetRegularParser(new SmartSettings
+            { Parser = new ParserSettings { ConvertCharacterStringLiterals = false } });
+
+        // Edge case where an escaping character is
+        // immediately followed by another escaping character:
+        const string input = @"\\\\aaa\\\{\}bbb ccc\x\{\}ddd\\\\";
+        var format = parser.ParseFormat(input);
+        var result = format.ToString();
+
+        Assert.That(result, Is.EqualTo(@"\\aaa\{}bbb ccc\x{}ddd\\"));
     }
 
     [Test]
@@ -475,7 +494,6 @@ public class ParserTests
         var parser = GetRegularParser(new SmartSettings {StringFormatCompatibility = true});
         Assert.That(parser.ParseFormat("{{}}").ToString(), Is.EqualTo("{}"));
     }
-
 
     [Test]
     public void Nested_format_with_literal_escaping()
