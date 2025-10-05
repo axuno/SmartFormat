@@ -54,4 +54,23 @@ It uses extensions to provide named placeholders, localization, pluralization, g
         </AssemblyAttribute>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Utilities\CldrPluralRules.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>CldrPluralRules.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Utilities\CldrPluralRules.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CldrPluralRules.tt</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
