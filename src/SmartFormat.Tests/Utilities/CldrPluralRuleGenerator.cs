@@ -18,7 +18,7 @@ namespace SmartFormat.Tests.Utilities;
 [ExcludeFromCodeCoverage]
 internal static class CldrPluralRuleGenerator
 {
-    #region JSON Deserialization DTOs
+    #region *** JSON Deserialization DTOs ***
 
     private class CldrRoot
     {
@@ -45,7 +45,7 @@ internal static class CldrPluralRuleGenerator
 
     #endregion
 
-    #region Rule Processing Classes
+    #region *** Rule Processing Classes ***
 
     private class LanguageRuleSet
     {
@@ -88,25 +88,25 @@ internal static class CldrPluralRuleGenerator
     #endregion
 
     // Download the CLDR JSON data file from: https://github.com/unicode-org/cldr-json
-    public static void Generate(string inputFile, string outputFile)
+    internal static void Generate(string inputFile, string outputFile)
     {
         if (!File.Exists(inputFile))
         {
-            Console.WriteLine($"Error: Input file not found: {Path.GetFullPath(inputFile)}");
+            Console.WriteLine($@"Error: Input file not found: {Path.GetFullPath(inputFile)}");
             return;
         }
 
-        Console.WriteLine($"Reading CLDR plural rules from '{inputFile}'...");
+        Console.WriteLine($@"Reading CLDR plural rules from '{inputFile}'...");
         var jsonContent = File.ReadAllText(inputFile);
         var cldrData = JsonSerializer.Deserialize<CldrRoot>(jsonContent);
 
         if (cldrData?.Supplemental.PluralsTypeCardinal == null)
         {
-            Console.WriteLine("Error: Failed to parse 'plurals-type-cardinal' data from JSON.");
+            Console.WriteLine(@"Error: Failed to parse 'plurals-type-cardinal' data from JSON.");
             return;
         }
 
-        Console.WriteLine("Processing rules for each language...");
+        Console.WriteLine(@"Processing rules for each language...");
         var langToRuleSet = cldrData.Supplemental.PluralsTypeCardinal
             .ToDictionary(kvp => kvp.Key, kvp => new LanguageRuleSet(kvp.Value));
 
@@ -114,7 +114,7 @@ internal static class CldrPluralRuleGenerator
             .GroupBy(kvp => kvp.Value.CanonicalKey)
             .ToDictionary(g => g.Key, g => g.Select(kvp => kvp.Key).ToList());
 
-        Console.WriteLine($"Generating '{outputFile}'...");
+        Console.WriteLine($@"Generating '{outputFile}'...");
         var sb = new StringBuilder();
 
         // Add header
@@ -129,8 +129,10 @@ internal static class CldrPluralRuleGenerator
 
         File.WriteAllText(outputFile, sb.ToString(), Encoding.UTF8);
         Console.WriteLine(
-            $"Successfully generated '{outputFile}'. Found {rulesToLangs.Count} unique pluralization rule sets across {langToRuleSet.Count} languages.");
+            $@"Successfully generated '{outputFile}'. Found {rulesToLangs.Count} unique pluralization rule sets across {langToRuleSet.Count} languages.");
     }
+
+    #region *** Rule Translation and Code Generation ***
 
     internal static readonly char[] CommaSeparator = { ',' };
 
@@ -236,7 +238,7 @@ internal static class CldrPluralRuleGenerator
 
         sb.AppendLine("using System;");
         sb.AppendLine("using System.Collections.Generic;");
-        sb.AppendLine("using System.Globalization;");
+        sb.AppendLine("using System.Linq;");
         sb.AppendLine();
         sb.AppendLine("namespace SmartFormat.Utilities;");
         sb.AppendLine();
@@ -253,6 +255,25 @@ internal static class CldrPluralRuleGenerator
         sb.AppendLine("    Other");
         sb.AppendLine("}");
         sb.AppendLine();
+        sb.AppendLine("""
+                      public sealed class CldrPluralRule
+                      {
+                          public IReadOnlyList<PluralCategory> PossibleCategories { get; }
+                          public CldrPluralRules.PluralRuleDelegate Delegate { get; }
+
+                          public CldrPluralRule(IEnumerable<PluralCategory> possibleCategories, CldrPluralRules.PluralRuleDelegate ruleDelegate)
+                          {
+                              PossibleCategories = possibleCategories.ToArray();
+                              Delegate = ruleDelegate;
+                          }
+
+                          public PluralCategory GetCategory(decimal value)
+                          {
+                              return Delegate(value);
+                          }
+                      }
+
+                      """);
         sb.Append("""
                   /// <summary>
                   /// Provides functionality for determining plural categories based
@@ -274,7 +295,7 @@ internal static class CldrPluralRuleGenerator
         sb.AppendLine(
             "    // For languages with a single form (e.g., Japanese, Chinese, Vietnamese), the category is 'other'.");
         sb.AppendLine(
-            "    private static PluralCategory Singular(decimal value, int pluralWordsCount) => PluralCategory.Other;");
+            "    private static PluralCategory Singular(decimal value) => PluralCategory.Other;");
         sb.AppendLine();
         foreach (var (key, langs) in rulesToLangs.OrderBy(kvp => kvp.Value.First()))
         {
@@ -284,7 +305,7 @@ internal static class CldrPluralRuleGenerator
             var ruleSet = langToRuleSet[langs.First()];
             var titleCase = CultureInfo.InvariantCulture.TextInfo;
             sb.AppendLine($"    // Rule for: {string.Join(", ", langs.Take(5))}{(langs.Count > 5 ? ", ..." : "")}");
-            sb.AppendLine($"    private static PluralCategory {methodName}(decimal value, int pluralWordsCount)");
+            sb.AppendLine($"    private static PluralCategory {methodName}(decimal value)");
             sb.AppendLine("    {");
             sb.AppendLine("        var (n, i, v, w, f, t, e) = GetOperands(value);");
 
@@ -303,8 +324,9 @@ internal static class CldrPluralRuleGenerator
         sb.AppendLine("    #endregion");
         sb.AppendLine();
 
+        sb.AppendLine("    #region Language-to-Rule Mapping");
         sb.AppendLine(
-            "    private static readonly Dictionary<string, PluralRuleDelegate> DefaultLangToDelegate = new()");
+            "    private static readonly Dictionary<string, CldrPluralRule> DefaultLangToRule= new()");
         sb.AppendLine("    {");
 
         foreach (var lang in rulesToLangs.SelectMany(kvp => kvp.Value).OrderBy(l => l))
@@ -313,81 +335,117 @@ internal static class CldrPluralRuleGenerator
             var methodName = ruleMethodNames[ruleSet.CanonicalKey];
             var categories = ruleSet.Rules.Select(r => r.Category).ToList();
             categories.Add("other");
-            var comment = string.Join(", ", categories);
-            sb.AppendLine($"        {{ \"{lang}\", {methodName} }}, // {comment}");
+            var categoryArrayString = $"new[] {{ {string.Join(", ", categories.Select(c => $"PluralCategory.{CultureInfo.InvariantCulture.TextInfo.ToTitleCase(c)}"))} }}";
+            sb.AppendLine($"        {{ \"{lang}\", new CldrPluralRule({categoryArrayString}, {methodName}) }},");
         }
 
         sb.AppendLine("    };");
-        sb.AppendLine();
-
+        sb.AppendLine("    #endregion");
         sb.AppendLine(
-            @"    public static Dictionary<string, PluralRuleDelegate> IsoLangToDelegate { get; private set; } = new(DefaultLangToDelegate);
+            """
+                
+                #region CLDR Helper methods
 
-    public static void RestoreDefault() => IsoLangToDelegate = new Dictionary<string, PluralRuleDelegate>(DefaultLangToDelegate);
+                /// <summary>
+                /// n => The absolute value of the input number (e.g., 1, 2.5, 0.01)
+                /// u => The integer digits of n (deprecated in CLDR, but may appear in legacy rules)
+                /// v => Number of visible fraction digits in n (e.g., 1.5 => v = 1)
+                /// w => Number of visible fraction digits excluding trailing zeros (e.g., 1.50 => w = 1)
+                /// f => Visible fraction digits as an integer (e.g., 1.25 => f = 25)
+                /// t => Visible fraction digits excluding trailing zeros (e.g., 1.50 => t = 5) 
+                /// e => Always 0 for decimal input
+                /// </summary>
+                private static (decimal n, long i, int v, int w, long f, long t, int e) GetOperands(decimal value)
+                {
+                    // Get absolute value for CLDR rules
+                    var n = Math.Abs(value);
+                  
+                    // GetBits() returns an array of four integers.
+                    // Extract the binary representation of the decimal:
+                    // decimals are stored as 96-bit integer with a scaling factor.
+                    // - bits[0], bits[1], bits[2] form the 96-bit integer value
+                    // - bits[3] contains the scale (bits 16-23) and sign (bit 31)
+                    var bits = decimal.GetBits(n);
+                  
+                    // Integer part (before decimal point)
+                    var i = (long) Math.Truncate(n);
+                  
+                    // v = number of visible fractional digits (including trailing zeros)
+                    // w = number of significant fractional digits (excluding trailing zeros)  
+                    // f = fractional digits as integer (with trailing zeros)
+                    // t = fractional digits as integer (without trailing zeros)
+                    // e = exponent (used for scientific notation)
+                    //     Only numbers like 1.0e6 should have e != 0
+                    //     Since we're parsing from regular decimal, e is always 0
+                    int v = 0, w = 0, e = 0;
+                    long f = 0, t = 0;
 
-    public delegate PluralCategory PluralRuleDelegate(decimal value, int pluralWordsCount);
-        
-    public static PluralRuleDelegate GetPluralRule(string? twoLetterIsoLanguageName)
-    {
-        if (twoLetterIsoLanguageName != null && IsoLangToDelegate.TryGetValue(twoLetterIsoLanguageName, out var rule))
-            return rule;
-        
-        return IsoLangToDelegate[""und""];
-    }
+                    // Extract scale factor - to see how many fractional digits exist
+                    // Move scale to the lowest 8 bits and filter lower 5 bits (0-28)
+                    var scale = (bits[3] >> 16) & 0x1F;
+                  
+                    if (scale > 0)
+                    {
+                        // Total visible fractional digits (v) equals the scale
+                        v = scale;
+                      
+                        // Calculate fractional part mathematically
+                        var fractionalPart = n - i;
+                        f = (long) (fractionalPart * Pow10(scale));
+                      
+                        // Remove trailing zeros for significant fractional digits (w)
+                        var temp = f;
+                        w = scale;
+                        while (temp % 10 == 0 && temp > 0)
+                        {
+                            temp /= 10;
+                            w--;
+                        }
+                        t = temp;
+                    }
 
-    #region CLDR Helper methods
+                    return (n, i, v, w, f, t, e);
+                }
 
-    /// <summary>
-    /// n => The absolute value of the input number (e.g., 1, 2.5, 0.01)
-    /// u => The integer digits of n (deprecated in CLDR, but may appear in legacy rules)
-    /// v => Number of visible fraction digits in n (e.g., 1.5 => v = 1)
-    /// w => Number of visible fraction digits excluding trailing zeros (e.g., 1.50 => w = 1)
-    /// f => Visible fraction digits as an integer (e.g., 1.25 => f = 25)
-    /// t => Visible fraction digits excluding trailing zeros (e.g., 1.50 => t = 5) 
-    /// </summary>
-    private static (decimal n, long i, int v, int w, long f, long t, int e) GetOperands(decimal value)
-    {
-        var n = Math.Abs(value);
-        var s = value.ToString(CultureInfo.InvariantCulture);
-        long i = (long)Math.Truncate(n);
-        int v = 0, w = 0, e = 0;
-        long f = 0, t = 0;
+                private static decimal Pow10(int exponent) => (decimal) Math.Pow(10, exponent);
 
-        var decPoint = s.IndexOf('.');
-        if (decPoint != -1)
-        {
-            var fractionStr = s.Substring(decPoint + 1);
-            v = fractionStr.Length;
-            long.TryParse(fractionStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out f);
+                private static bool IsInRange(long val, long min, long max) => val >= min && val <= max;
+                  
+                private static bool IsInRange(decimal val, decimal min, decimal max)
+                {
+                    // First check if value is within the range
+                    if (val < min || val > max)
+                        return false;
 
-            var fractionStrTrimmed = fractionStr.TrimEnd('0');
-            w = fractionStrTrimmed.Length;
-            long.TryParse(fractionStrTrimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out t);
-        }
+                    // If min and max are integers (whole numbers), then require val to also be integer
+                    // This for rules like 'n = 2..4' which should not match '2.5'
+                    if (min == Math.Truncate(min) && max == Math.Truncate(max))
+                    {
+                        return val == Math.Truncate(val);
+                    }
 
-        return (n, i, v, w, f, t, e);
-    }
+                    return true;
+                }
 
-    private static bool IsInRange(long val, long min, long max) => val >= min && val <= max;
-    
-    private static bool IsInRange(decimal val, decimal min, decimal max)
-    {
-        // First check if value is within the range
-        if (val < min || val > max)
-            return false;
+                #endregion                      
 
-        // If min and max are integers (whole numbers), then require val to also be integer
-        // This for rules like 'n = 2..4' which should not match '2.5'
-        if (min == Math.Truncate(min) && max == Math.Truncate(max))
-        {
-            return val == Math.Truncate(val);
-        }
+                public static Dictionary<string, CldrPluralRule> IsoCodeToRule { get; private set; } = new(DefaultLangToRule);
 
-        return true;
+                public static void RestoreDefault() => IsoCodeToRule = new Dictionary<string, CldrPluralRule>(DefaultLangToRule);
+
+                internal delegate PluralCategory PluralRuleDelegate(decimal value);
+                      
+                public static CldrPluralRule GetPluralRule(string? twoLetterIsoCode)
+                {
+                    if (twoLetterIsoCode != null && IsoCodeToRule.TryGetValue(twoLetterIsoCode, out var rule))
+                        return rule;
+                      
+                    return IsoCodeToRule["und"];
+                }
+            }
+            """);
     }
 
     #endregion
-}");
-    }
 }
 #endif
