@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace SmartFormat.Utilities;
 #pragma warning disable S3776 // disable sonar cognitive complexity warnings
