@@ -13,7 +13,7 @@ namespace SmartFormat.Tests.Utilities;
 internal class CldrPluralRulesTests
 {
     private static readonly Dictionary<string, List<PluralRuleInfo>> Samples
-        = CldrPluralRuleSamples.LoadRules(GetCldrPluralizationAssetFilePath());
+        = CldrPluralRuleSamples.LoadRules(Path.Combine(GetCldrPluralizationAssetFilePath(), "plurals.json"));
 
     private static string GetCldrPluralizationAssetFilePath()
     {
@@ -26,7 +26,7 @@ internal class CldrPluralRulesTests
                 throw new FileNotFoundException("Could not find the 'src' folder.");
         }
 
-        var filePath = Path.Combine(sourceRoot, "SmartFormat", "Utilities", "plurals.json");
+        var filePath = Path.Combine(sourceRoot, "SmartFormat", "Utilities");
         return filePath;
     }
 
@@ -48,7 +48,7 @@ internal class CldrPluralRulesTests
                 {
                     _ = Enum.TryParse<PluralCategory>(ruleInfo.Category, true, out var cat);
                     var message = $"Locale '{locale}' with integer '{val}' should be '{cat}'";
-                    var catFound = rule(val, 0);
+                    var catFound = rule.Delegate(val);
 
                     switch (ruleInfo.Category)
                     {
@@ -82,7 +82,7 @@ internal class CldrPluralRulesTests
                 foreach (var val in ruleInfo.DecimalSamples)
                 {
                     _ = Enum.TryParse<PluralCategory>(ruleInfo.Category, true, out var cat);
-                    var samplePluralIndex = rule(val, 0);
+                    var samplePluralIndex = rule.GetCategory(val);
                     var message = $"Locale '{locale}' with decimal '{val.ToString(CultureInfo.InvariantCulture)}' should be '{cat}'";
 
                     switch (ruleInfo.Category)
@@ -120,18 +120,18 @@ internal class CldrPluralRulesTests
     [Test]
     public void UnknownIsoCode_ShouldReturn_SingularRule()
     {
-        Assert.That(() => CldrPluralRules.GetPluralRule(null).Method.Name, Is.EqualTo("Singular"));
-        Assert.That(() => CldrPluralRules.GetPluralRule("unknown").Method.Name, Is.EqualTo("Singular"));
+        Assert.That(() => CldrPluralRules.GetPluralRule(null).Delegate.Method.Name, Is.EqualTo("Singular"));
+        Assert.That(() => CldrPluralRules.GetPluralRule("unknown").Delegate.Method.Name, Is.EqualTo("Singular"));
     }
 
     [Test]
     public void RestoreDefault_ShouldClear_CustomRules()
     {
-        var defaultSize = CldrPluralRules.IsoLangToDelegate.Count;
-        CldrPluralRules.IsoLangToDelegate.Add("unknown", (n, i) => PluralCategory.One);
-        var sizeAfterAdding = CldrPluralRules.IsoLangToDelegate.Count;
+        var defaultSize = CldrPluralRules.IsoCodeToRule.Count;
+        CldrPluralRules.IsoCodeToRule.Add("unknown", new CldrPluralRule([], n => PluralCategory.Other));
+        var sizeAfterAdding = CldrPluralRules.IsoCodeToRule.Count;
         CldrPluralRules.RestoreDefault();
-        var sizeAfterRestoring = CldrPluralRules.IsoLangToDelegate.Count;
+        var sizeAfterRestoring = CldrPluralRules.IsoCodeToRule.Count;
 
         using (Assert.EnterMultipleScope())
         {
@@ -146,13 +146,21 @@ internal class CldrPluralRulesTests
     {
         // Creates or overwrites the CldrPluralRules.cs
         // file from the plurals.json asset file.
-        Assert.That(() =>
+        var assetPath = GetCldrPluralizationAssetFilePath();
+        var jsonFile = Path.GetFullPath(Path.Combine(assetPath, "plurals.json"));
+        var csFile = Path.GetFullPath(Path.Combine(assetPath, "CldrPluralRules.cs"));
+
+        using (Assert.EnterMultipleScope())
         {
-            var assetPath = GetCldrPluralizationAssetFilePath();
-            var jsonFile = Path.GetFullPath(Path.Combine(assetPath, "plurals.json"));
-            var csFile = Path.GetFullPath(Path.Combine(assetPath, "CldrPluralRules.cs"));
-            CldrPluralRuleGenerator.Generate(jsonFile, csFile);
-        }, Throws.Nothing);
+            var fileWriteTimeBefore = File.GetLastWriteTime(csFile);
+            Assert.That(() =>
+            {
+                CldrPluralRuleGenerator.Generate(jsonFile, csFile);
+            }, Throws.Nothing);
+            var fileWriteTimeAfter = File.GetLastWriteTime(csFile);
+            Assert.That(fileWriteTimeAfter, Is.GreaterThan(fileWriteTimeBefore),
+                "The CldrPluralRules.cs file should be overwritten with a newer file.");
+        }
     }
 #endif
 
