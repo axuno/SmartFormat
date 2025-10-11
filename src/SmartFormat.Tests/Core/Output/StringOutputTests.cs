@@ -12,7 +12,7 @@ public class StringOutputTests
     public void Output_Of_Span()
     {
         var so = new StringOutput();
-        so.Write("text".AsSpan(), null!);
+        so.Write("text".AsSpan(), null);
         Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 
@@ -20,7 +20,7 @@ public class StringOutputTests
     public void Output_Of_String()
     {
         var so = new StringOutput(16);
-        so.Write("text", null!);
+        so.Write("text", null);
         Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 
@@ -30,7 +30,7 @@ public class StringOutputTests
         var so = new StringOutput();
         using var sb = ZStringBuilderUtilities.CreateZStringBuilder();
         sb.Append("text");
-        so.Write(sb, null!);
+        so.Write(sb, null);
         Assert.That(so.ToString(), Is.EqualTo("text"));
     }
 }

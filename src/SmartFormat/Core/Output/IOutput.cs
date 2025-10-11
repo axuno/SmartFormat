@@ -18,6 +18,8 @@ public interface IOutput
     /// </summary>
     /// <param name="text"></param>
     /// <param name="formattingInfo"></param>
+    // vNext: Remove formattingInfo argument?
+    [Obsolete("Use Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null) instead.", false)]
     void Write(string text, IFormattingInfo? formattingInfo = null);
 
     /// <summary>
@@ -25,6 +27,7 @@ public interface IOutput
     /// </summary>
     /// <param name="text"></param>
     /// <param name="formattingInfo"></param>
+    // vNext: Remove formattingInfo argument?
     void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null);
 
     /// <summary>
@@ -32,5 +35,7 @@ public interface IOutput
     /// </summary>
     /// <param name="stringBuilder"></param>
     /// <param name="formattingInfo"></param>
+    // vNext: Remove formattingInfo argument?
+    [Obsolete("Use Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null) instead.", false)]
     void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null);
 }
