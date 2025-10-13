@@ -173,7 +173,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo, IFormattingExtensi
     {
         if (Alignment == 0)
         {
-            FormatDetails.Output.Write(text);
+            FormatDetails.Output.Write(text, this);
             FormatDetails.Formatter.Evaluator.OnOutputWritten?.Invoke(this,
                 new Evaluator.OutputWrittenEventArgs(text.ToString()));
             return;
@@ -199,7 +199,7 @@ public class FormattingInfo : IFormattingInfo, ISelectorInfo, IFormattingExtensi
         }
 
         // Write the aligned text to the output
-        FormatDetails.Output.Write(buffer.GetSpan());
+        FormatDetails.Output.Write(buffer.GetSpan(), this);
 
         FormatDetails.Formatter.Evaluator.OnOutputWritten?.Invoke(this,
             new Evaluator.OutputWrittenEventArgs(buffer.ToString()));

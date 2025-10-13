@@ -57,7 +57,7 @@ public class StringOutput : IOutput
     /// <param name="formattingInfo">This parameter from <see cref="IOutput"/> will not be used here.</param>
     public void Write(string text, IFormattingInfo? formattingInfo = null)
     {
-        Output.Append(text);
+        Write(text.AsSpan(), formattingInfo);
     }
 
     /// <summary>
@@ -77,11 +77,7 @@ public class StringOutput : IOutput
     ///<inheritdoc/>
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
     {
-#if NETSTANDARD2_1 || NET6_0_OR_GREATER
-        Output.Append(stringBuilder.AsSpan());
-#else
-        Output.Append(stringBuilder);
-#endif
+        Write(stringBuilder.AsSpan(), formattingInfo);
     }
 
     /// <summary>

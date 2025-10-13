@@ -31,7 +31,7 @@ public class TextWriterOutput : IOutput
     ///<inheritdoc/>
     public void Write(string text, IFormattingInfo? formattingInfo = null)
     {
-        Output.Write(text);
+        Write(text.AsSpan(), formattingInfo);
     }
 
     ///<inheritdoc/>
@@ -47,10 +47,6 @@ public class TextWriterOutput : IOutput
     ///<inheritdoc/>
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
     {
-#if NETSTANDARD2_1 || NET6_0_OR_GREATER
-        Output.Write(stringBuilder.AsSpan());
-#else
-        Output.Write(stringBuilder.ToString());
-#endif
+        Write(stringBuilder.AsSpan(), formattingInfo);
     }
 }

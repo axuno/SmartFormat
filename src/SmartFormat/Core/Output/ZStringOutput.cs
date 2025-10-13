@@ -60,7 +60,7 @@ public class ZStringOutput : IOutput, IDisposable
     ///<inheritdoc/>
     public void Write(string text, IFormattingInfo? formattingInfo = null)
     {
-        Output.Append(text);
+        Write(text.AsSpan(), formattingInfo);
     }
 
     ///<inheritdoc/>
@@ -72,7 +72,7 @@ public class ZStringOutput : IOutput, IDisposable
     ///<inheritdoc/>
     public void Write(ZStringBuilder stringBuilder, IFormattingInfo? formattingInfo = null)
     {
-        Output.Append(stringBuilder);
+        Write(stringBuilder.AsSpan(), formattingInfo);
     }
 
     /// <summary>
