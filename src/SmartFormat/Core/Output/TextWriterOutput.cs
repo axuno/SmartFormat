@@ -6,7 +6,6 @@ using System;
 using System.IO;
 using SmartFormat.Core.Extensions;
 using SmartFormat.ZString;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SmartFormat.Core.Output;
 

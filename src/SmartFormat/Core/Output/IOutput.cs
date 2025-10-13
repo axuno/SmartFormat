@@ -30,7 +30,7 @@ public interface IOutput
     /// </summary>
     /// <param name="text"></param>
     /// <param name="formattingInfo"></param>
-    // vNext: Remove formattingInfo argument? Or make it non-optional and non-nullable?
+    // v4: Remove formattingInfo argument? Or make it non-optional and non-nullable?
     void Write(ReadOnlySpan<char> text, IFormattingInfo? formattingInfo = null);
 
     /// <summary>
