@@ -190,8 +190,8 @@ Example:
 
     private void LstExamples_SelectedIndexChanged(object sender, EventArgs e)
     {
+        if (lstExamples.SelectedItem == null) return;
         var example = (KeyValuePair<string, string>) lstExamples.SelectedItem;
-        if (example.Value == null) return;
         txtInput.Text = example.Value;
     }
 }
