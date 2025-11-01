@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace SmartFormat.Utilities;
 #pragma warning disable S3776 // disable sonar cognitive complexity warnings
@@ -210,7 +211,6 @@ public static class PluralRules
 
     private static PluralRuleDelegate DualOneOther => (value, pluralWordsCount) =>
     {
-        value = Math.Abs(value);
         return pluralWordsCount switch {
             2 => value == 1 ? 0 : 1,
             3 => value switch {
@@ -224,15 +224,10 @@ public static class PluralRules
     }; // Dual: one (n == 1), other
 
     private static PluralRuleDelegate DualWithZero =>
-        (value, pluralWordsCount) =>
-        {
-            value = Math.Abs(value);
-            return value == 0 || value == 1 ? 0 : 1;
-        }; // DualWithZero: one (n == 0..1), other
+        (value, pluralWordsCount) => value == 0 || value == 1 ? 0 : 1; // DualWithZero: one (n == 0..1), other
 
     private static PluralRuleDelegate DualFromZeroToTwo => (value, pluralWordsCount) =>
     {
-        value = Math.Abs(value);
         if (pluralWordsCount == 2) return value is >= 0 and < 2 ? 0 : 1;
 
         if (pluralWordsCount == 3) return GetWordsCount3Value(value);
@@ -244,7 +239,6 @@ public static class PluralRules
 
     private static int GetWordsCount3Value(decimal n)
     {
-        n = Math.Abs(n);
         return n switch
         {
             0 => 0,
@@ -255,7 +249,6 @@ public static class PluralRules
 
     private static int GetWordsCount4Value(decimal n)
     {
-        n = Math.Abs(n);
         return n switch
         {
             < 0 => 0,
@@ -265,35 +258,20 @@ public static class PluralRules
         };
     }
         
-    private static PluralRuleDelegate TripleOneTwoOther => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 1 ? 0 : value == 2 ? 1 : 2;
-    }; // Triple: one (n == 1), two (n == 2), other
-
+    private static PluralRuleDelegate TripleOneTwoOther => (value, pluralWordsCount) => value == 1 ? 0 : value == 2 ? 1 : 2; // Triple: one (n == 1), two (n == 2), other
     private static PluralRuleDelegate RussianSerboCroatian => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value % 10 == 1 && value % 100 != 11 ? 0 : // one
-            (value % 10).BetweenWithoutFraction(2, 4) && !(value % 100).BetweenWithoutFraction(12, 14) ? 1 : // few
-            2;
-    }; // Russian & Serbo-Croatian
-
+        value % 10 == 1 && value % 100 != 11 ? 0 : // one
+        (value % 10).BetweenWithoutFraction(2, 4) && !(value % 100).BetweenWithoutFraction(12, 14) ? 1 : // few
+        2; // Russian & Serbo-Croatian
     private static PluralRuleDelegate Arabic => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 0 ? 0 : // zero
-            value == 1 ? 1 : // one
-            value == 2 ? 2 : // two
-            (value % 100).BetweenWithoutFraction(3, 10) ? 3 : // few
-            (value % 100).BetweenWithoutFraction(11, 99) ? 4 : // many
-            5;
-    }; // other
-
+        value == 0 ? 0 : // zero
+        value == 1 ? 1 : // one
+        value == 2 ? 2 : // two
+        (value % 100).BetweenWithoutFraction(3, 10) ? 3 : // few
+        (value % 100).BetweenWithoutFraction(11, 99) ? 4 : // many
+        5; // other
     private static PluralRuleDelegate Breton => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value switch
+        value switch
         {
             0 => 0, // zero
             1 => 1, // one
@@ -301,23 +279,16 @@ public static class PluralRules
             3 => 3, // few
             6 => 4, // many
             _ => 5  // other
-        };
-    };
-
+        }; 
     private static PluralRuleDelegate Czech => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 0 ? 0 : // zero
-            value == 1 ? 1 : // one
-            value.BetweenWithoutFraction(2, 4) ? 2 : // few
-            value % 1 == 0 ? 3 : // many
-            4; // other
-    };  
+        value == 0 ? 0 : // zero
+        value == 1 ? 1 : // one
+        value.BetweenWithoutFraction(2, 4) ? 2 : // few
+        value % 1 == 0 ? 3 : // many
+        4;  // other
 
     private static PluralRuleDelegate Welsh => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value switch
+        value switch
         {
             0 => 0, // zero
             1 => 1, // one
@@ -326,120 +297,67 @@ public static class PluralRules
             6 => 4, // many
             _ => 5  // other
         };
-    };
     private static PluralRuleDelegate Manx => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return (value % 10).BetweenWithoutFraction(1, 2) || value % 20 == 0
+        (value % 10).BetweenWithoutFraction(1, 2) || value % 20 == 0
             ? 0
             : // one
             1;
-    };
-
     private static PluralRuleDelegate Langi => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value switch
+        value switch
         {
             0 => 0,
             > 0 and < 2 => 1,
             _ => 2
         };
-    };
-
     private static PluralRuleDelegate Lithuanian => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value % 10 == 1 && !(value % 100).BetweenWithoutFraction(11, 19) ? 0 : // one
-            (value % 10).BetweenWithoutFraction(2, 9) && !(value % 100).BetweenWithoutFraction(11, 19) ? 1 : // few
-            2;
-    };
-
+        value % 10 == 1 && !(value % 100).BetweenWithoutFraction(11, 19) ? 0 : // one
+        (value % 10).BetweenWithoutFraction(2, 9) && !(value % 100).BetweenWithoutFraction(11, 19) ? 1 : // few
+        2;
     private static PluralRuleDelegate Latvian => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 0 ? 0 : // zero
-            value % 10 == 1 && value % 100 != 11 ? 1 :
-            2;
-    };
-
+        value == 0 ? 0 : // zero
+        value % 10 == 1 && value % 100 != 11 ? 1 :
+        2;
     private static PluralRuleDelegate Macedonian => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value % 10 == 1 && value != 11
+        value % 10 == 1 && value != 11
             ? 0
             : // one
             1;
-    };
-
     private static PluralRuleDelegate Moldavian => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 1 ? 0 : // one
-            value == 0 || value != 1 && (value % 100).BetweenWithoutFraction(1, 19) ? 1 : // few
-            2;
-    };
-
+        value == 1 ? 0 : // one
+        value == 0 || value != 1 && (value % 100).BetweenWithoutFraction(1, 19) ? 1 : // few
+        2;
     private static PluralRuleDelegate Maltese => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 1 ? 0 : // one
-            value == 0 || (value % 100).BetweenWithoutFraction(2, 10) ? 1 : // few
-            (value % 100).BetweenWithoutFraction(11, 19) ? 2 : // many
-            3;
-    };
-
+        value == 1 ? 0 : // one
+        value == 0 || (value % 100).BetweenWithoutFraction(2, 10) ? 1 : // few
+        (value % 100).BetweenWithoutFraction(11, 19) ? 2 : // many
+        3;
     private static PluralRuleDelegate Polish => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 1 ? 0 : // one
-            (value % 10).BetweenWithoutFraction(2, 4) && !(value % 100).BetweenWithoutFraction(12, 14) ? 1 : // few
-            (value % 10).BetweenWithoutFraction(0, 1) || (value % 10).BetweenWithoutFraction(5, 9) ||
-            (value % 100).BetweenWithoutFraction(12, 14) ? 2 : // many
-            3;
-    };
-
+        value == 1 ? 0 : // one
+        (value % 10).BetweenWithoutFraction(2, 4) && !(value % 100).BetweenWithoutFraction(12, 14) ? 1 : // few
+        (value % 10).BetweenWithoutFraction(0, 1) || (value % 10).BetweenWithoutFraction(5, 9) || (value % 100).BetweenWithoutFraction(12, 14) ? 2 : // many
+        3;
     private static PluralRuleDelegate Romanian => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 1 ? 0 : // one
-            value == 0 || (value % 100).BetweenWithoutFraction(1, 19) ? 1 : // few
-            2;
-    };
-
+        value == 1 ? 0 : // one
+        value == 0 || (value % 100).BetweenWithoutFraction(1, 19) ? 1 : // few
+        2;
     private static PluralRuleDelegate Tachelhit => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value >= 0 && value <= 1 ? 0 : // one
-            value.BetweenWithoutFraction(2, 10) ? 1 : // few
-            2;
-    };
-
+        value >= 0 && value <= 1 ? 0 : // one
+        value.BetweenWithoutFraction(2, 10) ? 1 : // few
+        2;
     private static PluralRuleDelegate Slovak => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value == 1 ? 0 : // one
-            value.BetweenWithoutFraction(2, 4) ? 1 : // few
-            2;
-    };
-
+        value == 1 ? 0 : // one
+        value.BetweenWithoutFraction(2, 4) ? 1 : // few
+        2;
     private static PluralRuleDelegate Slovenian => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value % 100 == 1 ? 0 : // one
-            value % 100 == 2 ? 1 : // two
-            (value % 100).BetweenWithoutFraction(3, 4) ? 2 : // few
-            3;
-    };
-
+        value % 100 == 1 ? 0 : // one
+        value % 100 == 2 ? 1 : // two
+        (value % 100).BetweenWithoutFraction(3, 4) ? 2 : // few
+        3;
     private static PluralRuleDelegate CentralMoroccoTamazight => (value, pluralWordsCount) =>
-    {
-        value = Math.Abs(value);
-        return value.BetweenWithoutFraction(0, 1) || value.BetweenWithoutFraction(11, 99)
+        value.BetweenWithoutFraction(0, 1) || value.BetweenWithoutFraction(11, 99)
             ? 0
             : // one
             1;
-    };
 
     /// <summary>
     /// This delegate determines which singular or plural word should be chosen for the given quantity.

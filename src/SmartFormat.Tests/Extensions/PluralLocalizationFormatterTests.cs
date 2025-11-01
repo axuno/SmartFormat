@@ -99,7 +99,7 @@ public class PluralLocalizationFormatterTests
             new CultureInfo("en-US"),
             "There {0:plural:is|are} {0} {0:plural:item|items} remaining",
             new ExpectedResults {
-                {  -1, "There is -1 item remaining"},
+                {  -1, "There are -1 items remaining"},
                 {   0, "There are 0 items remaining"},
                 {0.5m, "There are 0.5 items remaining"},
                 {   1, "There is 1 item remaining"},
@@ -116,7 +116,7 @@ public class PluralLocalizationFormatterTests
             new CultureInfo("en-US"),
             "There {0:plural:is|are} {0} {0:plural:item|items} remaining",
             new ExpectedResults {
-                {  -1, "There is -1 item remaining"},
+                {  -1, "There are -1 items remaining"},
                 {   0, "There are 0 items remaining"},
                 {0.5m, "There are 0.5 items remaining"},
                 {   1, "There is 1 item remaining"},
@@ -184,7 +184,7 @@ public class PluralLocalizationFormatterTests
         Assert.That(actual, Is.EqualTo(string.Format(ci, expected, count)));
     }
 
-    [TestCase(-1, "une personne")] // -1 is treated as 1 (singular)
+    [TestCase(-1, "-")]
     [TestCase(0, "pas de personne")] // 0 is singular
     [TestCase(1, "une personne")] // 1 is singular
     [TestCase(2, "{0} personnes")] // 2 is plural
@@ -214,7 +214,7 @@ public class PluralLocalizationFormatterTests
             new CultureInfo("tr"),
             "Seçili {0:plural:nesneyi|nesneleri} silmek istiyor musunuz?",
             new ExpectedResults {
-                {  -1, "Seçili nesneyi silmek istiyor musunuz?"}, // -1 is treated as 1 (singular)
+                {  -1, "Seçili nesneleri silmek istiyor musunuz?"},
                 {   0, "Seçili nesneleri silmek istiyor musunuz?"},
                 {0.5m, "Seçili nesneleri silmek istiyor musunuz?"},
                 {   1, "Seçili nesneyi silmek istiyor musunuz?"},
