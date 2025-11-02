@@ -287,15 +287,16 @@ public sealed class Format : FormatItem, IDisposable
 
     /// <summary>
     /// Splits the <see cref="Format"/> items by the given search character.
+    /// The number of splits is limited to <see cref="int.MaxValue"/>.
     /// </summary>
     /// <param name="search">The search character used to split.</param>
-    /// <returns></returns>
+    /// <returns>An <see cref="IList{T}"/> of <see cref="Format"/>s.</returns>
     public IList<Format> Split(char search)
     {
         if (_splitCache == null || _splitCacheChar != search)
         {
             _splitCacheChar = search;
-            _splitCache = Split(search, -1);
+            _splitCache = Split(search, int.MaxValue);
         }
 
         return _splitCache;
@@ -309,8 +310,11 @@ public sealed class Format : FormatItem, IDisposable
     /// <returns>An <see cref="IList{T}"/> of <see cref="Format"/>s.</returns>
     public IList<Format> Split(char search, int maxCount)
     {
+        maxCount = Math.Abs(maxCount);
         var splits = FindAll(search, maxCount);
+        // Initialize the SplitList and prefill the cache:
         var splitList = SplitListPool.Instance.Get().Initialize(this, splits);
+        splitList.CreateSplitCache();
 
         // Keep track of the split lists we create,
         // so that they can be returned to the object pool for later reuse.
