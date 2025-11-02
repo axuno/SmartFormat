@@ -20,7 +20,7 @@ internal class SplitList : IList<Format>
 
     private Format _format = InitializationObject.Format;
     private List<int> _splits = InitializationObject.IntegerList;
-    private readonly List<Format?> _formatCache = new();
+    private readonly List<Format?> _splitFormatCache = new();
         
     /// <summary>
     /// CTOR for object pooling.
@@ -42,9 +42,10 @@ internal class SplitList : IList<Format>
         _format = format;
         _splits = splits;
 
-        // Resize the cache to match
+        // Pre-size the cache to match
+        // If we have N splits, we have N+1 resulting formats (see Count property)
         for (var i = 0; i < Count; ++i)
-            _formatCache.Add(null);
+            _splitFormatCache.Add(null);
 
         return this;
     }
@@ -63,31 +64,44 @@ internal class SplitList : IList<Format>
 
             if (_splits.Count == 0) return _format;
 
-            // Return the cached version?
-            if (_formatCache[index] != null)
-                return _formatCache[index]!;
+            // The cache was initialized with nulls, but not yet filled
+            if (_splitFormatCache.Exists(c => c is null))
+                throw new InvalidOperationException("SplitList cache was not filled.");
 
+            // Return the result from the cache
+            // which was created in method Format.Split(...)
+            return _splitFormatCache[index]!;
+        }
+        set => throw new NotSupportedException();
+    }
+
+    internal void CreateSplitCache()
+    {
+        if (_splits.Count == 0) return;
+
+        // If we have N splits, we have N+1 resulting formats
+        for (var index = 0; index <= _splits.Count; index++)
+        {
+            Format f;
             if (index == 0)
             {
-                var f = _format.Substring(0, _splits[0]);
-                _formatCache[index] = f;
-                return f;
+                f = _format.Substring(0, _splits[0]);
+                _splitFormatCache[index] = f;
+                continue;
             }
 
             if (index == _splits.Count)
             {
-                var f = _format.Substring(_splits[index - 1] + 1);
-                _formatCache[index] = f;
-                return f;
+                f = _format.Substring(_splits[index - 1] + 1);
+                _splitFormatCache[index] = f;
+                continue;
             }
 
-            // Return the format between the splits
+            // The format between the splits
             var startIndex = _splits[index - 1] + 1;
-            var format = _format.Substring(startIndex, _splits[index] - startIndex);
-            _formatCache[index] = format;
-            return format;
+            f = _format.Substring(startIndex, _splits[index] - startIndex);
+            _splitFormatCache[index] = f;
         }
-        set => throw new NotSupportedException();
     }
 
     /// <summary>
@@ -101,11 +115,13 @@ internal class SplitList : IList<Format>
         _splits = InitializationObject.IntegerList;
 
         // Return the Formats we created to the pool
-        for (var i = 0; i < _formatCache.Count; i++)
-            if (_formatCache[i] != null)
-                FormatPool.Instance.Return(_formatCache[i]!);
-            
-        _formatCache.Clear();
+        for (var i = 0; i < _splitFormatCache.Count; i++)
+        {
+            if (_splitFormatCache[i] != null)
+                FormatPool.Instance.Return(_splitFormatCache[i]!);
+        }
+
+        _splitFormatCache.Clear();
     }
 
     ///<inheritdoc/>
@@ -120,6 +136,21 @@ internal class SplitList : IList<Format>
 
     ///<inheritdoc/>
     public bool IsReadOnly => true;
+
+    ///<inheritdoc/>
+    public IEnumerator<Format> GetEnumerator()
+    {
+        for (var i = 0; i < Count; i++)
+        {
+            yield return this[i];
+        }
+    }
+
+    ///<inheritdoc/>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     #endregion
 
@@ -169,22 +200,6 @@ internal class SplitList : IList<Format>
     /// This method is not implemented.
     /// </summary>
     public bool Remove(Format item)
-    {
-        throw new NotSupportedException();
-    }
-
-    /// <summary>
-    /// This method is not implemented.
-    /// </summary>
-    public IEnumerator<Format> GetEnumerator()
-    {
-        throw new NotSupportedException();
-    }
-
-    /// <summary>
-    /// This method is not implemented.
-    /// </summary>
-    IEnumerator IEnumerable.GetEnumerator()
     {
         throw new NotSupportedException();
     }

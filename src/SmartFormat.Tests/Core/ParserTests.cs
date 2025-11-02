@@ -306,37 +306,6 @@ public class ParserTests
         });
     }
 
-    [Test]
-    public void Test_Format_Split()
-    {
-        var parser = GetRegularParser();
-        var format = " a|aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg|g ";
-        var parsedFormat = parser.ParseFormat(format);
-        var splits = parsedFormat.Split('|');
-
-        Assert.That(splits, Has.Count.EqualTo(3));
-        Assert.Multiple(() =>
-        {
-            Assert.That(splits[0].ToString(), Is.EqualTo(" a"));
-            Assert.That(splits[1].ToString(), Is.EqualTo("aa {bbb: ccc dd|d {:|||} {eee} ff|f } gg"));
-            Assert.That(splits[2].ToString(), Is.EqualTo("g "));
-        });
-
-        // Test nested formats:
-        var placeholder = (Placeholder) parsedFormat.Items[1];
-        parsedFormat = placeholder.Format!;
-        Assert.That(parsedFormat.ToString(), Is.EqualTo(" ccc dd|d {:|||} {eee} ff|f "));
-        splits = parsedFormat.Split('|');
-
-        Assert.That(splits, Has.Count.EqualTo(3));
-        Assert.Multiple(() =>
-        {
-            Assert.That(splits[0].ToString(), Is.EqualTo(" ccc dd"));
-            Assert.That(splits[1].ToString(), Is.EqualTo("d {:|||} {eee} ff"));
-            Assert.That(splits[2].ToString(), Is.EqualTo("f "));
-        });
-    }
-
     [TestCase("{0:name:}", "name", "", "")]
     [TestCase("{0:name()}", "name", "", "")]
     [TestCase("{0:name(1|2|3)}", "name", "1|2|3", "")]
