@@ -49,7 +49,7 @@ public abstract class Source : ISource, IInitializer
 #pragma warning disable S3267 // Don't use LINQ in favor of less GC
             foreach (var s in selectorInfo.Placeholder.Selectors)
             {
-                if (s.OperatorLength > 1 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator)
+                if (s.OperatorLength > 1 && s.BaseString[s.OperatorStartIndex] == ParserSettings.NullableOperator)
                     return true;
             }
 #pragma warning restore S3267 // Restore: Loops should be simplified with "LINQ" expressions

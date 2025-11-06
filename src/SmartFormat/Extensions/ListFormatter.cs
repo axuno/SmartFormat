@@ -300,14 +300,14 @@ public class ListFormatter : IFormatter, ISource, IInitializer
     /// <remarks>
     /// The nullable operator '?' can be followed by a dot (like '?.') or a square brace (like '?[')
     /// </remarks>
-    private bool HasNullableOperator(IFormattingInfo formattingInfo)
+    private static bool HasNullableOperator(IFormattingInfo formattingInfo)
     {
         if (formattingInfo.Placeholder != null)
         {
 #pragma warning disable S3267 // Don't use LINQ in favor of less GC
             foreach (var s in formattingInfo.Placeholder.Selectors)
             {
-                if (s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == _smartSettings.Parser.NullableOperator)
+                if (s.OperatorLength > 0 && s.BaseString[s.OperatorStartIndex] == ParserSettings.NullableOperator)
                     return true;
             }
 #pragma warning restore S3267 // Restore: Loops should be simplified with "LINQ" expressions

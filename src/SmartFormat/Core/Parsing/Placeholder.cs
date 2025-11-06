@@ -5,6 +5,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.ObjectPools;
 using SmartFormat.Pooling.SmartPools;
 using SmartFormat.ZString;
@@ -138,7 +139,7 @@ public class Placeholder : FormatItem
         // 1. The operator character must have a value, usually ','
         // 2. The alignment is an integer value
         if (selector.OperatorLength > 0 
-            && selector.Operator[0] == SmartSettings.Parser.AlignmentOperator 
+            && selector.Operator[0] == ParserSettings.AlignmentOperator 
             && int.TryParse(selector.RawText, out var alignment))
         {
             Alignment = alignment;
@@ -231,41 +232,41 @@ public class Placeholder : FormatItem
 
         using var buffer = new ZCharArray(Length + 2); // +2 for the braces
 
-        buffer.Write(SmartSettings.Parser.PlaceholderBeginChar);
+        buffer.Write(ParserSettings.PlaceholderBeginChar);
         foreach (var s in Selectors)
         {
             // alignment operators will be appended later
-            if (s.Operator.Length > 0 && s.Operator[0] == SmartSettings.Parser.AlignmentOperator) continue;
+            if (s.Operator.Length > 0 && s.Operator[0] == ParserSettings.AlignmentOperator) continue;
 
             var selectorSpan = s.BaseString.AsSpan(s.OperatorStartIndex, s.EndIndex - s.OperatorStartIndex);
             buffer.Write(selectorSpan);
         }
         if (Alignment != 0)
         {
-            buffer.Write(SmartSettings.Parser.AlignmentOperator);
+            buffer.Write(ParserSettings.AlignmentOperator);
             buffer.Write(Alignment.ToString());
         }
 
         if (FormatterName != string.Empty)
         {
-            buffer.Write(SmartSettings.Parser.FormatterNameSeparator);
+            buffer.Write(ParserSettings.FormatterNameSeparator);
             buffer.Write(FormatterName);
 
             if (FormatterOptions != string.Empty)
             {
-                buffer.Write(SmartSettings.Parser.FormatterOptionsBeginChar);
+                buffer.Write(ParserSettings.FormatterOptionsBeginChar);
                 buffer.Write(FormatterOptions);
-                buffer.Write(SmartSettings.Parser.FormatterOptionsEndChar);
+                buffer.Write(ParserSettings.FormatterOptionsEndChar);
             }
         }
 
         if (Format != null)
         {
-            buffer.Write(SmartSettings.Parser.FormatterNameSeparator);
+            buffer.Write(ParserSettings.FormatterNameSeparator);
             buffer.Write(Format.AsSpan());
         }
 
-        buffer.Write(SmartSettings.Parser.PlaceholderEndChar);
+        buffer.Write(ParserSettings.PlaceholderEndChar);
 
 #if NETSTANDARD2_1 || NET6_0_OR_GREATER
         _toStringCache = new string(buffer.GetSpan());

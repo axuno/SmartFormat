@@ -63,9 +63,9 @@ public class Parser
     {
         Settings = smartSettings ?? new SmartSettings();
         _parserSettings = Settings.Parser;
-        _operatorChars = _parserSettings.OperatorChars();
-        _customOperatorChars = _parserSettings.CustomOperatorChars();
-        _formatOptionsTerminatorChars = _parserSettings.FormatOptionsTerminatorChars();
+        _operatorChars = ParserSettings.OperatorChars;
+        _customOperatorChars = _parserSettings.CustomOperatorChars;
+        _formatOptionsTerminatorChars = ParserSettings.FormatOptionsTerminatorChars;
 
         _disallowedSelectorChars = _parserSettings.DisallowedSelectorChars();
     }
@@ -239,19 +239,19 @@ public class Parser
             return;
         }
 
-        if (inputChar == _parserSettings.PlaceholderBeginChar)
+        if (inputChar == ParserSettings.PlaceholderBeginChar)
         {
             AddLiteralCharsParsedBefore(state);
-            if (EscapeLikeStringFormat(_parserSettings.PlaceholderBeginChar, state)) return;
+            if (EscapeLikeStringFormat(ParserSettings.PlaceholderBeginChar, state)) return;
 
             // Context transition
             CreateNewPlaceholder(ref nestedDepth, state, out currentPlaceholder);
             currentContext = ParseContext.SelectorHeader;
         }
-        else if (inputChar == _parserSettings.PlaceholderEndChar)
+        else if (inputChar == ParserSettings.PlaceholderEndChar)
         {
             AddLiteralCharsParsedBefore(state);
-            if (EscapeLikeStringFormat(_parserSettings.PlaceholderEndChar, state)) return;
+            if (EscapeLikeStringFormat(ParserSettings.PlaceholderEndChar, state)) return;
             if (HasProcessedTooManyClosingBraces(parsingErrors, state)) return;
 
             // End of a nested placeholder's Format.
@@ -292,7 +292,7 @@ public class Parser
             }
             state.Index.LastEnd = state.Index.SafeAdd(state.Index.Current, 1);
         }
-        else if (inputChar == _parserSettings.FormatterNameSeparator)
+        else if (inputChar == ParserSettings.FormatterNameSeparator)
         {
             AddLastSelector(ref currentPlaceholder, state, parsingErrors);
 
@@ -308,7 +308,7 @@ public class Parser
             // We are now parsing the literal text *inside* the placeholder's format.
             currentContext = ParseContext.LiteralText;
         }
-        else if (inputChar == _parserSettings.PlaceholderEndChar)
+        else if (inputChar == ParserSettings.PlaceholderEndChar)
         {
             AddLastSelector(ref currentPlaceholder, state, parsingErrors);
 
@@ -465,8 +465,8 @@ public class Parser
             throw new ArgumentException($"Unrecognized escape sequence at the end of the literal");
 
         // **** Alternative brace escaping with { or } following the escape character ****
-        if (state.InputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar ||
-            state.InputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar)
+        if (state.InputFormat[indexNextChar] == ParserSettings.PlaceholderBeginChar ||
+            state.InputFormat[indexNextChar] == ParserSettings.PlaceholderEndChar)
         {
             // Finish the last text item:
             if (state.Index.Current != state.Index.LastEnd)
@@ -509,7 +509,7 @@ public class Parser
     private bool ParseNamedFormatter(ParserState state)
     {
         var inputChar = state.InputFormat[state.Index.Current];
-        if (inputChar == _parserSettings.FormatterOptionsBeginChar)
+        if (inputChar == ParserSettings.FormatterOptionsBeginChar)
         {
             var emptyName = state.Index.NamedFormatterStart == state.Index.Current;
             if (emptyName)
@@ -521,16 +521,16 @@ public class Parser
             // Note: This short-circuits the Parser.ParseFormat main loop
             ParseFormatOptions(state);
         }
-        else if (inputChar == _parserSettings.FormatterOptionsEndChar || inputChar == _parserSettings.FormatterNameSeparator)
+        else if (inputChar == ParserSettings.FormatterOptionsEndChar || inputChar == ParserSettings.FormatterNameSeparator)
         {
-            if (inputChar == _parserSettings.FormatterOptionsEndChar)
+            if (inputChar == ParserSettings.FormatterOptionsEndChar)
             {
                 var hasOpeningParenthesis = state.Index.NamedFormatterOptionsStart != PositionUndefined;
 
                 // ensure no trailing chars past ')'
                 var nextCharIndex = state.Index.SafeAdd(state.Index.Current, 1);
                 var nextCharIsValid = nextCharIndex < state.InputFormat.Length &&
-                                      (state.InputFormat[nextCharIndex] == _parserSettings.FormatterNameSeparator || state.InputFormat[nextCharIndex] == _parserSettings.PlaceholderEndChar);
+                                      (state.InputFormat[nextCharIndex] == ParserSettings.FormatterNameSeparator || state.InputFormat[nextCharIndex] == ParserSettings.PlaceholderEndChar);
 
                 if (!hasOpeningParenthesis || !nextCharIsValid)
                 {
@@ -540,7 +540,7 @@ public class Parser
 
                 state.Index.NamedFormatterOptionsEnd = state.Index.Current;
 
-                if (state.InputFormat[nextCharIndex] == _parserSettings.FormatterNameSeparator) state.Index.Current++;
+                if (state.InputFormat[nextCharIndex] == ParserSettings.FormatterNameSeparator) state.Index.Current++;
             }
 
             var nameIsEmpty = state.Index.NamedFormatterStart == state.Index.Current;
@@ -601,8 +601,8 @@ public class Parser
         if (state.Index.Current != state.Index.LastEnd ||
             currentPlaceholder.Selectors.Count > 0 && currentPlaceholder.Selectors[currentPlaceholder.Selectors.Count - 1].Length > 0 &&
             state.Index.Current - state.Index.Operator == 1 &&
-            (state.InputFormat[state.Index.Operator] == _parserSettings.ListIndexEndChar ||
-             state.InputFormat[state.Index.Operator] == _parserSettings.NullableOperator))
+            (state.InputFormat[state.Index.Operator] == ParserSettings.ListIndexEndChar ||
+             state.InputFormat[state.Index.Operator] == ParserSettings.NullableOperator))
             currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, state.InputFormat, state.Index.LastEnd, state.Index.Current, state.Index.Operator, state.Index.Selector));
         else if (state.Index.Operator != state.Index.Current)
             parsingErrors.AddIssue(state.ResultFormat,

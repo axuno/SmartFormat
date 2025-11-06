@@ -11,8 +11,8 @@ public class SettingsTests
     public void TryingToAddDisallowedSelectorCharacters_Should_Throw()
     {
         var settings = new SmartSettings();
-        Assert.That(() => settings.Parser.AddCustomSelectorChars([settings.Parser.PlaceholderBeginChar]),
-            Throws.ArgumentException.And.Message.Contains($"{settings.Parser.PlaceholderBeginChar}"));
+        Assert.That(() => settings.Parser.AddCustomSelectorChars([ParserSettings.PlaceholderBeginChar]),
+            Throws.ArgumentException.And.Message.Contains($"{ParserSettings.PlaceholderBeginChar}"));
     }
 
     [Test]
@@ -22,8 +22,8 @@ public class SettingsTests
         settings.Parser.AddCustomSelectorChars(['A', ' ']);
         Assert.Multiple(() =>
         {
-            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == 'A'), Is.EqualTo(0));
-            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == ' '), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomSelectorChars.Count(c => c == 'A'), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomSelectorChars.Count(c => c == ' '), Is.EqualTo(0));
         });
     }
 
@@ -31,13 +31,13 @@ public class SettingsTests
     public void ControlCharacters_Should_Be_Added_As_SelectorChars()
     {
         var settings = new SmartSettings();
-        var controlChars = settings.Parser.ControlChars().ToList();
+        var controlChars = ParserSettings.ControlChars().ToList();
         settings.Parser.AddCustomSelectorChars(controlChars);
         
         Assert.Multiple(() =>
         {
-            Assert.That(settings.Parser.CustomSelectorChars().Count, Is.EqualTo(controlChars.Count));
-            foreach (var c in settings.Parser.CustomSelectorChars())
+            Assert.That(settings.Parser.CustomSelectorChars, Has.Count.EqualTo(controlChars.Count));
+            foreach (var c in settings.Parser.CustomSelectorChars)
             {
                 Assert.That(settings.Parser.DisallowedSelectorChars(), Does.Not.Contain(c),
                 $"Control char U+{(int)c:X4} should be allowed as selector char.");
@@ -49,21 +49,21 @@ public class SettingsTests
     public void TryingToAddDisallowedOperatorCharacters_Should_Throw()
     {
         var settings = new SmartSettings();
-        Assert.That(() => settings.Parser.AddCustomOperatorChars([settings.Parser.PlaceholderBeginChar]),
-            Throws.ArgumentException.And.Message.Contains($"{settings.Parser.PlaceholderBeginChar}"));
+        Assert.That(() => settings.Parser.AddCustomOperatorChars([ParserSettings.PlaceholderBeginChar]),
+            Throws.ArgumentException.And.Message.Contains($"{ParserSettings.PlaceholderBeginChar}"));
     }
 
     [Test]
     public void ExistingOperatorCharacter_Should_Not_Be_Added()
     {
         var settings = new SmartSettings();
-        settings.Parser.AddCustomOperatorChars([settings.Parser.OperatorChars()[0], '°']);
+        settings.Parser.AddCustomOperatorChars([ParserSettings.OperatorChars[0], '°']);
         settings.Parser.AddCustomOperatorChars(['°']);
 
         Assert.Multiple(() =>
         {
-            Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == settings.Parser.OperatorChars()[0]), Is.EqualTo(0));
-            Assert.That(settings.Parser.CustomOperatorChars().Count(c => c == '°'), Is.EqualTo(1));
+            Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == ParserSettings.OperatorChars[0]), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomOperatorChars.Count(c => c == '°'), Is.EqualTo(1));
         });
     }
 

@@ -204,7 +204,7 @@ internal partial class Evaluator
     /// <summary>
     /// Skip empty selectors and alignment-only selectors.
     /// </summary>
-    private bool SkipThisSelector(Selector selector)
+    private static bool SkipThisSelector(Selector selector)
     {
         // Don't evaluate empty selectors
         // (used e.g. for Settings.Parser.NullableOperator and Settings.Parser.ListIndexEndChar final operators)
@@ -212,7 +212,7 @@ internal partial class Evaluator
 
         // Do not evaluate alignment-only selectors
         if (selector.Operator.Length > 0 &&
-            selector.Operator[0] == _settings.Parser.AlignmentOperator) return true;
+            selector.Operator[0] == ParserSettings.AlignmentOperator) return true;
 
         return false;
     }

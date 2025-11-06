@@ -28,12 +28,12 @@ public class ParserSettings
     /// <summary>
     /// Gets a read-only list of the custom selector characters, which were set with <see cref="AddCustomSelectorChars"/>.
     /// </summary>
-    internal List<char> CustomSelectorChars() => _customSelectorChars;
+    internal List<char> CustomSelectorChars => _customSelectorChars;
 
     /// <summary>
     /// The list of characters which are delimiting a selector.
     /// </summary>
-    internal HashSet<char> SelectorDelimitingChars() =>
+    internal static readonly HashSet<char> SelectorDelimitingChars =
     [
         FormatterNameSeparator,
         PlaceholderBeginChar, PlaceholderEndChar,
@@ -43,7 +43,7 @@ public class ParserSettings
     /// <summary>
     /// Gets the set of control characters (ASCII 0-31 and 127).
     /// </summary>
-    internal IEnumerable<char> ControlChars()
+    internal static IEnumerable<char> ControlChars()
     {
         for (var i = 0; i <= 31; i++) yield return (char) i;
         yield return (char) 127; // delete character
@@ -57,9 +57,9 @@ public class ParserSettings
         var chars = new HashSet<char> {
             CharLiteralEscapeChar // avoid confusion with escape sequences
         };
-        chars.UnionWith(SelectorDelimitingChars());
-        chars.UnionWith(OperatorChars()); // no overlaps
-        chars.UnionWith(CustomOperatorChars()); // no overlaps
+        chars.UnionWith(SelectorDelimitingChars);
+        chars.UnionWith(OperatorChars); // no overlaps
+        chars.UnionWith(CustomOperatorChars); // no overlaps
         // Hard to visualize and debug, disallow by default - can be added back as custom selector chars
         chars.UnionWith(ControlChars());
 
@@ -73,7 +73,7 @@ public class ParserSettings
     /// Gets a list of the custom operator characters, which were set with <see cref="AddCustomOperatorChars"/>.
     /// Contiguous operator characters are parsed as one operator (e.g. '?.').
     /// </summary>
-    internal List<char> CustomOperatorChars() => _customOperatorChars;
+    internal List<char> CustomOperatorChars => _customOperatorChars;
 
     /// <summary>
     /// Add a list of allowable selector characters on top of the default selector characters.
@@ -82,16 +82,13 @@ public class ParserSettings
     /// </summary>
     public void AddCustomSelectorChars(IList<char> characters)
     {
-        var delimitingChars = SelectorDelimitingChars();
         var controlChars = ControlChars().ToList();
-        var operatorChars = OperatorChars();
-        var customOperatorChars = CustomOperatorChars();
 
         foreach (var c in characters)
         {
             // Explicitly disallow certain characters
-            if (delimitingChars.Contains(c) || c == CharLiteralEscapeChar
-                || operatorChars.Contains(c) || customOperatorChars.Contains(c))
+            if (SelectorDelimitingChars.Contains(c) || c == CharLiteralEscapeChar
+                                                    || OperatorChars.Contains(c) || CustomOperatorChars.Contains(c))
                 throw new ArgumentException($"Cannot add '{c}' as a custom selector character. It is disallowed or in use as an operator character.");
 
             if (controlChars.Contains(c))
@@ -105,17 +102,12 @@ public class ParserSettings
     ///  </summary>
     public void AddCustomOperatorChars(IList<char> characters)
     {
-        var selectorDelimitingChars = SelectorDelimitingChars();
-        var customSelectorChars = CustomSelectorChars();
-        var operatorChars = OperatorChars();
-        var customOperatorChars = CustomOperatorChars();
-
         foreach (var c in characters)
         {
-            if (selectorDelimitingChars.Contains(c) || customSelectorChars.Contains(c))
+            if (SelectorDelimitingChars.Contains(c) || CustomSelectorChars.Contains(c))
                 throw new ArgumentException($"Cannot add '{c}' as a custom operator character. It is disallowed or in use as a selector.");
 
-            if (!operatorChars.Contains(c) && !customOperatorChars.Contains(c))
+            if (!OperatorChars.Contains(c) && !_customOperatorChars.Contains(c))
                 _customOperatorChars.Add(c);
         }
     }
@@ -154,13 +146,13 @@ public class ParserSettings
     /// The character which separates the formatter name (if any exists) from other parts of the placeholder.
     /// E.g.: {Variable:FormatterName:argument} or {Variable:FormatterName}
     /// </summary>
-    internal char FormatterNameSeparator => ':';
+    internal const char FormatterNameSeparator = ':';
 
     /// <summary>
     /// The standard operator characters.
     /// Contiguous operator characters are parsed as one operator (e.g. '?.').
     /// </summary>
-    internal List<char> OperatorChars() =>
+    internal static readonly List<char> OperatorChars = 
     [
         SelectorOperator, NullableOperator, AlignmentOperator, ListIndexBeginChar, ListIndexEndChar
     ];
@@ -168,55 +160,55 @@ public class ParserSettings
     /// <summary>
     /// The character which separates the selector for alignment. <c>E.g.: Smart.Format("Name: {name,10}")</c>
     /// </summary>
-    internal char AlignmentOperator => ',';
+    internal const char AlignmentOperator = ',';
 
     /// <summary>
     /// The character which separates two or more selectors <c>E.g.: "First.Second.Third"</c>
     /// </summary>
-    internal char SelectorOperator => '.';
+    internal const char SelectorOperator = '.';
 
     /// <summary>
     /// The character which flags the selector as <see langword="nullable"/>.
     /// The character after <see cref="NullableOperator"/> must be the <see cref="SelectorOperator"/>.
     /// <c>E.g.: "First?.Second"</c>
     /// </summary>
-    internal char NullableOperator => '?';
+    internal const char NullableOperator = '?';
 
     /// <summary>
     /// Gets the character indicating the start of a <see cref="Placeholder"/>.
     /// </summary>
-    internal char PlaceholderBeginChar => '{';
+    internal const char PlaceholderBeginChar = '{';
 
     /// <summary>
     /// Gets the character indicating the end of a <see cref="Placeholder"/>.
     /// </summary>
-    internal char PlaceholderEndChar => '}';
+    internal const char PlaceholderEndChar = '}';
 
     /// <summary>
     /// Gets the character indicating the beginning of formatter options.
     /// </summary>
-    internal char FormatterOptionsBeginChar => '(';
+    internal const char FormatterOptionsBeginChar = '(';
 
     /// <summary>
     /// Gets the character indicating the end of formatter options.
     /// </summary>
-    internal char FormatterOptionsEndChar => ')';
+    internal const char FormatterOptionsEndChar = ')';
 
     /// <summary>
     /// Gets the character indicating the beginning of a list index, like in '{Numbers[0]}'
     /// </summary>
-    internal char ListIndexBeginChar => '[';
+    internal const char ListIndexBeginChar = '[';
 
     /// <summary>
     /// Gets the character indicating the end of a list index, like in '{Numbers[0]}'
     /// </summary>
-    internal char ListIndexEndChar => ']';
+    internal const char ListIndexEndChar = ']';
 
     /// <summary>
     /// Characters which terminate parsing of format options.
     /// To use them as options, they must be escaped (preceded) by the <see cref="CharLiteralEscapeChar"/>.
     /// </summary>
-    internal List<char> FormatOptionsTerminatorChars() =>
+    internal static readonly List<char> FormatOptionsTerminatorChars =
     [
         FormatterNameSeparator, FormatterOptionsBeginChar, FormatterOptionsEndChar, PlaceholderBeginChar,
         PlaceholderEndChar
