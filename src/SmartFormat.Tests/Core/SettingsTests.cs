@@ -11,7 +11,7 @@ public class SettingsTests
     public void TryingToAddDisallowedSelectorCharacters_Should_Throw()
     {
         var settings = new SmartSettings();
-        Assert.That(() => settings.Parser.AddCustomSelectorChars(new[] {settings.Parser.PlaceholderBeginChar}),
+        Assert.That(() => settings.Parser.AddCustomSelectorChars([settings.Parser.PlaceholderBeginChar]),
             Throws.ArgumentException.And.Message.Contains($"{settings.Parser.PlaceholderBeginChar}"));
     }
 
@@ -19,12 +19,29 @@ public class SettingsTests
     public void ExistingSelectorCharacter_Should_Not_Be_Added()
     {
         var settings = new SmartSettings();
-        settings.Parser.AddCustomSelectorChars(new[] {'A', ' '});
-        settings.Parser.AddCustomSelectorChars(new[] {' '});
+        settings.Parser.AddCustomSelectorChars(['A', ' ']);
         Assert.Multiple(() =>
         {
             Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == 'A'), Is.EqualTo(0));
-            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == ' '), Is.EqualTo(1));
+            Assert.That(settings.Parser.CustomSelectorChars().Count(c => c == ' '), Is.EqualTo(0));
+        });
+    }
+
+    [Test]
+    public void ControlCharacters_Should_Be_Added_As_SelectorChars()
+    {
+        var settings = new SmartSettings();
+        var controlChars = settings.Parser.ControlChars().ToList();
+        settings.Parser.AddCustomSelectorChars(controlChars);
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(settings.Parser.CustomSelectorChars().Count, Is.EqualTo(controlChars.Count));
+            foreach (var c in settings.Parser.CustomSelectorChars())
+            {
+                Assert.That(settings.Parser.DisallowedSelectorChars(), Does.Not.Contain(c),
+                $"Control char U+{(int)c:X4} should be allowed as selector char.");
+            }
         });
     }
 
@@ -32,7 +49,7 @@ public class SettingsTests
     public void TryingToAddDisallowedOperatorCharacters_Should_Throw()
     {
         var settings = new SmartSettings();
-        Assert.That(() => settings.Parser.AddCustomOperatorChars(new[] {settings.Parser.PlaceholderBeginChar}),
+        Assert.That(() => settings.Parser.AddCustomOperatorChars([settings.Parser.PlaceholderBeginChar]),
             Throws.ArgumentException.And.Message.Contains($"{settings.Parser.PlaceholderBeginChar}"));
     }
 
@@ -40,8 +57,8 @@ public class SettingsTests
     public void ExistingOperatorCharacter_Should_Not_Be_Added()
     {
         var settings = new SmartSettings();
-        settings.Parser.AddCustomOperatorChars(new[] {settings.Parser.OperatorChars()[0], '°'});
-        settings.Parser.AddCustomOperatorChars(new[] {'°'});
+        settings.Parser.AddCustomOperatorChars([settings.Parser.OperatorChars()[0], '°']);
+        settings.Parser.AddCustomOperatorChars(['°']);
 
         Assert.Multiple(() =>
         {
@@ -50,27 +67,41 @@ public class SettingsTests
         });
     }
 
-    [TestCase('°')] // a custom char
-    [TestCase('A')] // a standard selector char
-    public void Add_CustomOperator_Used_As_Separator_Should_Throw(char operatorChar)
+    [TestCase('{')]
+    [TestCase('}')]
+    [TestCase(':')]
+    [TestCase('(')]
+    [TestCase(')')]
+    public void Add_Separators_As_Custom_Operator_Should_Throw(char operatorChar)
     {
         var settings = new SmartSettings();
-        settings.Parser.AddCustomSelectorChars(new[] {operatorChar}); // reserve as selector char
 
         // try to add the same char as operator
-        Assert.That(() => settings.Parser.AddCustomOperatorChars(new[] {operatorChar}),
-            Throws.ArgumentException.And.Message.Contains($"{operatorChar}"));
+        Assert.That(() => settings.Parser.AddCustomOperatorChars([operatorChar]),
+            Throws.ArgumentException.And.Message.Contains($"'{operatorChar}'"));
     }
 
-    [TestCase('°')] // a custom char
+    [TestCase('°')] // a custom selector char
     [TestCase('.')] // a standard operator char
     public void Add_CustomSelector_Used_As_Operator_Should_Throw(char selectorChar)
     {
         var settings = new SmartSettings();
-        settings.Parser.AddCustomOperatorChars(new[] {selectorChar}); // reserve as operator char
+        settings.Parser.AddCustomOperatorChars([selectorChar]); // reserve as operator char
 
         // try to add the same char as selector
-        Assert.That(() => settings.Parser.AddCustomSelectorChars(new[] {selectorChar}),
+        Assert.That(() => settings.Parser.AddCustomSelectorChars([selectorChar]),
             Throws.ArgumentException.And.Message.Contains($"{selectorChar}"));
+    }
+
+    [TestCase((char) 127)] // a custom char
+    [TestCase((char) 30)] // a standard operator char
+    public void Add_CustomOperator_Used_As_Selector_Should_Throw(char operatorChar)
+    {
+        var settings = new SmartSettings();
+        settings.Parser.AddCustomSelectorChars([operatorChar]); // reserve as operator char
+
+        // try to add the same char as selector
+        Assert.That(() => settings.Parser.AddCustomOperatorChars([operatorChar]),
+            Throws.ArgumentException.And.Message.Contains($"{operatorChar}"));
     }
 }

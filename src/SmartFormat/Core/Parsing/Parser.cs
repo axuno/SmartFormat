@@ -36,7 +36,7 @@ public class Parser
     private readonly List<char> _operatorChars;
     private readonly List<char> _customOperatorChars;
     private readonly ParserSettings _parserSettings;
-    private readonly List<char> _validSelectorChars;
+    private readonly HashSet<char> _disallowedSelectorChars;
     private readonly List<char> _formatOptionsTerminatorChars;
 
     #endregion
@@ -67,10 +67,7 @@ public class Parser
         _customOperatorChars = _parserSettings.CustomOperatorChars();
         _formatOptionsTerminatorChars = _parserSettings.FormatOptionsTerminatorChars();
 
-        _validSelectorChars = new List<char>();
-        _validSelectorChars.AddRange(_parserSettings.SelectorChars());
-        _validSelectorChars.AddRange(_parserSettings.OperatorChars());
-        _validSelectorChars.AddRange(_parserSettings.CustomSelectorChars());
+        _disallowedSelectorChars = _parserSettings.DisallowedSelectorChars();
     }
 
     #endregion
@@ -326,7 +323,7 @@ public class Parser
         else
         {
             // Ensure the selector characters are valid:
-            if (!_validSelectorChars.Contains(inputChar))
+            if (_disallowedSelectorChars.Contains(inputChar))
                 parsingErrors.AddIssue(state.ResultFormat,
                     $"'0x{Convert.ToUInt32(inputChar):X}': " +
                     _parsingErrorText[ParsingError.InvalidCharactersInSelector],

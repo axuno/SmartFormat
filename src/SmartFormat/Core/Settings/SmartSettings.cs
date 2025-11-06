@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SmartFormat.Core.Settings;
 
@@ -45,6 +46,7 @@ public class SmartSettings
     /// The default is <see cref="ErrorAction.ThrowError"/>.
     /// </summary>
     [Obsolete("Use 'SmartSettings.Formatter.ErrorAction' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public ErrorAction FormatErrorAction
     {
         get => (ErrorAction) Formatter.ErrorAction;
@@ -56,6 +58,7 @@ public class SmartSettings
     /// The default is <see cref="ErrorAction.ThrowError"/>.
     /// </summary>
     [Obsolete("Use 'SmartSettings.Parser.ErrorAction' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public ErrorAction ParseErrorAction
     {
         get => (ErrorAction) Parser.ErrorAction;
@@ -76,6 +79,7 @@ public class SmartSettings
     /// string.Format(@"\t")  will return the 2 characters "\" and "t"
     /// </summary>
     [Obsolete("Use SmartSettings.Parser.ConvertCharacterStringLiterals instead", true)]
+    [ExcludeFromCodeCoverage]
     public bool ConvertCharacterStringLiterals
     {
         get => Parser.ConvertCharacterStringLiterals;
