@@ -23,14 +23,15 @@ public class SettingsTests
         Assert.Multiple(() =>
         {
             Assert.That(settings.Parser.CustomSelectorChars.Count(c => c == 'A'), Is.EqualTo(0));
-            Assert.That(settings.Parser.CustomSelectorChars.Count(c => c == ' '), Is.EqualTo(0));
+            Assert.That(settings.Parser.CustomSelectorChars.Count(c => c == ' '), Is.EqualTo(1));
         });
     }
 
-    [Test]
-    public void ControlCharacters_Should_Be_Added_As_SelectorChars()
+    [TestCase(FilterType.Allowlist)]
+    [TestCase(FilterType.Blocklist)]
+    public void ControlCharacters_Should_Be_Added_As_SelectorChars(FilterType filterType)
     {
-        var settings = new SmartSettings();
+        var settings = new SmartSettings { Parser = { SelectorCharFilter = filterType } };
         var controlChars = ParserSettings.ControlChars().ToList();
         settings.Parser.AddCustomSelectorChars(controlChars);
         
@@ -39,8 +40,8 @@ public class SettingsTests
             Assert.That(settings.Parser.CustomSelectorChars, Has.Count.EqualTo(controlChars.Count));
             foreach (var c in settings.Parser.CustomSelectorChars)
             {
-                Assert.That(settings.Parser.DisallowedSelectorChars(), Does.Not.Contain(c),
-                $"Control char U+{(int)c:X4} should be allowed as selector char.");
+                Assert.That(settings.Parser.GetSelectorChars(), filterType == FilterType.Allowlist ? Does.Contain(c) : Does.Not.Contain(c),
+                    $"Control char U+{(int) c:X4} should be allowed as selector char.");
             }
         });
     }
