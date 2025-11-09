@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.SmartPools;
@@ -33,11 +34,11 @@ public class Parser
     public SmartSettings Settings { get; }
 
     // Cache method results from settings
-    private readonly List<char> _operatorChars;
-    private readonly List<char> _customOperatorChars;
+    private readonly CharSet _operatorChars;
+    private readonly CharSet _customOperatorChars;
     private readonly ParserSettings _parserSettings;
-    private readonly HashSet<char> _disallowedSelectorChars;
-    private readonly List<char> _formatOptionsTerminatorChars;
+    private readonly CharSet _selectorChars;
+    private readonly CharSet _formatOptionsTerminatorChars;
 
     #endregion
 
@@ -63,11 +64,11 @@ public class Parser
     {
         Settings = smartSettings ?? new SmartSettings();
         _parserSettings = Settings.Parser;
-        _operatorChars = ParserSettings.OperatorChars;
-        _customOperatorChars = _parserSettings.CustomOperatorChars;
-        _formatOptionsTerminatorChars = ParserSettings.FormatOptionsTerminatorChars;
-
-        _disallowedSelectorChars = _parserSettings.DisallowedSelectorChars();
+        _operatorChars = new CharSet(ParserSettings.OperatorChars.AsSpan()) ;
+        _customOperatorChars = new CharSet(_parserSettings.CustomOperatorChars);
+        _formatOptionsTerminatorChars = new CharSet(ParserSettings.FormatOptionsTerminatorChars.AsSpan());
+        // Selector chars can be an allowlist or blocklist:
+        _selectorChars = _parserSettings.GetSelectorChars();
     }
 
     #endregion
@@ -78,6 +79,7 @@ public class Parser
     /// Includes a-z and A-Z in the list of allowed selector chars.
     /// </summary>
     [Obsolete("Alphanumeric selectors are always enabled", true)]
+    [ExcludeFromCodeCoverage]
     public void AddAlphanumericSelectors()
     {
         // Do nothing - this is the standard behavior
@@ -88,6 +90,7 @@ public class Parser
     /// </summary>
     /// <param name="chars"></param>
     [Obsolete("Use 'Settings.Parser.AddCustomSelectorChars' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void AddAdditionalSelectorChars(string chars)
     {
         _parserSettings.AddCustomSelectorChars(chars.ToCharArray());
@@ -100,6 +103,7 @@ public class Parser
     /// </summary>
     /// <param name="chars"></param>
     [Obsolete("Use 'Settings.Parser.AddCustomOperatorChars' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void AddOperators(string chars)
     {
         _parserSettings.AddCustomOperatorChars(chars.ToCharArray());
@@ -112,6 +116,7 @@ public class Parser
     /// </summary>
     /// <param name="alternativeEscapeChar">Defaults to backslash</param>
     [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
     {
         if (alternativeEscapeChar != _parserSettings.CharLiteralEscapeChar)
@@ -129,6 +134,7 @@ public class Parser
     /// backslash.
     /// </summary>
     [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void UseBraceEscaping()
     {
         throw new NotSupportedException($"Init-only property {nameof(Settings)}.{nameof(Settings.StringFormatCompatibility)} can only be set in an object initializer");
@@ -140,6 +146,7 @@ public class Parser
     /// <param name="opening"></param>
     /// <param name="closing"></param>
     [Obsolete("This feature has been removed", true)]
+    [ExcludeFromCodeCoverage]
     public void UseAlternativeBraces(char opening, char closing)
     {
         throw new NotSupportedException("This feature has been removed");
@@ -323,11 +330,28 @@ public class Parser
         else
         {
             // Ensure the selector characters are valid:
-            if (_disallowedSelectorChars.Contains(inputChar))
-                parsingErrors.AddIssue(state.ResultFormat,
-                    $"'0x{Convert.ToUInt32(inputChar):X}': " +
-                    _parsingErrorText[ParsingError.InvalidCharactersInSelector],
-                    state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
+            if (_selectorChars.IsAllowList)
+            {
+                // Only allow specific characters
+                if (!_selectorChars.Contains(inputChar))
+                {
+                    parsingErrors.AddIssue(state.ResultFormat,
+                        $"'0x{Convert.ToUInt32(inputChar):X}': " +
+                        _parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                        state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
+                }
+            }
+            else
+            {
+                // Blocklist: Disallow specific characters
+                if (_selectorChars.Contains(inputChar))
+                {
+                    parsingErrors.AddIssue(state.ResultFormat,
+                        $"'0x{Convert.ToUInt32(inputChar):X}': " +
+                        _parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                        state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
+                }
+            }
         }
     }
 

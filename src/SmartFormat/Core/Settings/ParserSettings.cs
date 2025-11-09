@@ -18,6 +18,9 @@ public class ParserSettings
 {
     private readonly List<char> _customSelectorChars = [];
     private readonly List<char> _customOperatorChars = [];
+    private FilterType _selectorCharFilter = FilterType.Allowlist;
+
+    private const string StandardAllowlist = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-";
 
     /// <summary>
     /// Gets or sets the <see cref="ParseErrorAction" /> to use for the <see cref="Parser" />.
@@ -31,85 +34,66 @@ public class ParserSettings
     internal List<char> CustomSelectorChars => _customSelectorChars;
 
     /// <summary>
-    /// The list of characters which are delimiting a selector.
-    /// </summary>
-    internal static readonly HashSet<char> SelectorDelimitingChars =
-    [
-        FormatterNameSeparator,
-        PlaceholderBeginChar, PlaceholderEndChar,
-        FormatterOptionsBeginChar, FormatterOptionsEndChar
-    ];
-
-    /// <summary>
-    /// Gets the set of control characters (ASCII 0-31 and 127).
-    /// </summary>
-    internal static IEnumerable<char> ControlChars()
-    {
-        for (var i = 0; i <= 31; i++) yield return (char) i;
-        yield return (char) 127; // delete character
-    }
-
-    /// <summary>
-    /// The list of characters which are disallowed in a selector.
-    /// </summary>
-    internal HashSet<char> DisallowedSelectorChars()
-    {
-        var chars = new HashSet<char> {
-            CharLiteralEscapeChar // avoid confusion with escape sequences
-        };
-        chars.UnionWith(SelectorDelimitingChars);
-        chars.UnionWith(OperatorChars); // no overlaps
-        chars.UnionWith(CustomOperatorChars); // no overlaps
-        // Hard to visualize and debug, disallow by default - can be added back as custom selector chars
-        chars.UnionWith(ControlChars());
-
-        // Remove characters used as custom selector chars.
-        // Note: Using chars.ExceptWith(_customOperatorChars) would not remove char 0.
-        foreach (var c in _customSelectorChars) chars.Remove(c); 
-        return chars;
-    }
-
-    /// <summary>
     /// Gets a list of the custom operator characters, which were set with <see cref="AddCustomOperatorChars"/>.
     /// Contiguous operator characters are parsed as one operator (e.g. '?.').
     /// </summary>
     internal List<char> CustomOperatorChars => _customOperatorChars;
 
     /// <summary>
-    /// Add a list of allowable selector characters on top of the default selector characters.
-    /// This can be useful to add control characters (ASCII 0-31 and 127) that are excluded by default.
-    /// Operator chars and selector chars must be different.
+    /// When <see cref="FilterType.Allowlist"/> (default) is set, an allowlist of selector characters is used.
+    /// The allowlist contains alphanumeric characters (upper and lower case), plus '_' and '-'.
+    /// On top, any custom selector characters added with <see cref="AddCustomSelectorChars"/> are included.
+    /// <para/>
+    /// When <see cref="FilterType.Blocklist"/>, all Unicode characters are allowed in a selector,
+    /// except control characters (ASCII 0-31 and 127). Excluded control characters can be added back
+    /// using <see cref="AddCustomSelectorChars"/>.
+    /// <para/>
+    /// Changing this setting clears any custom operator characters added with <see cref="AddCustomOperatorChars"/>.
     /// </summary>
-    public void AddCustomSelectorChars(IList<char> characters)
+    public FilterType SelectorCharFilter
     {
-        var controlChars = ControlChars().ToList();
-
-        foreach (var c in characters)
+        get
         {
-            // Explicitly disallow certain characters
-            if (SelectorDelimitingChars.Contains(c) || c == CharLiteralEscapeChar
-                                                    || OperatorChars.Contains(c) || CustomOperatorChars.Contains(c))
-                throw new ArgumentException($"Cannot add '{c}' as a custom selector character. It is disallowed or in use as an operator character.");
-
-            if (controlChars.Contains(c))
-                _customSelectorChars.Add(c);
+            return _selectorCharFilter;
+        }
+        set
+        {
+            _selectorCharFilter = value;
+            _customOperatorChars.Clear();
         }
     }
 
     /// <summary>
-    /// Add a list of allowable operator characters on top of the standard <see cref="OperatorChars"/> setting.
-    /// Operator chars and selector chars must be different.
-    ///  </summary>
-    public void AddCustomOperatorChars(IList<char> characters)
-    {
-        foreach (var c in characters)
-        {
-            if (SelectorDelimitingChars.Contains(c) || CustomSelectorChars.Contains(c))
-                throw new ArgumentException($"Cannot add '{c}' as a custom operator character. It is disallowed or in use as a selector.");
+    /// The list of characters for a selector.
+    /// This can be an allowlist, which contains explicitly allowed characters,
+    /// or a blocklist, when all Unicode characters are allowed, except those from the blocklist.
+    /// </summary>
+    internal CharSet GetSelectorChars() => SelectorCharFilter == FilterType.Allowlist ? CreateAllowlist() : CreateBlocklist();
 
-            if (!OperatorChars.Contains(c) && !_customOperatorChars.Contains(c))
-                _customOperatorChars.Add(c);
-        }
+    private CharSet CreateBlocklist()
+    {
+        var chars = new CharSet {
+            CharLiteralEscapeChar // avoid confusion with escape sequences
+        };
+        chars.IsAllowList = false;
+        chars.AddRange(SelectorDelimitingChars.AsSpan());
+        chars.AddRange(OperatorChars.AsSpan()); // no overlaps
+        chars.AddRange(_customOperatorChars); // no overlaps
+        // Hard to visualize and debug, disallow by default - can be added back as custom selector chars
+        chars.AddRange(ControlChars());
+
+        // Remove characters used as custom selector chars from the blocklist
+        foreach (var c in _customSelectorChars) chars.Remove(c);
+        return chars;
+    }
+
+    private CharSet CreateAllowlist()
+    {
+        var chars = new CharSet {IsAllowList = true};
+        chars.AddRange(StandardAllowlist.AsSpan());
+        // Add characters used as custom selector chars to the allowlist
+        chars.AddRange(_customSelectorChars);
+        return chars;
     }
 
     /// <summary>
@@ -147,15 +131,6 @@ public class ParserSettings
     /// E.g.: {Variable:FormatterName:argument} or {Variable:FormatterName}
     /// </summary>
     internal const char FormatterNameSeparator = ':';
-
-    /// <summary>
-    /// The standard operator characters.
-    /// Contiguous operator characters are parsed as one operator (e.g. '?.').
-    /// </summary>
-    internal static readonly List<char> OperatorChars = 
-    [
-        SelectorOperator, NullableOperator, AlignmentOperator, ListIndexBeginChar, ListIndexEndChar
-    ];
 
     /// <summary>
     /// The character which separates the selector for alignment. <c>E.g.: Smart.Format("Name: {name,10}")</c>
@@ -208,9 +183,84 @@ public class ParserSettings
     /// Characters which terminate parsing of format options.
     /// To use them as options, they must be escaped (preceded) by the <see cref="CharLiteralEscapeChar"/>.
     /// </summary>
-    internal static readonly List<char> FormatOptionsTerminatorChars =
+    internal static readonly char[] FormatOptionsTerminatorChars =
     [
         FormatterNameSeparator, FormatterOptionsBeginChar, FormatterOptionsEndChar, PlaceholderBeginChar,
         PlaceholderEndChar
     ];
+
+    /// <summary>
+    /// The standard operator characters.
+    /// Contiguous operator characters are parsed as one operator (e.g. '?.').
+    /// </summary>
+    internal static readonly char[] OperatorChars =
+    [
+        SelectorOperator, NullableOperator, AlignmentOperator, ListIndexBeginChar, ListIndexEndChar
+    ];
+
+    /// <summary>
+    /// The list of characters which are delimiting a selector.
+    /// </summary>
+    internal static readonly char[] SelectorDelimitingChars =
+    [
+        FormatterNameSeparator,
+        PlaceholderBeginChar, PlaceholderEndChar,
+        FormatterOptionsBeginChar, FormatterOptionsEndChar
+    ];
+
+    /// <summary>
+    /// Gets the set of control characters (ASCII 0-31 and 127).
+    /// </summary>
+    internal static IEnumerable<char> ControlChars()
+    {
+        for (var i = 0; i <= 31; i++) yield return (char) i;
+        yield return (char) 127; // delete character
+    }
+
+    /// <summary>
+    /// Add a list of allowable selector characters on top of the default selector characters.
+    /// <para/>
+    /// When <see cref="SelectorCharFilter"/> is <see langword="true"/> (default), an allowlist of selector characters is used.
+    /// The allowlist contains alphanumeric characters (upper and lower case), plus '_' and '-'.
+    /// On top, any custom selector characters added with <see cref="AddCustomSelectorChars"/> are included.
+    /// <para/>
+    /// When <see cref="SelectorCharFilter"/> is <see langword="false"/>, all Unicode characters are allowed in a selector,
+    /// except control characters (ASCII 0-31 and 127). Excluded control characters can be added back
+    /// using <see cref="AddCustomSelectorChars"/>.
+    /// <para/>
+    /// Operator chars and selector chars must be different.
+    /// </summary>
+    public void AddCustomSelectorChars(IList<char> characters)
+    {
+        var controlChars = ControlChars().ToList();
+
+        foreach (var c in characters)
+        {
+            // Explicitly disallow certain characters
+            if (SelectorDelimitingChars.Contains(c) || c == CharLiteralEscapeChar
+                || OperatorChars.Contains(c) || CustomOperatorChars.Contains(c))
+                throw new ArgumentException($"Cannot add '{c}' as a custom selector character. It is disallowed or in use as an operator character.");
+
+            if (controlChars.Contains(c))
+                _customSelectorChars.Add(c);
+
+            if (SelectorCharFilter == FilterType.Allowlist && !(StandardAllowlist.Contains(c) || _customSelectorChars.Contains(c))) _customSelectorChars.Add(c);
+        }
+    }
+
+    /// <summary>
+    /// Add a list of allowable operator characters on top of the standard <see cref="OperatorChars"/> setting.
+    /// Operator chars and selector chars must be different.
+    ///  </summary>
+    public void AddCustomOperatorChars(IList<char> characters)
+    {
+        foreach (var c in characters)
+        {
+            if (SelectorDelimitingChars.Contains(c) || CustomSelectorChars.Contains(c))
+                throw new ArgumentException($"Cannot add '{c}' as a custom operator character. It is disallowed or in use as a selector.");
+
+            if (!OperatorChars.Contains(c) && !_customOperatorChars.Contains(c))
+                _customOperatorChars.Add(c);
+        }
+    }
 }
