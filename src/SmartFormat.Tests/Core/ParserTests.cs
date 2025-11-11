@@ -211,7 +211,7 @@ public class ParserTests
         {
             Parser = new ParserSettings
                 {
-                    SelectorCharFilter = FilterType.Allowlist, // default
+                    SelectorCharFilter = SelectorFilterType.Alphanumeric, // default
                     ErrorAction = ParseErrorAction.OutputErrorInResult
                 }
         });
@@ -471,7 +471,7 @@ public class ParserTests
     [Test]
     public void Parsing_Selector_With_CharFromBlocklist_ShouldThrow()
     {
-        var settings = new SmartSettings { Parser = new ParserSettings { SelectorCharFilter = FilterType.Blocklist } };
+        var settings = new SmartSettings { Parser = new ParserSettings { SelectorCharFilter = SelectorFilterType.VisualUnicodeChars } };
         var parser = GetRegularParser(settings);
 
         // The newline character is in the default blocklist of disallowed characters
@@ -609,7 +609,7 @@ public class ParserTests
         // See https://github.com/axuno/SmartFormat/issues/454
 
         // settings must be set before parser instantiation
-        var settings = new SmartSettings { Parser = { SelectorCharFilter = FilterType.Blocklist } };
+        var settings = new SmartSettings { Parser = { SelectorCharFilter = SelectorFilterType.VisualUnicodeChars } };
         const string expected = "The Value";
         // The default formatter with default settings should be able to handle any
         // Unicode characters in selectors except the "magic" disallowed ones
@@ -751,7 +751,7 @@ public class ParserTests
             StringFormatCompatibility = false,
             Parser = new ParserSettings
             {
-                SelectorCharFilter = FilterType.Blocklist,
+                SelectorCharFilter = SelectorFilterType.VisualUnicodeChars,
                 ErrorAction = ParseErrorAction.ThrowError,
                 ParseInputAsHtml = false
             }
@@ -780,7 +780,7 @@ public class ParserTests
             StringFormatCompatibility = false,
             Parser = new ParserSettings
             {
-                SelectorCharFilter = FilterType.Allowlist,
+                SelectorCharFilter = SelectorFilterType.Alphanumeric,
                 ErrorAction = ParseErrorAction.ThrowError,
                 ParseInputAsHtml = false
             }

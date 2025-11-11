@@ -18,7 +18,7 @@ public class ParserSettings
 {
     private readonly List<char> _customSelectorChars = [];
     private readonly List<char> _customOperatorChars = [];
-    private FilterType _selectorCharFilter = FilterType.Allowlist;
+    private SelectorFilterType _selectorCharFilter = SelectorFilterType.Alphanumeric;
 
     private const string StandardAllowlist = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-";
 
@@ -40,17 +40,21 @@ public class ParserSettings
     internal List<char> CustomOperatorChars => _customOperatorChars;
 
     /// <summary>
-    /// When <see cref="FilterType.Allowlist"/> (default) is set, an allowlist of selector characters is used.
+    /// When <see cref="SelectorFilterType.Alphanumeric"/> (default) is set, an allowlist of selector characters is used.
     /// The allowlist contains alphanumeric characters (upper and lower case), plus '_' and '-'.
     /// On top, any custom selector characters added with <see cref="AddCustomSelectorChars"/> are included.
     /// <para/>
-    /// When <see cref="FilterType.Blocklist"/>, all Unicode characters are allowed in a selector,
-    /// except control characters (ASCII 0-31 and 127). Excluded control characters can be added back
-    /// using <see cref="AddCustomSelectorChars"/>.
+    /// When <see cref="SelectorFilterType.VisualUnicodeChars"/> is set, all Unicode characters are allowed in a selector,
+    /// except 68 non-visual characters: Control Characters (U+0000–U+001F, U+007F), Format Characters (Category: Cf),
+    /// Directional Formatting (Category: Cf), Invisible Separator, Common Combining Marks (Category: Mn),
+    /// Whitespace Characters (non-glyph spacing).<br/>
+    /// Excluded characters can be added back using <see cref="AddCustomSelectorChars"/>.
+    /// <para/>
+    /// {}[]()\.? are characters with special functions that are never allowed.
     /// <para/>
     /// Changing this setting clears any custom operator characters added with <see cref="AddCustomOperatorChars"/>.
     /// </summary>
-    public FilterType SelectorCharFilter
+    public SelectorFilterType SelectorCharFilter
     {
         get
         {
@@ -68,7 +72,7 @@ public class ParserSettings
     /// This can be an allowlist, which contains explicitly allowed characters,
     /// or a blocklist, when all Unicode characters are allowed, except those from the blocklist.
     /// </summary>
-    internal CharSet GetSelectorChars() => SelectorCharFilter == FilterType.Allowlist ? CreateAllowlist() : CreateBlocklist();
+    internal CharSet GetSelectorChars() => SelectorCharFilter == SelectorFilterType.Alphanumeric ? CreateAllowlist() : CreateBlocklist();
 
     private CharSet CreateBlocklist()
     {
@@ -79,8 +83,7 @@ public class ParserSettings
         chars.AddRange(SelectorDelimitingChars.AsSpan());
         chars.AddRange(OperatorChars.AsSpan()); // no overlaps
         chars.AddRange(_customOperatorChars); // no overlaps
-        // Hard to visualize and debug, disallow by default - can be added back as custom selector chars
-        chars.AddRange(ControlChars());
+        chars.AddRange(NonVisualUnicodeCharacters.AsSpan());
 
         // Remove characters used as custom selector chars from the blocklist
         foreach (var c in _customSelectorChars) chars.Remove(c);
@@ -209,13 +212,90 @@ public class ParserSettings
     ];
 
     /// <summary>
-    /// Gets the set of control characters (ASCII 0-31 and 127).
+    /// All 68 non-visual Unicode characters that are typically not used in selectors.
     /// </summary>
-    internal static IEnumerable<char> ControlChars()
-    {
-        for (var i = 0; i <= 31; i++) yield return (char) i;
-        yield return (char) 127; // delete character
-    }
+    internal static char[] NonVisualUnicodeCharacters =
+    [
+        // Control Characters (U+0000–U+001F, U+007F)
+        '\u0000', // NULL – string terminator
+        '\u0001', // START OF HEADING – protocol control
+        '\u0002', // START OF TEXT – protocol control
+        '\u0003', // END OF TEXT – protocol control
+        '\u0004', // END OF TRANSMISSION – protocol control
+        '\u0005', // ENQUIRY – request for response
+        '\u0006', // ACKNOWLEDGE – positive response
+        '\u0007', // BELL – triggers alert
+        '\u0008', // BACKSPACE – moves cursor back
+        '\u0009', // CHARACTER TABULATION – horizontal tab
+        '\u000A', // LINE FEED – line break
+        '\u000B', // LINE TABULATION – vertical tab
+        '\u000C', // FORM FEED – page break
+        '\u000D', // CARRIAGE RETURN – return to line start
+        '\u000E', // SHIFT OUT – alternate character set
+        '\u000F', // SHIFT IN – return to standard set
+        '\u0010', // DATA LINK ESCAPE – protocol framing
+        '\u0011', // DEVICE CONTROL 1 – device-specific
+        '\u0012', // DEVICE CONTROL 2 – device-specific
+        '\u0013', // DEVICE CONTROL 3 – device-specific
+        '\u0014', // DEVICE CONTROL 4 – device-specific
+        '\u0015', // NEGATIVE ACKNOWLEDGE – error signal
+        '\u0016', // SYNCHRONOUS IDLE – timing control
+        '\u0017', // END OF TRANSMISSION BLOCK – block end
+        '\u0018', // CANCEL – cancel transmission
+        '\u0019', // END OF MEDIUM – physical medium end
+        '\u001A', // SUBSTITUTE – invalid character
+        '\u001B', // ESCAPE – escape sequence initiator
+        '\u001C', // FILE SEPARATOR – data structuring
+        '\u001D', // GROUP SEPARATOR – data structuring
+        '\u001E', // RECORD SEPARATOR – data structuring
+        '\u001F', // UNIT SEPARATOR – data structuring
+        '\u007F', // DELETE – erase character
+
+        // Format Characters (Category: Cf)
+        '\u200B', // ZERO WIDTH SPACE – invisible space
+        '\u200C', // ZERO WIDTH NON-JOINER – prevents ligature
+        '\u200D', // ZERO WIDTH JOINER – forces ligature
+        '\u2060', // WORD JOINER – prevents line break
+        '\uFEFF', // ZERO WIDTH NO-BREAK SPACE – BOM or NBSP
+
+        // Directional Formatting (Category: Cf)
+        '\u202A', // LEFT-TO-RIGHT EMBEDDING – sets LTR context
+        '\u202B', // RIGHT-TO-LEFT EMBEDDING – sets RTL context
+        '\u202C', // POP DIRECTIONAL FORMATTING – ends override
+        '\u202D', // LEFT-TO-RIGHT OVERRIDE – forces LTR rendering
+        '\u202E', // RIGHT-TO-LEFT OVERRIDE – forces RTL rendering
+        '\u2066', // LEFT-TO-RIGHT ISOLATE – isolates LTR segment
+        '\u2067', // RIGHT-TO-LEFT ISOLATE – isolates RTL segment
+        '\u2068', // FIRST STRONG ISOLATE – isolates with inferred direction
+        '\u2069', // POP DIRECTIONAL ISOLATE – ends isolate
+
+        // Invisible Separator
+        '\u2063', // INVISIBLE SEPARATOR – semantic boundary marker
+
+        // Common Combining Marks (Category: Mn)
+        '\u0300', // COMBINING GRAVE ACCENT – diacritic (invisible alone)
+        '\u0301', // COMBINING ACUTE ACCENT – diacritic (invisible alone)
+        '\u0302', // COMBINING CIRCUMFLEX ACCENT – diacritic (invisible alone)
+        '\u0308', // COMBINING DIAERESIS – diacritic (invisible alone)
+
+        // Whitespace Characters (non-glyph spacing)
+        '\u00A0', // NO-BREAK SPACE – non-breaking space
+        '\u1680', // OGHAM SPACE MARK – special spacing
+        '\u2000', // EN QUAD – fixed-width space
+        '\u2001', // EM QUAD – fixed-width space
+        '\u2002', // EN SPACE – fixed-width space
+        '\u2003', // EM SPACE – fixed-width space
+        '\u2004', // THREE-PER-EM SPACE – narrow space
+        '\u2005', // FOUR-PER-EM SPACE – narrow space
+        '\u2006', // SIX-PER-EM SPACE – narrow space
+        '\u2007', // FIGURE SPACE – aligns digits
+        '\u2008', // PUNCTUATION SPACE – aligns punctuation
+        '\u2009', // THIN SPACE – narrow space
+        '\u200A', // HAIR SPACE – ultra-thin space
+        '\u202F', // NARROW NO-BREAK SPACE – narrow NBSP
+        '\u205F', // MEDIUM MATHEMATICAL SPACE – math spacing
+        '\u3000' // IDEOGRAPHIC SPACE – full-width CJK space
+    ];
 
     /// <summary>
     /// Add a list of allowable selector characters on top of the default selector characters.
@@ -225,15 +305,12 @@ public class ParserSettings
     /// On top, any custom selector characters added with <see cref="AddCustomSelectorChars"/> are included.
     /// <para/>
     /// When <see cref="SelectorCharFilter"/> is <see langword="false"/>, all Unicode characters are allowed in a selector,
-    /// except control characters (ASCII 0-31 and 127). Excluded control characters can be added back
-    /// using <see cref="AddCustomSelectorChars"/>.
+    /// except 68 non-visual characters. Excluded characters can be added back using <see cref="AddCustomSelectorChars"/>.
     /// <para/>
     /// Operator chars and selector chars must be different.
     /// </summary>
     public void AddCustomSelectorChars(IList<char> characters)
     {
-        var controlChars = ControlChars().ToList();
-
         foreach (var c in characters)
         {
             // Explicitly disallow certain characters
@@ -241,10 +318,10 @@ public class ParserSettings
                 || OperatorChars.Contains(c) || CustomOperatorChars.Contains(c))
                 throw new ArgumentException($"Cannot add '{c}' as a custom selector character. It is disallowed or in use as an operator character.");
 
-            if (controlChars.Contains(c))
+            if (NonVisualUnicodeCharacters.Contains(c))
                 _customSelectorChars.Add(c);
 
-            if (SelectorCharFilter == FilterType.Allowlist && !(StandardAllowlist.Contains(c) || _customSelectorChars.Contains(c))) _customSelectorChars.Add(c);
+            if (SelectorCharFilter == SelectorFilterType.Alphanumeric && !(StandardAllowlist.Contains(c) || _customSelectorChars.Contains(c))) _customSelectorChars.Add(c);
         }
     }
 

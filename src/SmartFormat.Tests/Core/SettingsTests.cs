@@ -27,21 +27,21 @@ public class SettingsTests
         });
     }
 
-    [TestCase(FilterType.Allowlist)]
-    [TestCase(FilterType.Blocklist)]
-    public void ControlCharacters_Should_Be_Added_As_SelectorChars(FilterType filterType)
+    [TestCase(SelectorFilterType.Alphanumeric)]
+    [TestCase(SelectorFilterType.VisualUnicodeChars)]
+    public void NonVisualCharacters_Should_Be_AddedBack_As_SelectorChars(SelectorFilterType filterType)
     {
         var settings = new SmartSettings { Parser = { SelectorCharFilter = filterType } };
-        var controlChars = ParserSettings.ControlChars().ToList();
-        settings.Parser.AddCustomSelectorChars(controlChars);
+        var nonVisualChars = ParserSettings.NonVisualUnicodeCharacters;
+        settings.Parser.AddCustomSelectorChars(nonVisualChars);
         
         Assert.Multiple(() =>
         {
-            Assert.That(settings.Parser.CustomSelectorChars, Has.Count.EqualTo(controlChars.Count));
+            Assert.That(settings.Parser.CustomSelectorChars, Has.Count.EqualTo(nonVisualChars.Length));
             foreach (var c in settings.Parser.CustomSelectorChars)
             {
-                Assert.That(settings.Parser.GetSelectorChars(), filterType == FilterType.Allowlist ? Does.Contain(c) : Does.Not.Contain(c),
-                    $"Control char U+{(int) c:X4} should be allowed as selector char.");
+                Assert.That(settings.Parser.GetSelectorChars(), filterType == SelectorFilterType.Alphanumeric ? Does.Contain(c) : Does.Not.Contain(c),
+                    $"Character U+{(int) c:X4} should be allowed as selector char.");
             }
         });
     }
