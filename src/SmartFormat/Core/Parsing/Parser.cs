@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SmartFormat.Core.Settings;
 using SmartFormat.Pooling.SmartPools;
@@ -33,11 +34,11 @@ public class Parser
     public SmartSettings Settings { get; }
 
     // Cache method results from settings
-    private readonly List<char> _operatorChars;
-    private readonly List<char> _customOperatorChars;
+    private readonly CharSet _operatorChars;
+    private readonly CharSet _customOperatorChars;
     private readonly ParserSettings _parserSettings;
-    private readonly List<char> _validSelectorChars;
-    private readonly List<char> _formatOptionsTerminatorChars;
+    private readonly CharSet _selectorChars;
+    private readonly CharSet _formatOptionsTerminatorChars;
 
     #endregion
 
@@ -63,14 +64,11 @@ public class Parser
     {
         Settings = smartSettings ?? new SmartSettings();
         _parserSettings = Settings.Parser;
-        _operatorChars = _parserSettings.OperatorChars();
-        _customOperatorChars = _parserSettings.CustomOperatorChars();
-        _formatOptionsTerminatorChars = _parserSettings.FormatOptionsTerminatorChars();
-
-        _validSelectorChars = new List<char>();
-        _validSelectorChars.AddRange(_parserSettings.SelectorChars());
-        _validSelectorChars.AddRange(_parserSettings.OperatorChars());
-        _validSelectorChars.AddRange(_parserSettings.CustomSelectorChars());
+        _operatorChars = new CharSet(ParserSettings.OperatorChars.AsSpan()) ;
+        _customOperatorChars = new CharSet(_parserSettings.CustomOperatorChars);
+        _formatOptionsTerminatorChars = new CharSet(ParserSettings.FormatOptionsTerminatorChars.AsSpan());
+        // Selector chars can be an allowlist or blocklist:
+        _selectorChars = _parserSettings.GetSelectorChars();
     }
 
     #endregion
@@ -81,6 +79,7 @@ public class Parser
     /// Includes a-z and A-Z in the list of allowed selector chars.
     /// </summary>
     [Obsolete("Alphanumeric selectors are always enabled", true)]
+    [ExcludeFromCodeCoverage]
     public void AddAlphanumericSelectors()
     {
         // Do nothing - this is the standard behavior
@@ -91,6 +90,7 @@ public class Parser
     /// </summary>
     /// <param name="chars"></param>
     [Obsolete("Use 'Settings.Parser.AddCustomSelectorChars' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void AddAdditionalSelectorChars(string chars)
     {
         _parserSettings.AddCustomSelectorChars(chars.ToCharArray());
@@ -103,6 +103,7 @@ public class Parser
     /// </summary>
     /// <param name="chars"></param>
     [Obsolete("Use 'Settings.Parser.AddCustomOperatorChars' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void AddOperators(string chars)
     {
         _parserSettings.AddCustomOperatorChars(chars.ToCharArray());
@@ -115,6 +116,7 @@ public class Parser
     /// </summary>
     /// <param name="alternativeEscapeChar">Defaults to backslash</param>
     [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
     {
         if (alternativeEscapeChar != _parserSettings.CharLiteralEscapeChar)
@@ -132,6 +134,7 @@ public class Parser
     /// backslash.
     /// </summary>
     [Obsolete("Use 'Settings.StringFormatCompatibility' instead.", true)]
+    [ExcludeFromCodeCoverage]
     public void UseBraceEscaping()
     {
         throw new NotSupportedException($"Init-only property {nameof(Settings)}.{nameof(Settings.StringFormatCompatibility)} can only be set in an object initializer");
@@ -143,6 +146,7 @@ public class Parser
     /// <param name="opening"></param>
     /// <param name="closing"></param>
     [Obsolete("This feature has been removed", true)]
+    [ExcludeFromCodeCoverage]
     public void UseAlternativeBraces(char opening, char closing)
     {
         throw new NotSupportedException("This feature has been removed");
@@ -242,19 +246,19 @@ public class Parser
             return;
         }
 
-        if (inputChar == _parserSettings.PlaceholderBeginChar)
+        if (inputChar == ParserSettings.PlaceholderBeginChar)
         {
             AddLiteralCharsParsedBefore(state);
-            if (EscapeLikeStringFormat(_parserSettings.PlaceholderBeginChar, state)) return;
+            if (EscapeLikeStringFormat(ParserSettings.PlaceholderBeginChar, state)) return;
 
             // Context transition
             CreateNewPlaceholder(ref nestedDepth, state, out currentPlaceholder);
             currentContext = ParseContext.SelectorHeader;
         }
-        else if (inputChar == _parserSettings.PlaceholderEndChar)
+        else if (inputChar == ParserSettings.PlaceholderEndChar)
         {
             AddLiteralCharsParsedBefore(state);
-            if (EscapeLikeStringFormat(_parserSettings.PlaceholderEndChar, state)) return;
+            if (EscapeLikeStringFormat(ParserSettings.PlaceholderEndChar, state)) return;
             if (HasProcessedTooManyClosingBraces(parsingErrors, state)) return;
 
             // End of a nested placeholder's Format.
@@ -295,7 +299,7 @@ public class Parser
             }
             state.Index.LastEnd = state.Index.SafeAdd(state.Index.Current, 1);
         }
-        else if (inputChar == _parserSettings.FormatterNameSeparator)
+        else if (inputChar == ParserSettings.FormatterNameSeparator)
         {
             AddLastSelector(ref currentPlaceholder, state, parsingErrors);
 
@@ -311,7 +315,7 @@ public class Parser
             // We are now parsing the literal text *inside* the placeholder's format.
             currentContext = ParseContext.LiteralText;
         }
-        else if (inputChar == _parserSettings.PlaceholderEndChar)
+        else if (inputChar == ParserSettings.PlaceholderEndChar)
         {
             AddLastSelector(ref currentPlaceholder, state, parsingErrors);
 
@@ -326,11 +330,28 @@ public class Parser
         else
         {
             // Ensure the selector characters are valid:
-            if (!_validSelectorChars.Contains(inputChar))
-                parsingErrors.AddIssue(state.ResultFormat,
-                    $"'0x{Convert.ToUInt32(inputChar):X}': " +
-                    _parsingErrorText[ParsingError.InvalidCharactersInSelector],
-                    state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
+            if (_selectorChars.IsAllowList)
+            {
+                // Only allow specific characters
+                if (!_selectorChars.Contains(inputChar))
+                {
+                    parsingErrors.AddIssue(state.ResultFormat,
+                        $"'0x{Convert.ToUInt32(inputChar):X}': " +
+                        _parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                        state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
+                }
+            }
+            else
+            {
+                // Blocklist: Disallow specific characters
+                if (_selectorChars.Contains(inputChar))
+                {
+                    parsingErrors.AddIssue(state.ResultFormat,
+                        $"'0x{Convert.ToUInt32(inputChar):X}': " +
+                        _parsingErrorText[ParsingError.InvalidCharactersInSelector],
+                        state.Index.Current, state.Index.SafeAdd(state.Index.Current, 1));
+                }
+            }
         }
     }
 
@@ -468,8 +489,8 @@ public class Parser
             throw new ArgumentException($"Unrecognized escape sequence at the end of the literal");
 
         // **** Alternative brace escaping with { or } following the escape character ****
-        if (state.InputFormat[indexNextChar] == _parserSettings.PlaceholderBeginChar ||
-            state.InputFormat[indexNextChar] == _parserSettings.PlaceholderEndChar)
+        if (state.InputFormat[indexNextChar] == ParserSettings.PlaceholderBeginChar ||
+            state.InputFormat[indexNextChar] == ParserSettings.PlaceholderEndChar)
         {
             // Finish the last text item:
             if (state.Index.Current != state.Index.LastEnd)
@@ -512,7 +533,7 @@ public class Parser
     private bool ParseNamedFormatter(ParserState state)
     {
         var inputChar = state.InputFormat[state.Index.Current];
-        if (inputChar == _parserSettings.FormatterOptionsBeginChar)
+        if (inputChar == ParserSettings.FormatterOptionsBeginChar)
         {
             var emptyName = state.Index.NamedFormatterStart == state.Index.Current;
             if (emptyName)
@@ -524,16 +545,16 @@ public class Parser
             // Note: This short-circuits the Parser.ParseFormat main loop
             ParseFormatOptions(state);
         }
-        else if (inputChar == _parserSettings.FormatterOptionsEndChar || inputChar == _parserSettings.FormatterNameSeparator)
+        else if (inputChar == ParserSettings.FormatterOptionsEndChar || inputChar == ParserSettings.FormatterNameSeparator)
         {
-            if (inputChar == _parserSettings.FormatterOptionsEndChar)
+            if (inputChar == ParserSettings.FormatterOptionsEndChar)
             {
                 var hasOpeningParenthesis = state.Index.NamedFormatterOptionsStart != PositionUndefined;
 
                 // ensure no trailing chars past ')'
                 var nextCharIndex = state.Index.SafeAdd(state.Index.Current, 1);
                 var nextCharIsValid = nextCharIndex < state.InputFormat.Length &&
-                                      (state.InputFormat[nextCharIndex] == _parserSettings.FormatterNameSeparator || state.InputFormat[nextCharIndex] == _parserSettings.PlaceholderEndChar);
+                                      (state.InputFormat[nextCharIndex] == ParserSettings.FormatterNameSeparator || state.InputFormat[nextCharIndex] == ParserSettings.PlaceholderEndChar);
 
                 if (!hasOpeningParenthesis || !nextCharIsValid)
                 {
@@ -543,7 +564,7 @@ public class Parser
 
                 state.Index.NamedFormatterOptionsEnd = state.Index.Current;
 
-                if (state.InputFormat[nextCharIndex] == _parserSettings.FormatterNameSeparator) state.Index.Current++;
+                if (state.InputFormat[nextCharIndex] == ParserSettings.FormatterNameSeparator) state.Index.Current++;
             }
 
             var nameIsEmpty = state.Index.NamedFormatterStart == state.Index.Current;
@@ -604,8 +625,8 @@ public class Parser
         if (state.Index.Current != state.Index.LastEnd ||
             currentPlaceholder.Selectors.Count > 0 && currentPlaceholder.Selectors[currentPlaceholder.Selectors.Count - 1].Length > 0 &&
             state.Index.Current - state.Index.Operator == 1 &&
-            (state.InputFormat[state.Index.Operator] == _parserSettings.ListIndexEndChar ||
-             state.InputFormat[state.Index.Operator] == _parserSettings.NullableOperator))
+            (state.InputFormat[state.Index.Operator] == ParserSettings.ListIndexEndChar ||
+             state.InputFormat[state.Index.Operator] == ParserSettings.NullableOperator))
             currentPlaceholder.AddSelector(SelectorPool.Instance.Get().Initialize(Settings, currentPlaceholder, state.InputFormat, state.Index.LastEnd, state.Index.Current, state.Index.Operator, state.Index.Selector));
         else if (state.Index.Operator != state.Index.Current)
             parsingErrors.AddIssue(state.ResultFormat,

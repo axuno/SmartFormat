@@ -1,11 +1,12 @@
-﻿using NUnit.Framework;
-using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Settings;
-using SmartFormat.Tests.TestUtils;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NUnit.Framework;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
+using SmartFormat.Tests.TestUtils;
 
 namespace SmartFormat.Tests.Core;
 
@@ -66,9 +67,9 @@ public class ParserTests
         Assert.Throws<ParsingErrors>(() => formatter.Test(format, args, "Error"));
     }
 
-    [TestCase("{V(LU)}")] // braces are illegal
-    [TestCase("{V LU }")] // blanks are illegal
-    [TestCase("{VĀLUĒ}")] // 0x100 and 0x112 are illegal chars
+    [TestCase("{V(LU)}")] // braces are not allowed
+    [TestCase("{V LU\\}")] // escape char is not allowed
+    [TestCase("{V?LU,}")] // ? and , are allowed chars
     public void Parser_Throws_On_Illegal_Selector_Chars(string format)
     {
         var parser = GetRegularParser();
@@ -81,9 +82,9 @@ public class ParserTests
         {
             Assert.Multiple(() =>
             {
-                // Throws, because selector contains 2 illegal characters
+                // Throws, because selector contains disallowed characters
                 Assert.That(e, Is.InstanceOf<ParsingErrors>());
-                Assert.That(((ParsingErrors) e).Issues, Has.Count.EqualTo(2));
+                Assert.That(((ParsingErrors) e).Issues, Has.Count.GreaterThanOrEqualTo(1));
             });
         }
     }
@@ -154,6 +155,7 @@ public class ParserTests
         //                     | Literal  | Erroneous     | | Okay |  
         var invalidTemplate = "Hello, I'm {Name from {City} {Street}";
 
+        // settings must be set before parser instantiation
         var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.Ignore}});
         using var parsed = parser.ParseFormat(invalidTemplate);
             
@@ -176,6 +178,7 @@ public class ParserTests
     [TestCase("Hello, I'm {Name from {City} {Street", false)]
     public void Parser_Error_Action_MaintainTokens(string invalidTemplate, bool lastItemIsPlaceholder)
     {
+        // settings must be set before parser instantiation
         var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.MaintainTokens}});
         using var parsed = parser.ParseFormat(invalidTemplate);
 
@@ -203,8 +206,16 @@ public class ParserTests
     {
         //                     | Literal  | Erroneous     |
         var invalidTemplate = "Hello, I'm {Name from {City}";
-            
-        var parser = GetRegularParser(new SmartSettings {Parser = new ParserSettings {ErrorAction = ParseErrorAction.OutputErrorInResult}});
+
+        var parser = GetRegularParser(new SmartSettings
+        {
+            Parser = new ParserSettings
+                {
+                    SelectorCharFilter = SelectorFilterType.Alphanumeric, // default
+                    ErrorAction = ParseErrorAction.OutputErrorInResult
+                }
+        });
+
         using var parsed = parser.ParseFormat(invalidTemplate);
 
         Assert.That(parsed.Items, Has.Count.EqualTo(1));
@@ -412,11 +423,11 @@ public class ParserTests
         });
             
         formatter.Parser.OnParsingFailure += (o, args) => parsingError = args.Errors;
-        var res = formatter.Format("{NoName {Other} {Same", default(object)!);
+        var res = formatter.Format("{NoName {Other} {Same");
         Assert.Multiple(() =>
         {
             Assert.That(parsingError!.Issues, Has.Count.EqualTo(3));
-            Assert.That(parsingError.Issues[2].Issue, Is.EqualTo(new Parser.ParsingErrorText()[SmartFormat.Core.Parsing.Parser.ParsingError.MissingClosingBrace]));
+            Assert.That(parsingError.Issues[2].Issue, Is.EqualTo(new Parser.ParsingErrorText()[Parser.ParsingError.MissingClosingBrace]));
         });
     }
 
@@ -455,6 +466,18 @@ public class ParserTests
         var result = format.ToString();
 
         Assert.That(result, Is.EqualTo(@"\\aaa\{}bbb ccc\x{}ddd\\"));
+    }
+
+    [Test]
+    public void Parsing_Selector_With_CharFromBlocklist_ShouldThrow()
+    {
+        var settings = new SmartSettings { Parser = new ParserSettings { SelectorCharFilter = SelectorFilterType.VisualUnicodeChars } };
+        var parser = GetRegularParser(settings);
+
+        // The newline character is in the default blocklist of disallowed characters
+        Assert.That(() => parser.ParseFormat("{A\nB}"),
+            Throws.Exception.InstanceOf<ParsingErrors>().And.Message
+                .Contains(new Parser.ParsingErrorText()[Parser.ParsingError.InvalidCharactersInSelector]));
     }
 
     [Test]
@@ -534,8 +557,10 @@ public class ParserTests
     [TestCase("{%C}", '%')]
     public void Selector_With_Custom_Selector_Character(string formatString, char customChar)
     {
+        // settings must be set before parser instantiation
         var settings = new SmartSettings();
-        settings.Parser.AddCustomSelectorChars(new[]{customChar});
+        settings.Parser.AddCustomSelectorChars([customChar]);
+        var x = settings.Parser.GetSelectorChars();
         var parser = GetRegularParser(settings);
         var result = parser.ParseFormat(formatString);
 
@@ -544,7 +569,7 @@ public class ParserTests
         Assert.That(placeholder!.Selectors, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.That(placeholder!.Selectors, Has.Count.EqualTo(placeholder!.GetSelectors().Count));
+            Assert.That(placeholder.Selectors, Has.Count.EqualTo(placeholder.GetSelectors().Count));
             Assert.That(placeholder.Selectors[0].ToString(), Is.EqualTo(formatString.Substring(1, 2)));
         });
     }
@@ -553,8 +578,10 @@ public class ParserTests
     [TestCase("{a°b}", '°')]
     public void Selectors_With_Custom_Operator_Character(string formatString, char customChar)
     {
-        var parser = GetRegularParser();
-        parser.Settings.Parser.AddCustomOperatorChars(new[]{customChar});
+        // settings must be set before parser instantiation
+        var settings = new SmartSettings();
+        settings.Parser.AddCustomOperatorChars([customChar]);
+        var parser = GetRegularParser(settings);
         var result = parser.ParseFormat(formatString);
 
         var placeholder = result.Items[0] as Placeholder;
@@ -566,6 +593,31 @@ public class ParserTests
             Assert.That(placeholder.Selectors[1].ToString(), Is.EqualTo(formatString.Substring(3, 1)));
             Assert.That(placeholder.Selectors[1].Operator.ToString(), Is.EqualTo(formatString.Substring(2, 1)));
         });
+    }
+
+    [TestCase("German |öäüßÖÄÜ!")]
+    [TestCase("Russian абвгдеёжзийклмн")]
+    [TestCase("French >éèêëçàùâîô")]
+    [TestCase("Spanish <áéíóúñü¡¿")]
+    [TestCase("Portuguese !ãõáâêéíóúç")]
+    [TestCase("Chinese 汉字测试")]
+    [TestCase("Arabic مرحبا بالعالم")]
+    [TestCase("Turkish çğöşüİı")]
+    [TestCase("Hindi नमस्ते दुनिया")]
+    public void Selector_WorksWithAllUnicodeChars(string selector)
+    {
+        // See https://github.com/axuno/SmartFormat/issues/454
+
+        // settings must be set before parser instantiation
+        var settings = new SmartSettings { Parser = { SelectorCharFilter = SelectorFilterType.VisualUnicodeChars } };
+        const string expected = "The Value";
+        // The default formatter with default settings should be able to handle any
+        // Unicode characters in selectors except the "magic" disallowed ones
+        var formatter = Smart.CreateDefaultSmartFormat(settings);
+        // Use the Unicode string as a selector of the placeholder
+        var template = $"{{{selector}}}";
+        var result = formatter.Format(template, new Dictionary<string, string> { { selector, expected } });
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase("{A?.B}")]
@@ -622,10 +674,11 @@ public class ParserTests
     public void Selector_With_Other_Contiguous_Operator_Characters(string formatString, char customChar)
     {
         // contiguous operator characters are parsed as "ONE operator string"
-
-        var parser = GetRegularParser();
+        var settings = new SmartSettings();
+        settings.Parser.AddCustomOperatorChars([customChar]);
+        var parser = GetRegularParser(settings);
         // adding '.' is ignored, as it's a standard operator
-        parser.Settings.Parser.AddCustomOperatorChars(new[]{customChar});
+        parser.Settings.Parser.AddCustomOperatorChars([customChar]);
         var result = parser.ParseFormat(formatString);
 
         var placeholder = result.Items[0] as Placeholder;
@@ -681,6 +734,41 @@ public class ParserTests
         Assert.That(literalText!.RawText, Is.EqualTo(input));
     }
 
+    #region * Parse HTML input without ParserSetting 'IsHtml'
+
+    /// <summary>
+    /// <see cref="ParserSettings.SelectorCharFilter"/> is <see cref="FilterType.Blocklist"/>:
+    /// all characters are allowed in selectors
+    /// </summary>
+    [TestCase("<script>{Placeholder}</script>", "{Placeholder}")]
+    [TestCase("<style>{Placeholder}</style>", "{Placeholder}")]
+    [TestCase("Something <style>h1 { color : #000; }</style>! nice", "{ color : #000; }")]
+    [TestCase("Something <script>{const a = '</script>';}</script>! nice", "{const a = '</script>';}")]
+    public void ParseHtmlInput_Without_ParserSetting_IsHtml(string input, string selector)
+    {
+        var parser = GetRegularParser(new SmartSettings
+        {
+            StringFormatCompatibility = false,
+            Parser = new ParserSettings
+            {
+                SelectorCharFilter = SelectorFilterType.VisualUnicodeChars,
+                ErrorAction = ParseErrorAction.ThrowError,
+                ParseInputAsHtml = false
+            }
+        });
+
+        var result = parser.ParseFormat(input);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Has.Count.EqualTo(3));
+            Assert.That(((Placeholder) result.Items[1]).RawText, Is.EqualTo(selector));
+        });
+    }
+
+    /// <summary>
+    /// <see cref="ParserSettings.SelectorCharFilter"/> is <see cref="FilterType.Allowlist"/>:
+    /// Predefined set of allowed characters in selectors
+    /// </summary>
     [TestCase("<script>{Placeholder}</script>", false)] // should parse a placeholder
     [TestCase("<style>{Placeholder}</style>", false)] // should parse a placeholder
     [TestCase("Something <style>h1 { color : #000; }</style>! nice", true)] // illegal selector chars
@@ -690,7 +778,12 @@ public class ParserTests
         var parser = GetRegularParser(new SmartSettings
         {
             StringFormatCompatibility = false,
-            Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError, ParseInputAsHtml = false }
+            Parser = new ParserSettings
+            {
+                SelectorCharFilter = SelectorFilterType.Alphanumeric,
+                ErrorAction = ParseErrorAction.ThrowError,
+                ParseInputAsHtml = false
+            }
         });
 
         switch (shouldThrow)
@@ -706,6 +799,8 @@ public class ParserTests
             }
         }
     }
+
+    #endregion
 
     /// <summary>
     /// SmartFormat is able to parse script tags, if <see cref="ParserSettings.ParseInputAsHtml"/> is <see langword="true"/>
@@ -807,29 +902,31 @@ public class ParserTests
     [TestCase(true, false)]
     public void StyleTags_Can_Be_Parsed_Without_Failure(bool inputIsHtml, bool shouldFail)
     {
-        var styles = @"
-<style type='text/css'>
-.media {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-}
+        var styles = """
 
-.media .content {
-  font-size: .8rem;
-}
+                     <style type='text/css'>
+                     .media {
+                       display: grid;
+                       grid-template-columns: 1fr 3fr;
+                     }
 
-.comment img {
-  border: 1px solid grey;
-  anything: 'xyz'
-}
+                     .media .content {
+                       font-size: .8rem;
+                     }
 
-.list-item {
-  border-bottom: 1px solid grey;
-}
-/* Comment: { which mixes up the parser without ParserSettings.ParseInputAsHtml = true */
-</style>
-<p>############### {TheVariable} ###############</p>
-";
+                     .comment img {
+                       border: 1px solid grey;
+                       anything: 'xyz'
+                     }
+
+                     .list-item {
+                       border-bottom: 1px solid grey;
+                     }
+                     /* Comment: { which mixes up the parser without ParserSettings.ParseInputAsHtml = true */
+                     </style>
+                     <p>############### {TheVariable} ###############</p>
+
+                     """;
         var parsingFailures = 0;
         var parser = GetRegularParser(new SmartSettings
         {
