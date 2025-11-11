@@ -214,7 +214,7 @@ public class ParserSettings
     /// <summary>
     /// All 68 non-visual Unicode characters that are typically not used in selectors.
     /// </summary>
-    internal static char[] NonVisualUnicodeCharacters =
+    internal static readonly char[] NonVisualUnicodeCharacters =
     [
         // Control Characters (U+0000–U+001F, U+007F)
         '\u0000', // NULL – string terminator
