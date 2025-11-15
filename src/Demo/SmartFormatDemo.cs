@@ -40,15 +40,16 @@ public partial class SmartFormatDemo : Form
 
         _args.Person = TestFactory.GetPerson();
         _args.Date = DateTime.Now;
-        _args.DateTimeOffset = DateTimeOffset.Now - new TimeSpan(1, 0,0,0);
-        _args.Inventory = TestFactory.GetItems();
+        _args.DateTimeOffset = DateTimeOffset.Now - new TimeSpan(1, 0, 0, 0);
+
+        _args.Inventory = new ItemCollectionWrapper(CreateFrom(TestFactory.GetItems()));
         _args.Xml = XElement.Parse(XmlSourceTest.TwoLevelXml);
         propertyGrid1.SelectedObject = _args;
 
         Smart.Default = Smart.CreateDefaultSmartFormat(new SmartSettings
         {
-            Formatter = new FormatterSettings {ErrorAction = FormatErrorAction.OutputErrorInResult},
-            Parser = new ParserSettings {ErrorAction = ParseErrorAction.ThrowError}
+            Formatter = new FormatterSettings { ErrorAction = FormatErrorAction.OutputErrorInResult },
+            Parser = new ParserSettings { ErrorAction = ParseErrorAction.ThrowError }
         });
         Smart.Default.AddExtensions(new TimeFormatter());
         Smart.Default.AddExtensions(new XmlSource());
@@ -56,10 +57,51 @@ public partial class SmartFormatDemo : Form
 
         LoadExamples();
     }
+
+    private static List<InventoryItem> CreateFrom(List<object> objects)
+    {
+        var result = new List<InventoryItem>();
+        foreach (var obj in objects)
+        {
+            var type = obj.GetType();
+            var item = new InventoryItem();
+
+            // Map properties by name
+            var nameProp = type.GetProperty("Name");
+            if (nameProp != null)
+                item.Name = nameProp.GetValue(obj)?.ToString() ?? string.Empty;
+
+            var priceProp = type.GetProperty("Price");
+            if (priceProp != null)
+                item.Price = Convert.ToDecimal(priceProp.GetValue(obj) ?? 0);
+
+            var countProp = type.GetProperty("Count");
+            if (countProp != null)
+                item.Count = Convert.ToInt32(countProp.GetValue(obj) ?? 0);
+
+            var componentsProp = type.GetProperty("Components");
+            if (componentsProp != null)
+            {
+                //var componentsObj = componentsProp.GetValue(obj) as IEnumerable<object>;
+                if (componentsProp.GetValue(obj) is IEnumerable<object> componentsEnum)
+                    item.Components = CreateFrom(componentsEnum.ToList());
+                else
+                    item.Components = [];
+            }
+            else
+            {
+                item.Components = [];
+            }
+
+            result.Add(item);
+        }
+        return result;
+    }
+
     private void LoadExamples()
     {
         lstExamples.DisplayMember = "Key";
-        //this.lstExamples.ValueMember = "Value";
+        lstExamples.ValueMember = "Value";
         var examples = new Dictionary<string, string> {
             {"Basics of SmartFormat",
                 @"Basics of SmartFormat
@@ -79,7 +121,7 @@ Express Local Time offset to UTC with TimeFormatter: {DateTimeOffset.Offset:time
 For more information on Composite Formatting and standard formatting strings, please visit https://docs.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting
 "},
 
-            {"Named Placeholders", 
+            {"Named Placeholders",
                 @"Named Placeholders
 Placeholders can use the name of any property, method, or field:
 {Person.Name.ToUpper} is {Person.Age} years old and he has {Person.Friends.Count} friends.
@@ -90,7 +132,7 @@ Nested properties can use:
 - any mixture of the two: {Person.Address:{State.ToString:{ToUpper}} }
 "},
 
-            {"Pluralization, Grammatical Numbers, and Gender Conjugation", 
+            {"Pluralization, Grammatical Numbers, and Gender Conjugation",
                 @"Pluralization, Grammatical Numbers, and Gender Conjugation
 Many languages have specific and complex rules for pluralization and gender conjugation.  It is typically difficult to use templates and still use correct conjugation.  However, SmartFormat has a library of rules for hundreds of languages, and has an extremely simple syntax for choosing the correct word based on a value!
 
@@ -101,7 +143,7 @@ Example:
 There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remaining.
 "},
 
-            {"List Formatting", 
+            {"List Formatting",
                 @"<!-- Curly braces can be escaped with a backslash -->
 <Items count=""{Inventory.Count}"">
 {Inventory:
@@ -113,7 +155,7 @@ There {Person.Random:is|are} {Person.Random} {Person.Random:item|items} remainin
 |}
 </Items>
 "},
-            {"Xml Source", 
+            {"Xml Source",
                 @"It is possible to format Xml as input argument
 Example:
   There are {Xml.Person.Count} people: {Xml.Person: {FirstName}|,|, and}
@@ -140,7 +182,7 @@ Example:
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public object DateTimeOffset { get; set; } = new DateTimeOffset(DateTime.Now);
 
-        [TypeConverter(typeof(ArrayConverter))]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public object Inventory { get; set; } = new object();
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
@@ -159,7 +201,15 @@ Example:
         var l = txtInput.SelectionLength;
         try
         {
-            Smart.Default.FormatInto(_rtfOutput, format, _args);
+            var args = new {
+                Person = _args.Person,
+                Date = _args.Date,
+                DateTimeOffset = _args.DateTimeOffset,
+                Inventory = ((ItemCollectionWrapper) _args.Inventory).Items,
+                Xml = _args.Xml,
+            };
+
+            Smart.Default.FormatInto(_rtfOutput, format, args);
 
             txtInput.SelectAll();
             txtInput.SelectionBackColor = txtInput.BackColor;
@@ -173,7 +223,7 @@ Example:
             groupBox1.Text = string.Format("Format has {0} issue{1}: {2}",
                 ex.Issues.Count,
                 (ex.Issues.Count == 1) ? "" : "s",
-                ex.Issues.Select(i=>i.Issue).JoinStrings(" ", " ", " (and {0} more)", 1)
+                ex.Issues.Select(i => i.Issue).JoinStrings(" ", " ", " (and {0} more)", 1)
             );
             // Highlight errors:
             foreach (var issue in ex.Issues)
@@ -193,5 +243,10 @@ Example:
         if (lstExamples.SelectedItem == null) return;
         var example = (KeyValuePair<string, string>) lstExamples.SelectedItem;
         txtInput.Text = example.Value;
+    }
+
+    private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+    {
+        TxtInput_TextChanged(s, e);
     }
 }
