@@ -127,7 +127,7 @@ jobs:
           -p:PackageOutputPath=${{ github.workspace }}/artifacts
 
     - name: Store artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: SmartFormat-Packages_${{env.VERSION}}.${{github.run_number}}
         path: |
