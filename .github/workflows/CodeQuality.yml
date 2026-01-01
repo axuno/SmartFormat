@@ -75,7 +75,7 @@ jobs:
           dotnet test ./src/SmartFormat.sln --no-build --verbosity normal --configuration Release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|SmartFormat.ZString|NUnit3.TestAdapter|AltCover" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: Store coverage report as artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-report
           path: ./src/SmartFormat.Tests/coverage.*.xml  # store all coverage reports
