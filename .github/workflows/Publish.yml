@@ -22,7 +22,7 @@ jobs:
       TAG_NAME: ${{ steps.resolve.outputs.TAG_NAME }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0  # Fetch all history for all tags and branches
 
@@ -49,7 +49,7 @@ jobs:
           3.1.x
 
     - name: Checkout tag
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0  # Fetch all history for all tags and branches
         ref: ${{ steps.resolve.outputs.TAG_NAME }}
@@ -72,7 +72,7 @@ jobs:
 
     steps:
     - name: Checkout tag
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0  # Fetch all history for all tags and branches
         # Reuse the tag name from tests job
