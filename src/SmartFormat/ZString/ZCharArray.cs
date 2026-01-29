@@ -20,9 +20,8 @@ public struct ZCharArray : IDisposable
     private static readonly ArrayPool<char>
         Pool = ArrayPool<char>.Create(MaxBufferCapacity, 100);
 
-    private char[] _bufferArray;
+    private char[]? _bufferArray;
     private int _currentLength;
-    private bool _isDisposed;
 
     /// <summary>
     /// The default capacity of the array.
@@ -49,7 +48,6 @@ public struct ZCharArray : IDisposable
     {
         _bufferArray = Pool.Rent(length);
         _currentLength = 0;
-        _isDisposed = false;
     }
 
     /// <summary>
@@ -98,7 +96,7 @@ public struct ZCharArray : IDisposable
         get
         {
             ThrowIfDisposed();
-            return _bufferArray.Length;
+            return _bufferArray!.Length;
         }
     }
 
@@ -121,8 +119,8 @@ public struct ZCharArray : IDisposable
     private void Grow(int length)
     {
         var newArray = Pool.Rent(length);
-        Array.Copy(_bufferArray, newArray, Math.Min(_bufferArray.Length, length));
-        Pool.Return(_bufferArray);
+        Array.Copy(_bufferArray!, newArray, Math.Min(_bufferArray!.Length, length));
+        Pool.Return(_bufferArray, clearArray: true);
         _bufferArray = newArray;
     }
 
@@ -135,7 +133,7 @@ public struct ZCharArray : IDisposable
     {
         ThrowIfDisposed();
         GrowBufferIfNeeded(data.Length);
-        data.CopyTo(_bufferArray.AsSpan(_currentLength, data.Length));
+        data.CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
         _currentLength += data.Length;
     }
 
@@ -148,7 +146,7 @@ public struct ZCharArray : IDisposable
     {
         ThrowIfDisposed();
         GrowBufferIfNeeded(data.Length);
-        data.CopyTo(_bufferArray.AsSpan(_currentLength, data.Length));
+        data.CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
         _currentLength += data.Length;
     }
 
@@ -161,7 +159,7 @@ public struct ZCharArray : IDisposable
     {
         ThrowIfDisposed();
         GrowBufferIfNeeded(data.Length);
-        data.AsSpan().CopyTo(_bufferArray.AsSpan(_currentLength, data.Length));
+        data.AsSpan().CopyTo(_bufferArray!.AsSpan(_currentLength, data.Length));
         _currentLength += data.Length;
     }
 
@@ -174,7 +172,7 @@ public struct ZCharArray : IDisposable
     {
         ThrowIfDisposed();
         GrowBufferIfNeeded(1);
-        _bufferArray[_currentLength++] = c;
+        _bufferArray![_currentLength++] = c;
     }
 
     /// <summary>
@@ -190,7 +188,7 @@ public struct ZCharArray : IDisposable
 
         for (var i = 0; i < count; i++)
         {
-            _bufferArray[_currentLength++] = c;
+            _bufferArray![_currentLength++] = c;
         }
     }
 
@@ -248,7 +246,7 @@ public struct ZCharArray : IDisposable
     /// <summary>
     /// Returns <see langword="true"/> if the array has been disposed.
     /// </summary>
-    public bool IsDisposed => _isDisposed;
+    public bool IsDisposed => _bufferArray is null;
 
     private void ThrowIfDisposed()
     {
@@ -263,7 +261,7 @@ public struct ZCharArray : IDisposable
     public override string ToString()
     {
         ThrowIfDisposed();
-        return new string(_bufferArray, 0, _currentLength);
+        return new string(_bufferArray!, 0, _currentLength);
     }
 
     /// <summary>
@@ -271,7 +269,7 @@ public struct ZCharArray : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (_isDisposed) return;
+        if (IsDisposed) return;
 
         Pool.Return(_bufferArray!, clearArray: true);
         _bufferArray = null;
