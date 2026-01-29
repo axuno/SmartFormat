@@ -26,14 +26,14 @@ jobs:
         with:
           fetch-depth: 0   # Shallow clones should be disabled for a better relevancy of analysis
       - name: Cache SonarCloud packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
@@ -75,7 +75,7 @@ jobs:
           dotnet test ./src/SmartFormat.sln --no-build --verbosity normal --configuration Release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../SmartFormat.snk" /p:AltCoverAssemblyExcludeFilter="SmartFormat.Tests|SmartFormat.ZString|NUnit3.TestAdapter|AltCover" /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" /p:AltCoverLineCover="true"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: Store coverage report as artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-report
           path: ./src/SmartFormat.Tests/coverage.*.xml  # store all coverage reports
