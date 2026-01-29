@@ -273,7 +273,7 @@ public struct ZCharArray : IDisposable
     {
         if (_isDisposed) return;
 
-        Pool.Return(_bufferArray, clearArray: true);
-        _isDisposed = true;
+        Pool.Return(_bufferArray!, clearArray: true);
+        _bufferArray = null;
     }
 }
