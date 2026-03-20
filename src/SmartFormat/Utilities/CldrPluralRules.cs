@@ -4,8 +4,8 @@
 //     Runtime Version: 4.0.30319.42000
 //
 //     Unicode Version: 16.0.0
-//     CLDR Version: 47
-//     Generation date: 2025-10-10 23:01:05 UTC
+//     CLDR Version: 48
+//     Generation date: 2026-03-20 14:52:15 UTC
 //
 //     Changes to this file may cause incorrect behavior 
 //     and will be lost if the code is regenerated.
@@ -66,36 +66,29 @@ internal static class CldrPluralRules
     // For languages with a single form (e.g., Japanese, Chinese, Vietnamese), the category is 'other'.
     private static PluralCategory Singular(decimal value) => PluralCategory.Other;
 
-
     // Rule for: af, an, asa, az, bal, ...
     private static PluralCategory Rule1(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (n  ==  1) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ak, bho, csw, guw, ln, ...
     private static PluralCategory Rule2(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (IsInRange(n, 0m, 1m)) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: am, as, bn, doi, fa, ...
     private static PluralCategory Rule3(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((i  ==  0 || n  ==  1)) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ar, ars
     private static PluralCategory Rule4(decimal value)
@@ -106,20 +99,16 @@ internal static class CldrPluralRules
         if (n  ==  2) return PluralCategory.Two;
         if (IsInRange(n % 100, 3m, 10m)) return PluralCategory.Few;
         if (IsInRange(n % 100, 11m, 99m)) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ast, de, en, et, fi, ...
     private static PluralCategory Rule5(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((i  ==  1 && v  ==  0)) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: be
     private static PluralCategory Rule6(decimal value)
@@ -128,21 +117,17 @@ internal static class CldrPluralRules
         if ((n % 10  ==  1 && n % 100 != 11)) return PluralCategory.One;
         if ((IsInRange(n % 10, 2m, 4m) && !IsInRange(n % 100, 12m, 14m))) return PluralCategory.Few;
         if ((n % 10  ==  0 || IsInRange(n % 10, 5m, 9m) || IsInRange(n % 100, 11m, 14m))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
 
-
-    // Rule for: blo, ksh
+    // Rule for: blo, cv, ksh
     private static PluralCategory Rule7(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (n  ==  0) return PluralCategory.Zero;
         if (n  ==  1) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: br
     private static PluralCategory Rule8(decimal value)
@@ -152,10 +137,8 @@ internal static class CldrPluralRules
         if ((n % 10  ==  2 && !(n % 100 == 12m || n % 100 == 72m || n % 100 == 92m))) return PluralCategory.Two;
         if (((IsInRange(n % 10, 3m, 4m) || n % 10 == 9m) && !(IsInRange(n % 100, 10m, 19m) || IsInRange(n % 100, 70m, 79m) || IsInRange(n % 100, 90m, 99m)))) return PluralCategory.Few;
         if ((n != 0 && n % 1000000  ==  0)) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: bs, hr, sh, sr
     private static PluralCategory Rule9(decimal value)
@@ -163,10 +146,8 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (((v  ==  0 && i % 10  ==  1 && i % 100 != 11) || (f % 10  ==  1 && f % 100 != 11))) return PluralCategory.One;
         if (((v  ==  0 && IsInRange(i % 10, 2, 4) && !IsInRange(i % 100, 12, 14)) || (IsInRange(f % 10, 2, 4) && !IsInRange(f % 100, 12, 14)))) return PluralCategory.Few;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ca, it, lld, pt-PT, scn, ...
     private static PluralCategory Rule10(decimal value)
@@ -174,20 +155,16 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((i  ==  1 && v  ==  0)) return PluralCategory.One;
         if (((e  ==  0 && i != 0 && i % 1000000  ==  0 && v  ==  0) || !IsInRange(e, 0, 5))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ceb, fil, tl
     private static PluralCategory Rule11(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (((v  ==  0 && (i == 1 || i == 2 || i == 3)) || (v  ==  0 && !(i % 10 == 4 || i % 10 == 6 || i % 10 == 9)) || (v != 0 && !(f % 10 == 4 || f % 10 == 6 || f % 10 == 9)))) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: cs, sk
     private static PluralCategory Rule12(decimal value)
@@ -196,10 +173,8 @@ internal static class CldrPluralRules
         if ((i  ==  1 && v  ==  0)) return PluralCategory.One;
         if ((IsInRange(i, 2, 4) && v  ==  0)) return PluralCategory.Few;
         if (v != 0) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: cy
     private static PluralCategory Rule13(decimal value)
@@ -210,20 +185,16 @@ internal static class CldrPluralRules
         if (n  ==  2) return PluralCategory.Two;
         if (n  ==  3) return PluralCategory.Few;
         if (n  ==  6) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: da
     private static PluralCategory Rule14(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((n  ==  1 || (t != 0 && (i == 0 || i == 1)))) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: dsb, hsb
     private static PluralCategory Rule15(decimal value)
@@ -232,10 +203,8 @@ internal static class CldrPluralRules
         if (((v  ==  0 && i % 100  ==  1) || f % 100  ==  1)) return PluralCategory.One;
         if (((v  ==  0 && i % 100  ==  2) || f % 100  ==  2)) return PluralCategory.Two;
         if (((v  ==  0 && IsInRange(i % 100, 3, 4)) || IsInRange(f % 100, 3, 4))) return PluralCategory.Few;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: es
     private static PluralCategory Rule16(decimal value)
@@ -243,20 +212,16 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (n  ==  1) return PluralCategory.One;
         if (((e  ==  0 && i != 0 && i % 1000000  ==  0 && v  ==  0) || !IsInRange(e, 0, 5))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ff, hy, kab
     private static PluralCategory Rule17(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((i == 0 || i == 1)) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: fr
     private static PluralCategory Rule18(decimal value)
@@ -264,10 +229,8 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((i == 0 || i == 1)) return PluralCategory.One;
         if (((e  ==  0 && i != 0 && i % 1000000  ==  0 && v  ==  0) || !IsInRange(e, 0, 5))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ga
     private static PluralCategory Rule19(decimal value)
@@ -277,10 +240,8 @@ internal static class CldrPluralRules
         if (n  ==  2) return PluralCategory.Two;
         if (IsInRange(n, 3m, 6m)) return PluralCategory.Few;
         if (IsInRange(n, 7m, 10m)) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: gd
     private static PluralCategory Rule20(decimal value)
@@ -289,10 +250,8 @@ internal static class CldrPluralRules
         if ((n == 1m || n == 11m)) return PluralCategory.One;
         if ((n == 2m || n == 12m)) return PluralCategory.Two;
         if ((IsInRange(n, 3m, 10m) || IsInRange(n, 13m, 19m))) return PluralCategory.Few;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: gv
     private static PluralCategory Rule21(decimal value)
@@ -302,10 +261,8 @@ internal static class CldrPluralRules
         if ((v  ==  0 && i % 10  ==  2)) return PluralCategory.Two;
         if ((v  ==  0 && (i % 100 == 0 || i % 100 == 20 || i % 100 == 40 || i % 100 == 60 || i % 100 == 80))) return PluralCategory.Few;
         if (v != 0) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: he
     private static PluralCategory Rule22(decimal value)
@@ -313,20 +270,16 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (((i  ==  1 && v  ==  0) || (i  ==  0 && v != 0))) return PluralCategory.One;
         if ((i  ==  2 && v  ==  0)) return PluralCategory.Two;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: is
     private static PluralCategory Rule23(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (((t  ==  0 && i % 10  ==  1 && i % 100 != 11) || (t % 10  ==  1 && t % 100 != 11))) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: iu, naq, sat, se, sma, ...
     private static PluralCategory Rule24(decimal value)
@@ -334,10 +287,8 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (n  ==  1) return PluralCategory.One;
         if (n  ==  2) return PluralCategory.Two;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: kw
     private static PluralCategory Rule25(decimal value)
@@ -348,10 +299,8 @@ internal static class CldrPluralRules
         if (((n % 100 == 2m || n % 100 == 22m || n % 100 == 42m || n % 100 == 62m || n % 100 == 82m) || (n % 1000  ==  0 && (IsInRange(n % 100000, 1000m, 20000m) || n % 100000 == 40000m || n % 100000 == 60000m || n % 100000 == 80000m)) || (n != 0 && n % 1000000  ==  100000))) return PluralCategory.Two;
         if ((n % 100 == 3m || n % 100 == 23m || n % 100 == 43m || n % 100 == 63m || n % 100 == 83m)) return PluralCategory.Few;
         if ((n != 1 && (n % 100 == 1m || n % 100 == 21m || n % 100 == 41m || n % 100 == 61m || n % 100 == 81m))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: lag
     private static PluralCategory Rule26(decimal value)
@@ -359,10 +308,8 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (n  ==  0) return PluralCategory.Zero;
         if (((i == 0 || i == 1) && n != 0)) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: lt
     private static PluralCategory Rule27(decimal value)
@@ -371,10 +318,8 @@ internal static class CldrPluralRules
         if ((n % 10  ==  1 && !IsInRange(n % 100, 11m, 19m))) return PluralCategory.One;
         if ((IsInRange(n % 10, 2m, 9m) && !IsInRange(n % 100, 11m, 19m))) return PluralCategory.Few;
         if (f != 0) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: lv, prg
     private static PluralCategory Rule28(decimal value)
@@ -382,20 +327,16 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((n % 10  ==  0 || IsInRange(n % 100, 11m, 19m) || (v  ==  2 && IsInRange(f % 100, 11, 19)))) return PluralCategory.Zero;
         if (((n % 10  ==  1 && n % 100 != 11) || (v  ==  2 && f % 10  ==  1 && f % 100 != 11) || (v != 2 && f % 10  ==  1))) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: mk
     private static PluralCategory Rule29(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (((v  ==  0 && i % 10  ==  1 && i % 100 != 11) || (f % 10  ==  1 && f % 100 != 11))) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: mo, ro
     private static PluralCategory Rule30(decimal value)
@@ -403,10 +344,8 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((i  ==  1 && v  ==  0)) return PluralCategory.One;
         if ((v != 0 || n  ==  0 || (n != 1 && IsInRange(n % 100, 1m, 19m)))) return PluralCategory.Few;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: mt
     private static PluralCategory Rule31(decimal value)
@@ -416,10 +355,8 @@ internal static class CldrPluralRules
         if (n  ==  2) return PluralCategory.Two;
         if ((n  ==  0 || IsInRange(n % 100, 3m, 10m))) return PluralCategory.Few;
         if (IsInRange(n % 100, 11m, 19m)) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: pl
     private static PluralCategory Rule32(decimal value)
@@ -428,10 +365,8 @@ internal static class CldrPluralRules
         if ((i  ==  1 && v  ==  0)) return PluralCategory.One;
         if ((v  ==  0 && IsInRange(i % 10, 2, 4) && !IsInRange(i % 100, 12, 14))) return PluralCategory.Few;
         if (((v  ==  0 && i != 1 && IsInRange(i % 10, 0, 1)) || (v  ==  0 && IsInRange(i % 10, 5, 9)) || (v  ==  0 && IsInRange(i % 100, 12, 14)))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: pt
     private static PluralCategory Rule33(decimal value)
@@ -439,10 +374,8 @@ internal static class CldrPluralRules
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (IsInRange(i, 0, 1)) return PluralCategory.One;
         if (((e  ==  0 && i != 0 && i % 1000000  ==  0 && v  ==  0) || !IsInRange(e, 0, 5))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
-
 
     // Rule for: ru, uk
     private static PluralCategory Rule34(decimal value)
@@ -451,53 +384,54 @@ internal static class CldrPluralRules
         if ((v  ==  0 && i % 10  ==  1 && i % 100 != 11)) return PluralCategory.One;
         if ((v  ==  0 && IsInRange(i % 10, 2, 4) && !IsInRange(i % 100, 12, 14))) return PluralCategory.Few;
         if (((v  ==  0 && i % 10  ==  0) || (v  ==  0 && IsInRange(i % 10, 5, 9)) || (v  ==  0 && IsInRange(i % 100, 11, 14)))) return PluralCategory.Many;
-
         return PluralCategory.Other;
     }
 
+    // Rule for: sgs
+    private static PluralCategory Rule35(decimal value)
+    {
+        var (n, i, v, w, f, t, e) = GetOperands(value);
+        if ((n % 10  ==  1 && n % 100 != 11)) return PluralCategory.One;
+        if (n  ==  2) return PluralCategory.Two;
+        if ((n != 2 && IsInRange(n % 10, 2m, 9m) && !IsInRange(n % 100, 11m, 19m))) return PluralCategory.Few;
+        if (f != 0) return PluralCategory.Many;
+        return PluralCategory.Other;
+    }
 
     // Rule for: shi
-    private static PluralCategory Rule35(decimal value)
+    private static PluralCategory Rule36(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((i  ==  0 || n  ==  1)) return PluralCategory.One;
         if (IsInRange(n, 2m, 10m)) return PluralCategory.Few;
-
         return PluralCategory.Other;
     }
 
-
     // Rule for: si
-    private static PluralCategory Rule36(decimal value)
+    private static PluralCategory Rule37(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if (((n == 0m || n == 1m) || (i  ==  0 && f  ==  1))) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
 
-
     // Rule for: sl
-    private static PluralCategory Rule37(decimal value)
+    private static PluralCategory Rule38(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((v  ==  0 && i % 100  ==  1)) return PluralCategory.One;
         if ((v  ==  0 && i % 100  ==  2)) return PluralCategory.Two;
         if (((v  ==  0 && IsInRange(i % 100, 3, 4)) || v != 0)) return PluralCategory.Few;
-
         return PluralCategory.Other;
     }
 
-
     // Rule for: tzm
-    private static PluralCategory Rule38(decimal value)
+    private static PluralCategory Rule39(decimal value)
     {
         var (n, i, v, w, f, t, e) = GetOperands(value);
         if ((IsInRange(n, 0m, 1m) || IsInRange(n, 11m, 99m))) return PluralCategory.One;
-
         return PluralCategory.Other;
     }
-
 
     #endregion
 
@@ -534,6 +468,7 @@ internal static class CldrPluralRules
         { "ckb", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule1) },
         { "cs", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Few, PluralCategory.Many, PluralCategory.Other }, Rule12) },
         { "csw", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule2) },
+        { "cv", new CldrPluralRule(new[] { PluralCategory.Zero, PluralCategory.One, PluralCategory.Other }, Rule7) },
         { "cy", new CldrPluralRule(new[] { PluralCategory.Zero, PluralCategory.One, PluralCategory.Two, PluralCategory.Few, PluralCategory.Many, PluralCategory.Other }, Rule13) },
         { "da", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule14) },
         { "de", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule5) },
@@ -574,6 +509,7 @@ internal static class CldrPluralRules
         { "hy", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule17) },
         { "ia", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule5) },
         { "id", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
+        { "ie", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule5) },
         { "ig", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
         { "ii", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
         { "io", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule5) },
@@ -598,6 +534,8 @@ internal static class CldrPluralRules
         { "km", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
         { "kn", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule3) },
         { "ko", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
+        { "kok", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule3) },
+        { "kok-Latn", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule3) },
         { "ks", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule1) },
         { "ksb", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule1) },
         { "ksh", new CldrPluralRule(new[] { PluralCategory.Zero, PluralCategory.One, PluralCategory.Other }, Rule7) },
@@ -667,11 +605,12 @@ internal static class CldrPluralRules
         { "seh", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule1) },
         { "ses", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
         { "sg", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
+        { "sgs", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Two, PluralCategory.Few, PluralCategory.Many, PluralCategory.Other }, Rule35) },
         { "sh", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Few, PluralCategory.Other }, Rule9) },
-        { "shi", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Few, PluralCategory.Other }, Rule35) },
-        { "si", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule36) },
+        { "shi", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Few, PluralCategory.Other }, Rule36) },
+        { "si", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule37) },
         { "sk", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Few, PluralCategory.Many, PluralCategory.Other }, Rule12) },
-        { "sl", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Two, PluralCategory.Few, PluralCategory.Other }, Rule37) },
+        { "sl", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Two, PluralCategory.Few, PluralCategory.Other }, Rule38) },
         { "sma", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Two, PluralCategory.Other }, Rule24) },
         { "smi", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Two, PluralCategory.Other }, Rule24) },
         { "smj", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Two, PluralCategory.Other }, Rule24) },
@@ -701,7 +640,7 @@ internal static class CldrPluralRules
         { "tpi", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
         { "tr", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule1) },
         { "ts", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule1) },
-        { "tzm", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule38) },
+        { "tzm", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule39) },
         { "ug", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule1) },
         { "uk", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Few, PluralCategory.Many, PluralCategory.Other }, Rule34) },
         { "und", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
@@ -722,7 +661,6 @@ internal static class CldrPluralRules
         { "yue", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
         { "zh", new CldrPluralRule(new[] { PluralCategory.Other }, Singular) },
         { "zu", new CldrPluralRule(new[] { PluralCategory.One, PluralCategory.Other }, Rule3) },
-
     };
 
     public static Dictionary<string, CldrPluralRule> IsoCodeToRule { get; private set; } = new(DefaultLangToRule);
