@@ -224,6 +224,26 @@ public class PluralLocalizationFormatterTests
             });
     }
 
+    [TestCase("uz")]
+    [TestCase("uz-Latn-UZ")]
+    [TestCase("uz-Cyrl-UZ")]
+    [TestCase("ky")]
+    [TestCase("ky-KG")]
+    public void Test_Uzbek_And_Kyrgyz(string cultureName)
+    {
+        var expectedResults = new ExpectedResults {
+            {   0, "other"},
+            {0.5m, "other"},
+            {   1, "one"},
+            {1.5m, "other"},
+            {   2, "other"},
+            {  11, "other"},
+        };
+
+        TestAllResults(new CultureInfo(cultureName), "{0:plural:one|other}", expectedResults);
+        TestAllResults(new CultureInfo("en"), $"{{0:plural({cultureName}):one|other}}", expectedResults);
+    }
+
     [Test]
     public void Test_Russian()
     {

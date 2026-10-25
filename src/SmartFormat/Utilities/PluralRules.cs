@@ -82,6 +82,7 @@ public static class PluralRules
             { "kk", DualOneOther }, // Kazakh
             { "kl", DualOneOther }, // Kalaallisut
             { "ku", DualOneOther }, // Kurdish
+            { "ky", DualOneOther }, // Kyrgyz
             { "lb", DualOneOther }, // Luxembourgish
             { "lg", DualOneOther }, // Ganda
             { "lo", DualOneOther }, // Lao
@@ -115,6 +116,7 @@ public static class PluralRules
             { "tk", DualOneOther }, // Turkmen
             { "tr", DualOneOther }, // Turkish
             { "ur", DualOneOther }, // Urdu
+            { "uz", DualOneOther }, // Uzbek
             { "wae", DualOneOther }, // Walser
             { "xog", DualOneOther }, // Soga
             { "zu", DualOneOther }, // Zulu
