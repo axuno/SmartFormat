@@ -244,6 +244,26 @@ public class PluralLocalizationFormatterTests
         TestAllResults(new CultureInfo("en"), $"{{0:plural({cultureName}):one|other}}", expectedResults);
     }
 
+    [TestCase("mk")]
+    [TestCase("mk-MK")]
+    public void Test_Macedonian(string cultureName)
+    {
+        var expectedResults = new ExpectedResults {
+            {   0, "other"},
+            {   1, "one"},
+            {1.5m, "other"},
+            {   2, "other"},
+            {  11, "other"},
+            {  21, "one"},
+            { 101, "one"},
+            { 111, "other"},
+            { 211, "other"},
+        };
+
+        TestAllResults(new CultureInfo(cultureName), "{0:plural:one|other}", expectedResults);
+        TestAllResults(new CultureInfo("en"), $"{{0:plural({cultureName}):one|other}}", expectedResults);
+    }
+
     [Test]
     public void Test_Russian()
     {

@@ -174,7 +174,7 @@ public static class PluralRules
             // Latvian
             { "lv", Latvian },
             // Macedonian
-            { "mb", Macedonian },
+            { "mk", Macedonian },
             // Moldavian
             { "mo", Moldavian },
             // Maltese
@@ -320,7 +320,7 @@ public static class PluralRules
         value % 10 == 1 && value % 100 != 11 ? 1 :
         2;
     private static PluralRuleDelegate Macedonian => (value, pluralWordsCount) =>
-        value % 10 == 1 && value != 11
+        value % 10 == 1 && value % 100 != 11
             ? 0
             : // one
             1;
